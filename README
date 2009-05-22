@@ -72,7 +72,7 @@ See the *Finders* section for more details.
 
 	$post = Post::find(1);
 	echo $post->title; # 'My first blog post!!'
-    echo $post->author_id; # 5
+	echo $post->author_id; # 5
 
 	# also the same since it is the first record in the db
 	$post = Post::first();
