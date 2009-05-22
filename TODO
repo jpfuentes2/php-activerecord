@@ -1,0 +1,15 @@
+== General
+
+- named scopes
+- add has_to_and_belongs_to_many
+- oracle adapter
+- mssql adapter
+- pgsql adapter
+- using create_xxx, build_xxx on a has_many :thru needs to create both records
+- support create! and save! functionality
+
+== Testing
+
+- make tests run faster by not re-creating whole db for every individual test
+- tests/fixes for funky table/field names
+- more tests for to_xml
