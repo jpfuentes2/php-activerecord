@@ -6,6 +6,8 @@ by Kien La and Jacques Fuentes
 <phpactiverecord@gmail.com>
 <http://www.phpactiverecord.org/>
 
+Information can be found on our blog here: <http://www.derivante.com/>
+
 ## Introduction ##
 A brief summarization of what ActiveRecord is:
 
