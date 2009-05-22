@@ -1,0 +1,3 @@
+.project
+*.log
+test/*.db
