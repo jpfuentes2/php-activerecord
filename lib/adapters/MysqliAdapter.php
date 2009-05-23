@@ -81,7 +81,10 @@ class MysqliAdapter extends AbstractMysqlAdapter
 
 			foreach ($values as &$value)
 			{
-				$params[1] .= 's';
+				if (is_int($value))			$params[1] .= 'i';
+				elseif (is_float($value))	$params[1] .= 'd';
+				else						$params[1] .= 's';
+
 				$params[] = &$value;
 			}
 
