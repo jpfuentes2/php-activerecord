@@ -80,13 +80,6 @@ class Sqlite3Adapter extends Connection
 
 		$sql = trim($sql->to_s());
 		$values = $values ? array_flatten($values) : array();
-		$select = true;
-
-		// don't return a resultset if we're inserting/updating
-		$left7 = strtolower(substr($sql,0,7));
-
-		if ($left7 === 'insert ' || $left7 === 'update ' || $left7 === 'delete ')
-			$select = false;
 
 		if (!($sth = @$this->connection->prepare($sql)))
 			throw new DatabaseException($this->connection->lastErrorMsg(),$this->connection->lastErrorCode());
@@ -102,8 +95,7 @@ class Sqlite3Adapter extends Connection
 			$sth->bindParam($i+1,$values[$i],$type);
 		}
 
-		$res = $sth->execute();
-		return $select ? $res : true;
+		return $sth->execute();
 	}
 
 	public function quote_name($string)

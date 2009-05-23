@@ -63,14 +63,6 @@ class MysqliAdapter extends AbstractMysqlAdapter
 
 		$sql = trim($sql->to_s());
 		$values = $values ? array_flatten($values) : array();
-		$select = true;
-
-		// don't return a resultset if we're inserting/updating
-		$left7 = strtolower(substr($sql,0,7));
-
-		// TODO find better way to do this
-		if ($left7 === 'insert ' || $left7 === 'update ' || $left7 === 'delete ')
-			$select = false;
 
 		if (!($sth = mysqli_prepare($this->connection,$sql)))
 			throw new DatabaseException(mysqli_error($this->connection),mysqli_errno($this->connection));
@@ -92,8 +84,10 @@ class MysqliAdapter extends AbstractMysqlAdapter
 				call_user_func_array('mysqli_stmt_bind_param',$params);
 		}
 
-		mysqli_stmt_execute($sth);
-		return $select ? new MysqliResultSet($sth) : true;
+		if (is_int(($ret = mysqli_stmt_execute($sth))))
+			return $ret;
+
+		return new MysqliResultSet($sth);
 	}
 };
 
