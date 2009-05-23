@@ -16,11 +16,13 @@ class CallBackTest extends DatabaseTest
 	public function setUp($connection_name=null)
 	{
 		parent::setUp($connection_name);
+
 		self::$instance = $this;
 
 		$this->fired = array();
 		$this->test_closure = null;
 
+/*
 		//reset all call_backs on our model
 		$this->klass = ActiveRecord\Reflections::instance()->add('VenueCB')->get('VenueCB');
 		$call_backs = array_intersect_key(array_flip(ActiveRecord\CallBack::get_allowed_call_backs()), $this->klass->getStaticProperties());
@@ -38,6 +40,7 @@ class CallBackTest extends DatabaseTest
 		$default_call_back = str_replace('test_', '', $this->getName());
 		if (array_key_exists($default_call_back, $this->klass->getStaticProperties()))
 			$this->set_cb($default_call_back, $this->getName());
+*/
 	}
 
 	public function set_test_closure($closure)
@@ -56,7 +59,7 @@ class CallBackTest extends DatabaseTest
 			$call_backs = array($call_backs);
 
 		$fired = $unique === true ? array_unique($this->fired) : $this->fired;
-
+print_r($this->fired);
 		foreach ($call_backs as $cb)
 			$this->assertTrue(in_array($cb, $fired));
 	}
@@ -87,14 +90,21 @@ class CallBackTest extends DatabaseTest
 			call_user_func($this->test_closure, $record);
 	}
 
+
+
+
 	public function test_all_generic_call_back_methods()
 	{
 		$this->test_closure = null;
 		$call_backs = ActiveRecord\CallBack::get_allowed_call_backs();
-		$caller = new ActiveRecord\CallBack(new VenueGenericCallBacks());
+		$model = new VenueGenericCallBacks();
+		$caller = new ActiveRecord\CallBack('VenueGenericCallBacks');
 
 		foreach ($call_backs as $cb)
-			$caller->send($cb);
+		{
+			echo "$cb\n";
+			$caller->send($model,$cb);
+		}
 
 		//array_unique b/c save is called multiple times as a wrapper for update/create
 		$this->assertEquals(count($call_backs), count(array_unique($this->fired)));
@@ -109,15 +119,19 @@ class CallBackTest extends DatabaseTest
 	public function test_after_construct()
 	{
 		$venue = VenueCB::find(1);
+		echo "===\n";
+		print_r($this->fired);
+		echo "===!\n";
 		$this->assert_fired('test_after_construct');
-
+/*
 		foreach (array(1,2) as $key)
 		{
 			VenueCB::find($key);
 			$this->assert_fired('test_after_construct', true);
 		}
+		*/
 	}
-
+/*
 	public function test_validation_call_backs_not_fired_due_to_bypassing_validations()
 	{
 		foreach (array('save', 'insert', 'update') as $method)
@@ -234,4 +248,5 @@ class CallBackTest extends DatabaseTest
 			$this->assert_fired(array('test_before_destroy', 'test_after_destroy'));
 		}
 	}
+*/
 };

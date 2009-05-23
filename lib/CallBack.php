@@ -48,13 +48,6 @@ class CallBack
 	private $klass;
 
 	/**
-	 * Reference to the given model
-	 * @access private
-	 * @var object
-	 */
-	private $model;
-
-	/**
 	 * @access private
 	 * @var array
 	 */
@@ -64,10 +57,9 @@ class CallBack
 	 * @param object ActiveRecord\Model
 	 * @return void
 	 */
-	public function __construct(Model $model)
+	public function __construct($model_class_name)
 	{
-		$this->model = $model;
-		$this->klass = Reflections::instance()->get($this->model);
+		$this->klass = Reflections::instance()->get($model_class_name);
 		$this->registry = array_fill_keys(self::$DEFAULT_CALLBACKS, array());
 		$this->register_all();
 	}
@@ -108,7 +100,7 @@ class CallBack
 	 * @param str
 	 * @return mixed
 	 */
-	public function send($name)
+	public function send($model, $name)
 	{
 		if (array_key_exists($name, $this->registry))
 		{
@@ -123,9 +115,9 @@ class CallBack
 			foreach ($registry as $method)
 			{
 				if ($method instanceof Closure)
-					$ret = $method($this->model);
+					$ret = $method($model);
 				else
-					$ret = $this->model->$method();
+					$ret = $model->$method();
 
 				if (false === $ret && substr($name, 0, 6) === 'before')
 					return false;

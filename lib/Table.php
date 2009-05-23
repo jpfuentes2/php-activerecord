@@ -33,6 +33,13 @@ class Table
 	public $db_name;
 
 	/**
+	 * A instance of CallBack for this model/table
+	 * @static
+	 * @var object ActiveRecord\CallBack
+	 */
+	public $callback;
+
+	/**
 	 * List of relationships for this table.
 	 */
 	private $relationships = array();
@@ -62,6 +69,10 @@ class Table
 		$this->get_meta_data();
 		$this->set_primary_key();
 		$this->set_associations();
+
+		$this->callback = new CallBack($class_name);
+		$this->callback->register('before_save', function(Model $model) { $model->set_timestamps(); }, array('prepend' => true));
+		$this->callback->register('after_save', function(Model $model) { $model->reset_dirty(); }, array('prepend' => true));
 	}
 
 	public function construct_inner_join_sql($self, $other_class_name)

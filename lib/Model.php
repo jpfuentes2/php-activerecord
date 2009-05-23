@@ -53,13 +53,6 @@ class Model
 	private $__new_record;
 
 	/**
-	 * A instance of CallBack for this model
-	 * @static
-	 * @var object ActiveRecord\CallBack
-	 */
-	private static $__call_back;
-
-	/**
 	 * Container of aliases which allows you to access an attribute via a
 	 * different name.
 	 * @static
@@ -104,10 +97,7 @@ class Model
 		Reflections::instance()->add($this);
 		$this->set_attributes_via_mass_assignment($attributes, $guard_attributes);
 
-		self::$__call_back = new CallBack($this);
-		$this->register_call_back('before_save', function(Model $model) { $model->set_timestamps(); }, array('prepend' => true));
-		$this->register_call_back('after_save', function(Model $model) { $model->reset_dirty(); }, array('prepend' => true));
-		$this->invoke_call_back('after_construct');
+		$this->invoke_callback('after_construct');
 	}
 
 	/**
@@ -362,12 +352,12 @@ class Model
 		if ($validate && !$this->_validate())
 			return false;
 
-		$this->invoke_call_back('before_create');
+		$this->invoke_callback('before_create');
 		if (($dirty = $this->dirty_attributes()))
 			static::table()->insert($dirty);
 		else
 			static::table()->insert($this->attributes);
-		$this->invoke_call_back('after_create');
+		$this->invoke_callback('after_create');
 
 		$pk = $this->get_primary_key(false);
 		$table = static::table();
@@ -397,9 +387,9 @@ class Model
 
 		if (($dirty = $this->dirty_attributes()))
 		{
-			$this->invoke_call_back('before_update');
+			$this->invoke_callback('before_update');
 			static::table()->update($dirty,$this->values_for_pk());
-			$this->invoke_call_back('after_update');
+			$this->invoke_callback('after_update');
 		}
 
 		return true;
@@ -413,9 +403,9 @@ class Model
 	{
 		$this->verify_not_readonly('delete');
 
-		$this->invoke_call_back('before_destroy');
+		$this->invoke_callback('before_destroy');
 		static::table()->delete($this->values_for_pk());
-		$this->invoke_call_back('after_destroy');
+		$this->invoke_callback('after_destroy');
 
 		return true;
 	}
@@ -454,16 +444,16 @@ class Model
 
 		$validation_on = 'validation_on_' . ($this->is_new_record() ? 'create' : 'update');
 
-		foreach (array('before_validation', "before_$validation_on") as $call_back)
+		foreach (array('before_validation', "before_$validation_on") as $callback)
 		{
-			if (!$this->invoke_call_back($call_back))
+			if (!$this->invoke_callback($callback))
 				return false;
 		}
 
 		$this->errors = $validator->validate();
 
-		foreach (array('after_validation', "after_$validation_on") as $call_back)
-			$this->invoke_call_back($call_back);
+		foreach (array('after_validation', "after_$validation_on") as $callback)
+			$this->invoke_callback($callback);
 
 		if (!$this->errors->is_empty())
 			return false;
@@ -914,25 +904,13 @@ class Model
 	}
 
 	/**
-	 * Registers a call back on @static @var $__call_back.
-	 * @param string
-	 * @param mixed closure or array
-	 * @param array
-	 * @return void
-	 */
-	private function register_call_back($name, $definition, $options=array())
-	{
-		self::$__call_back->register($name, $definition, $options);
-	}
-
-	/**
-	 * Notifies this model's @static @var $__call_back to invoke defined call backs.
-	 * @param string
+	 * Invokes the specified callback on this model.
+	 * @param string $method_name Name of the call back to run.
 	 * @return boolean or null
 	 */
-	private function invoke_call_back($method_name)
+	private function invoke_callback($method_name)
 	{
-		return self::$__call_back->send($method_name);
+		return $this->table()->callback->send($this,$method_name);
 	}
 
 	public function after_find() {}
