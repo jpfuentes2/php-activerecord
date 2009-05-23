@@ -49,16 +49,16 @@ class MysqlAdapter extends AbstractMysqlAdapter
 		return mysql_insert_id($this->connection);
 	}
 
-	public function query($sql, $params=array())
+	public function query($sql, $values=array())
 	{
 		if (isset($GLOBALS['ACTIVERECORD_LOG']) && $GLOBALS['ACTIVERECORD_LOG'])
 			$GLOBALS['ACTIVERECORD_LOGGER']->log($sql, PEAR_LOG_INFO);
 
-		if (is_array($params) && count($params) > 0)
+		if (is_array($values) && count($values) > 0)
 		{
 			$sql = new Expressions($sql);
 			$sql->set_connection($this);
-			$sql->bind_values($params);
+			$sql->bind_values($values);
 			$sql = $sql->to_s(true);
 		}
 
