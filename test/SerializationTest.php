@@ -1,4 +1,4 @@
-<?
+<?php
 include 'helpers/config.php';
 
 class SerializationTest extends DatabaseTest

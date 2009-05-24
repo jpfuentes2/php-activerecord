@@ -1,4 +1,4 @@
-<?
+<?php
 include 'helpers/config.php';
 
 // Only use this to test static methods in Connection that are not specific

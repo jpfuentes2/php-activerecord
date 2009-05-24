@@ -1,4 +1,4 @@
-<?
+<?php
 include 'helpers/config.php';
 require_once dirname(__FILE__) . '/../lib/adapters/MysqliAdapter.php';
 

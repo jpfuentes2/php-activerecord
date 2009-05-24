@@ -1,4 +1,4 @@
-<?
+<?php
 class RmBldg extends ActiveRecord\Model
 {
 	static $table = 'rm-bldg';

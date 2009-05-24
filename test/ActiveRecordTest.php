@@ -1,4 +1,4 @@
-<?
+<?php
 include 'helpers/config.php';
 
 class ActiveRecordTest extends DatabaseTest

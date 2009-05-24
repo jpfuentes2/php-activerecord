@@ -1,4 +1,4 @@
-<?
+<?php
 class VenueCB extends ActiveRecord\Model
 {
 	static $table_name = 'venues';
