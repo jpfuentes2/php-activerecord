@@ -157,5 +157,4 @@ class PgsqlAdapter extends Connection
 		return $c;
 	}
 };
-}
 ?>
