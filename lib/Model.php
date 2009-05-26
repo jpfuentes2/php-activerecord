@@ -94,8 +94,6 @@ class Model
 				$this->attributes[$meta->inflected_name] = $meta->default;
 		}
 
-		Reflections::instance()->add($this);
-
 		$this->set_attributes_via_mass_assignment($attributes, $guard_attributes);
 		$this->invoke_callback('after_construct',false);
 	}
