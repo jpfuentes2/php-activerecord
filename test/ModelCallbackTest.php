@@ -3,149 +3,98 @@ include 'helpers/config.php';
 
 class ModelCallbackTest extends DatabaseTest
 {
-
-/*
-	public function test_all_generic_call_back_methods()
+	public function setUp($connection_name=null)
 	{
-		$this->test_closure = null;
-		$call_backs = ActiveRecord\CallBack::get_allowed_call_backs();
-		$model = new VenueGenericCallBacks();
-		$caller = new ActiveRecord\CallBack('VenueGenericCallBacks');
+		parent::setUp($connection_name);
 
-		foreach ($call_backs as $cb)
-		{
-			echo "$cb\n";
-			$caller->send($model,$cb);
-		}
+		ActiveRecord\Table::clear_cache();
 
-		//array_unique b/c save is called multiple times as a wrapper for update/create
-		$this->assertEquals(count($call_backs), count(array_unique($this->fired)));
+		$this->venue = new Venue();
+		$this->callback = Venue::table()->callback;
 	}
 
-	public function test_call_back_not_fired_due_to_non_existent_method()
+	public function register_and_invoke_callbacks($callbacks, $return, $closure)
 	{
-		$venue = VenueCB::find(1);
-		$this->assert_nothing_fired();
+		if (!is_array($callbacks))
+			$callbacks = array($callbacks);
+
+		$fired = array();
+
+		foreach ($callbacks as $name)
+			$this->callback->register($name,function($model) use (&$fired, $name, $return) { $fired[] = $name; return $return; });
+
+		$closure($this->venue);
+		return array_intersect($callbacks,$fired);
 	}
 
-	public function test_after_construct()
+	public function assert_fires($callbacks, $closure)
 	{
-		$venue = VenueCB::find(1);
-		$this->assert_fired('test_after_construct');
+		$executed = $this->register_and_invoke_callbacks($callbacks,true,$closure);
+		$this->assertEquals(count($callbacks),count($executed));
+	}
 
-		foreach (array(1,2) as $key)
-		{
-			VenueCB::find($key);
-			$this->assert_fired('test_after_construct', true);
-		}
+	public function assert_does_not_fire($callbacks, $closure)
+	{
+		$executed = $this->register_and_invoke_callbacks($callbacks,true,$closure);
+		$this->assertEquals(0,count($executed));
+	}
+
+	public function assert_fires_returns_false($callbacks, $only_fire, $closure)
+	{
+		if (!is_array($only_fire))
+			$only_fire = array($only_fire);
+
+		$executed = $this->register_and_invoke_callbacks($callbacks,false,$closure);
+		sort($only_fire);
+		$intersect = array_intersect($only_fire,$executed);
+		sort($intersect);
+		$this->assertEquals($only_fire,$intersect);
+	}
+
+	public function test_after_construct_fires_by_default()
+	{
+		$this->assert_fires('after_construct',function($model) { new Venue(); });
+	}
+
+	public function test_fire_validation_callbacks_on_insert()
+	{
+		$this->assert_fires(array('before_validation','after_validation','before_validation_on_create','after_validation_on_create'),
+			function($model) { $model = new Venue(); $model->save(); });
+	}
+
+	public function test_fire_validation_callbacks_on_update()
+	{
+		$this->assert_fires(array('before_validation','after_validation','before_validation_on_update','after_validation_on_update'),
+			function($model) { $model = Venue::first(); $model->save(); });
 	}
 
 	public function test_validation_call_backs_not_fired_due_to_bypassing_validations()
 	{
-		foreach (array('save', 'insert', 'update') as $method)
-		{
-			$venue = new VenueCB;
-			$venue->$method(false);
-			$this->assert_nothing_fired();
-		}
+		$this->assert_does_not_fire('before_validation',function($model) { $model->save(false); });
 	}
 
-	public function test_before_validation()
+	public function test_before_validation_returning_false_cancels_callbacks()
 	{
-		$test_case = $this;
-		$closure = function($record) use ($test_case) {
-			$test_case->assertObjectHasAttribute('attributes', $record);
-			$test_case->assertTrue(is_null($record->errors));
-		};
-		$this->set_test_closure($closure);
-		$this->set_cb('before_validation_on_create', 'test_before_validation_on_create');
-
-		$venue = new VenueCB;
-		$venue->save();
-		$this->assert_fired(array('test_before_validation', 'test_before_validation_on_create'));
-
-		$this->setUp();
-		$this->set_cb('before_validation_on_update', 'test_before_validation_on_update');
-
-		$venue = VenueCB::first();
-		$venue->name = 'updated';
-		$venue->save();
-		$this->assert_fired(array('test_before_validation_on_update'));
+		$this->assert_fires_returns_false(array('before_validation','after_validation'),'before_validation',
+			function($model) { $model->save(); });
 	}
 
-	public function test_before_validation_returns_false_cancels_call_backs()
+	public function test_fires_before_save_and_before_update_when_updating()
 	{
-		$this->set_cb('before_validation', 'test_before_validation_returns_false_cancels_call_backs');
-		$this->set_cb('after_validation', 'test_after_validation');
-
-		$venue = new VenueCB;
-		$venue->save();
-		$this->assert_fired(array('test_before_validation_returns_false_cancels_call_backs'));
-		$this->assert_not_fired(array('test_after_validation'));
+		$this->assert_fires(array('before_save','before_update'),
+			function($model) { $model = Venue::first(); $model->name = "something new"; $model->save(); });
 	}
 
-	public function test_after_validation()
+	public function test_before_save_returning_false_cancels_callbacks()
 	{
-		$test_case = $this;
-		$closure = function($record) use ($test_case) {
-			$test_case->assertObjectHasAttribute('attributes', $record);
-			$test_case->assertTrue($record->errors instanceof ActiveRecord\Errors);
-		};
-		$this->set_test_closure($closure);
-		$this->set_cb('after_validation_on_create', 'test_after_validation_on_create');
-
-		$venue = new VenueCB;
-		$venue->save();
-		$this->assert_fired(array('test_after_validation', 'test_after_validation_on_create'));
-
-		$this->setUp();
-		$this->set_cb('after_validation_on_update', 'test_after_validation_on_update');
-
-		$venue = VenueCB::first();
-		$venue->name = 'updated';
-		$venue->save();
-		$this->assert_fired(array('test_after_validation_on_update'));
+		$this->assert_fires_returns_false(array('before_save','before_create'),'before_save',
+			function($model) { $model = new Venue(); $model->save(); });
 	}
 
-	public function test_before_update()
+	public function test_destroy()
 	{
-		$this->set_cb('before_save', 'test_before_save');
-
-		$venue = VenueCB::first();
-		$venue->name = 'updated';
-		$venue->save();
-		$this->assert_fired(array('test_before_save', 'test_before_update'));
+		$this->assert_fires(array('before_destroy','after_destroy'),
+			function($model) { $model->delete(); });
 	}
-
-	public function test_before_save_returns_false_cancels_call_backs()
-	{
-		$this->set_cb('before_save', 'test_before_save_returns_false_cancels_call_backs');
-		$this->set_cb('before_create', 'test_before_create');
-
-		$venue = new VenueCB;
-		$venue->name = 'create';
-		$venue->save();
-		$this->assert_fired('test_before_save_returns_false_cancels_call_backs');
-		$this->assert_not_fired('test_before_create');
-	}
-
-	public function test_delete()
-	{
-		$this->set_cb('before_destroy', 'test_before_destroy');
-		$this->set_cb('after_destroy', 'test_after_destroy');
-
-		$venue = VenueCB::first();
-		$venue->delete();
-		$this->assert_fired(array('test_before_destroy', 'test_after_destroy'));
-
-		$this->fired = array();
-		$venues = VenueCB::all();
-		foreach ($venues as $venue)
-		{
-			$venue->delete();
-			$this->assert_fired(array('test_before_destroy', 'test_after_destroy'));
-		}
-	}
-*/
 }
 ?>

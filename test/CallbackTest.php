@@ -1,32 +1,17 @@
 <?php
 include 'helpers/config.php';
 
-class VenueCB extends ActiveRecord\Model
-{
-	static $table_name = 'venues';
-
-	static $after_destroy = array('after_destroy_one', 'after_destroy_two');
-	static $before_destroy = 'before_destroy_using_string';
-
-	// DO NOT add a static $after_construct for this. we are testing
-	// auto registration of callback with this
-	public function after_construct() {}
-
-	public function non_generic_after_construct() {}
-
-	public function after_destroy_one() {}
-	public function after_destroy_two() {}
-
-	public function before_destroy_using_string() {}
-}
-
 class CallBackTest extends DatabaseTest
 {
 	public function setUp($connection_name=null)
 	{
 		parent::setUp($connection_name);
 
+		ActiveRecord\Table::clear_cache();
+
+		// ensure VenueCB model has been loaded
 		VenueCB::find(1);
+
 		$this->callback = new ActiveRecord\CallBack('VenueCB');
 	}
 
@@ -46,12 +31,12 @@ class CallBackTest extends DatabaseTest
 		$this->callback->invoke(null,$second_method);
 		$this->assertEquals(array($first_method,$second_method),$i_ran);
 	}
-	
+
 	public function test_generic_callback_was_auto_registered()
 	{
 		$this->assert_has_callback('after_construct');
 	}
-	
+
 	public function test_register()
 	{
 		$this->callback->register('after_construct');
@@ -90,7 +75,7 @@ class CallBackTest extends DatabaseTest
 	{
 		$this->callback->register('after_construct',function($mode) { });
 	}
-	
+
 	public function test_register_with_null_definition()
 	{
 		$this->callback->register('after_construct',null);
@@ -158,7 +143,7 @@ class CallBackTest extends DatabaseTest
 		$this->callback->register('after_construct');
 		$this->assertTrue(is_array($this->callback->get_callbacks('after_construct')));
 	}
-	
+
 	public function test_get_callbacks_returns_null()
 	{
 		$this->assertNull($this->callback->get_callbacks('this_callback_name_should_never_exist'));

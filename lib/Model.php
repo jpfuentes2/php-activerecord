@@ -321,7 +321,6 @@ class Model
 	public function save($validate=true)
 	{
 		$this->verify_not_readonly('save');
-
 		$this->__new_record = false;
 
 		foreach ($this->get_primary_key(true) as $pk)
@@ -441,7 +440,6 @@ class Model
 	private function _validate()
 	{
 		$validator = new Validations($this);
-
 		$validation_on = 'validation_on_' . ($this->is_new_record() ? 'create' : 'update');
 
 		foreach (array('before_validation', "before_$validation_on") as $callback)
