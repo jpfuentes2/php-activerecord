@@ -637,7 +637,8 @@ class Model
 				$args = $args[0];
 
 			$association_name = str_replace(array('build_', 'create_'), '', $method);
-			if (($association = $this->table()->get_relationship($association_name)))
+
+			if (($association = static::table()->get_relationship($association_name)))
 			{
 				//access association to ensure that the relationship has been loaded
 				//so that we do not double-up on records if we append a newly created
@@ -909,7 +910,7 @@ class Model
 	 */
 	private function invoke_callback($method_name, $must_exist=true)
 	{
-		return $this->table()->callback->invoke($this,$method_name,$must_exist);
+		return static::table()->callback->invoke($this,$method_name,$must_exist);
 	}
 };
 ?>
