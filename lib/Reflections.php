@@ -32,7 +32,7 @@ class Reflections extends Singleton
 
 		if (!isset($this->reflections[$class]))
 			$this->reflections[$class] = new ReflectionClass($class);
-
+			
 		return $this;
 	}
 
@@ -48,7 +48,7 @@ class Reflections extends Singleton
 		if (isset($this->reflections[$class]))
 			return $this->reflections[$class];
 
-		return null;
+		throw new ActiveRecordException("Class not found: $class");
 	}
 
 	/**
@@ -60,10 +60,11 @@ class Reflections extends Singleton
 	{
 		if (is_object($mixed))
 			return get_class($mixed);
-		elseif (!is_null($mixed))
+
+		if (!is_null($mixed))
 			return $mixed;
-		else
-			return $this->get_called_class();
+
+		return $this->get_called_class();
 	}
 }
 ?>

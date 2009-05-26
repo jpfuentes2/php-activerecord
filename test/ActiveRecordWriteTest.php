@@ -139,7 +139,7 @@ class ActiveRecordWriteTest extends DatabaseTest
 	public function testDirtyAttributesClearedAfterUpdating()
 	{
 		$book = Book::first();
-		$book->name = 'rivers cuomos';
+		$book->name = 'rivers cuomo';
 		$book->update();
 		$this->assertEquals(null,$book->dirty_attributes());
 	}
@@ -147,7 +147,7 @@ class ActiveRecordWriteTest extends DatabaseTest
 	public function testDirtyAttributesAfterReloading()
 	{
 		$book = Book::first();
-		$book->name = 'rivers cuomos';
+		$book->name = 'rivers cuomo';
 		$book->reload();
 		$this->assertEquals(null,$book->dirty_attributes());
 	}

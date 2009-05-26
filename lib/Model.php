@@ -95,9 +95,9 @@ class Model
 		}
 
 		Reflections::instance()->add($this);
-		$this->set_attributes_via_mass_assignment($attributes, $guard_attributes);
 
-		$this->invoke_callback('after_construct');
+		$this->set_attributes_via_mass_assignment($attributes, $guard_attributes);
+		$this->invoke_callback('after_construct',false);
 	}
 
 	/**
@@ -352,12 +352,12 @@ class Model
 		if ($validate && !$this->_validate())
 			return false;
 
-		$this->invoke_callback('before_create');
+		$this->invoke_callback('before_create',false);
 		if (($dirty = $this->dirty_attributes()))
 			static::table()->insert($dirty);
 		else
 			static::table()->insert($this->attributes);
-		$this->invoke_callback('after_create');
+		$this->invoke_callback('after_create',false);
 
 		$pk = $this->get_primary_key(false);
 		$table = static::table();
@@ -387,9 +387,9 @@ class Model
 
 		if (($dirty = $this->dirty_attributes()))
 		{
-			$this->invoke_callback('before_update');
+			$this->invoke_callback('before_update',false);
 			static::table()->update($dirty,$this->values_for_pk());
-			$this->invoke_callback('after_update');
+			$this->invoke_callback('after_update',false);
 		}
 
 		return true;
@@ -403,9 +403,9 @@ class Model
 	{
 		$this->verify_not_readonly('delete');
 
-		$this->invoke_callback('before_destroy');
+		$this->invoke_callback('before_destroy',false);
 		static::table()->delete($this->values_for_pk());
-		$this->invoke_callback('after_destroy');
+		$this->invoke_callback('after_destroy',false);
 
 		return true;
 	}
@@ -446,14 +446,14 @@ class Model
 
 		foreach (array('before_validation', "before_$validation_on") as $callback)
 		{
-			if (!$this->invoke_callback($callback))
+			if (!$this->invoke_callback($callback,false))
 				return false;
 		}
 
 		$this->errors = $validator->validate();
 
 		foreach (array('after_validation', "after_$validation_on") as $callback)
-			$this->invoke_callback($callback);
+			$this->invoke_callback($callback,false);
 
 		if (!$this->errors->is_empty())
 			return false;
@@ -906,28 +906,12 @@ class Model
 	/**
 	 * Invokes the specified callback on this model.
 	 * @param string $method_name Name of the call back to run.
+	 * @param boolean $must_exist Set to true to raise an exception if the callback does not exist.
 	 * @return boolean or null
 	 */
-	private function invoke_callback($method_name)
+	private function invoke_callback($method_name, $must_exist=true)
 	{
-		return $this->table()->callback->send($this,$method_name);
+		return $this->table()->callback->invoke($this,$method_name,$must_exist);
 	}
-
-	public function after_find() {}
-	public function after_construct() {}
-	public function before_save() {}
-	public function after_save() {}
-	public function before_create() {}
-	public function after_create() {}
-	public function before_update() {}
-	public function after_update() {}
-	public function before_validation() {}
-	public function after_validation() {}
-	public function before_validation_on_create() {}
-	public function after_validation_on_create() {}
-	public function before_validation_on_update() {}
-	public function after_validation_on_update() {}
-	public function before_destroy() {}
-	public function after_destroy() {}
 };
 ?>
