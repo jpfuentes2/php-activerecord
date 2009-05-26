@@ -92,12 +92,13 @@ class Expressions
 		$ret = "";
 		$replace = array();
 		$num_values = count($values);
+		$len = strlen($this->expressions);
 
 		for ($i=0,$n=strlen($this->expressions),$j=0; $i<$n; ++$i)
 		{
 			$append = $this->expressions[$i];
 
-			if ($this->is_marker($this->expressions,$i))
+			if ($this->expressions[$i] == self::ParameterMarker && $this->is_marker($this->expressions,$i,$len))
 			{
 				if ($j > $num_values-1)
 					throw new ExpressionsException("No bound parameter for index $j");
@@ -166,23 +167,21 @@ class Expressions
 		return "'" . str_replace("'","''",$value) . "'";
 	}
 
-	private function is_marker($s, $pos)
+	private function is_marker($s, $pos, $len)
 	{
-		if ($s[$pos] == self::ParameterMarker)
+		$count = 0;
+
+		// the number of single quotes preceeding must be even otherwise we
+		// are inside a quoted string and therefore not a marker
+		for ($i=0; $i<$pos && $i<$len; ++$i)
 		{
-			$count = 0;
-
-			// the number of single quotes preceeding must be even otherwise we
-			// are inside a quoted string and therefore not a marker
-			for ($i=0,$n=strlen($this->expressions); $i<$pos && $i<$n; ++$i)
-			{
-				if ($s[$i] == "'" && $i > 0 && $s[$i-1] != "\\")
-					$count++;
-			}
-
-			if ($count % 2 == 0)
-				return true;
+			if ($s[$i] == "'" && $i > 0 && $s[$i-1] != "\\")
+				$count++;
 		}
+
+		if ($count % 2 == 0)
+			return true;
+
 		return false;
 	}
 }
