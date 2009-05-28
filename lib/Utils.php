@@ -51,14 +51,6 @@ function array_flatten($array, $ret=array())
 }
 
 /**
- * Returns the value of the specified key if it exists otherwise returns $default.
- */
-function hash_value($key, &$hash, $default)
-{
-	return array_key_exists($key,$hash) ? $hash[$key] :$default;
-}
-
-/**
  * Somewhat naive way to determine if an array is a hash.
  */
 function is_hash(&$array)

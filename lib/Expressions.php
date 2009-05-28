@@ -87,7 +87,7 @@ class Expressions
 	{
 		if (!$options) $options = array();
 
-		$values = hash_value('values',$options,$this->values);
+		$values = array_key_exists('values',$options) ? $options['values'] : $this->values;
 
 		$ret = "";
 		$replace = array();
