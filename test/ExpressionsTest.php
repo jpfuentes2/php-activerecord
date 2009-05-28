@@ -46,7 +46,7 @@ class ExpressionsTest extends PHPUnit_Framework_TestCase
 	public function testToStringWithNullOptions()
 	{
 		$c = new Expressions('name=? and book=?','Tito','Sharks');
-		$this->assertEquals('name=? and book=?',$c->to_s(false,null));
+		$this->assertEquals('name=? and book=?',$c->to_s(false,($x = null)));
 	}
 
 	/**
@@ -163,7 +163,7 @@ class ExpressionsTest extends PHPUnit_Framework_TestCase
 	{
 		$a = new Expressions('name=?','Tito');
 		$this->assertEquals("name='Tito'",$a->to_s(true));
-		$this->assertEquals("name='Hocus'",$a->to_s(true,array('values' => array('Hocus'))));
+		$this->assertEquals("name='Hocus'",$a->to_s(true,($x = array('values' => array('Hocus')))));
 	}
 
 	public function testNullValue()

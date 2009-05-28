@@ -83,7 +83,7 @@ class Expressions
 		$this->connection = $connection;
 	}
 
-	public function to_s($substitute=false, $options=null)
+	public function to_s($substitute=false, &$options=null)
 	{
 		if (!$options) $options = array();
 
@@ -93,20 +93,26 @@ class Expressions
 		$replace = array();
 		$num_values = count($values);
 		$len = strlen($this->expressions);
+		$quotes = 0;
 
 		for ($i=0,$n=strlen($this->expressions),$j=0; $i<$n; ++$i)
 		{
-			$append = $this->expressions[$i];
+			$ch = $this->expressions[$i];
 
-			if ($this->expressions[$i] == self::ParameterMarker && $this->is_marker($this->expressions,$i,$len))
+			if ($ch == self::ParameterMarker)
 			{
-				if ($j > $num_values-1)
-					throw new ExpressionsException("No bound parameter for index $j");
+				if ($quotes % 2 == 0)
+				{
+					if ($j > $num_values-1)
+						throw new ExpressionsException("No bound parameter for index $j");
 
-				$append = $this->substitute($values,$substitute,$i,$j++);
+					$ch = $this->substitute($values,$substitute,$i,$j++);
+				}
 			}
+			elseif ($ch == '\'' && $i > 0 && $this->expressions[$i-1] != '\\')
+				++$quotes;
 
-			$ret .= $append;
+			$ret .= $ch;
 		}
 		return $ret;
 	}
@@ -165,24 +171,6 @@ class Expressions
 			return "'" . $this->connection->escape($value) . "'";
 
 		return "'" . str_replace("'","''",$value) . "'";
-	}
-
-	private function is_marker($s, $pos, $len)
-	{
-		$count = 0;
-
-		// the number of single quotes preceeding must be even otherwise we
-		// are inside a quoted string and therefore not a marker
-		for ($i=0; $i<$pos && $i<$len; ++$i)
-		{
-			if ($s[$i] == "'" && $i > 0 && $s[$i-1] != "\\")
-				$count++;
-		}
-
-		if ($count % 2 == 0)
-			return true;
-
-		return false;
 	}
 }
 ?>
