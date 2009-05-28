@@ -37,5 +37,17 @@ class UtilsTest extends PHPUnit_Framework_TestCase
 	{
 		$this->assertEquals(array("0a","1a"),ActiveRecord\collect($this->array_hash,"a"));
 	}
+
+    public function testArrayFlatten()
+    {
+		$this->assertEquals(array(), ActiveRecord\array_flatten(array()));
+		$this->assertEquals(array(1), ActiveRecord\array_flatten(array(1)));
+		$this->assertEquals(array(1), ActiveRecord\array_flatten(array(array(1))));
+		$this->assertEquals(array(1, 2), ActiveRecord\array_flatten(array(array(1, 2))));
+		$this->assertEquals(array(1, 2), ActiveRecord\array_flatten(array(array(1), 2)));
+		$this->assertEquals(array(1, 2), ActiveRecord\array_flatten(array(1, array(2))));
+		$this->assertEquals(array(1, 2, 3), ActiveRecord\array_flatten(array(1, array(2), 3)));
+		$this->assertEquals(array(1, 2, 3, 4), ActiveRecord\array_flatten(array(1, array(2, 3), 4)));
+	}
 };
 ?>

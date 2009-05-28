@@ -133,7 +133,7 @@ class Expressions
 		return array($sql,array_values($hash));
 	}
 
-	private function substitute($values, $substitute, $pos, $parameter_index)
+	private function substitute(&$values, $substitute, $pos, $parameter_index)
 	{
 		$value = $values[$parameter_index];
 
@@ -141,10 +141,10 @@ class Expressions
 		{
 			if ($substitute)
 			{
-				$ret = $delim = '';
+				$ret = '';
 
-				for ($i=0,$n=count($value); $i<$n; ++$i,$delim=',')
-					$ret .= $delim . $this->stringify_value($value[$i]);
+				for ($i=0,$n=count($value); $i<$n; ++$i)
+					$ret .= ($i > 0 ? ',' : '') . $this->stringify_value($value[$i]);
 
 				return $ret;
 			}

@@ -35,19 +35,20 @@ function classify($s)
 	return ucfirst(Utils::singularize(Inflector::instance()->camelize($s)));
 }
 
-function array_flatten($array, $ret=array())
+// http://snippets.dzone.com/posts/show/4660
+function array_flatten(array $array)
 {
-	for ($i=0,$n=count($array); $i<=$n; $i++)
+	$i = 0;
+	$n = count($array);
+
+	while ($i < $n)
 	{
-		if (!is_array(@$array[$i]))
-		{
-			if (array_key_exists($i,$array))
-				$ret[] = $array[$i];
-		}
-		else
-			$ret = array_flatten($array[$i],$ret);
-	}
-	return $ret;
+		if (is_array($array[$i]))
+			array_splice($array,$i,1,$array[$i]);
+        else
+			++$i;
+    }
+    return $array;
 }
 
 /**
@@ -55,12 +56,11 @@ function array_flatten($array, $ret=array())
  */
 function is_hash(&$array)
 {
-	if (is_array($array))
-	{
-		$keys = array_keys($array);
-		return count($keys) > 0 && is_string($keys[0]) ? true : false;
-	}
-	return false;
+	if (!is_array($array))
+		return false;
+
+	$keys = array_keys($array);
+	return @is_string($keys[0]) ? true : false;
 }
 
 /**
