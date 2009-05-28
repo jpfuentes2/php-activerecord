@@ -178,23 +178,21 @@ class SQLBuilder
 			if ($i >= 2)
 				$conditions[0] .= preg_replace(array('/_and_/i','/_or_/i'),array(' AND ',' OR '),$parts[$i-1]);
 
-			$bind = '=?';
-
 			if ($j < $num_values)
 			{
-				if (is_array($values[$j]))
-					$bind = ' IN(?)';
-				elseif (is_null($values[$j]))
+				if (!is_null($values[$j]))
+				{
+					$bind = is_array($values[$j]) ? ' IN(?)' : '=?';
+					$conditions[] = $values[$j];
+				}
+				else
 					$bind = ' IS NULL';
 			}
 			else
 				$bind = ' IS NULL';
 
-			if ($bind != ' IS NULL')
-				$conditions[] = $values[$j];
-
 			// map to correct name if $map was supplied
-			$name = $map && array_key_exists($parts[$i],$map) ? $map[$parts[$i]] : $parts[$i];
+			$name = $map && isset($map[$parts[$i]]) ? $map[$parts[$i]] : $parts[$i];
 
 			$conditions[0] .= $name . $bind;
 		}

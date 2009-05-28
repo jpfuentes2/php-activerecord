@@ -117,14 +117,20 @@ class Table
 
 		if (array_key_exists('conditions',$options))
 		{
-			// accept a string as a condition
-			if (is_string($options['conditions']))
-				$options['conditions'] = array($options['conditions']);
+			if (!is_hash($options['conditions']))
+			{
+				if (is_string($options['conditions']))
+					$options['conditions'] = array($options['conditions']);
 
-			if (is_hash($options['conditions']))
-				$sql->where($options['conditions']);
-			else
 				call_user_func_array(array($sql,'where'),$options['conditions']);
+			}
+			else
+			{
+				if (count($options['mapped_names']) > 0)
+					$options['conditions'] = $this->map_names($options['conditions'],$options['mapped_names']);
+
+				$sql->where($options['conditions']);
+			}
 		}
 
 		if (array_key_exists('order',$options))
@@ -230,6 +236,27 @@ class Table
 
 		foreach ($this->columns as $name => &$column)
 			$this->inflected[$column->inflected_name] = $column;
+	}
+
+	/**
+	 * Replaces any aliases used in a hash based condition.
+	 *
+	 * @param $hash array A hash
+	 * @param $map array Hash of used_name => real_name
+	 * @return array Array with any aliases replaced with their read field name
+	 */
+	private function map_names(&$hash, &$map)
+	{
+		$ret = array();
+
+		foreach ($hash as $name => &$value)
+		{
+			if (array_key_exists($name,$map))
+				$name = $map[$name];
+
+			$ret[$name] = $value;
+		}
+		return $ret;
 	}
 
 	private function &process_data($hash)

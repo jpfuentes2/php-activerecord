@@ -608,12 +608,12 @@ class Model
 
 		if (substr($method,0,7) === 'find_by')
 		{
-			$options['conditions'] = SQLBuilder::create_conditions_from_underscored_string(substr($method,8),$args);
+			$options['conditions'] = SQLBuilder::create_conditions_from_underscored_string(substr($method,8),$args,static::$alias_attribute);
 			return static::find('first',$options);
 		}
 		elseif (substr($method,0,11) === 'find_all_by')
 		{
-			$options['conditions'] = SQLBuilder::create_conditions_from_underscored_string(substr($method,12),$args);
+			$options['conditions'] = SQLBuilder::create_conditions_from_underscored_string(substr($method,12),$args,static::$alias_attribute);
 			return static::find('all',$options);
 		}
 
@@ -754,6 +754,7 @@ class Model
 		if ($num_args > 0)
 			return static::find_by_pk($args, $options);
 
+		$options['mapped_names'] = static::$alias_attribute;
 		$list = static::table()->find($options);
 
 		return $single ? (count($list) > 0 ? $list[0] : null) : $list;
@@ -844,7 +845,7 @@ class Model
 	}
 
 	/**
-	 * Pulls out the options hash from $array if any.	 *
+	 * Pulls out the options hash from $array if any.
 	 * DO NOT remove the reference on $array.
 	 * @param array
 	 * @return array

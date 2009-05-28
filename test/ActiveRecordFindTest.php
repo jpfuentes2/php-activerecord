@@ -80,10 +80,21 @@ class ActiveRecordFindTest extends DatabaseTest
 		$this->assertEquals(1,$authors[0]->author_id);
 	}
 
-	public function testFindAllUsingAllAlias()
+	public function testFindHashUsingAlias()
 	{
-		$authors = Author::all(array('conditions' => array('author_id IN(?)',array(1,2,3))));
-		$this->assertTrue(count($authors) >= 3);
+		$venues = Venue::all(array('conditions' => array('marquee' => 'Warner Theatre', 'city' => array('Washington','New York'))));
+		$this->assertTrue(count($venues) >= 1);
+	}
+
+	public function testFindHashUsingAliasWithNull()
+	{
+		$venues = Venue::all(array('conditions' => array('marquee' => null)));
+		$this->assertEquals(0,count($venues));
+	}
+
+	public function testDynamicFinderUsingAlias()
+	{
+		$this->assertNotNull(Venue::find_by_marquee('Warner Theatre'));
 	}
 
 	public function testFindAllHash()
