@@ -850,11 +850,11 @@ class Model
 	 * @param array
 	 * @return array
 	 */
-	public static function extract_and_validate_options(&$array)
+	public static function extract_and_validate_options(array &$array)
 	{
 		$options = array();
 
-		if ($array && is_array($array))
+		if ($array)
 		{
 			$last = &$array[count($array)-1];
 
@@ -872,7 +872,7 @@ class Model
 	 * @param array
 	 * @return string
 	 */
-	public function to_json($options=array())
+	public function to_json(array $options=array())
 	{
 		return $this->serialize('Json', $options);
 	}
@@ -882,7 +882,7 @@ class Model
 	 * @param array
 	 * @return string
 	 */
-	public function to_xml($options=array())
+	public function to_xml(array $options=array())
 	{
 		return $this->serialize('Xml', $options);
 	}

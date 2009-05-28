@@ -29,7 +29,7 @@ class Expressions
 			list($expressions,$values) = $this->build_sql_from_hash($expressions,$glue);
 		}
 
-		if (trim($expressions) != '')
+		if ($expressions != '')
 		{
 			if (!$values)
 				$values = array_slice(func_get_args(),1);
