@@ -166,23 +166,20 @@ class Table
 		return $list;
 	}
 
+	public function get_fully_qualified_table_name()
+	{
+		$table = $this->conn->quote_name($this->table);
+
+		if ($this->db_name)
+			$table = $this->conn->quote_name($this->db_name) . ".$table";
+
+		return $table;
+	}
+
 	public function get_relationship($name)
 	{
 		if (isset($this->relationships[$name]))
 			return $this->relationships[$name];
-	}
-
-	private function &process_data($hash)
-	{
-		foreach ($hash as $name => &$value)
-		{
-			// TODO this will probably need to be changed for oracle
-			if ($value instanceof DateTime)
-				$hash[$name] = $value->format('Y-m-d H:i:s T');
-			else
-				$hash[$name] = $value;
-		}
-		return $hash;
 	}
 
 	public function insert(&$data)
@@ -235,6 +232,19 @@ class Table
 			$this->inflected[$column->inflected_name] = $column;
 	}
 
+	private function &process_data($hash)
+	{
+		foreach ($hash as $name => &$value)
+		{
+			// TODO this will probably need to be changed for oracle
+			if ($value instanceof DateTime)
+				$hash[$name] = $value->format('Y-m-d H:i:s T');
+			else
+				$hash[$name] = $value;
+		}
+		return $hash;
+	}
+
 	private function set_primary_key()
 	{
 		if (($pk = $this->class->getStaticPropertyValue('pk',null)) || ($pk = $this->class->getStaticPropertyValue('primary_key',null)))
@@ -249,16 +259,6 @@ class Table
 					$this->pk[] = $c->name;
 			}
 		}
-	}
-
-	public function get_fully_qualified_table_name()
-	{
-		$table = $this->conn->quote_name($this->table);
-
-		if ($this->db_name)
-			$table = $this->conn->quote_name($this->db_name) . ".$table";
-
-		return $table;
 	}
 
 	private function set_table_name()
