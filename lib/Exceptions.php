@@ -5,7 +5,20 @@ class ActiveRecordException extends \Exception {};
 
 class RecordNotFound extends ActiveRecordException {};
 
-class DatabaseException extends ActiveRecordException {};
+class DatabaseException extends ActiveRecordException
+{
+	public function __construct($adapter_or_string_or_mystery)
+	{
+		if ($adapter_or_string_or_mystery instanceof Connection)
+		{
+			parent::__construct(
+				join(", ",$adapter_or_string_or_mystery->connection->errorInfo()),
+				intval($adapter_or_string_or_mystery->connection->errorCode()));
+		}
+		else
+			parent::__construct($adapter_or_string_or_mystery);
+	}
+};
 
 class ModelException extends ActiveRecordException {};
 
@@ -30,6 +43,7 @@ class UndefinedPropertyException extends ModelException
 		}
 
 		$this->message = "Undefined property: $property_name in {$this->file} on line {$this->line}";
+		parent::__construct();
 	}
 };
 
@@ -45,12 +59,11 @@ class ReadOnlyException extends ModelException
 	public function __construct($class_name, $method_name)
 	{
 		$this->message = "Model ".get_class($this)." cannot be $method_name because it is set to read only";
+		parent::__construct();
 	}
 };
 
 class ValidationsArgumentError extends ActiveRecordException {};
-
-
 
 namespace ActiveRecord\Relationship;
 use ActiveRecord;

@@ -1,13 +1,17 @@
 <?php
 namespace ActiveRecord;
 
-require_once 'URL.php';
 require_once 'Column.php';
 require_once 'Expressions.php';
+
+use PDO;
+use PDOException;
+use Closure;
 
 abstract class Connection
 {
 	public $connection;
+	public $last_query;
 
 	/**
 	 * Retrieve a database connection.
@@ -35,31 +39,31 @@ abstract class Connection
 		if (!$connection_string)
 			throw new DatabaseException("Empty connection string");
 
-		$url = new Net_URL($connection_string);
-		$protocol = $url->protocol;
-		$class = ucwords($protocol) . 'Adapter';
-		$fqclass = '\ActiveRecord\\' . $class;
-		$source = dirname(__FILE__) . "/adapters/$class.php";
+		$info = static::parse_connection_url($connection_string);
+		$fqclass = static::load_adapter_class($info->protocol);
 
-		if (!file_exists($source))
-			throw new DatabaseException("Adapter source not found. Expected to be in $source");
-
-		require_once($source);
-
-		if (!class_exists($fqclass))
-			throw new DatabaseException("No connection adapter found for protocol: $url->protocol");
-
-		$connection = new $fqclass($connection_string);
-		$connection->protocol	= $protocol;
-		$connection->class		= $class;
-		$connection->fqclass	= $fqclass;
-
+		$connection = new $fqclass($info);
+		$connection->protocol = $info->protocol;
 		return $connection;
 	}
 
-	protected function __construct($connection_string)
+	/**
+	 * Loads the specified the class for an adapter.
+	 *
+	 * @param string $adapter Name of the adapter.
+	 * @return string The full name of the class including namespace.
+	 */
+	private static function load_adapter_class($adapter)
 	{
-		$this->connect($connection_string);
+		$class = ucwords($adapter) . 'Adapter';
+		$fqclass = 'ActiveRecord\\' . $class;
+		$source = dirname(__FILE__) . "/adapters/$class.php";
+
+		if (!file_exists($source))
+			throw new DatabaseException("$fqclass not found!");
+
+		require_once($source);
+		return $fqclass;
 	}
 
 	/**
@@ -69,34 +73,38 @@ abstract class Connection
 	 * protocol://user:pass@host[:port]/dbname
 	 *
 	 * @params string $url A URL
-	 * @return The parsed URL as an array.
+	 * @return The parsed URL as an object.
 	 */
-	public static function connection_info_from($url)
+	public static function parse_connection_url($url)
 	{
-		$url = new Net_URL($url);
+		$url = @parse_url($url);
 
-		if (!$url->host)
+		if (!isset($url['host']))
 			throw new DatabaseException('Database host must be specified in the connection string.');
 
-		if (!$url->path)
-			throw new DatabaseException('Database name must be specified in the connection string.');
+		$info = new \stdClass();
+		$info->protocol = $url['scheme'];
+		$info->host		= $url['host'];
+		$info->db		= substr($url['path'],1);
+		$info->user		= $url['user'];
+		$info->pass		= $url['pass'];
 
-		$url->db = substr($url->path,1);
+		if (isset($url['port']))
+			$info->port = $url['port'];
 
-		return $url;
+		return $info;
 	}
 
 	/**
-	 * Fetches all data in the result set into an array.
+	 * Nope, you can't call this.
 	 */
-	public function fetch_all($res)
+	protected function __construct($info)
 	{
-		$list = array();
-
-		while (($row = $this->fetch($res)))
-			$list[] = $row;
-
-		return $list;
+		try {
+			$this->connection = new PDO("$info->protocol:host=$info->host" . (isset($info->port) ? ";port=$info->port":'') . ";dbname=$info->db",$info->user,$info->pass);
+		} catch (PDOException $e) {
+			throw new DatabaseException($e);
+		}
 	}
 
 	/**
@@ -105,47 +113,94 @@ abstract class Connection
 	 * @param string $table Name of a table
 	 * @return An array of ActiveRecord::Column objects.
 	 */
-	abstract function columns($table);
+	public function columns($table)
+	{
+		$columns = array();
+		$sth = $this->query_column_info($table);
 
+		while (($row = $sth->fetch()))
+		{
+			$c = $this->create_column($row);
+			$columns[$c->name] = $c;
+		}
+		return $columns;
+	}
+	
 	/**
-	 * Connects to the database. Should throw an ActiveRecord\DatabaseException
-	 * if connection failed.
-	 */
-	protected abstract function connect($connection_string);
-
-	/**
-	 * Closes the connection. Must set $this->connection to null.
-	 */
-	abstract function close();
-
-	/**
-	 * Escapes a string.
+	 * Escapes quotes in a string.
 	 *
-	 * @param string $string String to escape
-	 * @return string
+	 * @param $string string The string to be quoted.
+	 * @return string The string with any quotes in it properly escaped.
 	 */
-	abstract function escape($string);
-
-	/**
-	 * Fetches the current row data for the specified result set.
-	 *
-	 * @param object $res The raw connectoin result set.
-	 * @return An associative array containing the record values.
-	 */
-	abstract function fetch($res);
-
-	/**
-	 * Frees a result set or statement handle.
-	 *
-	 * @param mixed $res The result set or statement handle to free
-	 */
-	abstract function free_result_set($res);
+	public function escape($string)
+	{
+		return $this->connection->quote($string);
+	}
 
 	/**
 	 * Retrieve the insert id of the last model saved.
 	 * @return int.
 	 */
-	abstract function insert_id();
+	function insert_id()
+	{
+		return $this->connection->lastInsertId();
+	}
+
+	/**
+	 * Execute a raw SQL query on the database.
+	 *
+	 * @param string $sql Raw SQL string to execute.
+	 * @param array $values Optional array of bind values
+	 * @return A result set handle or void if you used $handler closure.
+	 */
+	function query($sql, &$values=array())
+	{
+		if (isset($GLOBALS['ACTIVERECORD_LOG']) && $GLOBALS['ACTIVERECORD_LOG'])
+			$GLOBALS['ACTIVERECORD_LOGGER']->log($sql, PEAR_LOG_INFO);
+
+		$this->last_query = $sql;
+
+		if (!($sth = $this->connection->prepare($sql)))
+			throw new DatabaseException($this);
+
+		$sth->setFetchMode(PDO::FETCH_ASSOC);
+
+		if (!($sth->execute($values)))
+			throw new DatabaseException($this);
+
+		return $sth;
+	}
+
+	/**
+	 * Execute a raw SQL query and fetch the results.
+	 *
+	 * @param string $sql Raw SQL string to execute.
+	 * @param Closure $handler Closure that will be passed the fetched results.
+	 * @return array Array of table names.
+	 */
+	function query_and_fetch($sql, Closure $handler)
+	{
+		$sth = $this->query($sql);
+
+		while (($row = $sth->fetch(PDO::FETCH_ASSOC)))
+			$handler($row);
+	}
+
+	/**
+	 * Returns all tables for the current database.
+	 *
+	 * @return array Array containing table names.
+	 */
+	public function tables()
+	{
+		$tables = array();
+		$sth = $this->query_for_tables();
+
+		while (($row = $sth->fetch(PDO::FETCH_NUM)))
+			$tables[] = $row[0];
+
+		return $tables;
+	}
 
 	/**
 	 * Adds a limit clause to the SQL query.
@@ -157,28 +212,20 @@ abstract class Connection
 	abstract function limit($sql, $offset, $limit);
 
 	/**
-	 * Execute a raw SQL query on the database.
+	 * Query for column meta info and return statement handle.
 	 *
-	 * @param string $sql Raw SQL string to execute.
-	 * @param array $values Optional array of bind values
-	 * @return A result set handle or void if you used $handler closure.
+	 * @param string $table Name of a table
+	 * @param PDOStatement
 	 */
-	abstract function query($sql, $values=array());
+	abstract public function query_column_info($table);
 
 	/**
-	 * Execute a raw SQL query and fetch the results.
+	 * Query for all tables in the current database. The result must only
+	 * contain one column which has the name of the table.
 	 *
-	 * @param string $sql Raw SQL string to execute.
-	 * @param Closure $handler Closure that will be passed the fetched results.
-	 * @return array Array of table names.
+	 * @return PDOStatement
 	 */
-	function query_and_fetch($sql, \Closure $handler)
-	{
-		$res = $this->query($sql);
-
-		while (($row = $this->fetch($res)))
-			$handler($row);
-	}
+	abstract function query_for_tables();
 
 	/**
 	 * Quote a name like table names and field names.
@@ -187,12 +234,5 @@ abstract class Connection
 	 * @return string
 	 */
 	abstract function quote_name($string);
-
-	/**
-	 * Returns a list of tables available to the current connection.
-	 *
-	 * @return array Array of table names.
-	 */
-	abstract function tables();
 };
 ?>

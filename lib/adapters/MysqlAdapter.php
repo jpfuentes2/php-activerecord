@@ -1,71 +1,64 @@
 <?php
 namespace ActiveRecord;
 
-require_once 'AbstractMysqlAdapter.php';
-
-class MysqlAdapter extends AbstractMysqlAdapter
+class MysqlAdapter extends Connection
 {
-	protected function connect($connection_string)
+	public function limit($sql, $offset, $limit)
 	{
-		$info = static::connection_info_from($connection_string);
-		$this->connection = @mysql_connect($info->host . ($info->port ? ":$info->port" : ""),$info->user,$info->pass);
-
-		if (!$this->connection)
-			throw new DatabaseException("Could not connect to database $info->host");
-
-		if (!mysql_select_db($info->db))
-			throw new DatabaseException(mysql_error($this->connection),mysql_errno($this->connection));
+		$offset = intval($offset);
+		$limit = intval($limit);
+		return "$sql LIMIT $offset,$limit";
 	}
 
-	public function close()
+	public function query_column_info($table)
 	{
-		if ($this->connection)
+		return $this->query("SHOW COLUMNS FROM $table");
+	}
+
+	public function query_for_tables()
+	{
+		return $this->query('SHOW TABLES');
+	}
+
+	public function quote_name($string)
+	{
+		return "`$string`";
+	}
+
+	public function create_column(&$column)
+	{
+		$c = new Column();
+		$c->inflected_name	= Inflector::instance()->variablize($column['Field']);
+		$c->name			= $column['Field'];
+		$c->nullable		= ($column['Null'] === 'YES' ? true : false);
+		$c->pk				= ($column['Key'] === 'PRI' ? true : false);
+		$c->auto_increment	= ($column['Extra'] === 'auto_increment' ? true : false);
+
+		if ($column['Type'] == 'timestamp' || $column['Type'] == 'datetime')
 		{
-			mysql_close($this->connection);
-			$this->connection = null;
+			$c->raw_type = 'datetime';
+			$c->length = 19;
 		}
-	}
-
-	public function escape($string)
-	{
-		return mysql_real_escape_string($string, $this->connection);
-	}
-
-	public function fetch($res)
-	{
-		if (!($row = mysql_fetch_assoc($res)))
-			$this->free_result_set($res);
-
-		return $row;
-	}
-
-	public function free_result_set($res)
-	{
-		@mysql_free_result($res);
-	}
-
-	public function insert_id()
-	{
-		return mysql_insert_id($this->connection);
-	}
-
-	public function query($sql, $values=array())
-	{
-		if (isset($GLOBALS['ACTIVERECORD_LOG']) && $GLOBALS['ACTIVERECORD_LOG'])
-			$GLOBALS['ACTIVERECORD_LOGGER']->log($sql, PEAR_LOG_INFO);
-
-		if (is_array($values) && count($values) > 0)
+		elseif ($column['Type'] == 'date')
 		{
-			$sql = new Expressions($sql);
-			$sql->set_connection($this);
-			$sql->bind_values($values);
-			$sql = $sql->to_s(true);
+			$c->raw_type = 'date';
+			$c->length = 10;
+		}
+		else
+		{
+			preg_match('/^(.*?)\(([0-9]+(,[0-9]+)?)\)/',$column['Type'],$matches);
+
+			if (sizeof($matches) > 0)
+			{
+				$c->raw_type = $matches[1];
+				$c->length = intval($matches[2]);
+			}
 		}
 
-		if (!($res = mysql_query($sql,$this->connection)))
-			throw new DatabaseException(mysql_error($this->connection),mysql_errno($this->connection));
+		$c->map_raw_type();
+		$c->default = $c->cast($column['Default']);
 
-		return $res;
+		return $c;
 	}
-};
+}
 ?>

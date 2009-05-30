@@ -15,9 +15,8 @@ ActiveRecord\Config::initialize(function($cfg)
 	$cfg->set_model_directory(realpath(dirname(__FILE__) . '/../models'));
 	$cfg->set_connections(array(
 		'mysql'		=> 'mysql://test:test@127.0.0.1/test',
-		'mysqli'	=> 'mysqli://test:test@127.0.0.1/test',
 		'pgsql'		=> 'pgsql://test:test@127.0.0.1/test',
-		'sqlite3'	=> 'sqlite3://test.db'));
+		'sqlite'	=> 'sqlite://test.db'));
 	$cfg->set_default_connection('mysql');
 });
 ?>

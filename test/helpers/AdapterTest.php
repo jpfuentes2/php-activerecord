@@ -8,8 +8,6 @@ class AdapterTest extends DatabaseTest
 	public function testShouldSetAdapterVariables()
 	{
 		$this->assertNotNull($this->conn->protocol);
-		$this->assertNotNull($this->conn->class);
-		$this->assertNotNull($this->conn->fqclass);
 	}
 
 	public function testNullConnectionStringUsesDefaultConnection()
@@ -125,13 +123,13 @@ class AdapterTest extends DatabaseTest
 
 	public function testQuery()
 	{
-		$res = $this->conn->query('SELECT * FROM authors');
+		$sth = $this->conn->query('SELECT * FROM authors');
 
-		while (($row = $this->conn->fetch($res)))
+		while (($row = $sth->fetch()))
 			$this->assertNotNull($row);
 
-		$res = $this->conn->query('SELECT * FROM authors WHERE author_id=1');
-		$row = $this->conn->fetch($res);
+		$sth = $this->conn->query('SELECT * FROM authors WHERE author_id=1');
+		$row = $sth->fetch();
 		$this->assertEquals('Tito',$row['name']);
 	}
 
@@ -145,11 +143,11 @@ class AdapterTest extends DatabaseTest
 
 	public function testFetch()
 	{
-		$res = $this->conn->query('SELECT * FROM authors WHERE author_id IN(1,2,3)');
+		$sth = $this->conn->query('SELECT * FROM authors WHERE author_id IN(1,2,3)');
 		$i = 0;
 		$ids = array();
 
-		while (($row = $this->conn->fetch($res)))
+		while (($row = $sth->fetch()))
 		{
 			++$i;
 			$ids[] = $row['author_id'];
@@ -161,14 +159,14 @@ class AdapterTest extends DatabaseTest
 
 	public function testQueryWithParams()
 	{
-		$res = $this->conn->query('SELECT * FROM authors WHERE name IN(?) ORDER BY name DESC',array(array('Bill Clinton','Tito')));
-		$row = $this->conn->fetch($res);
+		$sth = $this->conn->query('SELECT * FROM authors WHERE name IN(?,?) ORDER BY name DESC',($x=array('Bill Clinton','Tito')));
+		$row = $sth->fetch();
 		$this->assertEquals('Tito',$row['name']);
 
-		$row = $this->conn->fetch($res);
+		$row = $sth->fetch();
 		$this->assertEquals('Bill Clinton',$row['name']);
 
-		$row = $this->conn->fetch($res);
+		$row = $sth->fetch();
 		$this->assertEquals(null,$row);
 	}
 
@@ -186,7 +184,7 @@ class AdapterTest extends DatabaseTest
 
 	public function testInsertIdWithParams()
 	{
-		$this->conn->query('INSERT INTO authors(name) VALUES(?)',array('name'));
+		$this->conn->query('INSERT INTO authors(name) VALUES(?)',($x=array('name')));
 		$this->assertTrue($this->conn->insert_id() > 0);
 	}
 
@@ -240,26 +238,29 @@ class AdapterTest extends DatabaseTest
 
 	public function testFetchNoResults()
 	{
-		$res = $this->conn->query('SELECT * FROM authors WHERE author_id=65534');
-		$this->assertEquals(null,$this->conn->fetch($res));
-	}
-
-	public function testFetchAll()
-	{
-		$res = $this->conn->query('SELECT * FROM authors');
-		$this->assertTrue(count($this->conn->fetch_all($res)) > 0);
-	}
-
-	public function testFree()
-	{
-		$res = $this->conn->query('SELECT * FROM authors');
-		$this->conn->free_result_set($res);
-		$this->assertFalse(is_resource($res));
+		$sth = $this->conn->query('SELECT * FROM authors WHERE author_id=65534');
+		$this->assertEquals(null,$sth->fetch());
 	}
 
 	public function testTables()
 	{
 		$this->assertTrue(count($this->conn->tables()) > 0);
+	}
+
+	public function testQueryColumnInfo()
+	{
+		$this->assertGreaterThan(0,count($this->conn->query_column_info("authors")));
+	}
+
+	public function testQueryTableInfo()
+	{
+		$this->assertGreaterThan(0,count($this->conn->query_for_tables()));
+	}
+
+	public function testQueryTableInfoMustReturnOneField()
+	{
+		$sth = $this->conn->query_for_tables();
+		$this->assertEquals(1,count($sth->fetch()));
 	}
 }
 ?>

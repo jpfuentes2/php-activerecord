@@ -126,7 +126,7 @@ class Table
 			}
 			else
 			{
-				if (count($options['mapped_names']) > 0)
+				if (!empty($options['mapped_names']))
 					$options['conditions'] = $this->map_names($options['conditions'],$options['mapped_names']);
 
 				$sql->where($options['conditions']);
@@ -158,9 +158,9 @@ class Table
 		$this->last_sql = $sql;
 
 		$list = array();
-		$res = $this->conn->query($sql,$values);
+		$sth = $this->conn->query($sql,$values);
 
-		while (($row = $this->conn->fetch($res)))
+		while (($row = $sth->fetch()))
 		{
 			$model = new $this->class->name($row,false,true);
 
@@ -231,11 +231,6 @@ class Table
 	private function get_meta_data()
 	{
 		$this->columns = $this->conn->columns($this->get_fully_qualified_table_name());
-
-		$this->inflected = array();
-
-		foreach ($this->columns as $name => &$column)
-			$this->inflected[$column->inflected_name] = $column;
 	}
 
 	/**

@@ -1,12 +1,12 @@
 <?php
 include 'helpers/config.php';
-require_once dirname(__FILE__) . '/../lib/adapters/Sqlite3Adapter.php';
+require_once dirname(__FILE__) . '/../lib/adapters/SqliteAdapter.php';
 
-class Sqlite3AdapterTest extends AdapterTest
+class SqliteAdapterTest extends AdapterTest
 {
 	public function setUp($connection_name=null)
 	{
-		parent::setUp('sqlite3');
+		parent::setUp('sqlite');
 	}
 
 	public function tearDown()
@@ -21,7 +21,7 @@ class Sqlite3AdapterTest extends AdapterTest
 	{
 		try
 		{
-			ActiveRecord\Connection::instance("sqlite3://" . self::InvalidDb);
+			ActiveRecord\Connection::instance("sqlite://" . self::InvalidDb);
 			$this->assertFalse(true);
 		}
 		catch (ActiveRecord\DatabaseException $e)

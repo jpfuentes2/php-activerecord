@@ -11,20 +11,12 @@ class ConnectionTest extends PHPUnit_Framework_TestCase
 	 */
 	public function testConnectionInfoFromShouldThrowExceptionWhenNoHost()
 	{
-		ActiveRecord\Connection::connection_info_from('mysql://user:pass');
-	}
-
-	/**
-	 * @expectedException ActiveRecord\DatabaseException
-	 */
-	public function testConnectionInfoFromShouldThrowExceptionWhenNoPath()
-	{
-		ActiveRecord\Connection::connection_info_from('mysql://user:pass@127.0.0.1');
+		ActiveRecord\Connection::parse_connection_url('mysql://user:pass@');
 	}
 
 	public function testConnectionInfo()
 	{
-		$info = ActiveRecord\Connection::connection_info_from('mysql://user:pass@127.0.0.1:3306/dbname');
+		$info = ActiveRecord\Connection::parse_connection_url('mysql://user:pass@127.0.0.1:3306/dbname');
 		$this->assertEquals('mysql',$info->protocol);
 		$this->assertEquals('user',$info->user);
 		$this->assertEquals('pass',$info->pass);

@@ -212,11 +212,25 @@ class SQLBuilder
 		}
 		elseif ($num_args > 0)
 		{
-			$e = new Expressions($args[0]);
-			$e->set_connection($this->connection);
-			$e->bind_values(array_slice($args,1));
-			$this->where = $e->to_s();
-			$this->where_values = array_flatten($e->values());
+			// if the values has a nested array then we'll need to use Expressions to expand the bind marker for us
+			$values = array_slice($args,1);
+
+			foreach ($values as $name => &$value)
+			{
+				if (is_array($value))
+				{
+					$e = new Expressions($args[0]);
+					$e->set_connection($this->connection);
+					$e->bind_values($values);
+					$this->where = $e->to_s();
+					$this->where_values = array_flatten($e->values());
+					return;
+				}
+			}
+
+			// no nested array so nothing special to do
+			$this->where = $args[0];
+			$this->where_values = &$values;
 		}
 	}
 

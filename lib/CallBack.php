@@ -18,7 +18,7 @@ class CallBack
 {
 	/**
 	 * Array of callbacks that are available to use.
-	 * 
+	 *
 	 * @access private
 	 * @static
 	 * @var array
@@ -50,7 +50,7 @@ class CallBack
 
 	/**
 	 * Holds data for registered callbacks.
-	 * 
+	 *
 	 * @access private
 	 * @var array
 	 */
@@ -86,7 +86,7 @@ class CallBack
 
 	/**
 	 * Returns callback methods for the specified callback name.
-	 * 
+	 *
 	 * @param $name string Name of a callback
 	 * @return array of callbacks or null if invalid callback name.
 	 */
@@ -107,7 +107,7 @@ class CallBack
 	 *  a method was invoked that was for a before_* callback and that
 	 *  method returned false. If this happens, execution of any other callbacks after
 	 *  the offending callback will not occur.
-	 *  
+	 *
 	 * @param string $model Model to invoke the callback on.
 	 * @param string $name Name of the callback to invoke
 	 * @param boolean $must_exist Set to true to raise an exception if the callback does not exist.
@@ -119,8 +119,10 @@ class CallBack
 			throw new ActiveRecordException("No callbacks were defined for: $name on " . get_class($model));
 
 		$registry = $this->registry[$name];
+		$first = substr($name,0,6);
 
-				if (preg_match('/(after|before)_(create|update)/', $name))
+		// starts with /(after|before)_(create|update)/
+		if (($first == 'after_' || $first == 'before') && (($second = substr($name,7,5)) == 'creat' || $second == 'updat' || $second == 'reate' || $second == 'pdate'))
 		{
 			$temporal_save = str_replace(array('create', 'update'), 'save', $name);
 
@@ -136,7 +138,7 @@ class CallBack
 			{
 				$ret = ($method instanceof Closure ? $method($model) : $model->$method());
 
-				if (false === $ret && substr($name, 0, 6) === 'before')
+				if (false === $ret && $first === 'before')
 					return false;
 			}
 		}
@@ -145,7 +147,7 @@ class CallBack
 
 	/**
 	 * Register a new callback.
-	 * 
+	 *
 	 * @param string
 	 * @param array
 	 * @param array
@@ -157,14 +159,14 @@ class CallBack
 
 		if (!$closure_or_method_name)
 			$closure_or_method_name = $name;
-		
+
 		if (!in_array($name,self::$VALID_CALLBACKS))
 			throw new ActiveRecordException("Invalid callback: $name");
 
 		if (!($closure_or_method_name instanceof Closure) && !$this->klass->hasMethod($closure_or_method_name))
 		{
 			// i'm a dirty ruby programmer
-			throw new ActiveRecordException("Unknown method for callback: $name" . 
+			throw new ActiveRecordException("Unknown method for callback: $name" .
 				(is_string($closure_or_method_name) ? ": #$closure_or_method_name" : ""));
 		}
 

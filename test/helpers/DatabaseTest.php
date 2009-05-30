@@ -13,10 +13,10 @@ class DatabaseTest extends PHPUnit_Framework_TestCase
 		if ($connection_name)
 			$config->set_default_connection($connection_name);
 
-		if ($connection_name == 'sqlite3' || $config->get_default_connection() == 'sqlite3')
+		if ($connection_name == 'sqlite' || $config->get_default_connection() == 'sqlite')
 		{
 			// need to create the db. the adapter specifically does not create it for us.
-			$this->db = substr(ActiveRecord\Config::instance()->get_connection('sqlite3'),10);
+			$this->db = substr(ActiveRecord\Config::instance()->get_connection('sqlite'),9);
 			new SQLite3($this->db);
 		}
 

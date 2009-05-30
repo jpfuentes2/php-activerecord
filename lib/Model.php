@@ -192,7 +192,7 @@ class Model
 			return null;
 
 		$dirty = array_intersect_key($this->attributes,$this->__dirty);
-		return count($dirty) > 0 ? $dirty : null;
+		return !empty($dirty) ? $dirty : null;
 	}
 
 	/**
@@ -502,7 +502,7 @@ class Model
 	 * @param array
 	 * @return void
 	 */
-	public function set_attributes($attributes)
+	public function set_attributes(array $attributes)
 	{
 		$this->set_attributes_via_mass_assignment($attributes, true);
 	}
@@ -514,26 +514,21 @@ class Model
 	 * @param boolean flag of whether or not attributes should be guarded
 	 * @return unknown_type
 	 */
-	private function set_attributes_via_mass_assignment(&$attributes, $guard_attributes)
+	private function set_attributes_via_mass_assignment(array &$attributes, $guard_attributes)
 	{
-		if (!is_array($attributes) || empty($attributes))
-			return false;
-
 		//access uninflected columns since that is what we would have in result set
 		$table = static::table();
-		$columns = array_merge($table->inflected,$table->columns);
 		$exceptions = array();
-		$use_attr_accessible = is_array(static::$attr_accessible) && count(static::$attr_accessible) > 0;
-		$use_attr_protected = is_array(static::$attr_protected) && count(static::$attr_protected) > 0;
+		$use_attr_accessible = !empty(static::$attr_accessible);
+		$use_attr_protected = !empty(static::$attr_protected);
 
 		foreach ($attributes as $name => $value)
 		{
-			if (array_key_exists($name,$columns))
+			// is a normal field on the table
+			if (array_key_exists($name,$table->columns))
 			{
-				$name = $columns[$name]->inflected_name;
-
-				if (!$guard_attributes)
-					$value = $columns[$name]->cast($value);
+				$value = $table->columns[$name]->cast($value);
+				$name = $table->columns[$name]->inflected_name;
 			}
 
 			if ($guard_attributes)
@@ -544,6 +539,7 @@ class Model
 				if ($use_attr_protected && in_array($name,static::$attr_protected))
 					continue;
 
+				// set valid table data
 				try {
 					$this->$name = $value;
 				} catch (UndefinedPropertyException $e) {
@@ -551,7 +547,10 @@ class Model
 				}
 			}
 			else
+			{
+				// set arbitrary data
 				$this->attributes[$name] = $value;
+			}
 		}
 
 		if (!empty($exceptions))
@@ -757,7 +756,7 @@ class Model
 		$options['mapped_names'] = static::$alias_attribute;
 		$list = static::table()->find($options);
 
-		return $single ? (count($list) > 0 ? $list[0] : null) : $list;
+		return $single ? (!empty($list) ? $list[0] : null) : $list;
 	}
 
 	/**
@@ -814,6 +813,7 @@ class Model
 	/**
 	 * Returns true if @var $array is a valid options hash. Will throw exceptions
 	 * if it is a hash and contains invalid option keys.
+	 * 
 	 * @throws ActiveRecord\ActiveRecordException
 	 * @return boolean
 	 */
@@ -822,11 +822,14 @@ class Model
 		if (is_hash($array))
 		{
 			$keys = array_keys($array);
+			$diff = array_diff($keys,self::$VALID_OPTIONS);
 
-			if (count(($diff = array_diff($keys,self::$VALID_OPTIONS))) > 0)
+			if (!empty($diff))
 				throw new ActiveRecordException("Unknown key(s): " . join(', ',$diff));
 
-			if (count(array_intersect($keys,self::$VALID_OPTIONS)) > 0)
+			$intersect = array_intersect($keys,self::$VALID_OPTIONS);
+
+			if (!empty($intersect))
 				return true;
 		}
 		return false;
