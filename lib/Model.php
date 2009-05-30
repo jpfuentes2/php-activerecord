@@ -349,15 +349,15 @@ class Model
 		if ($validate && !$this->_validate())
 			return false;
 
+		$table = static::table();
 		$this->invoke_callback('before_create',false);
 		if (($dirty = $this->dirty_attributes()))
-			static::table()->insert($dirty);
+			$table->insert($dirty);
 		else
-			static::table()->insert($this->attributes);
+			$table->insert($this->attributes);
 		$this->invoke_callback('after_create',false);
 
 		$pk = $this->get_primary_key(false);
-		$table = static::table();
 
 		// if we've got an autoincrementing pk set it
 		if (count($pk) == 1 && $table->columns[$pk[0]]->auto_increment)
