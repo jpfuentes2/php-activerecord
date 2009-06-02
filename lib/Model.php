@@ -914,5 +914,32 @@ class Model
 	{
 		return static::table()->callback->invoke($this,$method_name,$must_exist);
 	}
+
+	/**
+	 * Execute a closure inside a transaction.
+	 * 
+	 * @param Closure $closure The closure to execute. It should return false or
+	 * throw an exception to rollback the transaction.
+	 */
+	public static function transaction(\Closure $closure)
+	{
+		$connection = static::connection();
+
+		try
+		{
+			$connection->transaction();
+
+			if ($closure() === false)
+				$connection->rollback();
+			else
+				$connection->commit();
+		}
+		catch (Exception $e)
+		{
+			// TODO rollback via exception does not work yet
+			$connection->rollback();
+			throw $e;
+		}
+	}
 };
 ?>

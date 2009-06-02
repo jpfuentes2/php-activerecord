@@ -6,7 +6,7 @@ CREATE TABLE authors(
 	updated_at datetime,
 	created_at datetime,
 	some_date date
-);
+) ENGINE=InnoDB;
 
 DROP TABLE IF EXISTS books;
 CREATE TABLE books(

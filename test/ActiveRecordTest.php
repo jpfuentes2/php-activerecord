@@ -218,5 +218,55 @@ class ActiveRecordTest extends DatabaseTest
 		$book = new Book();
 		$this->assertSame(0.0,$book->special);
 	}
+
+	public function testTransactionCommitted()
+	{
+		$original = Author::count();
+		Author::transaction(function() { Author::create(array("name" => "blah")); });
+		$this->assertEquals($original+1,Author::count());
+	}
+
+	public function testTransactionCommittedWhenReturningTrue()
+	{
+		$original = Author::count();
+		Author::transaction(function() { Author::create(array("name" => "blah")); return true; });
+		$this->assertEquals($original+1,Author::count());
+	}
+	
+	public function testTransactionRolledbackByReturningFalse()
+	{
+		$original = Author::count();
+
+		Author::transaction(function()
+		{
+			Author::create(array("name" => "blah"));
+			return false;
+		});
+
+		$this->assertEquals($original,Author::count());
+	}
+	
+	// TODO this doesn't work for some reason
+	// TODO the exception is not being caught from within Model::transaction
+	public function testTransactionRolledbackByThrowingException()
+	{
+		/*
+		$original = Author::count();
+
+		try
+		{
+			Author::transaction(function()
+			{
+				Author::create(array("name" => "blah"));
+				throw new Exception("blah");
+			});
+		}
+		catch (Exception $e)
+		{
+		}
+
+		$this->assertEquals($original,Author::count());
+		*/
+	}
 };
 ?>

@@ -262,5 +262,27 @@ class AdapterTest extends DatabaseTest
 		$sth = $this->conn->query_for_tables();
 		$this->assertEquals(1,count($sth->fetch()));
 	}
+
+	public function testTransactionCommit()
+	{
+		$original = $this->conn->query_and_fetch_one("select count(*) from authors");
+
+		$this->conn->transaction();
+		$this->conn->query("insert into authors(name) values('blahhhhhhhh')");
+		$this->conn->commit();
+
+		$this->assertEquals($original+1,$this->conn->query_and_fetch_one("select count(*) from authors"));
+	}
+
+	public function testTransactionRollback()
+	{
+		$original = $this->conn->query_and_fetch_one("select count(*) from authors");
+
+		$this->conn->transaction();
+		$this->conn->query("insert into authors(name) values('blahhhhhhhh')");
+		$this->conn->rollback();
+
+		$this->assertEquals($original,$this->conn->query_and_fetch_one("select count(*) from authors"));
+	}
 }
 ?>

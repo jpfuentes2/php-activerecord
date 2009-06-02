@@ -141,7 +141,7 @@ abstract class Connection
 	 * Retrieve the insert id of the last model saved.
 	 * @return int.
 	 */
-	function insert_id()
+	public function insert_id()
 	{
 		return $this->connection->lastInsertId();
 	}
@@ -153,7 +153,7 @@ abstract class Connection
 	 * @param array $values Optional array of bind values
 	 * @return A result set handle or void if you used $handler closure.
 	 */
-	function query($sql, &$values=array())
+	public function query($sql, &$values=array())
 	{
 		if (isset($GLOBALS['ACTIVERECORD_LOG']) && $GLOBALS['ACTIVERECORD_LOG'])
 			$GLOBALS['ACTIVERECORD_LOGGER']->log($sql, PEAR_LOG_INFO);
@@ -172,13 +172,27 @@ abstract class Connection
 	}
 
 	/**
+	 * Execute a query that returns maximum of one row with one field and return it.
+	 * 
+	 * @param string $sql Raw SQL string to execute.
+	 * @param array $values Optional array of values to bind to the query.
+	 * @return string
+	 */
+	public function query_and_fetch_one($sql, &$values=array())
+	{
+		$sth = $this->query($sql,$values);
+		$row = $sth->fetch(PDO::FETCH_NUM);
+		return $row[0];
+	}
+
+	/**
 	 * Execute a raw SQL query and fetch the results.
 	 *
 	 * @param string $sql Raw SQL string to execute.
 	 * @param Closure $handler Closure that will be passed the fetched results.
 	 * @return array Array of table names.
 	 */
-	function query_and_fetch($sql, Closure $handler)
+	public function query_and_fetch($sql, Closure $handler)
 	{
 		$sth = $this->query($sql);
 
@@ -200,6 +214,33 @@ abstract class Connection
 			$tables[] = $row[0];
 
 		return $tables;
+	}
+
+	/**
+	 * Starts a transaction.
+	 */
+	public function transaction()
+	{
+		if (!$this->connection->beginTransaction())
+			throw new DatabaseException($this);
+	}
+
+	/**
+	 * Commits the current transaction.
+	 */
+	public function commit()
+	{
+		if (!$this->connection->commit())
+			throw new DatabaseException($this);
+	}
+
+	/**
+	 * Rollback a transaction.
+	 */
+	public function rollback()
+	{
+		if (!$this->connection->rollback())
+			throw new DatabaseException($this);
 	}
 
 	/**
