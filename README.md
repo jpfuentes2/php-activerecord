@@ -23,6 +23,12 @@ This implementation is inspired and thus borrows heavily from Ruby on Rails' Act
 We have tried to maintain their conventions while deviating mainly because of convenience or necessity.
 Of course, there are some differences which will be obvious to the user if they are familiar with rails.
 
+## Supported Databases ##
+
+- MySQL
+- SQLite
+- (oracle and postgres very soon)
+
 ## Installation ##
 
 Setup is very easy and straight-forward. There are essentially only two configuration points you must concern yourself with:

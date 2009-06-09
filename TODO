@@ -12,6 +12,5 @@
 
 == Testing
 
-- make tests run faster by not re-creating whole db for every individual test
 - tests/fixes for funky table/field names
 - more tests for to_xml
