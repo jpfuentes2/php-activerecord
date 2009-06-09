@@ -10,14 +10,14 @@ class SqliteAdapter extends Connection
 		if (!file_exists($info->host))
 			throw new DatabaseException("Could not find sqlite db: $info->host");
 
-		try {
-			$this->protocol = $info->protocol;
-			$this->connection = new PDO("sqlite:$info->host");
-		} catch (PDOException $e) {
-			throw new DatabaseException($e);
-		}
+		$this->connection = new PDO("sqlite:$info->host",null,null,static::$PDO_OPTIONS);
 	}
 
+	public function default_port()
+	{
+		return 0;
+	}
+	
 	public function limit($sql, $offset, $limit)
 	{
 		$offset = intval($offset);

@@ -61,9 +61,9 @@ class ActiveRecordFindTest extends DatabaseTest
 	}
 
 	/**
-	 * @expectedException ActiveRecord\RecordNotFound
+	 * @expectedException Exception
 	 */
-	public function testFindByPKWithSQLInString()
+	public function testFindNothingWithSQLInString()
 	{
 		Author::first('name = 123123123');
 	}
@@ -291,7 +291,7 @@ class ActiveRecordFindTest extends DatabaseTest
 
 	public function testFindWithSelect()
 	{
-		$author = Author::first(array('select' => 'name, 123 as bubba'));
+		$author = Author::first(array('select' => 'name, 123 as bubba', 'order' => 'name desc'));
 		$this->assertEquals('Tito',$author->name);
 		$this->assertEquals(123,$author->bubba);
 	}
@@ -323,7 +323,7 @@ class ActiveRecordFindTest extends DatabaseTest
 
 	public function testGroup()
 	{
-		$venues = Venue::all(array('group' => 'state'));
+		$venues = Venue::all(array('select' => 'state', 'group' => 'state'));
 		$this->assertTrue(count($venues) > 0);
 		$this->assertTrue(strpos(ActiveRecord\Table::load('Venue')->last_sql, 'GROUP BY state') !== false);
 	}

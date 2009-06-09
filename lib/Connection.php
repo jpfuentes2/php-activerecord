@@ -13,6 +13,12 @@ abstract class Connection
 	public $connection;
 	public $last_query;
 
+	static $PDO_OPTIONS = array(
+		PDO::ATTR_CASE				=> PDO::CASE_LOWER,
+		PDO::ATTR_ERRMODE			=> PDO::ERRMODE_EXCEPTION,
+		PDO::ATTR_ORACLE_NULLS		=> PDO::NULL_NATURAL,
+		PDO::ATTR_STRINGIFY_FETCHES	=> false);
+
 	/**
 	 * Retrieve a database connection.
 	 *
@@ -42,8 +48,12 @@ abstract class Connection
 		$info = static::parse_connection_url($connection_string);
 		$fqclass = static::load_adapter_class($info->protocol);
 
-		$connection = new $fqclass($info);
-		$connection->protocol = $info->protocol;
+		try {
+			$connection = new $fqclass($info);
+			$connection->protocol = $info->protocol;
+		} catch (PDOException $e) {
+			throw new DatabaseException($e);
+		}
 		return $connection;
 	}
 
@@ -101,7 +111,9 @@ abstract class Connection
 	protected function __construct($info)
 	{
 		try {
-			$this->connection = new PDO("$info->protocol:host=$info->host" . (isset($info->port) ? ";port=$info->port":'') . ";dbname=$info->db",$info->user,$info->pass);
+			$this->connection = new PDO("$info->protocol:host=$info->host" . 
+				(isset($info->port) ? ";port=$info->port":'') .	";dbname=$info->db",$info->user,$info->pass,
+				static::$PDO_OPTIONS);
 		} catch (PDOException $e) {
 			throw new DatabaseException($e);
 		}
@@ -138,12 +150,22 @@ abstract class Connection
 	}
 
 	/**
+	 * Return a default sequence name for the specified table.
+	 * 
+	 * @return A sequence name or null if not supported.
+	 */
+	public function get_sequence_name($table)
+	{
+		return null;
+	}
+
+	/**
 	 * Retrieve the insert id of the last model saved.
 	 * @return int.
 	 */
-	public function insert_id()
+	public function insert_id($sequence=null)
 	{
-		return $this->connection->lastInsertId();
+		return $this->connection->lastInsertId($sequence);
 	}
 
 	/**
@@ -160,14 +182,21 @@ abstract class Connection
 
 		$this->last_query = $sql;
 
-		if (!($sth = $this->connection->prepare($sql)))
+		try {
+			if (!($sth = $this->connection->prepare($sql)))
+				throw new DatabaseException($this);
+		} catch (PDOException $e) {
 			throw new DatabaseException($this);
+		}
 
 		$sth->setFetchMode(PDO::FETCH_ASSOC);
 
-		if (!($sth->execute($values)))
+		try {
+			if (!$sth->execute($values))
+				throw new DatabaseException($this);
+		} catch (PDOException $e) {
 			throw new DatabaseException($this);
-
+		}
 		return $sth;
 	}
 
@@ -242,6 +271,11 @@ abstract class Connection
 		if (!$this->connection->rollback())
 			throw new DatabaseException($this);
 	}
+
+	/**
+	 * Returns the default port of the database server.
+	 */
+	abstract function default_port();
 
 	/**
 	 * Adds a limit clause to the SQL query.

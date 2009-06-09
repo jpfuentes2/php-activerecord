@@ -1,7 +1,6 @@
 -- CREATE USER test;
 -- GRANT ALL PRIVILEGES ON test to test;
 
-DROP TABLE IF EXISTS authors;
 CREATE TABLE authors(
 	author_id SERIAL PRIMARY KEY,
 	parent_author_id INT,
@@ -11,7 +10,6 @@ CREATE TABLE authors(
 	some_date date
 );
 
-DROP TABLE IF EXISTS books;
 CREATE TABLE books(
 	book_id SERIAL PRIMARY KEY,
 	author_id INT,
@@ -21,7 +19,6 @@ CREATE TABLE books(
 	special NUMERIC(10,2) DEFAULT 0
 );
 
-DROP TABLE IF EXISTS venues;
 CREATE TABLE venues (
 	id SERIAL PRIMARY KEY,
 	name varchar(50),
@@ -32,7 +29,6 @@ CREATE TABLE venues (
 	UNIQUE(name,address)
 );
 
-DROP TABLE IF EXISTS events;
 CREATE TABLE events (
 	id SERIAL PRIMARY KEY,
 	venue_id int NOT NULL,
@@ -42,13 +38,11 @@ CREATE TABLE events (
 	type varchar(15) default NULL
 );
 
-DROP TABLE IF EXISTS hosts;
 CREATE TABLE hosts(
 	id SERIAL PRIMARY KEY,
-	name VARCHAR(10)
+	name VARCHAR(25)
 );
 
-DROP TABLE IF EXISTS employees;
 CREATE TABLE employees (
 	id SERIAL PRIMARY KEY,
 	first_name VARCHAR(255) NOT NULL,
@@ -56,7 +50,6 @@ CREATE TABLE employees (
 	nick_name VARCHAR(255) NOT NULL
 );
 
-DROP TABLE IF EXISTS positions;
 CREATE TABLE positions (
 	id SERIAL PRIMARY KEY,
 	employee_id int NOT NULL,
@@ -64,7 +57,6 @@ CREATE TABLE positions (
 	active SMALLINT NOT NULL
 );
 
-DROP TABLE IF EXISTS "rm-bldg";
 CREATE TABLE "rm-bldg"(
     "rm-id" SERIAL PRIMARY KEY,
     "rm-name" VARCHAR(10) NOT NULL,

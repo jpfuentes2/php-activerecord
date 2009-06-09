@@ -3,6 +3,11 @@ namespace ActiveRecord;
 
 class MysqlAdapter extends Connection
 {
+	public function default_port()
+	{
+		return 3306;
+	}
+
 	public function limit($sql, $offset, $limit)
 	{
 		$offset = intval($offset);
@@ -28,25 +33,25 @@ class MysqlAdapter extends Connection
 	public function create_column(&$column)
 	{
 		$c = new Column();
-		$c->inflected_name	= Inflector::instance()->variablize($column['Field']);
-		$c->name			= $column['Field'];
-		$c->nullable		= ($column['Null'] === 'YES' ? true : false);
-		$c->pk				= ($column['Key'] === 'PRI' ? true : false);
-		$c->auto_increment	= ($column['Extra'] === 'auto_increment' ? true : false);
+		$c->inflected_name	= Inflector::instance()->variablize($column['field']);
+		$c->name			= $column['field'];
+		$c->nullable		= ($column['null'] === 'YES' ? true : false);
+		$c->pk				= ($column['key'] === 'PRI' ? true : false);
+		$c->auto_increment	= ($column['extra'] === 'auto_increment' ? true : false);
 
-		if ($column['Type'] == 'timestamp' || $column['Type'] == 'datetime')
+		if ($column['type'] == 'timestamp' || $column['type'] == 'datetime')
 		{
 			$c->raw_type = 'datetime';
 			$c->length = 19;
 		}
-		elseif ($column['Type'] == 'date')
+		elseif ($column['type'] == 'date')
 		{
 			$c->raw_type = 'date';
 			$c->length = 10;
 		}
 		else
 		{
-			preg_match('/^(.*?)\(([0-9]+(,[0-9]+)?)\)/',$column['Type'],$matches);
+			preg_match('/^(.*?)\(([0-9]+(,[0-9]+)?)\)/',$column['type'],$matches);
 
 			if (sizeof($matches) > 0)
 			{
@@ -56,7 +61,7 @@ class MysqlAdapter extends Connection
 		}
 
 		$c->map_raw_type();
-		$c->default = $c->cast($column['Default']);
+		$c->default = $c->cast($column['default']);
 
 		return $c;
 	}

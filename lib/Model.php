@@ -363,7 +363,7 @@ class Model
 		if (count($pk) == 1 && $table->columns[$pk[0]]->auto_increment)
 		{
 			$inflector = Inflector::instance();
-			$this->attributes[$inflector->variablize($pk[0])] = $table->conn->insert_id();
+			$this->attributes[$inflector->variablize($pk[0])] = $table->conn->insert_id($table->sequence);
 		}
 		return true;
 	}

@@ -245,7 +245,7 @@ class ActiveRecordTest extends DatabaseTest
 
 		$this->assertEquals($original,Author::count());
 	}
-	
+
 	// TODO this doesn't work for some reason
 	// TODO the exception is not being caught from within Model::transaction
 	public function testTransactionRolledbackByThrowingException()

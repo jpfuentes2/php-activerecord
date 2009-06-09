@@ -59,8 +59,10 @@ class AdapterTest extends DatabaseTest
 
 	public function testConnectWithPort()
 	{
-		// TODO refactor so we use whats in the config but just add port to it
-		ActiveRecord\Connection::instance("{$this->conn->protocol}://test:test@127.0.0.1:3306/test");
+		$config = ActiveRecord\Config::instance();
+		$name = $config->get_default_connection();
+		$url = parse_url($config->get_connection($name));
+		ActiveRecord\Connection::instance("{$url[scheme]}://$url[user]:$url[pass]@$url[host]:{$this->conn->default_port()}$url[path]");
 	}
 
 	/**
@@ -84,7 +86,7 @@ class AdapterTest extends DatabaseTest
 		$columns = $this->conn->columns('authors');
 		$this->assertEquals('date',$columns['some_date']->raw_type);
 		$this->assertEquals(Column::DATE,$columns['some_date']->type);
-		$this->assertEquals(10,$columns['some_date']->length);
+		$this->assertTrue($columns['some_date']->length >= 7);
 	}
 
 	public function testColumnsNoInflectionOnHashKey()
@@ -116,7 +118,7 @@ class AdapterTest extends DatabaseTest
 	public function testColumnsType()
 	{
 		$author_columns = $this->conn->columns('authors');
-		$this->assertEquals('varchar',$author_columns['name']->raw_type);
+		$this->assertEquals('varchar',substr($author_columns['name']->raw_type,0,7));
 		$this->assertEquals(Column::STRING,$author_columns['name']->type);
 		$this->assertEquals(25,$author_columns['name']->length);
 	}
@@ -214,7 +216,7 @@ class AdapterTest extends DatabaseTest
 		$this->assertEquals(false,$columns['parent_author_id']->pk);
 		$this->assertTrue($columns['parent_author_id']->nullable);
 
-		$this->assertEquals('varchar',$columns['name']->raw_type);
+		$this->assertEquals('varchar',substr($columns['name']->raw_type,0,7));
 		$this->assertEquals(Column::STRING,$columns['name']->type);
 		$this->assertEquals(25,$columns['name']->length);
 		$this->assertEquals('default_name',$columns['name']->default);
@@ -224,16 +226,40 @@ class AdapterTest extends DatabaseTest
 	{
 		$columns = $this->conn->columns('books');
 		$this->assertEquals(Column::DECIMAL,$columns['special']->type);
-		$this->assertEquals(10,$columns['special']->length);
+		$this->assertTrue($columns['special']->length >= 10);
+	}
+
+	private function limit($offset, $limit)
+	{
+		$ret = array();
+		$sql = 'SELECT * FROM authors ORDER BY name ASC';
+		$this->conn->query_and_fetch($this->conn->limit($sql,$offset,$limit),function($row) use (&$ret) { $ret[] = $row; });
+		return ActiveRecord\collect($ret,'author_id');
 	}
 
 	public function testLimit()
 	{
-		$sql = 'SELECT * FROM authors';
-		$this->assertEquals("$sql LIMIT 1,5",$this->conn->limit($sql,1,5));
-		$this->assertEquals("$sql LIMIT 0,1",$this->conn->limit($sql,0,1));
-		$this->assertEquals("$sql LIMIT 0,0",$this->conn->limit($sql,null,null));
-		$this->assertEquals("$sql LIMIT 0,1",$this->conn->limit($sql,null,1));
+		$this->assertEquals(array(2,1),$this->limit(1,2));
+	}
+
+	public function testLimitToFirstRecord()
+	{
+		$this->assertEquals(array(3),$this->limit(0,1));
+	}
+
+	public function testLimitToLastRecord()
+	{
+		$this->assertEquals(array(1),$this->limit(2,1));
+	}
+
+	public function testLimitWithNullOffset()
+	{
+		$this->assertEquals(array(3),$this->limit(null,1));
+	}
+
+	public function testLimitWithNulls()
+	{
+		$this->assertEquals(array(),$this->limit(null,null));
 	}
 
 	public function testFetchNoResults()
@@ -268,7 +294,7 @@ class AdapterTest extends DatabaseTest
 		$original = $this->conn->query_and_fetch_one("select count(*) from authors");
 
 		$this->conn->transaction();
-		$this->conn->query("insert into authors(name) values('blahhhhhhhh')");
+		$this->conn->query("insert into authors(author_id,name) values(9999,'blahhhhhhhh')");
 		$this->conn->commit();
 
 		$this->assertEquals($original+1,$this->conn->query_and_fetch_one("select count(*) from authors"));
@@ -279,7 +305,7 @@ class AdapterTest extends DatabaseTest
 		$original = $this->conn->query_and_fetch_one("select count(*) from authors");
 
 		$this->conn->transaction();
-		$this->conn->query("insert into authors(name) values('blahhhhhhhh')");
+		$this->conn->query("insert into authors(author_id,name) values(9999,'blahhhhhhhh')");
 		$this->conn->rollback();
 
 		$this->assertEquals($original,$this->conn->query_and_fetch_one("select count(*) from authors"));

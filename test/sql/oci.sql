@@ -1,0 +1,67 @@
+CREATE SEQUENCE authors_seq;
+CREATE TABLE authors(
+	author_id INT NOT NULL PRIMARY KEY,
+	parent_author_id INT,
+	name VARCHAR(25) DEFAULT 'default_name' NOT NULL,
+	updated_at timestamp,
+	created_at timestamp,
+	some_date date
+);
+
+CREATE SEQUENCE books_seq;
+CREATE TABLE books(
+	book_id INT NOT NULL PRIMARY KEY,
+	author_id INT,
+	secondary_author_id INT,
+	name VARCHAR(50),
+	numeric_test VARCHAR(10) DEFAULT '0',
+	special NUMERIC(10,2) DEFAULT 0);
+
+CREATE SEQUENCE venues_seq;
+CREATE TABLE venues (
+  id INT NOT NULL PRIMARY KEY,
+  name varchar(50),
+  city varchar(60),
+  state char(2),
+  address varchar(50),
+  phone varchar(10) default NULL,
+  UNIQUE(name,address)
+);
+
+CREATE SEQUENCE events_seq;
+CREATE TABLE events (
+  id INT NOT NULL PRIMARY KEY,
+  venue_id int NOT NULL,
+  host_id int NOT NULL,
+  title varchar(60) NOT NULL,
+  description varchar(10),
+  type varchar(15) default NULL
+);
+
+CREATE SEQUENCE hosts_seq;
+CREATE TABLE hosts(
+	id INT NOT NULL PRIMARY KEY,
+	name VARCHAR(25)
+);
+
+CREATE SEQUENCE employees_seq;
+CREATE TABLE employees (
+	id INT NOT NULL PRIMARY KEY,
+	first_name VARCHAR( 255 ) NOT NULL ,
+	last_name VARCHAR( 255 ) NOT NULL ,
+	nick_name VARCHAR( 255 ) NOT NULL
+);
+
+CREATE SEQUENCE positions_seq;
+CREATE TABLE positions (
+  id INT NOT NULL PRIMARY KEY,
+  employee_id int NOT NULL,
+  title VARCHAR(255) NOT NULL,
+  active SMALLINT NOT NULL
+);
+
+CREATE TABLE "RM-BLDG"(
+    "RM-ID" INT NOT NULL,
+    "RM-NAME" VARCHAR(10) NOT NULL,
+    "SPACE OUT" VARCHAR(1) NOT NULL
+);

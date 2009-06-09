@@ -33,6 +33,11 @@ class Table
 	public $db_name;
 
 	/**
+	 * Name of the sequence for this table (optional). Defaults to {$table}_seq
+	 */
+	public $sequence;
+
+	/**
 	 * A instance of CallBack for this model/table
 	 * @static
 	 * @var object ActiveRecord\CallBack
@@ -66,6 +71,7 @@ class Table
 
 		$this->conn = ConnectionManager::get_connection($connection);
 		$this->set_table_name();
+		$this->set_sequence_name();
 		$this->get_meta_data();
 		$this->set_primary_key();
 		$this->set_associations();
@@ -178,7 +184,7 @@ class Table
 
 		if ($this->db_name)
 			$table = $this->conn->quote_name($this->db_name) . ".$table";
-
+ 
 		return $table;
 	}
 
@@ -193,7 +199,7 @@ class Table
 		$data = $this->process_data($data);
 
 		$sql = new SQLBuilder($this->conn,$this->get_fully_qualified_table_name());
-		$sql->insert($data);
+		$sql->insert($data,$this->pk[0],$this->sequence);
 
 		return $this->conn->query(($this->last_sql = $sql->to_s()),array_values($data));
 	}
@@ -295,6 +301,11 @@ class Table
 
 		if(($db = $this->class->getStaticPropertyValue('db',null)) || ($db = $this->class->getStaticPropertyValue('db_name',null)))
 			$this->db_name = $db;
+	}
+
+	private function set_sequence_name()
+	{
+		$this->sequence = $this->class->getStaticPropertyValue('sequence',$this->conn->get_sequence_name($this->table));
 	}
 
 	private function set_associations()
