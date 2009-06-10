@@ -122,7 +122,7 @@ abstract class AbstractRelationship implements InterfaceRelationship
 	 */
 	protected function set_inferred_class_name()
 	{
-		$class_name = Utils::singularize(ucfirst($this->attribute_name));
+		$class_name = Utils::singularize(ucfirst(preg_replace("/_(.)/e", "ucfirst('\\1');", $this->attribute_name)));
 		$this->class_name = $class_name;
 	}
 
