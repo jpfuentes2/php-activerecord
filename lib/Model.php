@@ -384,6 +384,9 @@ class Model
 
 		if (($dirty = $this->dirty_attributes()))
 		{
+			if (!count($this->values_for_pk()))
+				throw new ActiveRecordException("no primary key");
+
 			$this->invoke_callback('before_update',false);
 			static::table()->update($dirty,$this->values_for_pk());
 			$this->invoke_callback('after_update',false);
@@ -399,6 +402,9 @@ class Model
 	public function delete()
 	{
 		$this->verify_not_readonly('delete');
+
+		if (!count($this->values_for_pk()))
+			throw new ActiveRecordException("no primary key");
 
 		$this->invoke_callback('before_destroy',false);
 		static::table()->delete($this->values_for_pk());
