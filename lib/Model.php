@@ -730,8 +730,6 @@ class Model
 			{
 				case 'all':
 					$single = false;
-					unset($options['limit']);
-					unset($options['offset']);
 					break;
 
 			 	case 'last':
