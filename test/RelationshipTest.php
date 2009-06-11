@@ -14,7 +14,6 @@ class RelationshipTest extends DatabaseTest
 		Venue::$has_one = array();
 		Employee::$has_one = array(array('position'));
 		Host::$has_many = array(array('events'));
-		ActiveRecord\Table::clear_cache();
 
 		foreach ($this->relationship_names as $name)
 		{

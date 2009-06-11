@@ -7,8 +7,6 @@ class CallBackTest extends DatabaseTest
 	{
 		parent::setUp($connection_name);
 
-		ActiveRecord\Table::clear_cache();
-
 		// ensure VenueCB model has been loaded
 		VenueCB::find(1);
 

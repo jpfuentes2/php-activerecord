@@ -8,6 +8,8 @@ class DatabaseTest extends PHPUnit_Framework_TestCase
 
 	public function setUp($connection_name=null)
 	{
+		ActiveRecord\Table::clear_cache();
+
 		$config = ActiveRecord\Config::instance();
 		$this->original_default_connection = $config->get_default_connection();
 

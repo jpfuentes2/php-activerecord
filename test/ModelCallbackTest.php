@@ -7,8 +7,6 @@ class ModelCallbackTest extends DatabaseTest
 	{
 		parent::setUp($connection_name);
 
-		ActiveRecord\Table::clear_cache();
-
 		$this->venue = new Venue();
 		$this->callback = Venue::table()->callback;
 	}
