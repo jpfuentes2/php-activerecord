@@ -5,7 +5,6 @@ class DatabaseTest extends PHPUnit_Framework_TestCase
 {
 	protected $conn;
 	public static $log = false;
-	public static $imported = 0;
 
 	public function setUp($connection_name=null)
 	{
