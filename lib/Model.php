@@ -734,8 +734,6 @@ class Model
 			{
 				case 'all':
 					$single = false;
-					unset($options['limit']);
-					unset($options['offset']);
 					break;
 
 			 	case 'last':
@@ -813,11 +811,12 @@ class Model
 	 * will still escape the raw sql to prevent SQL injection.
 	 * @static
 	 * @param string
+	 * @param array
 	 * @return array
 	 */
-	public static function find_by_sql($sql)
+	public static function find_by_sql($sql, $values = null)
 	{
-		return static::table()->find_by_sql($sql, null, true);
+		return static::table()->find_by_sql($sql, $values, true);
 	}
 
 	/**
