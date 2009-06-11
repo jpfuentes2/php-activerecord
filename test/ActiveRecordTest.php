@@ -185,14 +185,10 @@ class ActiveRecordTest extends DatabaseTest
 		$book = Book::first(array('readonly' => true));
 		$this->assertTrue($book->is_readonly());
 
-		foreach (array('insert','update', 'save') as $method)
-		{
-			try {
-				$book->$method();
-				$this-fail('expected exception ActiveRecord\ReadonlyException');
-			} catch (ActiveRecord\ReadonlyException $e) {
-				;
-			}
+		try {
+			$book->save();
+			$this-fail('expected exception ActiveRecord\ReadonlyException');
+		} catch (ActiveRecord\ReadonlyException $e) {
 		}
 
 		$book->name = 'some new name';

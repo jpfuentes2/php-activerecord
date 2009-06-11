@@ -100,14 +100,10 @@ class RelationshipTest extends DatabaseTest
 		$event = $this->get_relationship();
 		$this->assert_default_belongs_to($event);
 
-		foreach (array('insert', 'update', 'save') as $method)
-		{
-			try{
-				$event->venue->$method();
-				$this->fail('expected exception ActiveRecord\ReadonlyException');
-			} catch (ActiveRecord\ReadonlyException $e) {
-				;
-			}
+		try {
+			$event->venue->save();
+			$this->fail('expected exception ActiveRecord\ReadonlyException');
+		} catch (ActiveRecord\ReadonlyException $e) {
 		}
 
 		$event->venue->name = 'new name';
@@ -181,14 +177,10 @@ class RelationshipTest extends DatabaseTest
 		$venue = $this->get_relationship();
 		$this->assert_default_has_many($venue);
 
-		foreach (array('insert', 'update', 'save') as $method)
-		{
-			try{
-				$venue->events[0]->$method();
-				$this->fail('expected exception ActiveRecord\ReadonlyException');
-			} catch (ActiveRecord\ReadonlyException $e) {
-				;
-			}
+		try {
+			$venue->events[0]->save();
+			$this->fail('expected exception ActiveRecord\ReadonlyException');
+		} catch (ActiveRecord\ReadonlyException $e) {
 		}
 
 		$venue->events[0]->description = 'new desc';
@@ -333,14 +325,10 @@ class RelationshipTest extends DatabaseTest
 		$employee = $this->get_relationship();
 		$this->assert_default_has_one($employee);
 
-		foreach (array('insert', 'update', 'save') as $method)
-		{
-			try{
-				$employee->position->$method();
-				$this->fail('expected exception ActiveRecord\ReadonlyException');
-			} catch (ActiveRecord\ReadonlyException $e) {
-				;
-			}
+		try {
+			$employee->position->save();
+			$this->fail('expected exception ActiveRecord\ReadonlyException');
+		} catch (ActiveRecord\ReadonlyException $e) {
 		}
 
 		$employee->position->title = 'new title';

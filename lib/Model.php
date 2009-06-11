@@ -342,7 +342,7 @@ class Model
 	 * @param boolean
 	 * @return boolean
 	 */
-	public function insert($validate = true)
+	private function insert($validate=true)
 	{
 		$this->verify_not_readonly('insert');
 
@@ -375,7 +375,7 @@ class Model
 	 * @param boolean
 	 * @return boolean
 	 */
-	public function update($validate = true)
+	private function update($validate=true)
 	{
 		$this->verify_not_readonly('update');
 
@@ -384,8 +384,13 @@ class Model
 
 		if (($dirty = $this->dirty_attributes()))
 		{
+			$pk = $this->values_for_pk();
+
+			if (empty($pk))
+				throw new ActiveRecordException("Cannot update, no primary key defined for: " . get_called_class());
+
 			$this->invoke_callback('before_update',false);
-			static::table()->update($dirty,$this->values_for_pk());
+			static::table()->update($dirty,$pk);
 			$this->invoke_callback('after_update',false);
 		}
 
@@ -400,8 +405,13 @@ class Model
 	{
 		$this->verify_not_readonly('delete');
 
+		$pk = $this->values_for_pk();
+
+		if (empty($pk))
+			throw new ActiveRecordException("Cannot delete, no primary key defined for: " . get_called_class());
+
 		$this->invoke_callback('before_destroy',false);
-		static::table()->delete($this->values_for_pk());
+		static::table()->delete($pk);
 		$this->invoke_callback('after_destroy',false);
 
 		return true;

@@ -12,7 +12,7 @@ class ActiveRecordWriteTest extends DatabaseTest
 	public function testInsert()
 	{
 		$author = new Author(array('name' => 'Blah Blah'));
-		$author->insert();
+		$author->save();
 		$this->assertNotNull(Author::find($author->id));
 	}
 
@@ -47,7 +47,7 @@ class ActiveRecordWriteTest extends DatabaseTest
 		$book = Book::find(1);
 		$new_name = 'new name';
 		$book->name = $new_name;
-		$book->update();
+		$book->save();
 
 		$this->assertSame($new_name, $book->name);
 		$this->assertSame($new_name, $book->name, Book::find(1)->name);
@@ -108,22 +108,22 @@ class ActiveRecordWriteTest extends DatabaseTest
 		$this->assertTrue(Book::first()->name === '');
 	}
 
-	public function testDirtyAttributes()
+	public function testDirtyAttributes1()
 	{
-		$book = $this->makeNewBookAnd();
+		$book = $this->makeNewBookAnd(false);
 		$this->assertEquals(array('name','special'),array_keys($book->dirty_attributes()));
 	}
 
 	public function testDirtyAttributesClearedAfterSaving()
 	{
-		$book = $this->makeNewBookAnd('save');
+		$book = $this->makeNewBookAnd();
 		$this->assertTrue(strpos($book->table()->last_sql,'(name,special)') !== false);
 		$this->assertEquals(null,$book->dirty_attributes());
 	}
 
 	public function testDirtyAttributesClearedAfterInserting()
 	{
-		$book = $this->makeNewBookAnd('insert');
+		$book = $this->makeNewBookAnd();
 		$this->assertEquals(null,$book->dirty_attributes());
 	}
 
@@ -140,7 +140,7 @@ class ActiveRecordWriteTest extends DatabaseTest
 	{
 		$book = Book::first();
 		$book->name = 'rivers cuomo';
-		$book->update();
+		$book->save();
 		$this->assertEquals(null,$book->dirty_attributes());
 	}
 
@@ -194,14 +194,35 @@ class ActiveRecordWriteTest extends DatabaseTest
 		$this->assertNotNull($author->created_at);
 	}
 
-	private function makeNewBookAnd($method=null)
+	/**
+	 * @expectedException ActiveRecord\ActiveRecordException
+	 */
+	public function testUpdateWithNoPrimaryKeyDefined()
+	{
+		Author::table()->pk = array();
+		$author = Author::first();
+		$author->name = 'blahhhhhhhhhh';
+		$author->save();
+	}
+
+	/**
+	 * @expectedException ActiveRecord\ActiveRecordException
+	 */
+	public function testDeleteWithNoPrimaryKeyDefined()
+	{
+		Author::table()->pk = array();
+		$author = author::first();
+		$author->delete();
+	}
+
+	private function makeNewBookAnd($save=true)
 	{
 		$book = new Book();
 		$book->name = 'rivers cuomo';
 		$book->special = 1;
 
-		if ($method)
-			$book->$method();
+		if ($save)
+			$book->save();
 
 		return $book;
 	}
