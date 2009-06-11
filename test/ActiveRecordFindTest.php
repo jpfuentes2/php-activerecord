@@ -166,6 +166,12 @@ class ActiveRecordFindTest extends DatabaseTest
 		$this->assertEquals(2,count($author));
 	}
 
+	public function testFindBySQLTakesValuesArray()
+	{
+		$author = Author::find_by_sql("SELECT * FROM authors WHERE author_id=?",array(1));
+		$this->assertNotNull($author);
+	}
+
 	public function testFindLast()
 	{
 		$author = Author::last();
@@ -279,6 +285,12 @@ class ActiveRecordFindTest extends DatabaseTest
 	public function testFindAllByCallStaticUndefinedMethod()
 	{
 		Author::find_sharks('Tito');
+	}
+
+	public function testFindAllTakesLimitOptions()
+	{
+		$authors = Author::all(array('limit' => 1, 'offset' => 2, 'order' => 'name desc'));
+		$this->assertEquals('Bill Clinton',$authors[0]->name);
 	}
 
 	/**
