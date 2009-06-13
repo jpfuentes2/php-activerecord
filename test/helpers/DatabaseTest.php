@@ -1,7 +1,22 @@
 <?php
 require_once 'DatabaseLoader.php';
 
-class DatabaseTest extends PHPUnit_Framework_TestCase
+class SnakeCasePHPUnitMethodNames extends PHPUnit_Framework_TestCase
+{
+	public function __call($meth, $args)
+	{
+		$camel_cased_method = ActiveRecord\Inflector::instance()->camelize($meth);
+
+		if (method_exists($this, $camel_cased_method))
+			return call_user_func_array(array($this, $camel_cased_method), $args);
+
+		$class_name = get_called_class();
+		$trace = debug_backtrace();
+		die("PHP Fatal Error:  Call to undefined method $class_name::$meth() in {$trace[1]['file']} on line {$trace[1]['line']}" . PHP_EOL);
+	}
+}
+
+class DatabaseTest extends SnakeCasePHPUnitMethodNames
 {
 	protected $conn;
 	public static $log = false;

@@ -1,7 +1,7 @@
 <?php
 include 'helpers/config.php';
 
-class UtilsTest extends PHPUnit_Framework_TestCase
+class UtilsTest extends SnakeCasePHPUnitMethodNames
 {
 	public function setUp()
 	{
@@ -57,5 +57,6 @@ class UtilsTest extends PHPUnit_Framework_TestCase
 		$this->assertFalse(ActiveRecord\all(1,array(1,'1')));
 		$this->assertFalse(ActiveRecord\all(null,array('',null)));
 	}
+
 };
 ?>
