@@ -264,5 +264,31 @@ class ActiveRecordTest extends DatabaseTest
 		$this->assertEquals($original,Author::count());
 		*/
 	}
+
+	public function testDelegate()
+	{
+		$event = Event::first();
+		$this->assertEquals($event->venue->state,$event->state);
+		$this->assertEquals($event->venue->address,$event->address);
+	}
+
+	public function testDelegatePrefix()
+	{
+		$event = Event::first();
+		$this->assertEquals($event->host->name,$event->woot_name);
+	}
+
+	public function testDelegateReturnsNullIfRelationshipDoesNotExist()
+	{
+		$event = new Event();
+		$this->assertNull($event->state);
+	}
+	
+	public function testDelegateSetter()
+	{
+		$event = Event::first();
+		$event->state = 'MEXICO';
+		$this->assertEquals('MEXICO',$event->venue->state);
+	}
 };
 ?>

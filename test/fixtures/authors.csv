@@ -1,4 +1,4 @@
-author_id,name
-1,"Tito"
-2,"George W. Bush"
-3,"Bill Clinton"
+author_id,name,created_at,updated_at
+1,"Tito","2001-01-01 01:01:01","2001-01-01 01:01:01"
+2,"George W. Bush","2001-01-01 01:01:01","2001-01-01 01:01:01"
+3,"Bill Clinton","2001-01-01 01:01:01","2001-01-01 01:01:01"

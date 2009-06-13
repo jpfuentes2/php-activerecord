@@ -75,6 +75,7 @@ class Table
 		$this->get_meta_data();
 		$this->set_primary_key();
 		$this->set_associations();
+		$this->set_delegates();
 
 		$this->callback = new CallBack($class_name);
 		$this->callback->register('before_save', function(Model $model) { $model->set_timestamps(); }, array('prepend' => true));
@@ -184,7 +185,7 @@ class Table
 
 		if ($this->db_name)
 			$table = $this->conn->quote_name($this->db_name) . ".$table";
- 
+
 		return $table;
 	}
 
@@ -341,6 +342,45 @@ class Table
 				if ($relationship)
 					$this->add_relationship($relationship);
 			}
+		}
+	}
+
+	/**
+	 * Rebuild the delegates array into format that we can more easily work with in Model.
+	 * Will end up consisting of array of:
+	 *
+	 * array('delegate' => array('{prefix}field1','{prefix}field2',...),
+	 *       'to'       => 'delegate_to_relationship',
+	 *       'prefix'	=> 'prefix')
+	 */
+	private function set_delegates()
+	{
+		$delegates = $this->class->getStaticPropertyValue('delegate',array());
+		$new = array();
+
+		if (!empty($delegates) && !$delegates['processed'])
+		{
+			foreach ($delegates as &$delegate)
+			{
+				if (!is_array($delegate) || !isset($delegate['to']))
+					continue;
+
+				$new_delegate = array(
+					'to'		=> $delegate['to'],
+					'prefix'	=> $delegate['prefix'],
+					'delegate'	=> array());
+
+				foreach ($delegate as $name => $value)
+				{
+					if (is_numeric($name))
+						$new_delegate['delegate'][] = $value;
+				}
+
+				$new[] = $new_delegate;
+			}
+
+			$new['processed'] = true;
+			$this->class->setStaticPropertyValue('delegate',$new);
 		}
 	}
 };

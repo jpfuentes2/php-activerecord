@@ -77,6 +77,22 @@ class Model
 	static $attr_protected = array();
 
 	/**
+	 * Delegates calls to a relationship.
+	 * 
+	 * static $belongs_to = array(array('venue'),array('host'));
+	 * static $delegate = array(
+	 *   array('name', 'state', 'to' => 'venue'),
+	 *   array('name', 'to' => 'host', 'prefix' => 'woot'));
+	 * 
+	 * Can then do:
+	 * 
+	 * $model->state (same as calling $model->venue->state)
+	 * $model->name (same as calling $model->venue->name)
+	 * $model->woot_name (same as calling $model->host->name)
+	 */
+	static $delegate = array();
+
+	/**
 	 * When a user instantiates a new object (e.g.: it was not ActiveRecord that instantiated via a find)
 	 * then @var $attributes will be mapped according to the schema's defaults. Otherwise, the given @param
 	 * $attributes will be mapped via set_attributes_via_mass_assignment.
@@ -139,6 +155,15 @@ class Model
 				return $this->attributes[$table->pk[0]];
 		}
 
+		foreach (static::$delegate as &$item)
+		{
+			if (($delegated_name = $this->is_delegated($name,$item)))
+			{
+				$to = $item['to'];
+				return $this->$to ? $this->$to->$delegated_name : null;
+			}
+		}
+
 		throw new UndefinedPropertyException($name);
 	}
 
@@ -177,6 +202,12 @@ class Model
 			$this->attributes[$name] = $value;
 			$this->__dirty[$name] = true;
 			return $value;
+		}
+
+		foreach (static::$delegate as &$item)
+		{
+			if (($delegated_name = $this->is_delegated($name,$item)))
+				return $this->$item['to']->$delegated_name = $value;
 		}
 
 		throw new UndefinedPropertyException($name);
@@ -229,6 +260,25 @@ class Model
 				$ret[$property] = $this->attributes[$property];
 		}
 		return $ret;
+	}
+
+	/**
+	 * Returns the attribute name on the delegated relationship if $name is
+	 * delegated or null if not delegated.
+	 *
+	 * @param string $name Name of an attribute
+	 * @param array $delegate An array containing delegate data
+	 * @return delegated attribute name or null
+	 */
+	private function is_delegated($name, &$delegate)
+	{
+		if ($delegate['prefix'] != '')
+			$name = substr($name,strlen($delegate['prefix'])+1);
+
+		if (is_array($delegate) && in_array($name,$delegate['delegate']))
+			return $name;
+
+		return null;
 	}
 
 	/**
@@ -822,7 +872,7 @@ class Model
 	/**
 	 * Returns true if @var $array is a valid options hash. Will throw exceptions
 	 * if it is a hash and contains invalid option keys.
-	 * 
+	 *
 	 * @throws ActiveRecord\ActiveRecordException
 	 * @return boolean
 	 */
@@ -926,7 +976,7 @@ class Model
 
 	/**
 	 * Execute a closure inside a transaction.
-	 * 
+	 *
 	 * @param Closure $closure The closure to execute. It should return false or
 	 * throw an exception to rollback the transaction.
 	 */
