@@ -6,6 +6,8 @@ class OciAdapterTest extends AdapterTest
 {
 	public function setUp($connection_name=null)
 	{
+		if (!array_key_exists('oci', PDO::getAvailableDrivers()))
+			$this->markTestSkipped('Oracle drivers are not present');
 		parent::setUp('oci');
 	}
 
