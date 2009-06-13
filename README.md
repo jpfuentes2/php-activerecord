@@ -126,3 +126,4 @@ the record in your database but you can still use the object if you need to.
 	$post->delete();
 	# DELETE FROM `posts` WHERE id=1
 	echo $post->title; # 'New real title'
+
