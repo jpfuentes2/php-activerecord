@@ -97,6 +97,22 @@ function has_namespace($class_name)
 	return false;
 }
 
+/**
+ * Returns true if all values in $haystack === $needle
+ * @param $needle
+ * @param $haystack
+ * @return unknown_type
+ */
+function all($needle, array $haystack)
+{
+	foreach ($haystack as $value)
+	{
+		if ($value !== $needle)
+			return false;
+	}
+	return true;
+}
+
 function collect(&$enumerable, $name_or_closure)
 {
 	$ret = array();
