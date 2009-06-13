@@ -1,6 +1,8 @@
 <?php
 include 'helpers/config.php';
 
+use ActiveRecord as AR;
+
 class UtilsTest extends SnakeCasePHPUnitMethodNames
 {
 	public function setUp()
@@ -58,5 +60,28 @@ class UtilsTest extends SnakeCasePHPUnitMethodNames
 		$this->assertFalse(ActiveRecord\all(null,array('',null)));
 	}
 
+	public function test_classify()
+	{
+		$bad_class_names = array('ubuntu_rox', 'stop_the_Snake_Case', 'CamelCased', 'camelCased');
+		$good_class_names = array('UbuntuRox', 'StopTheSnakeCase', 'CamelCased', 'CamelCased');
+
+		$class_names = array();
+		foreach ($bad_class_names as $s)
+			$class_names[] = AR\classify($s);
+
+		$this->assert_equals($class_names, $good_class_names);
+	}
+
+	public function test_classify_singularize()
+	{
+		$bad_class_names = array('events', 'stop_the_Snake_Cases', 'angry_boxes', 'Mad_Sheep_herders', 'happy_People');
+		$good_class_names = array('Event', 'StopTheSnakeCase', 'AngryBox', 'MadSheepHerder', 'HappyPerson');
+
+		$class_names = array();
+		foreach ($bad_class_names as $s)
+			$class_names[] = AR\classify($s, true);
+
+		$this->assert_equals($class_names, $good_class_names);
+	}
 };
 ?>

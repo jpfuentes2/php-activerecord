@@ -214,7 +214,7 @@ class HasMany extends AbstractRelationship
 			if (!($through_relationship instanceof HasMany) && !($through_relationship instanceof BelongsTo))
 				throw new HasManyThroughAssociationException('has_many through can only use a belongs_to or has_many association');
 
-			$through_table = Table::load(AR\classify($this->through));
+			$through_table = Table::load(AR\classify($this->through, true));
 			$through_table_name = $through_table->get_fully_qualified_table_name();
 			$through_pk = $this->keyify($class_name);
 

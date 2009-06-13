@@ -30,9 +30,21 @@ namespace ActiveRecord;
 
 use \Closure;
 
-function classify($s)
+function classify($class_name, $singularize=false)
 {
-	return ucfirst(Utils::singularize(Inflector::instance()->camelize($s)));
+	if ($singularize)
+	{
+		$parts = explode('_',  Inflector::instance()->uncamelize($class_name));
+		$class_name = '';
+		foreach ($parts as $name)
+			$class_name .= '_' . Utils::singularize($name);
+
+		$class_name = ltrim($class_name, '_');
+	}
+
+	$class_name = Inflector::instance()->camelize($class_name);
+
+	return ucfirst($class_name);
 }
 
 // http://snippets.dzone.com/posts/show/4660
