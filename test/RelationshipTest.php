@@ -335,6 +335,13 @@ class RelationshipTest extends DatabaseTest
 		$this->assertEquals($employee->position->title, 'new title');
 	}
 
+	public function test_dont_attempt_to_load_if_all_foreign_keys_are_null()
+	{
+		$event = new Event();
+		$event->venue;
+		$this->assertSame(false,strpos($this->conn->last_query,'id IS NULL'));
+	}
+	
 /*	public function test_has_one_through()
 	{
 
