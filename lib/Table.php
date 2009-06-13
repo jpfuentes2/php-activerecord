@@ -349,7 +349,7 @@ class Table
 	 * Rebuild the delegates array into format that we can more easily work with in Model.
 	 * Will end up consisting of array of:
 	 *
-	 * array('delegate' => array('{prefix}field1','{prefix}field2',...),
+	 * array('delegate' => array('field1','field2',...),
 	 *       'to'       => 'delegate_to_relationship',
 	 *       'prefix'	=> 'prefix')
 	 */
