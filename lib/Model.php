@@ -78,14 +78,14 @@ class Model
 
 	/**
 	 * Delegates calls to a relationship.
-	 * 
+	 *
 	 * static $belongs_to = array(array('venue'),array('host'));
 	 * static $delegate = array(
 	 *   array('name', 'state', 'to' => 'venue'),
 	 *   array('name', 'to' => 'host', 'prefix' => 'woot'));
-	 * 
+	 *
 	 * Can then do:
-	 * 
+	 *
 	 * $model->state (same as calling $model->venue->state)
 	 * $model->name (same as calling $model->venue->name)
 	 * $model->woot_name (same as calling $model->host->name)
@@ -155,12 +155,20 @@ class Model
 				return $this->attributes[$table->pk[0]];
 		}
 
+		//do not remove - have to return null by reference in strict mode
+		$null = null;
 		foreach (static::$delegate as &$item)
 		{
 			if (($delegated_name = $this->is_delegated($name,$item)))
 			{
 				$to = $item['to'];
-				return $this->$to ? $this->$to->$delegated_name : null;
+				if ($this->$to)
+				{
+					$val =& $this->$to->$delegated_name;
+					return $val;
+				}
+				else
+					return $null;
 			}
 		}
 

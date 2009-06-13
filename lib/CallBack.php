@@ -92,7 +92,7 @@ class CallBack
 	 */
 	public function get_callbacks($name)
 	{
-		return isset($this->registry) ? $this->registry[$name] : null;
+		return isset($this->registry[$name]) ? $this->registry[$name] : null;
 	}
 
 	/**
@@ -118,7 +118,13 @@ class CallBack
 		if ($must_exist && !array_key_exists($name, $this->registry))
 			throw new ActiveRecordException("No callbacks were defined for: $name on " . get_class($model));
 
-		$registry = $this->registry[$name];
+		// if it doesn't exist it might be a /(after|before)_(create|update)/ so we still need to run the save
+		// callback
+		if (!array_key_exists($name, $this->registry))
+			$registry = array();
+		else
+			$registry = $this->registry[$name];
+
 		$first = substr($name,0,6);
 
 		// starts with /(after|before)_(create|update)/

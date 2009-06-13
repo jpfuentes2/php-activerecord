@@ -95,9 +95,9 @@ abstract class Connection
 		$info = new \stdClass();
 		$info->protocol = $url['scheme'];
 		$info->host		= $url['host'];
-		$info->db		= substr($url['path'],1);
-		$info->user		= $url['user'];
-		$info->pass		= $url['pass'];
+		$info->db		= isset($url['path']) ? substr($url['path'],1) : null;
+		$info->user		= isset($url['user']) ? $url['user'] : null;
+		$info->pass		= isset($url['pass']) ? $url['pass'] : null;
 
 		if (isset($url['port']))
 			$info->port = $url['port'];
@@ -111,7 +111,7 @@ abstract class Connection
 	protected function __construct($info)
 	{
 		try {
-			$this->connection = new PDO("$info->protocol:host=$info->host" . 
+			$this->connection = new PDO("$info->protocol:host=$info->host" .
 				(isset($info->port) ? ";port=$info->port":'') .	";dbname=$info->db",$info->user,$info->pass,
 				static::$PDO_OPTIONS);
 		} catch (PDOException $e) {
@@ -137,7 +137,7 @@ abstract class Connection
 		}
 		return $columns;
 	}
-	
+
 	/**
 	 * Escapes quotes in a string.
 	 *
@@ -151,7 +151,7 @@ abstract class Connection
 
 	/**
 	 * Return a default sequence name for the specified table.
-	 * 
+	 *
 	 * @return A sequence name or null if not supported.
 	 */
 	public function get_sequence_name($table)
@@ -202,7 +202,7 @@ abstract class Connection
 
 	/**
 	 * Execute a query that returns maximum of one row with one field and return it.
-	 * 
+	 *
 	 * @param string $sql Raw SQL string to execute.
 	 * @param array $values Optional array of values to bind to the query.
 	 * @return string

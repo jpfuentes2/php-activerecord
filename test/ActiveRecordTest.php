@@ -228,7 +228,7 @@ class ActiveRecordTest extends DatabaseTest
 		Author::transaction(function() { Author::create(array("name" => "blah")); return true; });
 		$this->assertEquals($original+1,Author::count());
 	}
-	
+
 	public function testTransactionRolledbackByReturningFalse()
 	{
 		$original = Author::count();
@@ -283,7 +283,7 @@ class ActiveRecordTest extends DatabaseTest
 		$event = new Event();
 		$this->assertNull($event->state);
 	}
-	
+
 	public function testDelegateSetter()
 	{
 		$event = Event::first();

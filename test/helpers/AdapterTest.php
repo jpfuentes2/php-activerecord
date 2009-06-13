@@ -62,7 +62,7 @@ class AdapterTest extends DatabaseTest
 		$config = ActiveRecord\Config::instance();
 		$name = $config->get_default_connection();
 		$url = parse_url($config->get_connection($name));
-		ActiveRecord\Connection::instance("{$url[scheme]}://$url[user]:$url[pass]@$url[host]:{$this->conn->default_port()}$url[path]");
+		ActiveRecord\Connection::instance("{$url['scheme']}://{$url['user']}:{$url['pass']}@{$url['host']}:{$this->conn->default_port()}{$url['path']}");
 	}
 
 	/**

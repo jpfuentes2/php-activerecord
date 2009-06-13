@@ -358,12 +358,18 @@ class Table
 		$delegates = $this->class->getStaticPropertyValue('delegate',array());
 		$new = array();
 
+		if (!array_key_exists('processed', $delegates))
+			$delegates['processed'] = false;
+
 		if (!empty($delegates) && !$delegates['processed'])
 		{
 			foreach ($delegates as &$delegate)
 			{
 				if (!is_array($delegate) || !isset($delegate['to']))
 					continue;
+
+				if (!isset($delegate['prefix']))
+					$delegate['prefix'] = null;
 
 				$new_delegate = array(
 					'to'		=> $delegate['to'],
