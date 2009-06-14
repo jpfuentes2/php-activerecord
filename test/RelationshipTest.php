@@ -54,12 +54,13 @@ class RelationshipTest extends DatabaseTest
 	{
 		$this->assertEquals(2,$venue->id);
 		$this->assertTrue(count($venue->$association_name) > 1);
-		$this->assertTrue($venue->{$association_name}[0] instanceof Event);
+		$this->assertEquals('Yeah Yeah Yeahs',$venue->{$association_name}[0]->title);
 	}
 
 	protected function assert_default_has_one($employee, $association_name='position')
 	{
 		$this->assertTrue($employee->$association_name instanceof Position);
+		$this->assertEquals('physicist',$employee->$association_name->title);
 		$this->assertNotNull($employee->id, $employee->$association_name->title);
 	}
 
@@ -209,7 +210,7 @@ class RelationshipTest extends DatabaseTest
 		$this->assertEquals($venue->events[0]->title,'Yeah Yeah Yeahs');
 	}
 
-	public function test_has_many_through()
+	public function test_has_many_through1()
 	{
 		Event::$belongs_to = array(array('host'));
 		Venue::$has_many[1] = array('hosts', 'through' => 'events');
@@ -341,7 +342,12 @@ class RelationshipTest extends DatabaseTest
 		$event->venue;
 		$this->assertSame(false,strpos($this->conn->last_query,'id IS NULL'));
 	}
-	
+
+	public function test_relationship_on_table_with_underscores()
+	{
+		$this->assertEquals(1,Author::find(1)->awesome_person->is_awesome);
+	}
+
 /*	public function test_has_one_through()
 	{
 

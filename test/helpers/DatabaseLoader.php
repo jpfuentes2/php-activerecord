@@ -3,7 +3,7 @@ class DatabaseLoader
 {
 	private $db;
 	static $instances = array();
-	
+
 	public function __construct($db)
 	{
 		$this->db = $db;
@@ -40,10 +40,13 @@ class DatabaseLoader
 			if (in_array($table,$tables))
 				$this->db->query('DROP TABLE ' . $this->quote_name($table));
 
-			try {
-				$this->db->query("DROP SEQUENCE {$table}_seq");
-			} catch (ActiveRecord\DatabaseException $e) {
-				// ignore
+			if ($this->db->protocol == 'oci')
+			{
+				try {
+					$this->db->query("DROP SEQUENCE {$table}_seq");
+				} catch (ActiveRecord\DatabaseException $e) {
+					// ignore
+				}
 			}
 		}
 	}
@@ -69,10 +72,10 @@ class DatabaseLoader
 
 		return $tables;
 	}
-	
+
 	public function get_sql($file)
 	{
-		$file = dirname(__FILE__) . "/../sql/$file.sql"; 
+		$file = dirname(__FILE__) . "/../sql/$file.sql";
 
 		if (!file_exists($file))
 			throw new Exception("File not found: $file");
@@ -84,17 +87,20 @@ class DatabaseLoader
 	{
 		$fp = fopen(dirname(__FILE__) . "/../fixtures/$table.csv",'r');
 		$fields = fgetcsv($fp);
-		$markers = join(',',array_fill(0,count($fields),'?'));
-		$table = $this->quote_name($table);
 
-		foreach ($fields as &$name)
-			$name = $this->quote_name($name);
+		if (!empty($fields))
+		{
+			$markers = join(',',array_fill(0,count($fields),'?'));
+			$table = $this->quote_name($table);
 
-		$fields = join(',',$fields);
+			foreach ($fields as &$name)
+				$name = $this->quote_name($name);
 
-		while (($values = fgetcsv($fp)))
-			$this->db->query("INSERT INTO $table($fields) VALUES($markers)",$values);
+			$fields = join(',',$fields);
 
+			while (($values = fgetcsv($fp)))
+				$this->db->query("INSERT INTO $table($fields) VALUES($markers)",$values);
+		}
 		fclose($fp);
 	}
 

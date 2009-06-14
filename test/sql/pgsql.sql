@@ -62,3 +62,9 @@ CREATE TABLE "rm-bldg"(
     "rm-name" VARCHAR(10) NOT NULL,
     "space out" VARCHAR(1) NOT NULL
 );
+
+CREATE TABLE awesome_people(
+	id serial primary key,
+	author_id int,
+	is_awesome int default 1
+);

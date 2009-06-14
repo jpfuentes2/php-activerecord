@@ -77,7 +77,7 @@ abstract class Inflector
 
 	public function underscorify($s)
 	{
-		return preg_replace('/[_\- ]+/','_',trim($s));
+		return preg_replace(array('/[_\- ]+/','/([a-z])([A-Z])/'),array('_','\\1_\\2'),trim($s));
 	}
 
 	abstract function variablize($s);
@@ -85,6 +85,7 @@ abstract class Inflector
 
 class StandardInflector extends Inflector
 {
+	public function tableize($s) { return Utils::pluralize(strtolower($this->underscorify($s))); }
 	public function variablize($s) { return $this->underscorify($s); }
 }
 ?>

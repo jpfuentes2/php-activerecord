@@ -91,6 +91,7 @@ abstract class AbstractRelationship implements InterfaceRelationship
 	{
 		$available_options = array_merge(self::$valid_association_options,static::$valid_association_options);
 		$valid_options = array_intersect_key(array_flip($available_options),$options);
+
 		foreach ($valid_options as $option => $v)
 			$valid_options[$option] = $options[$option];
 
@@ -186,22 +187,15 @@ class HasMany extends AbstractRelationship
 			$this->foreign_key = array($this->keyify(get_class($model)));
 
 		if (!$this->primary_key)
-			$this->primary_key = array($this->get_table()->pk[0]);
+			$this->primary_key = $model->get_primary_key();
 	}
 
 	public function load(Model $model)
 	{
 		$inflector = Inflector::instance();
-
 		$class_name = $this->class_name;
-
 		$table = $this->get_table();
-
 		$this->set_keys($model);
-
-		$keys = array();
-		foreach ($this->primary_key as $key)
-			$keys[] = $inflector->variablize($key);
 
 		if ($this->through)
 		{
@@ -227,7 +221,7 @@ class HasMany extends AbstractRelationship
 				$key = "$through_table_name.$key";
 		}
 
-		if (!($conditions = $this->create_conditions_from_keys($model, $this->foreign_key, $keys)))
+		if (!($conditions = $this->create_conditions_from_keys($model, $this->foreign_key, $this->primary_key)))
 			return null;
 
 		$options = $this->unset_non_finder_options($this->options);

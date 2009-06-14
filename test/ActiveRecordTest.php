@@ -290,5 +290,10 @@ class ActiveRecordTest extends DatabaseTest
 		$event->state = 'MEXICO';
 		$this->assertEquals('MEXICO',$event->venue->state);
 	}
+
+	public function testTableNameWithUnderscores()
+	{
+		$this->assertNotNull(AwesomePerson::first());
+	}
 };
 ?>

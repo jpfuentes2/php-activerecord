@@ -65,3 +65,10 @@ CREATE TABLE "RM-BLDG"(
     "RM-NAME" VARCHAR(10) NOT NULL,
     "SPACE OUT" VARCHAR(1) NOT NULL
 );
+
+CREATE SEQUENCE awesome_people_seq;
+CREATE TABLE awesome_people(
+	id int not null primary key,
+	author_id int,
+	is_awesome int default 1
+);

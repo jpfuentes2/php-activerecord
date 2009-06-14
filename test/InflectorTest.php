@@ -13,5 +13,11 @@ class InflectorTest extends PHPUnit_Framework_TestCase
 	{
 		$this->assertEquals('rm_name_bob',$this->inflector->variablize('rm--name  bob'));
 	}
+
+	public function testTableize()
+	{
+		$this->assertEquals('angry_people',$this->inflector->tableize('AngryPerson'));
+		$this->assertEquals('my_sqls',$this->inflector->tableize('MySQL'));
+	}
 };
 ?>

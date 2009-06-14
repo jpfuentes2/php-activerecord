@@ -297,7 +297,7 @@ class Table
 		else
 		{
 			// infer table name from the class name
-			$this->table = Utils::pluralize(strtolower($this->class->getName()));
+			$this->table = Inflector::instance()->tableize($this->class->getName());
 		}
 
 		if(($db = $this->class->getStaticPropertyValue('db',null)) || ($db = $this->class->getStaticPropertyValue('db_name',null)))
