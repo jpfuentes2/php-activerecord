@@ -3,9 +3,9 @@ include 'helpers/config.php';
 
 class CallBackTest extends DatabaseTest
 {
-	public function setUp($connection_name=null)
+	public function set_up($connection_name=null)
 	{
-		parent::setUp($connection_name);
+		parent::set_up($connection_name);
 
 		// ensure VenueCB model has been loaded
 		VenueCB::find(1);
@@ -18,7 +18,7 @@ class CallBackTest extends DatabaseTest
 		if (!$method_name)
 			$method_name = $callback_name;
 
-		$this->assertTrue(in_array($method_name,$this->callback->get_callbacks($callback_name)));
+		$this->assert_true(in_array($method_name,$this->callback->get_callbacks($callback_name)));
 	}
 
 	public function assert_implicit_save($first_method, $second_method)
@@ -27,7 +27,7 @@ class CallBackTest extends DatabaseTest
 		$this->callback->register($first_method,function($model) use (&$i_ran, $first_method) { $i_ran[] = $first_method; });
 		$this->callback->register($second_method,function($model) use (&$i_ran, $second_method) { $i_ran[] = $second_method; });
 		$this->callback->invoke(null,$second_method);
-		$this->assertEquals(array($first_method,$second_method),$i_ran);
+		$this->assert_equals(array($first_method,$second_method),$i_ran);
 	}
 
 	public function test_generic_callback_was_auto_registered()
@@ -90,14 +90,14 @@ class CallBackTest extends DatabaseTest
 	{
 		$this->callback->register('after_construct');
 		$this->callback->register('after_construct','non_generic_after_construct');
-		$this->assertEquals(array('after_construct','after_construct','non_generic_after_construct'),$this->callback->get_callbacks('after_construct'));
+		$this->assert_equals(array('after_construct','after_construct','non_generic_after_construct'),$this->callback->get_callbacks('after_construct'));
 	}
 
 	public function test_register_prepends_to_registry()
 	{
 		$this->callback->register('after_construct');
 		$this->callback->register('after_construct','non_generic_after_construct',array('prepend' => true));
-		$this->assertEquals(array('non_generic_after_construct','after_construct','after_construct'),$this->callback->get_callbacks('after_construct'));
+		$this->assert_equals(array('non_generic_after_construct','after_construct','after_construct'),$this->callback->get_callbacks('after_construct'));
 	}
 
 	public function test_registers_via_static_array_definition()
@@ -126,30 +126,30 @@ class CallBackTest extends DatabaseTest
 	{
 		$this->callback->register('after_construct');
 		$this->callback->register('after_construct');
-		$this->assertEquals(array('after_construct','after_construct','after_construct'),$this->callback->get_callbacks('after_construct'));
+		$this->assert_equals(array('after_construct','after_construct','after_construct'),$this->callback->get_callbacks('after_construct'));
 	}
 
 	public function test_register_closure_callback()
 	{
 		$closure = function($model) {};
 		$this->callback->register('after_save',$closure);
-		$this->assertEquals(array($closure),$this->callback->get_callbacks('after_save'));
+		$this->assert_equals(array($closure),$this->callback->get_callbacks('after_save'));
 	}
 
 	public function test_get_callbacks_returns_array()
 	{
 		$this->callback->register('after_construct');
-		$this->assertTrue(is_array($this->callback->get_callbacks('after_construct')));
+		$this->assert_true(is_array($this->callback->get_callbacks('after_construct')));
 	}
 
 	public function test_get_callbacks_returns_null()
 	{
-		$this->assertNull($this->callback->get_callbacks('this_callback_name_should_never_exist'));
+		$this->assert_null($this->callback->get_callbacks('this_callback_name_should_never_exist'));
 	}
 
 	public function test_invoke_runs_all_callbacks()
 	{
-		$mock = $this->getMock('VenueCB',array('after_destroy_one','after_destroy_two'));
+		$mock = $this->get_mock('VenueCB',array('after_destroy_one','after_destroy_two'));
 		$mock->expects($this->once())->method('after_destroy_one');
 		$mock->expects($this->once())->method('after_destroy_two');
 		$this->callback->invoke($mock,'after_destroy');
@@ -160,7 +160,7 @@ class CallBackTest extends DatabaseTest
 		$i_ran = false;
 		$this->callback->register('after_validation',function($model) use (&$i_ran) { $i_ran = true; });
 		$this->callback->invoke(null,'after_validation');
-		$this->assertTrue($i_ran);
+		$this->assert_true($i_ran);
 	}
 
 	public function test_invoke_implicitly_calls_save_first()
@@ -176,20 +176,20 @@ class CallBackTest extends DatabaseTest
 	 */
 	public function test_invoke_unregistered_callback()
 	{
-		$mock = $this->getMock('VenueCB',array());
+		$mock = $this->get_mock('VenueCB',array());
 		$this->callback->invoke($mock,'before_validation_on_create');
 	}
 
 	public function test_before_callbacks_pass_on_false_return_callback_returned_false()
 	{
 		$this->callback->register('before_validation',function($model) { return false; });
-		$this->assertFalse($this->callback->invoke(null,'before_validation'));
+		$this->assert_false($this->callback->invoke(null,'before_validation'));
 	}
 
 	public function test_before_callbacks_does_not_pass_on_false_for_after_callbacks()
 	{
 		$this->callback->register('after_validation',function($model) { return false; });
-		$this->assertTrue($this->callback->invoke(null,'after_validation'));
+		$this->assert_true($this->callback->invoke(null,'after_validation'));
 	}
 };
 ?>

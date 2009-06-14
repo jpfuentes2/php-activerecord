@@ -1,6 +1,7 @@
 <?php
 require_once 'Log.php';
 require_once 'PHPUnit/Framework/TestCase.php';
+require_once 'SnakeCase_PHPUnit_Framework_TestCase.php';
 require_once 'DatabaseTest.php';
 require_once 'AdapterTest.php';
 require_once dirname(__FILE__) . '/../../ActiveRecord.php';

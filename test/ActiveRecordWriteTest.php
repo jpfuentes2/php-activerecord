@@ -3,35 +3,35 @@ include 'helpers/config.php';
 
 class ActiveRecordWriteTest extends DatabaseTest
 {
-	public function testSave()
+	public function test_save()
 	{
 		$venue = new Venue(array('name' => 'Tito'));
 		$venue->save();
 	}
 
-	public function testInsert()
+	public function test_insert()
 	{
 		$author = new Author(array('name' => 'Blah Blah'));
 		$author->save();
-		$this->assertNotNull(Author::find($author->id));
+		$this->assert_not_null(Author::find($author->id));
 	}
 
-	public function testSaveAutoIncrementId()
+	public function test_save_auto_increment_id()
 	{
 		$venue = new Venue(array('name' => 'Bob'));
 		$venue->save();
-		$this->assertTrue($venue->id > 0);
+		$this->assert_true($venue->id > 0);
 	}
 
-	public function testDelete()
+	public function test_delete()
 	{
 		$author = Author::find(1);
 		$author->delete();
 
-		$this->assertFalse(Author::exists(1));
+		$this->assert_false(Author::exists(1));
 	}
 
-	public function testDeleteByFindAll()
+	public function test_delete_by_find_all()
 	{
 		$books = Book::all();
 
@@ -39,137 +39,137 @@ class ActiveRecordWriteTest extends DatabaseTest
 			$model->delete();
 
 		$res = Book::all();
-		$this->assertEquals(0,count($res));
+		$this->assert_equals(0,count($res));
 	}
 
-	public function testUpdate()
+	public function test_update()
 	{
 		$book = Book::find(1);
 		$new_name = 'new name';
 		$book->name = $new_name;
 		$book->save();
 
-		$this->assertSame($new_name, $book->name);
-		$this->assertSame($new_name, $book->name, Book::find(1)->name);
+		$this->assert_same($new_name, $book->name);
+		$this->assert_same($new_name, $book->name, Book::find(1)->name);
 	}
 
-	public function testUpdateAttributes()
+	public function test_update_attributes()
 	{
 		$book = Book::find(1);
 		$new_name = 'How to lose friends and alienate people'; // jax i'm worried about you
 		$attrs = array('name' => $new_name);
 		$book->update_attributes($attrs);
 
-		$this->assertSame($new_name, $book->name);
-		$this->assertSame($new_name, $book->name, Book::find(1)->name);
+		$this->assert_same($new_name, $book->name);
+		$this->assert_same($new_name, $book->name, Book::find(1)->name);
 	}
 
 	/**
 	 * @expectedException ActiveRecord\UndefinedPropertyException
 	 */
-	public function testUpdateAttributesUndefinedProperty()
+	public function test_update_attributes_undefined_property()
 	{
 		$book = Book::find(1);
 		$book->update_attributes(array('name' => 'new name', 'invalid_attribute' => true , 'another_invalid_attribute' => 'blah'));
 	}
 
-	public function testUpdateAttribute()
+	public function test_update_attribute()
 	{
 		$book = Book::find(1);
 		$new_name = 'some stupid self-help book';
 		$book->update_attribute('name', $new_name);
 
-		$this->assertSame($new_name, $book->name);
-		$this->assertSame($new_name, $book->name, Book::find(1)->name);
+		$this->assert_same($new_name, $book->name);
+		$this->assert_same($new_name, $book->name, Book::find(1)->name);
 	}
 
 	/**
 	 * @expectedException ActiveRecord\UndefinedPropertyException
 	 */
-	public function testUpdateAttributeUndefinedProperty()
+	public function test_update_attribute_undefined_property()
 	{
 		$book = Book::find(1);
 		$book->update_attribute('invalid_attribute', true);
 	}
 
-	public function testSaveNullValue()
+	public function test_save_null_value()
 	{
 		$book = Book::first();
 		$book->name = null;
 		$book->save();
-		$this->assertTrue(Book::first()->name === null);
+		$this->assert_true(Book::first()->name === null);
 	}
 
-	public function testSaveBlankValue()
+	public function test_save_blank_value()
 	{
 		$book = Book::first();
 		$book->name = '';
 		$book->save();
-		$this->assertTrue(Book::first()->name === '');
+		$this->assert_true(Book::first()->name === '');
 	}
 
-	public function testDirtyAttributes1()
+	public function test_dirty_attributes1()
 	{
-		$book = $this->makeNewBookAnd(false);
-		$this->assertEquals(array('name','special'),array_keys($book->dirty_attributes()));
+		$book = $this->make_new_book_and(false);
+		$this->assert_equals(array('name','special'),array_keys($book->dirty_attributes()));
 	}
 
-	public function testDirtyAttributesClearedAfterSaving()
+	public function test_dirty_attributes_cleared_after_saving()
 	{
-		$book = $this->makeNewBookAnd();
-		$this->assertTrue(strpos($book->table()->last_sql,'(name,special)') !== false);
-		$this->assertEquals(null,$book->dirty_attributes());
+		$book = $this->make_new_book_and();
+		$this->assert_true(strpos($book->table()->last_sql,'(name,special)') !== false);
+		$this->assert_equals(null,$book->dirty_attributes());
 	}
 
-	public function testDirtyAttributesClearedAfterInserting()
+	public function test_dirty_attributes_cleared_after_inserting()
 	{
-		$book = $this->makeNewBookAnd();
-		$this->assertEquals(null,$book->dirty_attributes());
+		$book = $this->make_new_book_and();
+		$this->assert_equals(null,$book->dirty_attributes());
 	}
 
-	public function testNoDirtyAttributesButStillInsertRecord()
+	public function test_no_dirty_attributes_but_still_insert_record()
 	{
 		$book = new Book;
-		$this->assertEquals(null,$book->dirty_attributes());
+		$this->assert_equals(null,$book->dirty_attributes());
 		$book->save();
-		$this->assertEquals(null,$book->dirty_attributes());
-		$this->assertNotNull($book->id);
+		$this->assert_equals(null,$book->dirty_attributes());
+		$this->assert_not_null($book->id);
 	}
 
-	public function testDirtyAttributesClearedAfterUpdating()
+	public function test_dirty_attributes_cleared_after_updating()
 	{
 		$book = Book::first();
 		$book->name = 'rivers cuomo';
 		$book->save();
-		$this->assertEquals(null,$book->dirty_attributes());
+		$this->assert_equals(null,$book->dirty_attributes());
 	}
 
-	public function testDirtyAttributesAfterReloading()
+	public function test_dirty_attributes_after_reloading()
 	{
 		$book = Book::first();
 		$book->name = 'rivers cuomo';
 		$book->reload();
-		$this->assertEquals(null,$book->dirty_attributes());
+		$this->assert_equals(null,$book->dirty_attributes());
 	}
 
-	public function testDirtyAttributesWithMassAssignment()
+	public function test_dirty_attributes_with_mass_assignment()
 	{
 		$book = Book::first();
 		$book->set_attributes(array('name' => 'rivers cuomo'));
-		$this->assertEquals(array('name'), array_keys($book->dirty_attributes()));
+		$this->assert_equals(array('name'), array_keys($book->dirty_attributes()));
 	}
 
-	public function testTimestampsSetBeforeSave()
+	public function test_timestamps_set_before_save()
 	{
 		$author = new Author;
 		$author->save();
-		$this->assertNotNull($author->created_at, $author->updated_at);
+		$this->assert_not_null($author->created_at, $author->updated_at);
 
 		$author->reload();
-		$this->assertNotNull($author->created_at, $author->updated_at);
+		$this->assert_not_null($author->created_at, $author->updated_at);
 	}
 
-	public function testTimestampsUpdatedAtOnlySetBeforeUpdate()
+	public function test_timestamps_updated_at_only_set_before_update()
 	{
 		$author = Author::find(1);
 		$created_at = $author->created_at;
@@ -177,27 +177,27 @@ class ActiveRecordWriteTest extends DatabaseTest
 		$author->name = 'test';
 		$author->save();
 
-		$this->assertNotNull($author->updated_at);
-		$this->assertSame($created_at, $author->created_at);
-		$this->assertNotEquals($updated_at, $author->updated_at);
+		$this->assert_not_null($author->updated_at);
+		$this->assert_same($created_at, $author->created_at);
+		$this->assert_not_equals($updated_at, $author->updated_at);
 	}
 
-	public function testCreate()
+	public function test_create()
 	{
 		$author = Author::create(array('name' => 'Blah Blah'));
-		$this->assertNotNull(Author::find($author->id));
+		$this->assert_not_null(Author::find($author->id));
 	}
 
-	public function testCreateShouldSetCreatedAt()
+	public function test_create_should_set_created_at()
 	{
 		$author = Author::create(array('name' => 'Blah Blah'));
-		$this->assertNotNull($author->created_at);
+		$this->assert_not_null($author->created_at);
 	}
 
 	/**
 	 * @expectedException ActiveRecord\ActiveRecordException
 	 */
-	public function testUpdateWithNoPrimaryKeyDefined()
+	public function test_update_with_no_primary_key_defined()
 	{
 		Author::table()->pk = array();
 		$author = Author::first();
@@ -208,14 +208,14 @@ class ActiveRecordWriteTest extends DatabaseTest
 	/**
 	 * @expectedException ActiveRecord\ActiveRecordException
 	 */
-	public function testDeleteWithNoPrimaryKeyDefined()
+	public function test_delete_with_no_primary_key_defined()
 	{
 		Author::table()->pk = array();
 		$author = author::first();
 		$author->delete();
 	}
 
-	private function makeNewBookAnd($save=true)
+	private function make_new_book_and($save=true)
 	{
 		$book = new Book();
 		$book->name = 'rivers cuomo';

@@ -12,46 +12,46 @@ class BookPresence extends ActiveRecord\Model
 
 class ValidatesPresenceOfTest extends DatabaseTest
 {
-	public function testPresence()
+	public function test_presence()
 	{
 		$book = new Book;
 		$book->name = 'blah';
 		$book->save();
-		$this->assertFalse($book->errors->is_invalid('name'));
+		$this->assert_false($book->errors->is_invalid('name'));
 	}
 
-	public function testInvalidNull()
+	public function test_invalid_null()
 	{
 		$book = new BookPresence;
 		$book->name = null;
 		$book->save();
-		$this->assertTrue($book->errors->is_invalid('name'));
+		$this->assert_true($book->errors->is_invalid('name'));
 	}
 
-	public function testInvalidBlank()
+	public function test_invalid_blank()
 	{
 		$book = new BookPresence;
 		$book->name = '';
 		$book->save();
-		$this->assertTrue($book->errors->is_invalid('name'));
+		$this->assert_true($book->errors->is_invalid('name'));
 	}
 
-	public function testValidWhiteSpace()
+	public function test_valid_white_space()
 	{
 		$book = new BookPresence;
 		$book->name = ' ';
 		$book->save();
-		$this->assertFalse($book->errors->is_invalid('name'));
+		$this->assert_false($book->errors->is_invalid('name'));
 	}
 
-	public function testCustomMessage()
+	public function test_custom_message()
 	{
 		BookPresence::$validates_presence_of[0]['message'] = 'is using a custom message.';
 
 		$book = new BookPresence;
 		$book->name = null;
 		$book->save();
-		$this->assertEquals('is using a custom message.', $book->errors->on('name'));
+		$this->assert_equals('is using a custom message.', $book->errors->on('name'));
 	}
 };
 ?>

@@ -2,22 +2,23 @@
 include 'helpers/config.php';
 require_once dirname(__FILE__) . '/../lib/Inflector.php';
 
-class InflectorTest extends PHPUnit_Framework_TestCase
+class InflectorTest extends SnakeCase_PHPUnit_Framework_TestCase
 {
-	public function setUp()
+	public function set_up()
 	{
 		$this->inflector = ActiveRecord\Inflector::instance();
 	}
 
-	public function testUnderscorify()
+	public function test_underscorify()
 	{
-		$this->assertEquals('rm_name_bob',$this->inflector->variablize('rm--name  bob'));
+		$this->assert_equals('rm_name_bob',$this->inflector->variablize('rm--name  bob'));
+		$this->assert_equals('One_Two_Three',$this->inflector->underscorify('OneTwoThree'));
 	}
 
-	public function testTableize()
+	public function test_tableize()
 	{
-		$this->assertEquals('angry_people',$this->inflector->tableize('AngryPerson'));
-		$this->assertEquals('my_sqls',$this->inflector->tableize('MySQL'));
+		$this->assert_equals('angry_people',$this->inflector->tableize('AngryPerson'));
+		$this->assert_equals('my_sqls',$this->inflector->tableize('MySQL'));
 	}
 };
 ?>

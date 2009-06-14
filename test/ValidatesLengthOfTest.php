@@ -15,57 +15,57 @@ class BookSize extends ActiveRecord\Model
 
 class ValidatesLengthOfTest extends DatabaseTest
 {
-	public function setUp($connection_name=null)
+	public function set_up($connection_name=null)
 	{
-		parent::setUp($connection_name);
+		parent::set_up($connection_name);
 		BookLength::$validates_length_of[0] = array('name', 'allow_blank' => false, 'allow_null' => false);
 	}
 
-	public function testWithin()
+	public function test_within()
 	{
 		BookLength::$validates_length_of[0]['within'] = array(1, 5);
 		$book = new BookLength;
 		$book->name = '12345';
 		$book->save();
-		$this->assertFalse($book->errors->is_invalid('name'));
+		$this->assert_false($book->errors->is_invalid('name'));
 	}
 
-	public function testValidIn()
+	public function test_valid_in()
 	{
 		BookLength::$validates_length_of[0]['in'] = array(1, 5);
 		$book = new BookLength;
 		$book->name = '12345';
 		$book->save();
-		$this->assertFalse($book->errors->is_invalid('name'));
+		$this->assert_false($book->errors->is_invalid('name'));
 	}
 
-	public function testAliasedSizeOf()
+	public function test_aliased_size_of()
 	{
 		BookSize::$validates_size_of = BookLength::$validates_length_of;
 		BookSize::$validates_size_of[0]['within'] = array(1, 5);
 		$book = new BookSize;
 		$book->name = '12345';
 		$book->save();
-		$this->assertFalse($book->errors->is_invalid('name'));
+		$this->assert_false($book->errors->is_invalid('name'));
 	}
 
-	public function testInvalidWithinAndIn()
+	public function test_invalid_within_and_in()
 	{
 		BookLength::$validates_length_of[0]['within'] = array(1, 3);
 		$book = new BookLength;
 		$book->name = 'four';
 		$book->save();
-		$this->assertTrue($book->errors->is_invalid('name'));
+		$this->assert_true($book->errors->is_invalid('name'));
 
-		$this->setUp();
+		$this->set_up();
 		BookLength::$validates_length_of[0]['in'] = array(1, 3);
 		$book = new BookLength;
 		$book->name = 'four';
 		$book->save();
-		$this->assertTrue($book->errors->is_invalid('name'));
+		$this->assert_true($book->errors->is_invalid('name'));
 	}
 
-	public function testValidNull()
+	public function test_valid_null()
 	{
 		BookLength::$validates_length_of[0]['within'] = array(1, 3);
 		BookLength::$validates_length_of[0]['allow_null'] = true;
@@ -73,10 +73,10 @@ class ValidatesLengthOfTest extends DatabaseTest
 		$book = new BookLength;
 		$book->name = null;
 		$book->save();
-		$this->assertFalse($book->errors->is_invalid('name'));
+		$this->assert_false($book->errors->is_invalid('name'));
 	}
 
-	public function testValidBlank()
+	public function test_valid_blank()
 	{
 		BookLength::$validates_length_of[0]['within'] = array(1, 3);
 		BookLength::$validates_length_of[0]['allow_blank'] = true;
@@ -84,32 +84,32 @@ class ValidatesLengthOfTest extends DatabaseTest
 		$book = new BookLength;
 		$book->name = '';
 		$book->save();
-		$this->assertFalse($book->errors->is_invalid('name'));
+		$this->assert_false($book->errors->is_invalid('name'));
 	}
 
-	public function testInvalidBlank()
+	public function test_invalid_blank()
 	{
 		BookLength::$validates_length_of[0]['within'] = array(1, 3);
 
 		$book = new BookLength;
 		$book->name = '';
 		$book->save();
-		$this->assertTrue($book->errors->is_invalid('name'));
-		$this->assertEquals('is too short (minimum is 1 characters)', $book->errors->on('name'));
+		$this->assert_true($book->errors->is_invalid('name'));
+		$this->assert_equals('is too short (minimum is 1 characters)', $book->errors->on('name'));
 	}
 
-	public function testInvalidNull()
+	public function test_invalid_null()
 	{
 		BookLength::$validates_length_of[0]['within'] = array(1, 3);
 
 		$book = new BookLength;
 		$book->name = null;
 		$book->save();
-		$this->assertTrue($book->errors->is_invalid('name'));
-		$this->assertEquals('is too short (minimum is 1 characters)', $book->errors->on('name'));
+		$this->assert_true($book->errors->is_invalid('name'));
+		$this->assert_equals('is too short (minimum is 1 characters)', $book->errors->on('name'));
 	}
 
-	public function testFloatAsImpossibleRangeOption()
+	public function test_float_as_impossible_range_option()
 	{
 		BookLength::$validates_length_of[0]['within'] = array(1, 3.6);
 		$book = new BookLength;
@@ -117,24 +117,24 @@ class ValidatesLengthOfTest extends DatabaseTest
 		try {
 			$book->save();
 		} catch (ActiveRecord\ValidationsArgumentError $e) {
-			$this->assertEquals('Range values cannot use floats for length.', $e->getMessage());
+			$this->assert_equals('Range values cannot use floats for length.', $e->getMessage());
 		}
 
-		$this->setUp();
+		$this->set_up();
 		BookLength::$validates_length_of[0]['is'] = 1.8;
 		$book = new BookLength;
 		$book->name = '123';
 		try {
 			$book->save();
 		} catch (ActiveRecord\ValidationsArgumentError $e) {
-			$this->assertEquals('is value cannot use a float for length.', $e->getMessage());
+			$this->assert_equals('is value cannot use a float for length.', $e->getMessage());
 			return;
 		}
 
 		$this->fail('An expected exception has not be raised.');
 	}
 
-	public function testSignedIntegerAsImpossibleWithinOption()
+	public function test_signed_integer_as_impossible_within_option()
 	{
 		BookLength::$validates_length_of[0]['within'] = array(-1, 3);
 
@@ -143,14 +143,14 @@ class ValidatesLengthOfTest extends DatabaseTest
 		try {
 			$book->save();
 		} catch (ActiveRecord\ValidationsArgumentError $e) {
-			$this->assertEquals('Range values cannot use signed integers.', $e->getMessage());
+			$this->assert_equals('Range values cannot use signed integers.', $e->getMessage());
 			return;
 		}
 
 		$this->fail('An expected exception has not be raised.');
 	}
 
-	public function testSignedIntegerAsImpossibleIsOption()
+	public function test_signed_integer_as_impossible_is_option()
 	{
 		BookLength::$validates_length_of[0]['is'] = -8;
 
@@ -159,28 +159,28 @@ class ValidatesLengthOfTest extends DatabaseTest
 		try {
 			$book->save();
 		} catch (ActiveRecord\ValidationsArgumentError $e) {
-			$this->assertEquals('is value cannot use a signed integer.', $e->getMessage());
+			$this->assert_equals('is value cannot use a signed integer.', $e->getMessage());
 			return;
 		}
 
 		$this->fail('An expected exception has not be raised.');
 	}
 
-	public function testLackOfOption()
+	public function test_lack_of_option()
 	{
 		try {
 			$book = new BookLength;
 			$book->name = null;
 			$book->save();
 		} catch (ActiveRecord\ValidationsArgumentError $e) {
-			$this->assertEquals('Range unspecified.  Specify the [within], [maximum], or [is] option.', $e->getMessage());
+			$this->assert_equals('Range unspecified.  Specify the [within], [maximum], or [is] option.', $e->getMessage());
 			return;
 		}
 
 		$this->fail('An expected exception has not be raised.');
 	}
 
-	public function testTooManyOptions()
+	public function test_too_many_options()
 	{
 		BookLength::$validates_length_of[0]['within'] = array(1, 3);
 		BookLength::$validates_length_of[0]['in'] = array(1, 3);
@@ -190,14 +190,14 @@ class ValidatesLengthOfTest extends DatabaseTest
 			$book->name = null;
 			$book->save();
 		} catch (ActiveRecord\ValidationsArgumentError $e) {
-			$this->assertEquals('Too many range options specified.  Choose only one.', $e->getMessage());
+			$this->assert_equals('Too many range options specified.  Choose only one.', $e->getMessage());
 			return;
 		}
 
 		$this->fail('An expected exception has not be raised.');
 	}
 
-	public function testTooManyOptionsWithDifferentOptionTypes()
+	public function test_too_many_options_with_different_option_types()
 	{
 		BookLength::$validates_length_of[0]['within'] = array(1, 3);
 		BookLength::$validates_length_of[0]['is'] = 3;
@@ -207,7 +207,7 @@ class ValidatesLengthOfTest extends DatabaseTest
 			$book->name = null;
 			$book->save();
 		} catch (ActiveRecord\ValidationsArgumentError $e) {
-			$this->assertEquals('Too many range options specified.  Choose only one.', $e->getMessage());
+			$this->assert_equals('Too many range options specified.  Choose only one.', $e->getMessage());
 			return;
 		}
 
@@ -217,7 +217,7 @@ class ValidatesLengthOfTest extends DatabaseTest
 	/**
 	 * @expectedException ActiveRecord\ValidationsArgumentError
 	 */
-	public function testWithOptionAsNonNumeric()
+	public function test_with_option_as_non_numeric()
 	{
 		BookLength::$validates_length_of[0]['with'] = array('test');
 
@@ -229,7 +229,7 @@ class ValidatesLengthOfTest extends DatabaseTest
 	/**
 	 * @expectedException ActiveRecord\ValidationsArgumentError
 	 */
-	public function testWithOptionAsNonNumericNonArray()
+	public function test_with_option_as_non_numeric_non_array()
 	{
 		BookLength::$validates_length_of[0]['with'] = 'test';
 

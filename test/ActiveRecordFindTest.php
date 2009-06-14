@@ -6,26 +6,26 @@ class ActiveRecordFindTest extends DatabaseTest
 	/**
 	 * @expectedException ActiveRecord\RecordNotFound
 	 */
-	public function testFindWithNoParams()
+	public function test_find_with_no_params()
 	{
 		Author::find();
 	}
 
-	public function testFindByPK()
+	public function test_find_by_pk()
 	{
 		$author = Author::find(3);
-		$this->assertEquals(3,$author->id);
+		$this->assert_equals(3,$author->id);
 	}
 
 	/**
 	 * @expectedException ActiveRecord\RecordNotFound
 	 */
-	public function testFindByPKNoResults()
+	public function test_find_by_pkno_results()
 	{
 		Author::find(999999999999);
 	}
 
-	public function testFindByMultiplePKWithPartialMatch()
+	public function test_find_by_multiple_pk_with_partial_match()
 	{
 		try
 		{
@@ -34,281 +34,281 @@ class ActiveRecordFindTest extends DatabaseTest
 		}
 		catch (ActiveRecord\RecordNotFound $e)
 		{
-			$this->assertTrue(strpos($e->getMessage(),'found 1, but was looking for 2') !== false);
+			$this->assert_true(strpos($e->getMessage(),'found 1, but was looking for 2') !== false);
 		}
 	}
 
-	public function testFindByPKWithOptions()
+	public function test_find_by_pk_with_options()
 	{
 		$author = Author::find(3,array('order' => 'name'));
-		$this->assertEquals(3,$author->id);
-		$this->assertTrue(strpos(Author::table()->last_sql,'ORDER BY name') !== false);
+		$this->assert_equals(3,$author->id);
+		$this->assert_true(strpos(Author::table()->last_sql,'ORDER BY name') !== false);
 	}
 
-	public function testFindByPKArray()
+	public function test_find_by_pk_array()
 	{
 		$authors = Author::find(1,'2');
-		$this->assertEquals(2, count($authors));
-		$this->assertEquals(1, $authors[0]->id);
-		$this->assertEquals(2, $authors[1]->id);
+		$this->assert_equals(2, count($authors));
+		$this->assert_equals(1, $authors[0]->id);
+		$this->assert_equals(2, $authors[1]->id);
 	}
 
-	public function testFindByPKArrayWithOptions()
+	public function test_find_by_pk_array_with_options()
 	{
 		$authors = Author::find(1,'2',array('order' => 'name'));
-		$this->assertEquals(2, count($authors));
-		$this->assertTrue(strpos(Author::table()->last_sql,'ORDER BY name') !== false);
+		$this->assert_equals(2, count($authors));
+		$this->assert_true(strpos(Author::table()->last_sql,'ORDER BY name') !== false);
 	}
 
 	/**
 	 * @expectedException Exception
 	 */
-	public function testFindNothingWithSQLInString()
+	public function test_find_nothing_with_sql_in_string()
 	{
 		Author::first('name = 123123123');
 	}
 
-	public function testFindAll()
+	public function test_find_all()
 	{
 		$authors = Author::find('all',array('conditions' => array('author_id IN(?)',array(1,2,3))));
-		$this->assertTrue(count($authors) >= 3);
+		$this->assert_true(count($authors) >= 3);
 	}
 
-	public function testFindAllWithNoBindValues()
+	public function test_find_all_with_no_bind_values()
 	{
 		$authors = Author::find('all',array('conditions' => array('author_id IN(1,2,3)')));
-		$this->assertEquals(1,$authors[0]->author_id);
+		$this->assert_equals(1,$authors[0]->author_id);
 	}
 
-	public function testFindHashUsingAlias()
+	public function test_find_hash_using_alias()
 	{
 		$venues = Venue::all(array('conditions' => array('marquee' => 'Warner Theatre', 'city' => array('Washington','New York'))));
-		$this->assertTrue(count($venues) >= 1);
+		$this->assert_true(count($venues) >= 1);
 	}
 
-	public function testFindHashUsingAliasWithNull()
+	public function test_find_hash_using_alias_with_null()
 	{
 		$venues = Venue::all(array('conditions' => array('marquee' => null)));
-		$this->assertEquals(0,count($venues));
+		$this->assert_equals(0,count($venues));
 	}
 
-	public function testDynamicFinderUsingAlias()
+	public function test_dynamic_finder_using_alias()
 	{
-		$this->assertNotNull(Venue::find_by_marquee('Warner Theatre'));
+		$this->assert_not_null(Venue::find_by_marquee('Warner Theatre'));
 	}
 
-	public function testFindAllHash()
+	public function test_find_all_hash()
 	{
 		$books = Book::find('all',array('conditions' => array('author_id' => 1)));
-		$this->assertTrue(count($books) > 0);
+		$this->assert_true(count($books) > 0);
 	}
 
-	public function testFindAllHashWithOrder()
+	public function test_find_all_hash_with_order()
 	{
 		$books = Book::find('all',array('conditions' => array('author_id' => 1), 'order' => 'name DESC'));
-		$this->assertTrue(count($books) > 0);
+		$this->assert_true(count($books) > 0);
 	}
 
 	/**
 	 * @expectedException ActiveRecord\ActiveRecordException
 	 */
-	public function testFindAllWithInvalidOption()
+	public function test_find_all_with_invalid_option()
 	{
 		Book::find('all',array('author_id' => 1));
 	}
 
-	public function testFindAllNoArgs()
+	public function test_find_all_no_args()
 	{
 		$author = Author::all();
-		$this->assertTrue(count($author) > 1);
+		$this->assert_true(count($author) > 1);
 	}
 
-	public function testFindAllNoResults()
+	public function test_find_all_no_results()
 	{
 		$authors = Author::find('all',array('conditions' => array('author_id IN(11111111111,22222222222,333333333333)')));
-		$this->assertEquals(array(),$authors);
+		$this->assert_equals(array(),$authors);
 	}
 
-	public function testFindFirst()
+	public function test_find_first()
 	{
 		$author = Author::find('first',array('conditions' => array('author_id IN(?)', array(1,2,3))));
-		$this->assertEquals(1,$author->author_id);
-		$this->assertEquals('Tito',$author->name);
+		$this->assert_equals(1,$author->author_id);
+		$this->assert_equals('Tito',$author->name);
 	}
 
-	public function testFindFirstNoResults()
+	public function test_find_first_no_results()
 	{
-		$this->assertNull(Author::find('first',array('conditions' => 'author_id=1111111')));
+		$this->assert_null(Author::find('first',array('conditions' => 'author_id=1111111')));
 	}
 
-	public function testFindFirstUsingPK()
+	public function test_find_first_using_pk()
 	{
 		$author = Author::find('first',3);
-		$this->assertEquals(3,$author->author_id);
+		$this->assert_equals(3,$author->author_id);
 	}
 
-	public function testFindFirstWithConditionsAsString()
+	public function test_find_first_with_conditions_as_string()
 	{
 		$author = Author::find('first',array('conditions' => 'author_id=3'));
-		$this->assertEquals(3,$author->author_id);
+		$this->assert_equals(3,$author->author_id);
 	}
 
-	public function testFindAllWithConditionsAsString()
+	public function test_find_all_with_conditions_as_string()
 	{
 		$author = Author::find('all',array('conditions' => 'author_id in(2,3)'));
-		$this->assertEquals(2,count($author));
+		$this->assert_equals(2,count($author));
 	}
 
-	public function testFindBySQL()
+	public function test_find_by_sql()
 	{
 		$author = Author::find_by_sql("SELECT * FROM authors WHERE author_id in(1,2)");
-		$this->assertEquals(1,$author[0]->author_id);
-		$this->assertEquals(2,count($author));
+		$this->assert_equals(1,$author[0]->author_id);
+		$this->assert_equals(2,count($author));
 	}
 
-	public function testFindBySQLTakesValuesArray()
+	public function test_find_by_sqltakes_values_array()
 	{
 		$author = Author::find_by_sql("SELECT * FROM authors WHERE author_id=?",array(1));
-		$this->assertNotNull($author);
+		$this->assert_not_null($author);
 	}
 
-	public function testFindLast()
+	public function test_find_last()
 	{
 		$author = Author::last();
-		$this->assertEquals(3, $author->author_id);
-		$this->assertEquals('Bill Clinton',$author->name);
+		$this->assert_equals(3, $author->author_id);
+		$this->assert_equals('Bill Clinton',$author->name);
 	}
 
-	public function testFindLastUsingStringCondition()
+	public function test_find_last_using_string_condition()
 	{
 		$author = Author::find('last', array('conditions' => 'author_id IN(1,2,3)'));
-		$this->assertEquals(3, $author->author_id);
-		$this->assertEquals('Bill Clinton',$author->name);
+		$this->assert_equals(3, $author->author_id);
+		$this->assert_equals('Bill Clinton',$author->name);
 	}
 
-	public function testLimitBeforeOrder()
+	public function test_limit_before_order()
 	{
 		$authors = Author::all(array('limit' => 2, 'order' => 'author_id desc', 'conditions' => 'author_id in(1,2)'));
-		$this->assertEquals(2,$authors[0]->author_id);
-		$this->assertEquals(1,$authors[1]->author_id);
+		$this->assert_equals(2,$authors[0]->author_id);
+		$this->assert_equals(1,$authors[1]->author_id);
 	}
 
-	public function testForEach()
+	public function test_for_each()
 	{
 		$i = 0;
 		$res = Author::all();
 
 		foreach ($res as $author)
 		{
-			$this->assertTrue($author instanceof ActiveRecord\Model);
+			$this->assert_true($author instanceof ActiveRecord\Model);
 			$i++;
 		}
-		$this->assertTrue($i > 0);
+		$this->assert_true($i > 0);
 	}
 
-	public function testFetchAll()
+	public function test_fetch_all()
 	{
 		$i = 0;
 
 		foreach (Author::all() as $author)
 		{
-			$this->assertTrue($author instanceof ActiveRecord\Model);
+			$this->assert_true($author instanceof ActiveRecord\Model);
 			$i++;
 		}
-		$this->assertTrue($i > 0);
+		$this->assert_true($i > 0);
 	}
 
-	public function testCount()
+	public function test_count()
 	{
-		$this->assertTrue(Author::count(1) == 1);
-		$this->assertTrue(Author::count() > 1);
-		$this->assertEquals(0,Author::count(array('conditions' => 'author_id=99999999999999')));
+		$this->assert_true(Author::count(1) == 1);
+		$this->assert_true(Author::count() > 1);
+		$this->assert_equals(0,Author::count(array('conditions' => 'author_id=99999999999999')));
 	}
 
-	public function testExists()
+	public function test_exists()
 	{
-		$this->assertTrue(Author::exists(1));
-		$this->assertTrue(Author::exists(array('conditions' => 'author_id=1')));
-		$this->assertFalse(Author::exists(9999999));
-		$this->assertFalse(Author::exists(array('conditions' => 'author_id=999999')));
+		$this->assert_true(Author::exists(1));
+		$this->assert_true(Author::exists(array('conditions' => 'author_id=1')));
+		$this->assert_false(Author::exists(9999999));
+		$this->assert_false(Author::exists(array('conditions' => 'author_id=999999')));
 	}
 
-	public function testFindByCallStatic()
+	public function test_find_by_call_static()
 	{
-		$this->assertEquals('Tito',Author::find_by_name('Tito')->name);
-		$this->assertEquals('Tito',Author::find_by_author_id_and_name(1,'Tito')->name);
-		$this->assertEquals('George W. Bush',Author::find_by_author_id_or_name(2,'Tito',array('order' => 'author_id desc'))->name);
-		$this->assertEquals('Tito',Author::find_by_name(array('Tito','George W. Bush'),array('order' => 'name desc'))->name);
+		$this->assert_equals('Tito',Author::find_by_name('Tito')->name);
+		$this->assert_equals('Tito',Author::find_by_author_id_and_name(1,'Tito')->name);
+		$this->assert_equals('George W. Bush',Author::find_by_author_id_or_name(2,'Tito',array('order' => 'author_id desc'))->name);
+		$this->assert_equals('Tito',Author::find_by_name(array('Tito','George W. Bush'),array('order' => 'name desc'))->name);
 	}
 
-	public function testFindByCallStaticNoResults()
+	public function test_find_by_call_static_no_results()
 	{
-		$this->assertNull(Author::find_by_name('SHARKS WIT LASERZ'));
-		$this->assertNull(Author::find_by_name_or_author_id());
+		$this->assert_null(Author::find_by_name('SHARKS WIT LASERZ'));
+		$this->assert_null(Author::find_by_name_or_author_id());
 	}
 
 	/**
 	 * @expectedException ActiveRecord\DatabaseException
 	 */
-	public function testFindByCallStaticInvalidColumnName()
+	public function test_find_by_call_static_invalid_column_name()
 	{
 		Author::find_by_sharks();
 	}
 
-	public function testFindAllByCallStatic()
+	public function test_find_all_by_call_static()
 	{
 		$x = Author::find_all_by_name('Tito');
-		$this->assertEquals('Tito',$x[0]->name);
-		$this->assertEquals(1,count($x));
+		$this->assert_equals('Tito',$x[0]->name);
+		$this->assert_equals(1,count($x));
 
 		$x = Author::find_all_by_author_id_or_name(2,'Tito',array('order' => 'name asc'));
-		$this->assertEquals(2,count($x));
-		$this->assertEquals('George W. Bush',$x[0]->name);
+		$this->assert_equals(2,count($x));
+		$this->assert_equals('George W. Bush',$x[0]->name);
 	}
 
-	public function testFindAllByCallStaticNoResults()
+	public function test_find_all_by_call_static_no_results()
 	{
 		$x = Author::find_all_by_name('SHARKSSSSSSS');
-		$this->assertEquals(0,count($x));
+		$this->assert_equals(0,count($x));
 	}
 
-	public function testFindAllByCallStaticWithArrayValuesAndOptions()
+	public function test_find_all_by_call_static_with_array_values_and_options()
 	{
 		$author = Author::find_all_by_name(array('Tito','Bill Clinton'),array('order' => 'name desc'));
-		$this->assertEquals('Tito',$author[0]->name);
-		$this->assertEquals('Bill Clinton',$author[1]->name);
+		$this->assert_equals('Tito',$author[0]->name);
+		$this->assert_equals('Bill Clinton',$author[1]->name);
 	}
 
 	/**
 	 * @expectedException ActiveRecord\ActiveRecordException
 	 */
-	public function testFindAllByCallStaticUndefinedMethod()
+	public function test_find_all_by_call_static_undefined_method()
 	{
 		Author::find_sharks('Tito');
 	}
 
-	public function testFindAllTakesLimitOptions()
+	public function test_find_all_takes_limit_options()
 	{
 		$authors = Author::all(array('limit' => 1, 'offset' => 2, 'order' => 'name desc'));
-		$this->assertEquals('Bill Clinton',$authors[0]->name);
+		$this->assert_equals('Bill Clinton',$authors[0]->name);
 	}
 
 	/**
 	 * @expectedException ActiveRecord\ActiveRecordException
 	 */
-	public function testFindByCallStaticWithInvalidFieldName()
+	public function test_find_by_call_static_with_invalid_field_name()
 	{
 		Author::find_by_some_invalid_field_name('Tito');
 	}
 
-	public function testFindWithSelect()
+	public function test_find_with_select()
 	{
 		$author = Author::first(array('select' => 'name, 123 as bubba', 'order' => 'name desc'));
-		$this->assertEquals('Tito',$author->name);
-		$this->assertEquals(123,$author->bubba);
+		$this->assert_equals('Tito',$author->name);
+		$this->assert_equals(123,$author->bubba);
 	}
 
-	public function testFindWithSelectNonSelectedFieldsShouldNotHaveAttributes()
+	public function test_find_with_select_non_selected_fields_should_not_have_attributes()
 	{
 		$author = Author::first(array('select' => 'name, 123 as bubba'));
 		try {
@@ -319,31 +319,31 @@ class ActiveRecordFindTest extends DatabaseTest
 		}
 	}
 
-	public function testJoinsOnModelWithInferredStuff()
+	public function test_joins_on_model_with_inferred_stuff()
 	{
 		$x = JoinBook::first(array('joins' => array('Author','LEFT JOIN authors a ON(books.secondary_author_id=a.author_id)')));
-		$this->assertTrue(strpos(JoinBook::table()->last_sql,'INNER JOIN authors ON(books.author_id=authors.author_id)') !== false);
-		$this->assertTrue(strpos(JoinBook::table()->last_sql,'LEFT JOIN authors a ON(books.secondary_author_id=a.author_id)') !== false);
+		$this->assert_true(strpos(JoinBook::table()->last_sql,'INNER JOIN authors ON(books.author_id=authors.author_id)') !== false);
+		$this->assert_true(strpos(JoinBook::table()->last_sql,'LEFT JOIN authors a ON(books.secondary_author_id=a.author_id)') !== false);
 	}
 
-	public function testJoinsOnModelWithExplicitPkAndTable()
+	public function test_joins_on_model_with_explicit_pk_and_table()
 	{
 		JoinBook::first(array('joins' => array('JoinAuthor','LEFT JOIN authors a ON(books.secondary_author_id=a.author_id)')));
-		$this->assertTrue(strpos(JoinBook::table()->last_sql,'INNER JOIN authors ON(books.author_id=authors.author_id)') !== false);
-		$this->assertTrue(strpos(JoinBook::table()->last_sql,'LEFT JOIN authors a ON(books.secondary_author_id=a.author_id)') !== false);
+		$this->assert_true(strpos(JoinBook::table()->last_sql,'INNER JOIN authors ON(books.author_id=authors.author_id)') !== false);
+		$this->assert_true(strpos(JoinBook::table()->last_sql,'LEFT JOIN authors a ON(books.secondary_author_id=a.author_id)') !== false);
 	}
 
-	public function testGroup()
+	public function test_group()
 	{
 		$venues = Venue::all(array('select' => 'state', 'group' => 'state'));
-		$this->assertTrue(count($venues) > 0);
-		$this->assertTrue(strpos(ActiveRecord\Table::load('Venue')->last_sql, 'GROUP BY state') !== false);
+		$this->assert_true(count($venues) > 0);
+		$this->assert_true(strpos(ActiveRecord\Table::load('Venue')->last_sql, 'GROUP BY state') !== false);
 	}
 
-	public function testEscapeQuotes()
+	public function test_escape_quotes()
 	{
 		$author = Author::find_by_name("Tito's");
-		$this->assertNotEquals("Tito's",Author::table()->last_sql);
+		$this->assert_not_equals("Tito's",Author::table()->last_sql);
 	}
 };
 ?>

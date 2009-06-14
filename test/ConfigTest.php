@@ -3,9 +3,9 @@ include 'helpers/config.php';
 
 use ActiveRecord\Config;
 
-class ConfigTest extends PHPUnit_Framework_TestCase
+class ConfigTest extends SnakeCase_PHPUnit_Framework_TestCase
 {
-	public function setUp()
+	public function set_up()
 	{
 		$this->config = new Config();
 		$this->connections = array('development' => 'mysql://blah/development', 'test' => 'mysql://blah/test');
@@ -15,65 +15,65 @@ class ConfigTest extends PHPUnit_Framework_TestCase
 	/**
 	 * @expectedException ActiveRecord\ConfigException
 	 */
-	public function testSetConnectionsMustBeArray()
+	public function test_set_connections_must_be_array()
 	{
 		$this->config->set_connections(null);
 	}
 
-	public function testGetConnections()
+	public function test_get_connections()
 	{
-		$this->assertEquals($this->connections,$this->config->get_connections());
+		$this->assert_equals($this->connections,$this->config->get_connections());
 	}
 
-	public function testGetConnection()
+	public function test_get_connection()
 	{
-		$this->assertEquals($this->connections['development'],$this->config->get_connection('development'));
+		$this->assert_equals($this->connections['development'],$this->config->get_connection('development'));
 	}
 
-	public function testGetInvalidConnection()
+	public function test_get_invalid_connection()
 	{
-		$this->assertNull($this->config->get_connection('whiskey tango foxtrot'));
+		$this->assert_null($this->config->get_connection('whiskey tango foxtrot'));
 	}
 
-	public function testGetDefaultConnectionAndConnection()
+	public function test_get_default_connection_and_connection()
 	{
 		$this->config->set_default_connection('development');
-		$this->assertEquals('development',$this->config->get_default_connection());
-		$this->assertEquals($this->connections['development'],$this->config->get_default_connection_string());
+		$this->assert_equals('development',$this->config->get_default_connection());
+		$this->assert_equals($this->connections['development'],$this->config->get_default_connection_string());
 	}
 
-	public function testGetDefaultConnectionAndConnectionStringDefaultsToDevelopment()
+	public function test_get_default_connection_and_connection_string_defaults_to_development()
 	{
-		$this->assertEquals('development',$this->config->get_default_connection());
-		$this->assertEquals($this->connections['development'],$this->config->get_default_connection_string());
+		$this->assert_equals('development',$this->config->get_default_connection());
+		$this->assert_equals($this->connections['development'],$this->config->get_default_connection_string());
 	}
 
-	public function testGetDefaultConnectionStringWhenConnectionNameIsNotValid()
+	public function test_get_default_connection_string_when_connection_name_is_not_valid()
 	{
 		$this->config->set_default_connection('little mac');
-		$this->assertNull($this->config->get_default_connection_string());
+		$this->assert_null($this->config->get_default_connection_string());
 	}
 
-	public function testDefaultConnectionIsSetWhenOnlyOneConnectionIsPresent()
+	public function test_default_connection_is_set_when_only_one_connection_is_present()
 	{
 		$this->config->set_connections(array('development' => $this->connections['development']));
-		$this->assertEquals('development',$this->config->get_default_connection());
+		$this->assert_equals('development',$this->config->get_default_connection());
 	}
 
-	public function testSetConnectionsWithDefault()
+	public function test_set_connections_with_default()
 	{
 		$this->config->set_connections($this->connections,'test');
-		$this->assertEquals('test',$this->config->get_default_connection());
+		$this->assert_equals('test',$this->config->get_default_connection());
 	}
 
-	public function testInitializeClosure()
+	public function test_initialize_closure()
 	{
 		$test = $this;
 
 		Config::initialize(function($cfg) use ($test)
 		{
-			$test->assertNotNull($cfg);
-			$test->assertEquals('ActiveRecord\Config',get_class($cfg));
+			$test->assert_not_null($cfg);
+			$test->assert_equals('ActiveRecord\Config',get_class($cfg));
 		});
 	}
 }

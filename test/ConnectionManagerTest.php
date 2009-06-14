@@ -6,23 +6,23 @@ use ActiveRecord\ConnectionManager;
 
 class ConnectionManagerTest extends DatabaseTest
 {
-	public function testGetConnectionWithNullConnection()
+	public function test_get_connection_with_null_connection()
 	{
-		$this->assertNotNull(ConnectionManager::get_connection(null));
-		$this->assertNotNull(ConnectionManager::get_connection());
+		$this->assert_not_null(ConnectionManager::get_connection(null));
+		$this->assert_not_null(ConnectionManager::get_connection());
 	}
 
-	public function testGetConnection()
+	public function test_get_connection()
 	{
-		$this->assertNotNull(ConnectionManager::get_connection('mysql'));
+		$this->assert_not_null(ConnectionManager::get_connection('mysql'));
 	}
 
-	public function testGetConnectionUsesExistingObject()
+	public function test_get_connection_uses_existing_object()
 	{
 		$a = ConnectionManager::get_connection('mysql');
 		$a->harro = 'harro there';
 
-		$this->assertSame($a,ConnectionManager::get_connection('mysql'));
+		$this->assert_same($a,ConnectionManager::get_connection('mysql'));
 	}
 }
 ?>

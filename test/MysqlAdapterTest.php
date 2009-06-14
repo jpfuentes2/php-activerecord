@@ -4,9 +4,9 @@ require_once dirname(__FILE__) . '/../lib/adapters/MysqlAdapter.php';
 
 class MysqlAdapterTest extends AdapterTest
 {
-	public function setUp($connection_name=null)
+	public function set_up($connection_name=null)
 	{
-		parent::setUp('mysql');
+		parent::set_up('mysql');
 	}
 }
 ?>
