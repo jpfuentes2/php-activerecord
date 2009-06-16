@@ -1001,9 +1001,8 @@ class Model
 			else
 				$connection->commit();
 		}
-		catch (Exception $e)
+		catch (\Exception $e)
 		{
-			// TODO rollback via exception does not work yet
 			$connection->rollback();
 			throw $e;
 		}

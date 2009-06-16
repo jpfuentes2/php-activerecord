@@ -242,12 +242,10 @@ class ActiveRecordTest extends DatabaseTest
 		$this->assert_equals($original,Author::count());
 	}
 
-	// TODO this doesn't work for some reason
-	// TODO the exception is not being caught from within Model::transaction
 	public function test_transaction_rolledback_by_throwing_exception()
 	{
-		/*
 		$original = Author::count();
+		$exception = null;
 
 		try
 		{
@@ -259,10 +257,11 @@ class ActiveRecordTest extends DatabaseTest
 		}
 		catch (Exception $e)
 		{
+			$exception = $e;
 		}
 
+		$this->assert_not_null($exception);
 		$this->assert_equals($original,Author::count());
-		*/
 	}
 
 	public function test_delegate()
