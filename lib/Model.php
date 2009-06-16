@@ -50,7 +50,7 @@ class Model
 	 * sql statement
 	 * @var boolean
 	 */
-	private $__new_record;
+	private $__new_record = true;
 
 	/**
 	 * Container of aliases which allows you to access an attribute via a
@@ -99,10 +99,13 @@ class Model
 	 * @param array
 	 * @param boolean
 	 * @param boolean
+	 * @param boolean $new_record True if this should be considered a new record
 	 * @return void
 	 */
-	public function __construct($attributes=array(), $guard_attributes=true, $instantiating_via_find=false)
+	public function __construct($attributes=array(), $guard_attributes=true, $instantiating_via_find=false, $new_record=true)
 	{
+		$this->__new_record = $new_record;
+		
 		// initialize attributes applying defaults
 		if (!$instantiating_via_find)
 		{
@@ -304,7 +307,7 @@ class Model
 	 */
 	public function is_new_record()
 	{
-		return isset($this->__new_record) ? $this->__new_record : false;
+		return $this->__new_record;
 	}
 
 	/**
@@ -377,21 +380,7 @@ class Model
 	public function save($validate=true)
 	{
 		$this->verify_not_readonly('save');
-		$this->__new_record = false;
-
-		foreach ($this->get_primary_key(true) as $pk)
-		{
-			if (!isset($this->attributes[$pk]))
-			{
-				$this->__new_record = true;
-				break;
-			}
-		}
-
-		if (!$this->is_new_record())
-			return $this->update($validate);
-		else
-			return $this->insert($validate);
+		return $this->is_new_record() ? $this->insert($validate) : $this->update($validate);
 	}
 
 	/**
@@ -423,6 +412,8 @@ class Model
 			$inflector = Inflector::instance();
 			$this->attributes[$inflector->variablize($pk[0])] = $table->conn->insert_id($table->sequence);
 		}
+
+		$this->__new_record = false;
 		return true;
 	}
 

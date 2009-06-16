@@ -294,5 +294,11 @@ class ActiveRecordTest extends DatabaseTest
 	{
 		$this->assert_not_null(AwesomePerson::first());
 	}
+
+	public function test_model_should_default_as_new_record()
+	{
+		$author = new Author();
+		$this->assert_true($author->is_new_record());
+	}
 };
 ?>

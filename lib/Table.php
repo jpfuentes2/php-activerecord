@@ -169,7 +169,7 @@ class Table
 
 		while (($row = $sth->fetch()))
 		{
-			$model = new $this->class->name($row,false,true);
+			$model = new $this->class->name($row,false,true,false);
 
 			if ($readonly)
 				$model->readonly();

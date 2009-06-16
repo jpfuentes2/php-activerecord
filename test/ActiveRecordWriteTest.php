@@ -102,13 +102,13 @@ class ActiveRecordWriteTest extends DatabaseTest
 
 	public function test_save_blank_value()
 	{
-		$book = Book::first();
+		$book = Book::find(1);
 		$book->name = '';
 		$book->save();
-		$this->assert_true(Book::first()->name === '');
+		$this->assert_same('',Book::find(1)->name);
 	}
 
-	public function test_dirty_attributes1()
+	public function test_dirty_attributes()
 	{
 		$book = $this->make_new_book_and(false);
 		$this->assert_equals(array('name','special'),array_keys($book->dirty_attributes()));
@@ -171,9 +171,12 @@ class ActiveRecordWriteTest extends DatabaseTest
 
 	public function test_timestamps_updated_at_only_set_before_update()
 	{
-		$author = Author::find(1);
+		$author = new Author();
+		$author->save();
 		$created_at = $author->created_at;
 		$updated_at = $author->updated_at;
+		sleep(1);
+
 		$author->name = 'test';
 		$author->save();
 
@@ -215,6 +218,12 @@ class ActiveRecordWriteTest extends DatabaseTest
 		$author->delete();
 	}
 
+	public function test_inserting_with_explicit_pk()
+	{
+		$author = Author::create(array('author_id' => 9999, 'name' => 'blah'));
+		$this->assert_not_null(Author::find($author->id));
+	}
+	
 	private function make_new_book_and($save=true)
 	{
 		$book = new Book();
