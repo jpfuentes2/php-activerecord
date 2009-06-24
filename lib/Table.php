@@ -76,6 +76,7 @@ class Table
 		$this->set_primary_key();
 		$this->set_associations();
 		$this->set_delegates();
+		$this->set_setters();
 
 		$this->callback = new CallBack($class_name);
 		$this->callback->register('before_save', function(Model $model) { $model->set_timestamps(); }, array('prepend' => true));
@@ -152,10 +153,7 @@ class Table
 		if (array_key_exists('group',$options))
 			$sql->group($options['group']);
 
-		if (array_key_exists('readonly',$options) && $options['readonly'])
-			$readonly = true;
-		else
-			$readonly = false;
+		$readonly = (array_key_exists('readonly',$options) && $options['readonly']) ? true : false;
 
 		return $this->find_by_sql($sql->to_s(),$sql->get_where_values(), $readonly);
 	}
@@ -388,6 +386,19 @@ class Table
 			$new['processed'] = true;
 			$this->class->setStaticPropertyValue('delegate',$new);
 		}
+	}
+
+	/**
+	 * Rebuilds the setters array to prepend set_ to the method names.
+	 */
+	private function set_setters()
+	{
+		$setters = array();
+
+		foreach ($this->class->getStaticPropertyValue('setters',array()) as $method)
+			$setters[] = (substr($method,0,4) != "set_" ? "set_$method" : $method);
+
+		$this->class->setStaticPropertyValue('setters',$setters);
 	}
 };
 ?>

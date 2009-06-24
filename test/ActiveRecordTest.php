@@ -121,7 +121,7 @@ class ActiveRecordTest extends DatabaseTest
 	public function test_should_have_all_column_attributes_when_initializing_with_array()
 	{
 		$author = new Author(array('name' => 'Tito'));
-		$this->assert_equals(array('author_id','parent_author_id','name','updated_at','created_at','some_date'),array_keys($author->attributes()));
+		$this->assert_equals(array('author_id','parent_author_id','name','updated_at','created_at','some_date','encrypted_password'),array_keys($author->attributes()));
 	}
 
 	public function test_defaults()
@@ -299,6 +299,21 @@ class ActiveRecordTest extends DatabaseTest
 	{
 		$author = new Author();
 		$this->assert_true($author->is_new_record());
+	}
+
+	public function test_setter()
+	{
+		$author = new Author();
+		$author->password = 'plaintext';
+		$this->assert_equals(md5('plaintext'),$author->encrypted_password);
+	}
+
+	public function test_setter_with_same_name_as_an_attribute()
+	{
+		Author::$setters[] = 'name';
+		$author = new Author();
+		$author->name = 'bob';
+		$this->assert_equals('BOB',$author->name);
 	}
 };
 ?>

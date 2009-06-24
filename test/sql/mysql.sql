@@ -4,7 +4,8 @@ CREATE TABLE authors(
 	name VARCHAR(25) NOT NULL DEFAULT 'default_name',
 	updated_at datetime,
 	created_at datetime,
-	some_date date
+	some_date date,
+	encrypted_password varchar(50)
 ) ENGINE=InnoDB;
 
 CREATE TABLE books(

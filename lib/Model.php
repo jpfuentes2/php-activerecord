@@ -93,6 +93,23 @@ class Model
 	static $delegate = array();
 
 	/**
+	 * Define customer setters methods for the model. You can also use this to
+	 * define custom setters for attributes as well.
+	 * 
+	 * static $setters = array('password','name');
+	 * 
+	 * Now to define the two setter methods. Note you must prepend set_ to your
+	 * method name:
+	 * 
+	 * function set_password($plaintext) { $this->encrypted_password = md5($plaintext); }
+	 * function set_name($name) { $this->name = strtoupper($name); }
+	 * 
+	 * $model->password = 'plaintext';  # will call $model->set_password('plaintext')
+	 * $model->name = 'bob';            # will call $model->set_name('bob')
+	 */
+	static $setters = array();
+
+	/**
 	 * When a user instantiates a new object (e.g.: it was not ActiveRecord that instantiated via a find)
 	 * then @var $attributes will be mapped according to the schema's defaults. Otherwise, the given @param
 	 * $attributes will be mapped via set_attributes_via_mass_assignment.
@@ -187,7 +204,7 @@ class Model
 	{
 		return array_key_exists($name,$this->attributes);
 	}
-
+	
 	/**
 	 * Magic allows un-defined attributes to set via @var $attributes
 	 * @throws ActiveRecord\UndefinedPropertyException if @param $name does not exist
@@ -200,20 +217,14 @@ class Model
 		if (array_key_exists($name, static::$alias_attribute))
 			$name = static::$alias_attribute[$name];
 
-		if (array_key_exists($name,$this->attributes))
+		elseif (in_array("set_$name",static::$setters))
 		{
-			$table = static::table();
-
-			if (!$this->__dirty)
-				$this->__dirty = array();
-
-			if (array_key_exists($name,$table->columns) && !is_object($value))
-				$value = $table->columns[$name]->cast($value);
-
-			$this->attributes[$name] = $value;
-			$this->__dirty[$name] = true;
-			return $value;
+			$name = "set_$name";
+			return $this->$name($value);
 		}
+
+		if (array_key_exists($name,$this->attributes))
+			return $this->assign_attribute($name,$value);
 
 		foreach (static::$delegate as &$item)
 		{
@@ -222,6 +233,28 @@ class Model
 		}
 
 		throw new UndefinedPropertyException($name);
+	}
+
+	/**
+	 * Assign value to an attribute.
+	 * 
+	 * @param string $name Name of the attribute
+	 * @param mixed $value Value of the attribute
+	 * @return mixed
+	 */
+	public function assign_attribute($name, &$value)
+	{
+		$table = static::table();
+
+		if (!$this->__dirty)
+			$this->__dirty = array();
+
+		if (array_key_exists($name,$table->columns) && !is_object($value))
+			$value = $table->columns[$name]->cast($value);
+
+		$this->attributes[$name] = $value;
+		$this->__dirty[$name] = true;
+		return $value;
 	}
 
 	/**
@@ -863,7 +896,7 @@ class Model
 	 * @param array
 	 * @return array
 	 */
-	public static function find_by_sql($sql, $values = null)
+	public static function find_by_sql($sql, $values=null)
 	{
 		return static::table()->find_by_sql($sql, $values, true);
 	}
