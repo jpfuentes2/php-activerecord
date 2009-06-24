@@ -319,7 +319,7 @@ class AdapterTest extends DatabaseTest
 			$this->conn->query('select * from an_invalid_column');
 			$this->fail();
 		} catch (Exception $e) {
-			$this->assertTrue(strpos($e->getMessage(),'an_invalid_column') !== false);
+			$this->assert_equals(1,preg_match('/(an_invalid_column)|(exist)/',$e->getMessage()));
 		}
 	}
 }
