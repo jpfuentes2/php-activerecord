@@ -96,16 +96,29 @@ class Model
 	 * Define customer setters methods for the model. You can also use this to
 	 * define custom setters for attributes as well.
 	 * 
-	 * static $setters = array('password','name');
+	 * static $setters = array('password','more','even_more');
 	 * 
-	 * Now to define the two setter methods. Note you must prepend set_ to your
+	 * Now to define the setter methods. Note you must prepend set_ to your
 	 * method name:
 	 * 
 	 * function set_password($plaintext) { $this->encrypted_password = md5($plaintext); }
-	 * function set_name($name) { $this->name = strtoupper($name); }
-	 * 
 	 * $model->password = 'plaintext';  # will call $model->set_password('plaintext')
-	 * $model->name = 'bob';            # will call $model->set_name('bob')
+	 * 
+	 * If you define a custom setter for an attribute then you will need to use
+	 * assign_attribute() to assign the value to the attribute. This is necessary
+	 * due to the way __set() works.
+	 * 
+	 * For example, assume 'name' is a field on the table and we're defining a
+	 * custom setter for 'name':
+	 * 
+	 * static $setters = array('name');
+	 * 
+	 * function set_name($name) { $this->assign_attribute('name',strtoupper($name)); }
+	 * $model->name = 'bob';
+	 * 
+	 * This will NOT work as you expect:
+	 * 
+	 * function set_name($name) { $this->name = strtoupper($name); }
 	 */
 	static $setters = array();
 
