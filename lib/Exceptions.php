@@ -15,6 +15,12 @@ class DatabaseException extends ActiveRecordException
 				join(", ",$adapter_or_string_or_mystery->connection->errorInfo()),
 				intval($adapter_or_string_or_mystery->connection->errorCode()));
 		}
+		elseif ($adapter_or_string_or_mystery instanceof \PDOStatement)
+		{
+			parent::__construct(
+				join(", ",$adapter_or_string_or_mystery->errorInfo()),
+				intval($adapter_or_string_or_mystery->errorCode()));
+		}
 		else
 			parent::__construct($adapter_or_string_or_mystery);
 	}

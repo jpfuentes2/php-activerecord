@@ -195,7 +195,7 @@ abstract class Connection
 			if (!$sth->execute($values))
 				throw new DatabaseException($this);
 		} catch (PDOException $e) {
-			throw new DatabaseException($this);
+			throw new DatabaseException($sth);
 		}
 		return $sth;
 	}

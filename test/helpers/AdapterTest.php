@@ -312,5 +312,15 @@ class AdapterTest extends DatabaseTest
 
 		$this->assert_equals($original,$this->conn->query_and_fetch_one("select count(*) from authors"));
 	}
+
+	public function test_show_me_a_useful_pdo_exception_message()
+	{
+		try {
+			$this->conn->query('select * from an_invalid_column');
+			$this->fail();
+		} catch (Exception $e) {
+			$this->assertTrue(strpos($e->getMessage(),'an_invalid_column') !== false);
+		}
+	}
 }
 ?>
