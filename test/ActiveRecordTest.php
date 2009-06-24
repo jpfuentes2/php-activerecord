@@ -315,5 +315,12 @@ class ActiveRecordTest extends DatabaseTest
 		$author->name = 'bob';
 		$this->assert_equals('BOB',$author->name);
 	}
+
+	public function test_setting_invalid_date_should_set_date_to_null()
+	{
+		$author = new Author();
+		$author->created_at = 'CURRENT_TIMESTAMP';
+		$this->assertNull($author->created_at);
+	}
 };
 ?>

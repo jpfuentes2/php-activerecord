@@ -109,7 +109,12 @@ class Column
 			case self::INTEGER:	return (int)$value;
 			case self::DECIMAL:	return (double)$value;
 			case self::DATETIME:
-			case self::DATE:	return ($value instanceof \DateTime) ? $value : new \DateTime($value);
+			case self::DATE:
+				try {
+					return ($value instanceof \DateTime) ? $value : new \DateTime($value);
+				} catch (\Exception $e) {
+					return null;
+				}
 		}
 		return $value;
 	}
