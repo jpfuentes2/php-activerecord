@@ -95,29 +95,29 @@ class Model
 	/**
 	 * Define customer setters methods for the model. You can also use this to
 	 * define custom setters for attributes as well.
-	 * 
+	 *
 	 * static $setters = array('password','more','even_more');
-	 * 
+	 *
 	 * Now to define the setter methods. Note you must prepend set_ to your
 	 * method name:
-	 * 
+	 *
 	 * function set_password($plaintext) { $this->encrypted_password = md5($plaintext); }
 	 * $model->password = 'plaintext';  # will call $model->set_password('plaintext')
-	 * 
+	 *
 	 * If you define a custom setter for an attribute then you will need to use
 	 * assign_attribute() to assign the value to the attribute. This is necessary
 	 * due to the way __set() works.
-	 * 
+	 *
 	 * For example, assume 'name' is a field on the table and we're defining a
 	 * custom setter for 'name':
-	 * 
+	 *
 	 * static $setters = array('name');
-	 * 
+	 *
 	 * function set_name($name) { $this->assign_attribute('name',strtoupper($name)); }
 	 * $model->name = 'bob';
-	 * 
+	 *
 	 * This will NOT work as you expect:
-	 * 
+	 *
 	 * function set_name($name) { $this->name = strtoupper($name); }
 	 */
 	static $setters = array();
@@ -135,7 +135,7 @@ class Model
 	public function __construct($attributes=array(), $guard_attributes=true, $instantiating_via_find=false, $new_record=true)
 	{
 		$this->__new_record = $new_record;
-		
+
 		// initialize attributes applying defaults
 		if (!$instantiating_via_find)
 		{
@@ -217,7 +217,7 @@ class Model
 	{
 		return array_key_exists($name,$this->attributes);
 	}
-	
+
 	/**
 	 * Magic allows un-defined attributes to set via @var $attributes
 	 * @throws ActiveRecord\UndefinedPropertyException if @param $name does not exist
@@ -250,7 +250,7 @@ class Model
 
 	/**
 	 * Assign value to an attribute.
-	 * 
+	 *
 	 * @param string $name Name of the attribute
 	 * @param mixed $value Value of the attribute
 	 * @return mixed
@@ -560,6 +560,15 @@ class Model
 			return false;
 
 		return true;
+	}
+
+	/**
+	 * Run validations on model
+	 * @return boolean
+	 */
+	public function is_valid()
+	{
+		return $this->_validate(false);
 	}
 
 	/**

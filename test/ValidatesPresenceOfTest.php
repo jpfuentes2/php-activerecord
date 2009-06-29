@@ -14,7 +14,7 @@ class ValidatesPresenceOfTest extends DatabaseTest
 {
 	public function test_presence()
 	{
-		$book = new Book;
+		$book = new BookPresence;
 		$book->name = 'blah';
 		$book->save();
 		$this->assert_false($book->errors->is_invalid('name'));

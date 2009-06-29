@@ -66,6 +66,9 @@ class Validations
 		// create array of validators to use from valid functions merged with the static properties
 		$this->validators = array_intersect(array_keys($reflection->getStaticProperties()), self::$VALIDATION_FUNCTIONS);
 
+		if (empty($this->validators))
+			return $this->record;
+
 		$inflector = Inflector :: instance();
 
 		foreach ($this->validators as $validate)
@@ -326,20 +329,20 @@ class Validations
 
             	$message = str_replace('%d', $option, $message);
 
-            	$attributeValue = $this->model->$attribute;
-            	$option = (int)$option_value;
+            	$attribute_value = $this->model->$attribute;
+            	$option = (int)$attribute_value;
 
             	if (!is_null($this->model->$attribute))
             	{
             		$check = $validityChecks[$range_option];
 
-            		if ('maximum' == $range_option && strlen($attributeValue) > $option)
+            		if ('maximum' == $range_option && strlen($attribute_value) > $option)
             			$this->record->add($attribute, $message);
 
-            		if ('minimum' == $range_option && strlen($attributeValue) < $option)
+            		if ('minimum' == $range_option && strlen($attribute_value) < $option)
             			$this->record->add($attribute, $message);
 
-					if ('is' == $range_option && strlen($attributeValue) === $option)
+					if ('is' == $range_option && strlen($attribute_value) === $option)
             			$this->record->add($attribute, $message);
 
             	}
