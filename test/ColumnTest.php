@@ -72,11 +72,13 @@ class ColumnTest extends SnakeCase_PHPUnit_Framework_TestCase
 
 	public function test_cast()
 	{
+		$datetime = new \DateTime('2001-01-01');
 		$this->assert_cast(Column::INTEGER,1,'1');
 		$this->assert_cast(Column::INTEGER,1,'1.5');
 		$this->assert_cast(Column::DECIMAL,1.5,'1.5');
-		$this->assert_cast(Column::DATETIME,new \DateTime('2001-01-01'),'2001-01-01');
-		$this->assert_cast(Column::DATE,new \DateTime('2001-01-01'),'2001-01-01');
+		$this->assert_cast(Column::DATETIME,$datetime,'2001-01-01');
+		$this->assert_cast(Column::DATE,$datetime,'2001-01-01');
+		$this->assert_cast(Column::DATE,$datetime,$datetime);
 		$this->assert_cast(Column::STRING,'bubble tea','bubble tea');
 	}
 

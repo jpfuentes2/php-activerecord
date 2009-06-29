@@ -110,6 +110,9 @@ class Column
 			case self::DECIMAL:	return (double)$value;
 			case self::DATETIME:
 			case self::DATE:
+				if ($value instanceof DateTime)
+					return $value;
+
 				$value = date_create($value);
 				$errors = \DateTime::getLastErrors();
 
