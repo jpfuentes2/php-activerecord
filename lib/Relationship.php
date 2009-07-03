@@ -1,12 +1,5 @@
 <?php
-namespace ActiveRecord\Relationship;
-
-use ActiveRecord\Utils;
-use ActiveRecord\Inflector;
-use ActiveRecord\Table;
-use ActiveRecord\Model;
-use ActiveRecord\SQLBuilder;
-use ActiveRecord as AR;
+namespace ActiveRecord;
 
 interface InterfaceRelationship
 {
@@ -29,7 +22,7 @@ abstract class AbstractRelationship implements InterfaceRelationship
 		$this->attribute_name = $options[0];
 		$this->options = $this->merge_association_options($options);
 
-		$relationship = strtolower(AR\denamespace(get_called_class()));
+		$relationship = strtolower(denamespace(get_called_class()));
 
 		if ($relationship === 'hasmany' || $relationship === 'hasandbelongstomany')
 			$this->poly_relationship = true;
@@ -110,7 +103,7 @@ abstract class AbstractRelationship implements InterfaceRelationship
 
 	protected function keyify($class_name)
 	{
-		return strtolower(AR\classify($class_name)). '_id';
+		return strtolower(classify($class_name)). '_id';
 	}
 
 	/**
@@ -123,7 +116,7 @@ abstract class AbstractRelationship implements InterfaceRelationship
 	 */
 	protected function set_inferred_class_name()
 	{
-		$class_name = AR\classify($this->attribute_name, true);
+		$class_name = classify($this->attribute_name, true);
 		$this->class_name = $class_name;
 	}
 
@@ -133,7 +126,7 @@ abstract class AbstractRelationship implements InterfaceRelationship
 		$condition_values = array_values($model->get_values_for($value_keys));
 
 		// return null if all the foreign key values are null so that we don't try to do a query like "id is null"
-		if (AR\all(null,$condition_values))
+		if (all(null,$condition_values))
 			return null;
 
 		$conditions = SQLBuilder::create_conditions_from_underscored_string($condition_string,$condition_values);
@@ -208,7 +201,7 @@ class HasMany extends AbstractRelationship
 			if (!($through_relationship instanceof HasMany) && !($through_relationship instanceof BelongsTo))
 				throw new HasManyThroughAssociationException('has_many through can only use a belongs_to or has_many association');
 
-			$through_table = Table::load(AR\classify($this->through, true));
+			$through_table = Table::load(classify($this->through, true));
 			$through_table_name = $through_table->get_fully_qualified_table_name();
 			$through_pk = $this->keyify($class_name);
 

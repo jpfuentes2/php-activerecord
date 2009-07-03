@@ -71,10 +71,6 @@ class ReadOnlyException extends ModelException
 
 class ValidationsArgumentError extends ActiveRecordException {};
 
-namespace ActiveRecord\Relationship;
-use ActiveRecord;
-
-class RelationshipException extends ActiveRecord\ActiveRecordException {};
-
+class RelationshipException extends ActiveRecordException {};
 class HasManyThroughAssociationException extends RelationshipException {};
 ?>

@@ -321,19 +321,19 @@ class Table
 				switch ($name)
 				{
 					case 'has_many':
-						$relationship = new Relationship\HasMany($definition);
+						$relationship = new HasMany($definition);
 						break;
 
 					case 'has_one':
-						$relationship = new Relationship\HasOne($definition);
+						$relationship = new HasOne($definition);
 						break;
 
 					case 'belongs_to':
-						$relationship = new Relationship\BelongsTo($definition);
+						$relationship = new BelongsTo($definition);
 						break;
 
 					case 'has_and_belongs_to_many':
-						$relationship = new Relationship\HasAndBelongsToMany($definition);
+						$relationship = new HasAndBelongsToMany($definition);
 						break;
 				}
 

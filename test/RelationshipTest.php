@@ -220,7 +220,7 @@ class RelationshipTest extends DatabaseTest
 	}
 
 	/**
-	 * @expectedException ActiveRecord\Relationship\HasManyThroughAssociationException
+	 * @expectedException ActiveRecord\HasManyThroughAssociationException
 	 */
 	public function test_has_many_through_no_association()
 	{
@@ -262,7 +262,7 @@ class RelationshipTest extends DatabaseTest
 	}
 
 	/**
-	 * @expectedException ActiveRecord\Relationship\HasManyThroughAssociationException
+	 * @expectedException ActiveRecord\HasManyThroughAssociationException
 	 */
 	public function test_has_many_through_with_invalid_class_name()
 	{
