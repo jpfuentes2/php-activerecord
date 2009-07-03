@@ -34,6 +34,9 @@ function activerecord_autoload($class_name)
 		$root .= DIRECTORY_SEPARATOR .implode($directories, DIRECTORY_SEPARATOR);
 	}
 
-	@include_once $root . "/$class_name.php";
+	$file = "$root/$class_name.php";
+
+	if (file_exists($file))
+		@include_once $file;
 }
 ?>
