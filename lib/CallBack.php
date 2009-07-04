@@ -1,7 +1,6 @@
 <?php
 /**
  * @package ActiveRecord
- * @subpackage CallBack
  */
 namespace ActiveRecord;
 use Closure;
@@ -12,7 +11,6 @@ use Closure;
  * are invoked on your object inside of ActiveRecord.
  *
  * @package ActiveRecord
- * @subpackage CallBack
  */
 class CallBack
 {

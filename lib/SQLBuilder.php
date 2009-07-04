@@ -1,8 +1,13 @@
 <?php
+/**
+ * @package ActiveRecord
+ */
 namespace ActiveRecord;
 
 /**
  * Helper class for building sql statements progmatically.
+ * 
+ * @package ActiveRecord
  */
 class SQLBuilder
 {

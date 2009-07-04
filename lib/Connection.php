@@ -1,4 +1,7 @@
 <?php
+/**
+ * @package ActiveRecord
+ */
 namespace ActiveRecord;
 
 require_once 'Column.php';
@@ -8,6 +11,9 @@ use PDO;
 use PDOException;
 use Closure;
 
+/**
+ * @package ActiveRecord
+ */
 abstract class Connection
 {
 	public $connection;
@@ -82,7 +88,7 @@ abstract class Connection
 	 *
 	 * protocol://user:pass@host[:port]/dbname
 	 *
-	 * @params string $url A URL
+	 * @param string $url A URL
 	 * @return The parsed URL as an object.
 	 */
 	public static function parse_connection_url($url)

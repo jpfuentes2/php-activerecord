@@ -1,9 +1,24 @@
 <?php
+/**
+ * @package ActiveRecord
+ */
 namespace ActiveRecord;
 use DateTime;
 
+/**
+ * 
+ */
 require_once 'Relationship.php';
 
+/**
+ * Manages reading and writing to a database table.
+ * 
+ * This class manages a database table and is used by the Model class for
+ * reading and writing to its database table. There is one instance of Table
+ * for every table you have a model for.
+ *
+ * @package ActiveRecord
+ */
 class Table
 {
 	private static $cache = array();

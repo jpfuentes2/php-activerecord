@@ -4,12 +4,16 @@
  * this piece can be considered a straight port. The reason for this is that the vaildation process is
  * tricky due to order of operations/events. The former combined with PHP's odd typecasting means
  * that it was easier to formulate this piece base on the rails code.
+ * 
+ * @package ActiveRecord
  */
-
 
 namespace ActiveRecord;
 use ActiveRecord\Model;
 
+/**
+ * @package ActiveRecord
+ */
 class Validations
 {
 	protected $model;

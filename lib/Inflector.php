@@ -1,13 +1,11 @@
 <?php
 /**
  * @package ActiveRecord
- * @subpackage Inflector
  */
 namespace ActiveRecord;
 
 /**
  * @package ActiveRecord
- * @subpackage Inflector
  */
 abstract class Inflector
 {
@@ -83,6 +81,9 @@ abstract class Inflector
 	abstract function variablize($s);
 }
 
+/**
+ * @package ActiveRecord
+ */
 class StandardInflector extends Inflector
 {
 	public function tableize($s) { return Utils::pluralize(strtolower($this->underscorify($s))); }

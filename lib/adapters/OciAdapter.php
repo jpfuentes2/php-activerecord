@@ -1,8 +1,14 @@
 <?php
+/**
+ * @package ActiveRecord
+ */
 namespace ActiveRecord;
 
 use PDO;
 
+/**
+ * @package ActiveRecord
+ */
 class OciAdapter extends Connection
 {
 	protected function __construct($info)

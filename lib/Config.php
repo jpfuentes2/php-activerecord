@@ -1,14 +1,12 @@
 <?php
 /**
  * @package ActiveRecord
- * @subpackage Config
  */
 namespace ActiveRecord;
 use Closure;
 
 /**
  * @package ActiveRecord
- * @subpackage Config
  */
 class Config extends Singleton
 {

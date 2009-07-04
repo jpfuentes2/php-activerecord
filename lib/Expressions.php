@@ -1,7 +1,8 @@
 <?php
+/**
+ * @package ActiveRecord
+ */
 namespace ActiveRecord;
-
-require_once 'Exceptions.php';
 
 /**
  * Templating like class for building SQL statements.
@@ -10,6 +11,8 @@ require_once 'Exceptions.php';
  * 'name = :name AND author = :author'
  * 'id = IN(:ids)'
  * 'id IN(:subselect)'
+ * 
+ * @package ActiveRecord
  */
 class Expressions
 {

@@ -1,6 +1,12 @@
 <?php
+/**
+ * @package ActiveRecord
+ */
 namespace ActiveRecord;
 
+/**
+ * @package ActiveRecord
+ */
 class MysqlAdapter extends Connection
 {
 	public function default_port()

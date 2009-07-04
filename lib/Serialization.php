@@ -1,7 +1,13 @@
 <?php
+/**
+ * @package ActiveRecord
+ */
 namespace ActiveRecord;
 use XmlWriter;
 
+/**
+ * @package ActiveRecord
+ */
 abstract class Serialization
 {
 	protected $model;
@@ -134,6 +140,9 @@ abstract class Serialization
 	abstract public function to_s();
 };
 
+/**
+ * @package ActiveRecord
+ */
 class JsonSerializer extends Serialization
 {
 	public function to_s()
@@ -142,6 +151,9 @@ class JsonSerializer extends Serialization
 	}
 }
 
+/**
+ * @package ActiveRecord
+ */
 class XmlSerializer extends Serialization
 {
 	private $writer;

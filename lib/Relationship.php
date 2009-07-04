@@ -1,6 +1,12 @@
 <?php
+/**
+ * @package ActiveRecord
+ */
 namespace ActiveRecord;
 
+/**
+ * @package ActiveRecord
+ */
 interface InterfaceRelationship
 {
 	public function __construct($options=array());
@@ -8,6 +14,9 @@ interface InterfaceRelationship
 	public function create_association(Model $model, $attributes=array());
 }
 
+/**
+ * @package ActiveRecord
+ */
 abstract class AbstractRelationship implements InterfaceRelationship
 {
 	public $attribute_name;
@@ -146,6 +155,9 @@ abstract class AbstractRelationship implements InterfaceRelationship
 	abstract function load(Model $model);
 };
 
+/**
+ * @package ActiveRecord
+ */
 class HasMany extends AbstractRelationship
 {
 	private $has_one = false;
@@ -246,11 +258,17 @@ class HasMany extends AbstractRelationship
 	}
 };
 
+/**
+ * @package ActiveRecord
+ */
 class HasOne extends HasMany
 {
 
 };
 
+/**
+ * @package ActiveRecord
+ */
 class HasAndBelongsToMany extends AbstractRelationship
 {
 	public function __construct($options=array())
@@ -270,6 +288,9 @@ class HasAndBelongsToMany extends AbstractRelationship
 	}
 };
 
+/**
+ * @package ActiveRecord
+ */
 class BelongsTo extends AbstractRelationship
 {
 	public function __construct($options=array())

@@ -1,7 +1,6 @@
 <?php
 /**
  * @package ActiveRecord
- * @subpackage Singleton
  */
 namespace ActiveRecord;
 
@@ -13,7 +12,6 @@ namespace ActiveRecord;
  *
  * @abstract
  * @package ActiveRecord
- * @subpackage Singleton
  */
 abstract class Singleton
 {

@@ -1,7 +1,6 @@
 <?php
 /**
  * @package ActiveRecord
- * @subpackage Reflections
  */
 namespace ActiveRecord;
 use ReflectionClass;
@@ -10,7 +9,6 @@ use ReflectionClass;
  * Simple class that caches reflections of classes.
  *
  * @package ActiveRecord
- * @subpackage Reflections
  */
 class Reflections extends Singleton
 {

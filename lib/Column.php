@@ -1,13 +1,12 @@
 <?php
 /**
  * @package ActiveRecord
- * @subpackage Column
  */
 namespace ActiveRecord;
 use DateTime;
+
 /**
  * @package ActiveRecord
- * @subpackage Column
  */
 class Column
 {

@@ -1,13 +1,11 @@
 <?php
 /**
  * @package ActiveRecord
- * @subpackage ConnectionManager
  */
 namespace ActiveRecord;
 
 /**
  * @package ActiveRecord
- * @subpackage ConnectionManager
  */
 class ConnectionManager extends Singleton
 {

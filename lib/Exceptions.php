@@ -1,10 +1,22 @@
 <?php
+/**
+ * @package ActiveRecord
+ */
 namespace ActiveRecord;
 
+/**
+ * @package ActiveRecord
+ */
 class ActiveRecordException extends \Exception {};
 
+/**
+ * @package ActiveRecord
+ */
 class RecordNotFound extends ActiveRecordException {};
 
+/**
+ * @package ActiveRecord
+ */
 class DatabaseException extends ActiveRecordException
 {
 	public function __construct($adapter_or_string_or_mystery)
@@ -26,12 +38,24 @@ class DatabaseException extends ActiveRecordException
 	}
 };
 
+/**
+ * @package ActiveRecord
+ */
 class ModelException extends ActiveRecordException {};
 
+/**
+ * @package ActiveRecord
+ */
 class ExpressionsException extends ActiveRecordException {};
 
+/**
+ * @package ActiveRecord
+ */
 class ConfigException extends ActiveRecordException {};
 
+/**
+ * @package ActiveRecord
+ */
 class UndefinedPropertyException extends ModelException
 {
 	/**
@@ -53,6 +77,9 @@ class UndefinedPropertyException extends ModelException
 	}
 };
 
+/**
+ * @package ActiveRecord
+ */
 class ReadOnlyException extends ModelException
 {
 	/**
@@ -69,8 +96,18 @@ class ReadOnlyException extends ModelException
 	}
 };
 
+/**
+ * @package ActiveRecord
+ */
 class ValidationsArgumentError extends ActiveRecordException {};
 
+/**
+ * @package ActiveRecord
+ */
 class RelationshipException extends ActiveRecordException {};
+
+/**
+ * @package ActiveRecord
+ */
 class HasManyThroughAssociationException extends RelationshipException {};
 ?>
