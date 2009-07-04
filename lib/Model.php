@@ -1,77 +1,113 @@
 <?php
 /**
  * @package ActiveRecord
- * @subpackage Model
  */
 namespace ActiveRecord;
 use DateTime;
 
 /**
+ * The base class for your models.
+ * 
+ * Defining an ActiveRecord model:
+ * 
+ * <code>
+ * class Person extends ActiveRecord\Model {}
+ * </code>
+ * 
  * @package ActiveRecord
- * @subpackage Model
  */
 class Model
 {
 	/**
-	 * Instance of ActiveRecord\Errors and will be instantiated once a
-	 * write method is called
+	 * An instance of ActiveRecord\Errors and will be instantiated once a write method is called.
+	 * 
 	 * @var object
 	 */
 	public $errors;
 
 	/**
 	 * Contains model values as column_name => value
+	 * 
 	 * @var array
 	 */
 	private $attributes = array();
 
 	/**
-	 * Flag whether or not this model's attributes have been modified since
-	 * it will either be null or an array of column_names that have been modified
-	 * @var null/array
+	 * Flag whether or not this model's attributes have been modified since it will either be null or an array of column_names that have been modified
+	 * 
+	 * @var array
 	 */
 	private $__dirty = null;
 
 	/**
-	 * Flag that determines of this model can have a writer method invoked such
-	 * as: save/update/insert/delete
+	 * Flag that determines of this model can have a writer method invoked such as: save/update/insert/delete
+	 * 
 	 * @var boolean
 	 */
 	private $__readonly = false;
 
 	/**
 	 * Array of relationship objects as model_attribute_name => relationship
+	 * 
 	 * @var array
 	 */
 	private $__relationships = array();
 
 	/**
-	 * Flag that determines if a call to save() should issue an insert or an update
-	 * sql statement
+	 * Flag that determines if a call to save() should issue an insert or an update sql statement
+	 * 
 	 * @var boolean
 	 */
 	private $__new_record = true;
 
 	/**
-	 * Container of aliases which allows you to access an attribute via a
-	 * different name.
-	 * @static
+	 * Allows you to create aliases for attributes.
+	 * 
+	 * <code>
+	 * class Person extends ActiveRecord\Model {
+	 *   static $alias_attribute = array(
+	 *     'the_first_name' => 'first_name',
+	 *     'the_last_name' => 'last_name');
+	 * }
+	 * 
+	 * $person = Person::first();
+	 * $person->the_first_name = 'Tito';
+	 * echo $person->the_first_name;
+	 * </code>
+	 * 
 	 * @var array
 	 */
 	static $alias_attribute = array();
 
 	/**
-	 * Whitelist of attributes that can be mass-assigned via an instantiation or
-	 * a mass-assignment method such as Model#update_attributes()
-	 * @static
+	 * Whitelist of attributes that are checked from mass-assignment calls such as constructing a model or using update_attributes.
+	 * 
+	 * This is the opposite of $attr_protected.
+	 * 
+	 * <code>
+	 * class Person extends ActiveRecord\Model {
+	 *   static $attr_accessible = array('first_name','last_name');
+	 * }
+	 * 
+	 * $person = new Person(array(
+	 *   'first_name' => 'Tito',
+	 *   'last_name' => 'the Grief',
+	 *   'id' => 11111));
+	 * 
+	 * echo $person->id; # => null
+	 * </code>
+	 * 
+	 * @see $attr_protected
 	 * @var array
 	 */
 	static $attr_accessible = array();
 
 	/**
-	 * Blacklist of attributes that cannot be mass-assigned
-	 * @see @var $attr_accessible for more info
-	 * @static
+	 * Blacklist of attributes that cannot be mass-assigned.
+	 * 
+	 * This is the opposite of $attr_accessible.
+	 * 
+	 * @see $attr_accessible
 	 * @var array
 	 */
 	static $attr_protected = array();
@@ -79,60 +115,95 @@ class Model
 	/**
 	 * Delegates calls to a relationship.
 	 *
-	 * static $belongs_to = array(array('venue'),array('host'));
-	 * static $delegate = array(
-	 *   array('name', 'state', 'to' => 'venue'),
-	 *   array('name', 'to' => 'host', 'prefix' => 'woot'));
+	 * <code>
+	 * class Person extends ActiveRecord\Model {
+	 *   static $belongs_to = array(array('venue'),array('host'));
+	 *   static $delegate = array(
+	 *     array('name', 'state', 'to' => 'venue'),
+	 *     array('name', 'to' => 'host', 'prefix' => 'woot'));
+	 * }
+	 * </code>
 	 *
 	 * Can then do:
 	 *
-	 * $model->state (same as calling $model->venue->state)
-	 * $model->name (same as calling $model->venue->name)
-	 * $model->woot_name (same as calling $model->host->name)
+	 * <code>
+	 * $person->state     # same as calling $person->venue->state
+	 * $person->name      # same as calling $person->venue->name
+	 * $person->woot_name # same as calling $person->host->name
+	 * </code>
+	 * 
+	 * @var array
 	 */
 	static $delegate = array();
 
 	/**
-	 * Define customer setters methods for the model. You can also use this to
-	 * define custom setters for attributes as well.
+	 * Define customer setters methods for the model. 
+	 * 
+	 * You can also use this to define custom setters for attributes as well.
 	 *
-	 * static $setters = array('password','more','even_more');
+	 * <code>
+	 * class User extends ActiveRecord\Base {
+	 *   static $setters = array('password','more','even_more');
+	 * 
+	 *   # now to define the setter methods. Note you must
+	 *   # prepend set_ to your method name:
+	 *   function set_password($plaintext) {
+	 *     $this->encrypted_password = md5($plaintext);
+	 *   }
+	 * }
+	 * 
+	 * $user = new User();
+	 * $user->password = 'plaintext';  # will call $user->set_password('plaintext')
+	 * </code>
 	 *
-	 * Now to define the setter methods. Note you must prepend set_ to your
-	 * method name:
-	 *
-	 * function set_password($plaintext) { $this->encrypted_password = md5($plaintext); }
-	 * $model->password = 'plaintext';  # will call $model->set_password('plaintext')
-	 *
-	 * If you define a custom setter for an attribute then you will need to use
-	 * assign_attribute() to assign the value to the attribute. This is necessary
-	 * due to the way __set() works.
+	 * If you define a custom setter with the same name as an attribute then you 
+	 * will need to use assign_attribute() to assign the value to the attribute. 
+	 * This is necessary due to the way __set() works.
 	 *
 	 * For example, assume 'name' is a field on the table and we're defining a
-	 * custom setter for 'name':
+	 * custom setter for called 'name':
 	 *
-	 * static $setters = array('name');
+	 * <code>
+	 * class User extends ActiveRecord\Base {
+	 *   static $setters = array('name');
+	 * 
+	 *   # INCORRECT way to do it
+	 *   # function set_name($name) {
+	 *   #   $this->name = strtoupper($name);
+	 *   # }
 	 *
-	 * function set_name($name) { $this->assign_attribute('name',strtoupper($name)); }
-	 * $model->name = 'bob';
-	 *
-	 * This will NOT work as you expect:
-	 *
-	 * function set_name($name) { $this->name = strtoupper($name); }
+	 *   function set_name($name) {
+	 *     $this->assign_attribute('name',strtoupper($name));
+	 *   }
+	 * }
+	 * 
+	 * $user = new User();
+	 * $user->name = 'bob';
+	 * echo $user->name; # => BOB
+	 * </code>
+	 * 
+	 * @var array
 	 */
 	static $setters = array();
 
 	/**
+	 * Constructs a model.
+	 * 
 	 * When a user instantiates a new object (e.g.: it was not ActiveRecord that instantiated via a find)
 	 * then @var $attributes will be mapped according to the schema's defaults. Otherwise, the given @param
 	 * $attributes will be mapped via set_attributes_via_mass_assignment.
-	 * @param array
-	 * @param boolean
-	 * @param boolean
-	 * @param boolean $new_record True if this should be considered a new record
-	 * @return void
+	 * 
+	 * <code>
+	 * new Person(array('first_name' => 'Tito', 'last_name' => 'the Grief'));
+	 * </code>
+	 * 
+	 * @param array $attributes Hash containing names and values to mass assign to the model
+	 * @param boolean $guard_attributes Set to true to guard attributes
+	 * @param boolean $instantiating_via_find Set to true if this model is being created from a find call
+	 * @param boolean $new_record Set to true if this should be considered a new record
+	 * @return object
 	 */
-	public function __construct($attributes=array(), $guard_attributes=true, $instantiating_via_find=false, $new_record=true)
+	public function __construct(array $attributes=array(), $guard_attributes=true, $instantiating_via_find=false, $new_record=true)
 	{
 		$this->__new_record = $new_record;
 
@@ -151,10 +222,10 @@ class Model
 	 * Retrieves an attribute's value or a relationship object based on the name passed. If the attribute
 	 * accessed is 'id' then it will return the model's primary key no matter what the actual attribute name is
 	 * for the primary key.
-	 * @throws ActiveRecord\Exception (lacking composite PK support)
-	 * @throws ActiveRecord\UndefinedPropertyException (if an attr/relationshp is not found by @param $name)
-	 * @param $name
-	 * @return mixed
+	 * 
+	 * @throws ActiveRecord\UndefinedPropertyException Thrown if name could not be resolved to an attribute, relationship, ...
+	 * @param string $name Name of an attribute
+	 * @return mixed The value of the attribute
 	 */
 	public function &__get($name)
 	{
@@ -178,7 +249,7 @@ class Model
 			$this->__relationships[$name] = $relationship->load($this);
 			return $this->__relationships[$name];
 		}
-
+		
 		if ($name == 'id')
 		{
 			if (count(($this->get_primary_key(true))) > 1)
@@ -187,9 +258,10 @@ class Model
 			if (isset($this->attributes[$table->pk[0]]))
 				return $this->attributes[$table->pk[0]];
 		}
-
+		
 		//do not remove - have to return null by reference in strict mode
 		$null = null;
+
 		foreach (static::$delegate as &$item)
 		{
 			if (($delegated_name = $this->is_delegated($name,$item)))
@@ -204,14 +276,15 @@ class Model
 					return $null;
 			}
 		}
-
+		
 		throw new UndefinedPropertyException($name);
 	}
 
 	/**
-	 * Determines if an attribute name exists
-	 * @param string
-	 * @return boolean
+	 * Determines if an attribute name exists.
+	 * 
+	 * @param string $name Name of an attribute
+	 * @return boolean Returns true if the attribute is valid for this Model
 	 */
 	public function __isset($name)
 	{
@@ -219,11 +292,12 @@ class Model
 	}
 
 	/**
-	 * Magic allows un-defined attributes to set via @var $attributes
-	 * @throws ActiveRecord\UndefinedPropertyException if @param $name does not exist
-	 * @param string
-	 * @param mixed
-	 * @return mixed value of attribute name
+	 * Magic allows un-defined attributes to set via $attributes
+	 * 
+	 * @throws ActiveRecord\UndefinedPropertyException if $name does not exist
+	 * @param string $name Name of attribute, relationship or other to set
+	 * @param mixed $value The value
+	 * @return mixed The value
 	 */
 	public function __set($name, $value)
 	{
@@ -249,11 +323,11 @@ class Model
 	}
 
 	/**
-	 * Assign value to an attribute.
+	 * Assign a value to an attribute.
 	 *
 	 * @param string $name Name of the attribute
 	 * @param mixed $value Value of the attribute
-	 * @return mixed
+	 * @return mixed The attribute value
 	 */
 	public function assign_attribute($name, &$value)
 	{
@@ -272,7 +346,8 @@ class Model
 
 	/**
 	 * Returns hash of attributes that have been modified since loading the model.
-	 * @return null or array
+	 * 
+	 * @return mixed Returns null if no dirty attributes otherwise returns array of dirty attributes.
 	 */
 	public function dirty_attributes()
 	{
@@ -284,8 +359,9 @@ class Model
 	}
 
 	/**
-	 * Getter for @var $attributes
-	 * @return array
+	 * Returns a copy of the model's attributes hash.
+	 * 
+	 * @return array The model's attribute data
 	 */
 	public function attributes()
 	{
@@ -294,8 +370,9 @@ class Model
 
 	/**
 	 * Retrieve the primary key name.
-	 * @param boolean
-	 * @return string
+	 * 
+	 * @param boolean $inflect Set to true to inflect the key name
+	 * @return string The primary key for the model
 	 */
 	public function get_primary_key($inflect=true)
 	{
@@ -303,18 +380,19 @@ class Model
 	}
 
 	/**
-	 * Returns an associative array containg values for all the properties in $properties
-	 * @param array of property names
-	 * @return array containing $property => $value
+	 * Returns an associative array containing values for all the attributes in $attributes
+	 * 
+	 * @param array $properties Array containing attribute names
+	 * @return array A hash containing $name => $value
 	 */
-	public function get_values_for($properties)
+	public function get_values_for($attributes)
 	{
 		$ret = array();
 
-		foreach ($properties as $property)
+		foreach ($attributes as $name)
 		{
-			if (array_key_exists($property,$this->attributes))
-				$ret[$property] = $this->attributes[$property];
+			if (array_key_exists($name,$this->attributes))
+				$ret[$name] = $this->attributes[$name];
 		}
 		return $ret;
 	}
@@ -339,8 +417,9 @@ class Model
 	}
 
 	/**
-	 * True if this model is read only.
-	 * @return boolean
+	 * Determine if the model is in read-only mode.
+	 * 
+	 * @return boolean Returns true if the model is read only
 	 */
 	public function is_readonly()
 	{
@@ -348,8 +427,9 @@ class Model
 	}
 
 	/**
-	 * True if this is a new record.
-	 * @return boolean
+	 * Determine if the model is a new record.
+	 * 
+	 * @return boolean Returns true if this is a new record that has not been saved
 	 */
 	public function is_new_record()
 	{
@@ -358,9 +438,9 @@ class Model
 
 	/**
 	 * Throws an exception if this model is set to readonly.
+	 * 
 	 * @throws ActiveRecord\ReadOnlyException
-	 * @param string name of method that was invoked on model for exception message
-	 * @return void
+	 * @param string $method_name Name of method that was invoked on model for exception message
 	 */
 	private function verify_not_readonly($method_name)
 	{
@@ -369,9 +449,9 @@ class Model
 	}
 
 	/**
-	 * Flag model as readonly
-	 * @param boolean
-	 * @return void
+	 * Flag model as readonly.
+	 * 
+	 * @param boolean $readonly Set to true to put the model into readonly mode
 	 */
 	public function readonly($readonly=true)
 	{
@@ -380,8 +460,8 @@ class Model
 
 	/**
 	 * Retrieve the connection for this model.
-	 * @static
-	 * @return object instance of ActiveRecord\Connection
+	 * 
+	 * @return object An instance of ActiveRecord\Connection
 	 */
 	public static function connection()
 	{
@@ -389,10 +469,15 @@ class Model
 	}
 
 	/**
-	 * Returns the ActiveRecord\Table object for this model. Be sure to call in static scoping.
-	 * Example: static::table()
-	 * @static
-	 * @return object instance of ActiveRecord\Table
+	 * Returns the ActiveRecord\Table object for this model.
+	 * 
+	 * Be sure to call in static scoping:
+	 * 
+	 * <code>
+	 * static::table();
+	 * </code>
+	 * 
+	 * @return object An instance of ActiveRecord\Table
 	 */
 	public static function table()
 	{
@@ -400,11 +485,11 @@ class Model
 	}
 
 	/**
-	 * Creates a model and invokes insert.
-	 * @static
-	 * @param array Array of the models attributes
-	 * @param boolean True if the validators should be run
-	 * @return object ActiveRecord\Model
+	 * Creates a model and save it to the database.
+	 * 
+	 * @param array $attributes Array of the models attributes
+	 * @param boolean $validate True if the validators should be run
+	 * @return object An instance ActiveRecord\Model
 	 */
 	public static function create($attributes, $validate=true)
 	{
@@ -415,13 +500,16 @@ class Model
 	}
 
 	/**
-	 * Writer method that will determine whether or not the model is a new record or not. If it
-	 * is then it will issue an insert statement, otherwise it will be an upate. You may pass a boolean if the
-	 * writer method should invoke validations or not. Callbacks on this model will be called regardless of
-	 * the flag passed. If a validation or a callback for this model returns false, then the resultant sql
-	 * query will not be issued and false will be returned.
-	 * @param boolean true if this should validate
-	 * @return boolean
+	 * Save the model to the database.
+	 *
+	 * This function will automatically determine if an INSERT or UPDATE needs to occur.
+	 * If a validation or a callback for this model returns false, then the model will
+	 * not be saved and this will return false.
+	 * 
+	 * If saving an existing model only data that has changed will be saved.
+	 * 
+	 * @param boolean $validate Set to true or false depending on if you want the validators to run or not
+	 * @return boolean True if the model was saved to the database otherwise false
 	 */
 	public function save($validate=true)
 	{
@@ -431,9 +519,10 @@ class Model
 
 	/**
 	 * Issue an INSERT sql statement for this model's attribute.
-	 * @see @method save()
-	 * @param boolean
-	 * @return boolean
+	 * 
+	 * @see save
+	 * @param boolean $validate Set to true or false depending on if you want the validators to run or not
+	 * @return boolean True if the model was saved to the database otherwise false
 	 */
 	private function insert($validate=true)
 	{
@@ -465,10 +554,10 @@ class Model
 
 	/**
 	 * Issue an UPDATE sql statement for this model's dirty attributes.
-	 * @see @method save()
-	 * @see @var $__dirty
-	 * @param boolean
-	 * @return boolean
+	 * 
+	 * @see save
+	 * @param boolean $validate Set to true or false depending on if you want the validators to run or not
+	 * @return boolean True if the model was saved to the database otherwise false
 	 */
 	private function update($validate=true)
 	{
@@ -493,8 +582,9 @@ class Model
 	}
 
 	/**
-	 * Issue a DELETE statement based on this model's primary key
-	 * @return boolean
+	 * Delete this model from the database.
+	 * 
+	 * @return boolean True if the model was deleted otherwise false
 	 */
 	public function delete()
 	{
@@ -513,9 +603,9 @@ class Model
 	}
 
 	/**
-	 * Helper that creates an array of values for the primary key(s) of this model in the form of
-	 * key_name => value
-	 * @return array
+	 * Helper that creates an array of values for the primary key(s).
+	 * 
+	 * @return array An array in the form array(key_name => value, ...)
 	 */
 	public function values_for_pk()
 	{
@@ -523,8 +613,10 @@ class Model
 	}
 
 	/**
-	 * Return a hash of name => value for the specified attributes.
-	 * @return array
+	 * Helper to return a hash of values for the specified attributes.
+	 * 
+	 * @param array $attribute_names Array of attribute names
+	 * @return array An array in the form array(name => value, ...)
 	 */
 	public function values_for($attribute_names)
 	{
@@ -537,8 +629,9 @@ class Model
 	}
 
 	/**
-	 *
-	 * @return boolean
+	 * Validates the model.
+	 * 
+	 * @return boolean True if passed validators otherwise false
 	 */
 	private function _validate()
 	{
@@ -564,7 +657,8 @@ class Model
 
 	/**
 	 * Run validations on model
-	 * @return boolean
+	 * 
+	 * @return boolean True if passed validators otherwise false
 	 */
 	public function is_valid()
 	{
@@ -572,8 +666,7 @@ class Model
 	}
 
 	/**
-	 * Update model's timestamps based on is_new_record()?
-	 * @return void
+	 * Updates a model's timestamps.
 	 */
 	public function set_timestamps()
 	{
@@ -587,10 +680,10 @@ class Model
 	}
 
 	/**
-	 * Updates all the attributes from the passed-in array and saves the record. If the object is invalid,
-	 * the saving will fail and false will be returned.
-	 * @param $attributes array
-	 * @return boolean
+	 * Mass update the model with an array of attribute data and saves to the database.
+	 * 
+	 * @param array $attributes An attribute data array in the form array(name => value, ...)
+	 * @return boolean True if successfully updated and saved otherwise false
 	 */
 	public function update_attributes($attributes)
 	{
@@ -600,9 +693,10 @@ class Model
 
 	/**
 	 * Updates a single attribute and saves the record without going through the normal validation procedure.
-	 * @param string
-	 * @param mixed
-	 * @return boolean
+	 * 
+	 * @param string $name Name of attribute
+	 * @param mixed $value Value of the attribute
+	 * @return boolean True if successful otherwise false
 	 */
 	public function update_attribute($name, $value)
 	{
@@ -611,10 +705,13 @@ class Model
 	}
 
 	/**
-	 * Allows you to set all the attributes at once by passing in an array with
-	 * keys matching the attribute names (which again matches the column names).
-	 * @param array
-	 * @return void
+	 * Mass update the model with data from an attributes hash.
+	 * 
+	 * Unlike update_attributes() this method only updates the model's data
+	 * but DOES NOT save it to the database.
+	 * 
+	 * @see update_attributes
+	 * @param array $attributes An array containing data to update in the form array(name => value, ...)
 	 */
 	public function set_attributes(array $attributes)
 	{
@@ -623,10 +720,10 @@ class Model
 
 	/**
 	 * Passing strict as true will throw an exception if an attribute does not exist.
+	 * 
 	 * @throws ActiveRecord\UndefinedPropertyException
-	 * @param array
-	 * @param boolean flag of whether or not attributes should be guarded
-	 * @return unknown_type
+	 * @param array $attributes An array in the form array(name => value, ...)
+	 * @param boolean $guard_attributes Flag of whether or not attributes should be guarded
 	 */
 	private function set_attributes_via_mass_assignment(array &$attributes, $guard_attributes)
 	{
@@ -673,12 +770,8 @@ class Model
 
 	/**
 	 * Reloads the attributes of this object from the database and the relationships.
-	 * Returns $this to support:
 	 *
-	 * $model->reload()->relationship_name->attribute
-	 * $model->reload()->attribute
-	 *
-	 * @return $this
+	 * @return object $this
 	 */
 	public function reload()
 	{
@@ -691,8 +784,7 @@ class Model
 	}
 
 	/**
-	 * Resets @var $__dirty to null
-	 * @return void
+	 * Resets the dirty array.
 	 */
 	public function reset_dirty()
 	{
@@ -700,20 +792,24 @@ class Model
 	}
 
 	/**
-	 * A list of valid finder options
-	 * @static
+	 * A list of valid finder options.
+	 * 
 	 * @var array
 	 */
 	static $VALID_OPTIONS = array('conditions', 'limit', 'offset', 'order', 'select', 'joins', 'include', 'readonly', 'group');
 
 	/**
 	 * Enables the use of dynamic finders.
-	 * Example: SomeModel::find_by_attribute('value');
-	 * @static
-	 * @throws ActiveRecord\ActiveRecordException if invalid query
-	 * @param string
-	 * @param mixed
-	 * @return instance of ActiveRecord\Model
+	 * 
+	 * <code>
+	 * SomeModel::find_by_first_name('Tito');
+	 * SomeModel::find_by_first_name_and_last_name('Tito','the Grief');
+	 * </code>
+	 * 
+	 * @throws ActiveRecord\ActiveRecordException If invalid query
+	 * @param string $method Name of method
+	 * @param mixed $args Method args
+	 * @return object An instance of ActiveRecord\Model
 	 */
 	public static function __callStatic($method, $args)
 	{
@@ -735,9 +831,10 @@ class Model
 
 	/**
 	 * Enables the use of build|create for associations.
-	 * @param string
-	 * @param mixed
-	 * @return instance of a given ActiveRecord\Relationship
+	 * 
+	 * @param string $method Name of method
+	 * @param mixed $args Method args
+	 * @return object An instance of a given ActiveRecord\Relationship
 	 */
 	public function __call($method, $args)
 	{
@@ -761,9 +858,10 @@ class Model
 	}
 
 	/**
-	 * Alias for self::find('all')
-	 * @static
-	 * @return array
+	 * Alias for self::find('all').
+	 * 
+	 * @see find
+	 * @return array Array of records found
 	 */
 	public static function all(/* ... */)
 	{
@@ -771,9 +869,14 @@ class Model
 	}
 
 	/**
-	 * Get a count of qualifying records
-	 * @static
-	 * @return integer
+	 * Get a count of qualifying records.
+	 * 
+	 * <code>
+	 * SomeModel::count(array('conditions' => 'amount > 3.14159265'));
+	 * </code>
+	 * 
+	 * @see find
+	 * @return integer Number of records that matched the query
 	 */
 	public static function count(/* ... */)
 	{
@@ -786,9 +889,10 @@ class Model
 	}
 
 	/**
-	 * Uses count to determine whether a qualifying record exists or not.
-	 * @static
-	 * @return boolean
+	 * Determine if a record exists.
+	 * 
+	 * @see find
+	 * @return boolean True if it exists otherwise false
 	 */
 	public static function exists(/* ... */)
 	{
@@ -796,9 +900,10 @@ class Model
 	}
 
 	/**
-	 * Alias for self::find('first')
-	 * @static
-	 * @return object instanceof ActiveRecord\Model
+	 * Alias for self::find('first').
+	 * 
+	 * @see find
+	 * @return object The first matched record or null if not found
 	 */
 	public static function first(/* ... */)
 	{
@@ -807,7 +912,9 @@ class Model
 
 	/**
 	 * Alias for self::find('last')
-	 * @return object instanceof ActiveRecord\Model
+	 * 
+	 * @see find
+	 * @return object The last matched record or null if not found
 	 */
 	public static function last(/* ... */)
 	{
@@ -815,10 +922,49 @@ class Model
 	}
 
 	/**
-	 * Base method for retrieving records from the database.
-	 * @static
+	 * Find records in the database.
+	 * 
+	 * Finding by the primary key:
+	 * 
+	 * <code>
+	 * # queries for the model with id=123
+	 * $model->find(123);
+	 * 
+	 * # queries for model with id in(1,2,3)
+	 * $model->find(1,2,3);
+	 * 
+	 * # finding by pk accepts an options array
+	 * $model->find(123,array('order' => 'name desc'));
+	 * </code>
+	 * 
+	 * Finding by using a conditions array:
+	 * 
+	 * <code>
+	 * $model->find('first', array('conditions' => array('name=?','Tito'), 'order' => 'name asc))
+	 * $model->find('all', array('conditions' => 'amount > 3.14159265'));
+	 * $model->find('all', array('conditions' => array('id in(?)', array(1,2,3))));
+	 * </code>
+	 * 
+	 * An options array can take the following parameters:
+	 * 
+	 * <ul>
+	 * <li>select: A SQL fragment for what fields to return such as: '*', 'people.*', 'first_name, last_name, id'</li>
+	 * <li>joins: A SQL join fragment such as: 'JOIN roles ON(roles.user_id=user.id)'</li>
+	 * <li>include: TODO not implemented yet</li>
+	 * <li>conditions: A SQL fragment such as: 'id=1', array('id=1'), array('name=? and id=?','Tito',1), array('name IN(?)', array('Tito','Bob')),
+	 * array('name' => 'Tito', 'id' => 1)</li>
+	 * <li>limit: Number of records to limit the query to</li>
+	 * <li>offset: The row offset to return results from for the query</li>
+	 * <li>order: A SQL fragment for order such as: 'name asc', 'name asc, id desc'</li>
+	 * <li>readonly: Return all the models in readonly mode</li>
+	 * <li>group: A SQL group by fragment</li>
+	 * </ul>
+	 * 
 	 * @throws ActiveRecord\RecordNotFound if no options are passed
-	 * @return mixed instance(s) of ActiveRecord\Model
+	 * @return mixed An array of records found if doing a find_all otherwise a
+	 *   single Model object or null if it wasn't found. NULL is only return when
+	 *   doing a first/last find. If doing an all find and no records matched this
+	 *   will return an empty array. 
 	 */
 	public static function find(/* $type, $options */)
 	{
@@ -873,11 +1019,12 @@ class Model
 
 	/**
 	 * Finder method which will find by a single or array of primary keys for this model.
-	 * @static
+	 * 
+	 * @see find
 	 * @throws ActiveRecord\RecordNotFound if a record could not be found with the @param $values passed
-	 * @param mixed
-	 * @param mixed
-	 * @return unknown_type
+	 * @param $values mixed An array containing values for the pk
+	 * @param $options mixed An options array 
+	 * @return object An instance of ActiveRecord\Model
 	 */
 	public static function find_by_pk($values, $options)
 	{
@@ -911,12 +1058,16 @@ class Model
 	}
 
 	/**
-	 * Allows you to pass raw sql to be executed. Use only if feeling evil; although, this method
-	 * will still escape the raw sql to prevent SQL injection.
-	 * @static
-	 * @param string
-	 * @param array
-	 * @return array
+	 * Find using a raw SELECT query.
+	 * 
+	 * <code>
+	 * $model->find_by_sql("SELECT * FROM people WHERE name=?",array('Tito'));
+	 * $model->find_by_sql("SELECT * FROM people WHERE name='Tito'");
+	 * </code>
+	 * 
+	 * @param string $sql The raw SELECT query
+	 * @param array $values An array of values for any parameters that needs to be bound
+	 * @return array An array of models
 	 */
 	public static function find_by_sql($sql, $values=null)
 	{
@@ -924,11 +1075,11 @@ class Model
 	}
 
 	/**
-	 * Returns true if @var $array is a valid options hash. Will throw exceptions
-	 * if it is a hash and contains invalid option keys.
-	 *
-	 * @throws ActiveRecord\ActiveRecordException
-	 * @return boolean
+	 * Determines if the specified array is a valid ActiveRecord options array.
+	 * 
+	 * @throws ActiveRecord\ActiveRecordException If the array contained any invalid options
+	 * @param array $array An options array
+	 * @return boolean True if valid otherwise valse
 	 */
 	public static function is_options_hash($array)
 	{
@@ -949,9 +1100,12 @@ class Model
 	}
 
 	/**
-	 *
-	 * @param $args
-	 * @return unknown_type
+	 * Returns a hash containing the names => values of the primary key.
+	 * 
+	 * This needs to eventually support composite keys.
+	 * 
+	 * @params mixed $args Primary key value(s)
+	 * @return array An array in the form array(name => value, ...)
 	 */
 	public static function pk_conditions($args)
 	{
@@ -962,9 +1116,11 @@ class Model
 
 	/**
 	 * Pulls out the options hash from $array if any.
+	 * 
 	 * DO NOT remove the reference on $array.
-	 * @param array
-	 * @return array
+	 * 
+	 * @param array $array An array
+	 * @return array A valid options array
 	 */
 	public static function extract_and_validate_options(array &$array)
 	{
@@ -985,8 +1141,9 @@ class Model
 
 	/**
 	 * Returns a JSON representation of this model.
-	 * @param array
-	 * @return string
+	 * 
+	 * @param array $options An array containing options for json serialization
+	 * @return string JSON representation of the model
 	 */
 	public function to_json(array $options=array())
 	{
@@ -995,8 +1152,9 @@ class Model
 
 	/**
 	 * Returns an XML representation of this model.
-	 * @param array
-	 * @return string
+	 * 
+	 * @param array $options An array containing options for xml serialization
+	 * @return string XML representation of the model
 	 */
 	public function to_xml(array $options=array())
 	{
@@ -1005,10 +1163,12 @@ class Model
 
 	/**
 	 * Creates a serializer based on pre-defined to_serializer()
+	 * 
 	 * Use options['only'] and options['except'] to include/exclude desired attributes.
-	 * @param string
-	 * @param array
-	 * @return string
+	 * 
+	 * @param string $type Either Xml or Json
+	 * @param array $options Options array for the serializer
+	 * @return string Serialized representation of the model
 	 */
 	private function serialize($type, $options)
 	{
@@ -1019,9 +1179,10 @@ class Model
 
 	/**
 	 * Invokes the specified callback on this model.
+	 * 
 	 * @param string $method_name Name of the call back to run.
 	 * @param boolean $must_exist Set to true to raise an exception if the callback does not exist.
-	 * @return boolean or null
+	 * @return boolean True if invoked or null if not
 	 */
 	private function invoke_callback($method_name, $must_exist=true)
 	{
@@ -1031,8 +1192,7 @@ class Model
 	/**
 	 * Execute a closure inside a transaction.
 	 *
-	 * @param Closure $closure The closure to execute. It should return false or
-	 * throw an exception to rollback the transaction.
+	 * @param Closure $closure The closure to execute. To cause a rollback have your closure return false or throw an exception.
 	 */
 	public static function transaction(\Closure $closure)
 	{
