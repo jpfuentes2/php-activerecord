@@ -13,6 +13,7 @@ use Closure;
 
 /**
  * @package ActiveRecord
+ * @subpackage Internal
  */
 abstract class Connection
 {

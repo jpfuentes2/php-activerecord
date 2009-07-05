@@ -18,6 +18,7 @@ require_once 'Relationship.php';
  * for every table you have a model for.
  *
  * @package ActiveRecord
+ * @subpackage Internal
  */
 class Table
 {

@@ -7,6 +7,7 @@ use DateTime;
 
 /**
  * @package ActiveRecord
+ * @subpackage Internal
  */
 class Column
 {

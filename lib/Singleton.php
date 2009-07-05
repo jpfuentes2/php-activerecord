@@ -10,8 +10,8 @@ namespace ActiveRecord;
  * a singleton pattern is capable of being achieved; however, multiple instantiations are also
  * possible. This allows the user more freedom with this pattern.
  *
- * @abstract
  * @package ActiveRecord
+ * @subpackage Internal
  */
 abstract class Singleton
 {

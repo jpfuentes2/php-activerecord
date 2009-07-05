@@ -167,6 +167,7 @@ abstract class Serialization
  * JSON serializer.
  * 
  * @package ActiveRecord
+ * @subpackage Internal
  */
 class JsonSerializer extends Serialization
 {
@@ -180,6 +181,7 @@ class JsonSerializer extends Serialization
  * XML serializer.
  * 
  * @package ActiveRecord
+ * @subpackage Internal
  */
 class XmlSerializer extends Serialization
 {

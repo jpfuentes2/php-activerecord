@@ -7,6 +7,7 @@ use Closure;
 
 /**
  * @package ActiveRecord
+ * @subpackage Internal
  */
 class Config extends Singleton
 {

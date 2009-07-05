@@ -9,6 +9,7 @@ use ReflectionClass;
  * Simple class that caches reflections of classes.
  *
  * @package ActiveRecord
+ * @subpackage Internal
  */
 class Reflections extends Singleton
 {
