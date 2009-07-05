@@ -6,9 +6,46 @@ namespace ActiveRecord;
 use Closure;
 
 /**
- * Callbacks allow the programmer to hook into the life cycle of an ActiveRecord object. You can control
- * the state of your object by declaring certain methods to be called before or after methods
- * are invoked on your object inside of ActiveRecord.
+ * Callbacks allow the programmer to hook into the life cycle of an ActiveRecord\Model object.
+ * 
+ * You can control the state of your object by declaring certain methods to be
+ * called before or after methods are invoked on your object inside of ActiveRecord.
+ * 
+ * Valid callbacks are:
+ * <ul>
+ * <li>after_construct: called after a model has been constructed</li>
+ * <li>before_save: called before a model is saved</li>
+ * <li>after_save: called after a model is saved</li>
+ * <li>before_create: called before a NEW model is to be inserted into the database</li>
+ * <li>after_create: called after a NEW model has been inserted into the database</li>
+ * <li>before_update: called before an existing model has been saved</li>
+ * <li>after_update: called after an existing model has been saved</li>
+ * <li>before_validation: called before running validators</li>
+ * <li>after_validation: called after running validators</li>
+ * <li>before_validation_on_create: called before validation on a NEW model being inserted</li>
+ * <li>after_validation_on_create: called after validation on a NEW model being inserted</li>
+ * <li>before_validation_on_update: see above except for an existing model being saved</li>
+ * <li>after_validation_on_update: ...</li>
+ * <li>before_destroy: called after a model has been deleted</li>
+ * <li>after_destroy: called after a model has been deleted</li>
+ * </ul>
+ * 
+ * Example:
+ * 
+ * <code>
+ * class Person extends ActiveRecord\Model {
+ *   static $before_save = array('make_name_uppercase');
+ *   static $after_save = array('do_happy_dance');
+ *   
+ *   public function make_name_uppercase() {
+ *     $this->name = strtoupper($this->name);
+ *   }
+ * 
+ *   public function do_happy_dance() {
+ *     happy_dance();
+ *   }
+ * }
+ * </code>
  *
  * @package ActiveRecord
  */
