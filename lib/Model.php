@@ -15,6 +15,11 @@ use DateTime;
  * </code>
  * 
  * @package ActiveRecord
+ * @see CallBack
+ * @see Serialization
+ * @see BelongsTo
+ * @see HasMany
+ * @see HasAndBelongsToMany
  */
 class Model
 {
