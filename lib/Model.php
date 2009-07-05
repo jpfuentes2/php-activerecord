@@ -1142,7 +1142,8 @@ class Model
 	/**
 	 * Returns a JSON representation of this model.
 	 * 
-	 * @param array $options An array containing options for json serialization
+	 * @see Serialization
+	 * @param array $options An array containing options for json serialization (see Serialization class for valid options)
 	 * @return string JSON representation of the model
 	 */
 	public function to_json(array $options=array())
@@ -1153,7 +1154,8 @@ class Model
 	/**
 	 * Returns an XML representation of this model.
 	 * 
-	 * @param array $options An array containing options for xml serialization
+	 * @see Serialization
+	 * @param array $options An array containing options for xml serialization (see Serialization class for valid options)
 	 * @return string XML representation of the model
 	 */
 	public function to_xml(array $options=array())

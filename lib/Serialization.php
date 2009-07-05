@@ -6,6 +6,33 @@ namespace ActiveRecord;
 use XmlWriter;
 
 /**
+ * Base class for Model serializers.
+ * 
+ * All serializers support the following options:
+ * 
+ * <ul>
+ * <li>only: only include these attributes</li>
+ * <li>except: exclude these attributes</li>
+ * <li>methods: run these methods and include their return values</li>
+ * <li>include: list of associations to include</li>
+ * </ul>
+ * 
+ * Example usage:
+ * 
+ * <code>
+ * # include the attributes id and name
+ * # run $model->encoded_description() and include its return value
+ * # include the comments association
+ * $model->to_json(array(
+ *   'only' => array('id','name'),
+ *   'methods' => array('encoded_description'),
+ *   'include' => array('comments')
+ * ));
+ * 
+ * # exclude the password field from being included
+ * $model->to_xml(array('exclude' => 'password')));
+ * </code>
+ * 
  * @package ActiveRecord
  */
 abstract class Serialization
@@ -109,13 +136,9 @@ abstract class Serialization
 	private function parse_options()
 	{
 		$attributes = $this->model->attributes();
-
 		$attributes = $this->check_only($attributes);
-
 		$attributes = $this->check_except($attributes);
-
 		$attributes = $this->check_methods($attributes);
-
 		$attributes = $this->check_include($attributes);
 
 		$this->attributes = $attributes;
@@ -141,6 +164,8 @@ abstract class Serialization
 };
 
 /**
+ * JSON serializer.
+ * 
  * @package ActiveRecord
  */
 class JsonSerializer extends Serialization
@@ -152,6 +177,8 @@ class JsonSerializer extends Serialization
 }
 
 /**
+ * XML serializer.
+ * 
  * @package ActiveRecord
  */
 class XmlSerializer extends Serialization
