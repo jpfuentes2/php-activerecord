@@ -12,13 +12,11 @@ class ActiveRecordException extends \Exception {};
 
 /**
  * @package ActiveRecord
- * @subpackage Exceptions
  */
 class RecordNotFound extends ActiveRecordException {};
 
 /**
  * @package ActiveRecord
- * @subpackage Exceptions
  */
 class DatabaseException extends ActiveRecordException
 {
@@ -43,25 +41,21 @@ class DatabaseException extends ActiveRecordException
 
 /**
  * @package ActiveRecord
- * @subpackage Exceptions
  */
 class ModelException extends ActiveRecordException {};
 
 /**
  * @package ActiveRecord
- * @subpackage Exceptions
  */
 class ExpressionsException extends ActiveRecordException {};
 
 /**
  * @package ActiveRecord
- * @subpackage Exceptions
  */
 class ConfigException extends ActiveRecordException {};
 
 /**
  * @package ActiveRecord
- * @subpackage Exceptions
  */
 class UndefinedPropertyException extends ModelException
 {
@@ -86,7 +80,6 @@ class UndefinedPropertyException extends ModelException
 
 /**
  * @package ActiveRecord
- * @subpackage Exceptions
  */
 class ReadOnlyException extends ModelException
 {
@@ -106,19 +99,16 @@ class ReadOnlyException extends ModelException
 
 /**
  * @package ActiveRecord
- * @subpackage Exceptions
  */
 class ValidationsArgumentError extends ActiveRecordException {};
 
 /**
  * @package ActiveRecord
- * @subpackage Exceptions
  */
 class RelationshipException extends ActiveRecordException {};
 
 /**
  * @package ActiveRecord
- * @subpackage Exceptions
  */
 class HasManyThroughAssociationException extends RelationshipException {};
 ?>

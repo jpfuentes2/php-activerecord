@@ -6,6 +6,7 @@ namespace ActiveRecord;
 
 /**
  * @package ActiveRecord
+ * @subpackage Internal
  */
 interface InterfaceRelationship
 {
