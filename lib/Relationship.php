@@ -33,7 +33,7 @@ abstract class AbstractRelationship implements InterfaceRelationship
 		$this->options = $this->merge_association_options($options);
 
 		$relationship = strtolower(denamespace(get_called_class()));
-
+		
 		if ($relationship === 'hasmany' || $relationship === 'hasandbelongstomany')
 			$this->poly_relationship = true;
 
@@ -300,7 +300,7 @@ class BelongsTo extends AbstractRelationship
 
 		if (!$this->class_name)
 			$this->set_inferred_class_name();
-
+			
 		//infer from class_name
 		if (!$this->foreign_key)
 			$this->foreign_key = array($this->keyify($this->class_name));

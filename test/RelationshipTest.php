@@ -146,6 +146,14 @@ class RelationshipTest extends DatabaseTest
 		$venue = $event->create_venue($values);
 		$this->assert_not_null($venue->id);
 	}
+	
+	public function test_belongs_to_can_be_self_referential()
+	{
+		Author::$belongs_to = array(array('parent_author', 'class_name' => 'Author', 'foreign_key' => 'parent_author_id'));
+		$author = Author::first(); 
+		$this->assert_equals(1, $author->id);
+		$this->assert_equals(3, $author->parent_author->id);
+	}
 
 	public function test_has_many_basic()
 	{
@@ -334,6 +342,14 @@ class RelationshipTest extends DatabaseTest
 
 		$employee->position->title = 'new title';
 		$this->assert_equals($employee->position->title, 'new title');
+	}
+	
+	public function test_has_one_can_be_self_referential()
+	{
+		Author::$has_one[1] = array('parent_author', 'class_name' => 'Author', 'foreign_key' => 'parent_author_id');
+		$author = Author::first(); 
+		$this->assert_equals(1, $author->id);
+		$this->assert_equals(3, $author->parent_author->id);
 	}
 
 	public function test_dont_attempt_to_load_if_all_foreign_keys_are_null()

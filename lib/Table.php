@@ -68,7 +68,12 @@ class Table
 	public static function load($model_class_name)
 	{
 		if (!isset(self::$cache[$model_class_name]))
-			return (self::$cache[$model_class_name] = new Table($model_class_name));
+		{
+			/* do not place set_assoc in constructor..it will lead to infinite loop due to
+			   relationships requesting the model's table, but the cache hasn't been set yet */	
+			self::$cache[$model_class_name] = new Table($model_class_name);
+			self::$cache[$model_class_name]->set_associations(); 
+		}
 
 		return self::$cache[$model_class_name];
 	}
@@ -90,7 +95,6 @@ class Table
 		$this->set_sequence_name();
 		$this->get_meta_data();
 		$this->set_primary_key();
-		$this->set_associations();
 		$this->set_delegates();
 		$this->set_setters();
 
