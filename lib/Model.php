@@ -20,6 +20,7 @@ use DateTime;
  * @see BelongsTo
  * @see HasMany
  * @see HasAndBelongsToMany
+ * @see Validations
  */
 class Model
 {
