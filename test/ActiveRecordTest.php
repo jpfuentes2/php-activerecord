@@ -322,5 +322,10 @@ class ActiveRecordTest extends DatabaseTest
 		$author->created_at = 'CURRENT_TIMESTAMP';
 		$this->assertNull($author->created_at);
 	}
+
+	public function test_table_name()
+	{
+		$this->assert_equals('authors',Author::table_name());
+	}
 };
 ?>

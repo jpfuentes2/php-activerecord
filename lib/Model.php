@@ -404,6 +404,16 @@ class Model
 	}
 
 	/**
+	 * Retrieves the name of the table for this Model.
+	 * 
+	 * @return string Returns the table name.
+	 */
+	public static function table_name()
+	{
+		return static::table()->table;
+	}
+
+	/**
 	 * Returns the attribute name on the delegated relationship if $name is
 	 * delegated or null if not delegated.
 	 *
