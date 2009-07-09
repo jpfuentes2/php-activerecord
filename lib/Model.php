@@ -960,6 +960,14 @@ class Model
 	 * $model->find('all', array('conditions' => 'amount > 3.14159265'));
 	 * $model->find('all', array('conditions' => array('id in(?)', array(1,2,3))));
 	 * </code>
+	 * 
+	 * Finding by using a hash:
+	 * 
+	 * <code>
+	 * $model->find(array('name' => 'Tito', 'id' => 1));
+	 * $model->find('first',array('name' => 'Tito', 'id' => 1));
+	 * $model->find('all',array('name' => 'Tito', 'id' => 1));
+	 * </code>
 	 *
 	 * An options array can take the following parameters:
 	 *
@@ -1024,7 +1032,7 @@ class Model
 			$args = $args[0];
 
 		// anything left in $args is a find by pk
-		if ($num_args > 0)
+		if ($num_args > 0 && !isset($options['conditions']))
 			return static::find_by_pk($args, $options);
 
 		$options['mapped_names'] = static::$alias_attribute;
@@ -1095,16 +1103,17 @@ class Model
 	 *
 	 * @throws ActiveRecord\ActiveRecordException If the array contained any invalid options
 	 * @param array $array An options array
+	 * @param bool $throw True to throw an exception if not valid
 	 * @return boolean True if valid otherwise valse
 	 */
-	public static function is_options_hash($array)
+	public static function is_options_hash($array, $throw=true)
 	{
 		if (is_hash($array))
 		{
 			$keys = array_keys($array);
 			$diff = array_diff($keys,self::$VALID_OPTIONS);
 
-			if (!empty($diff))
+			if (!empty($diff) && $throw)
 				throw new ActiveRecordException("Unknown key(s): " . join(', ',$diff));
 
 			$intersect = array_intersect($keys,self::$VALID_OPTIONS);
@@ -1146,11 +1155,21 @@ class Model
 		{
 			$last = &$array[count($array)-1];
 
-			if (self::is_options_hash($last))
+			try
 			{
-				array_pop($array);
-				$options = $last;
+				if (self::is_options_hash($last))
+				{
+					array_pop($array);
+					$options = $last;
+				}
 			}
+			catch (ActiveRecordException $e)
+			{
+				if (!is_hash($last))
+					throw $e;
+
+				$options = array('conditions' => $last);
+			} 
 		}
 		return $options;
 	}

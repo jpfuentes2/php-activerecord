@@ -109,14 +109,6 @@ class ActiveRecordFindTest extends DatabaseTest
 		$this->assert_true(count($books) > 0);
 	}
 
-	/**
-	 * @expectedException ActiveRecord\ActiveRecordException
-	 */
-	public function test_find_all_with_invalid_option()
-	{
-		Book::find('all',array('author_id' => 1));
-	}
-
 	public function test_find_all_no_args()
 	{
 		$author = Author::all();
@@ -374,6 +366,14 @@ class ActiveRecordFindTest extends DatabaseTest
 	public function test_from_with_invalid_table()
 	{
 		$author = Author::find('first', array('from' => 'wrong_authors_table'));
+	}
+
+	public function test_find_with_hash()
+	{
+		$this->assert_not_null(Author::find(array('name' => 'Tito')));
+		$this->assert_not_null(Author::find('first',array('name' => 'Tito')));
+		$this->assert_equals(1,count(Author::find('all',array('name' => 'Tito'))));
+		$this->assert_equals(1,count(Author::all(array('name' => 'Tito'))));
 	}
 };
 ?>
