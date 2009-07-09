@@ -375,5 +375,25 @@ class ActiveRecordFindTest extends DatabaseTest
 		$this->assert_equals(1,count(Author::find('all',array('name' => 'Tito'))));
 		$this->assert_equals(1,count(Author::all(array('name' => 'Tito'))));
 	}
+
+	public function test_find_or_create_by_on_existing_record()
+	{
+		$this->assert_not_null(Author::find_or_create_by_name('Tito'));
+	}
+
+	public function test_find_or_create_by_creates_new_record()
+	{
+		$author = Author::find_or_create_by_name_and_encrypted_password('New Guy','pencil');
+		$this->assert_true($author->author_id > 0);
+		$this->assert_equals('pencil',$author->encrypted_password);
+	}
+
+	/**
+	 * @expectedException ActiveRecord\ActiveRecordException
+	 */
+	public function test_find_or_create_by_throws_exception_when_using_or()
+	{
+		Author::find_or_create_by_name_or_encrypted_password('New Guy','pencil');
+	}
 };
 ?>

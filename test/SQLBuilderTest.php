@@ -211,5 +211,20 @@ class SQLBuilderTest extends DatabaseTest
 		$conditions = SQLBuilder::create_conditions_from_underscored_string('id_and_my_name',$x,$map);
 		$this->assert_equals(array('id=? AND name=?',1,'Tito'),$conditions);
 	}
+
+	public function test_create_hash_from_underscored_string()
+	{
+		$values = array(1,'Tito');
+		$hash = SQLBuilder::create_hash_from_underscored_string('id_and_my_name',$values);
+		$this->assert_equals(array('id' => 1, 'my_name' => 'Tito'),$hash);
+	}
+
+	public function test_create_hash_from_underscored_string_with_mapped_columns()
+	{
+		$values = array(1,'Tito');
+		$map = array('my_name' => 'name');
+		$hash = SQLBuilder::create_hash_from_underscored_string('id_and_my_name',$values,$map);
+		$this->assert_equals(array('id' => 1, 'name' => 'Tito'),$hash);
+	}
 };
 ?>

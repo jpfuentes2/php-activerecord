@@ -172,7 +172,7 @@ class SQLBuilder
 	 * Converts a string like "id_and_name_or_z" into a conditions value like array("id=? AND name=? OR z=?", values, ...)
 	 *
 	 * @param $name Underscored string
-	 * @param $args Reference to the values for the field names. This is used
+	 * @param $values Array of values for the field names. This is used
 	 *   to determine what kind of bind marker to use: =?, IN(?), IS NULL
 	 * @param $map A hash of "mapped_column_name" => "real_column_name"
 	 * @return A conditions array in the form array(sql_string, value1, value2,...)
@@ -210,6 +210,28 @@ class SQLBuilder
 			$conditions[0] .= $name . $bind;
 		}
 		return $conditions;
+	}
+
+	/**
+	 * Like create_conditions_from_underscored_string but returns a hash of name => value array instead.
+	 * 
+	 * @params string $name A string containing attribute names connected with _and_ or _or_
+	 * @param $args Array of values for each attribute in $name
+	 * @param $map A hash of "mapped_column_name" => "real_column_name"
+	 * @return array A hash of array(name => value, ...)
+	 */
+	public static function create_hash_from_underscored_string($name, &$values=array(), &$map=null)
+	{
+		$parts = preg_split('/(_and_|_or_)/i',$name);
+		$hash = array();
+
+		for ($i=0,$n=count($parts); $i<$n; ++$i)
+		{
+			// map to correct name if $map was supplied
+			$name = $map && isset($map[$parts[$i]]) ? $map[$parts[$i]] : $parts[$i];
+			$hash[$name] = $values[$i];
+		}
+		return $hash;
 	}
 
 	private function apply_where_conditions($args)

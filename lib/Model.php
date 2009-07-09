@@ -816,10 +816,32 @@ class Model
 
 	/**
 	 * Enables the use of dynamic finders.
+	 * 
+	 * Dynamic finders are just an easy way to do queries quickly without having to
+	 * specify an options array with conditions in it.
 	 *
 	 * <code>
 	 * SomeModel::find_by_first_name('Tito');
 	 * SomeModel::find_by_first_name_and_last_name('Tito','the Grief');
+	 * SomeModel::find_by_first_name_or_last_name('Tito','the Grief');
+	 * SomeModel::find_all_by_last_name('Smith');
+	 * </code>
+	 * 
+	 * You can also create the model if the find call returned no results:
+	 * 
+	 * <code>
+	 * Person::find_or_create_by_name('Tito');
+	 * 
+	 * # would be the equivalent of
+	 * if (!Person::find_by_name('Tito'))
+	 *   Person::create(array('Tito'));
+	 * </code>
+	 * 
+	 * Some other examples of find_or_create_by:
+	 * 
+	 * <code>
+	 * Person::find_or_create_by_name_and_id('Tito',1);
+	 * Person::find_or_create_by_name_and_id(array('name' => 'Tito', 'id' => 1));
 	 * </code>
 	 *
 	 * @throws ActiveRecord\ActiveRecordException If invalid query
@@ -830,11 +852,29 @@ class Model
 	public static function __callStatic($method, $args)
 	{
 		$options = static::extract_and_validate_options($args);
+		$create = false;
+
+		if (substr($method,0,17) == 'find_or_create_by')
+		{
+			$attributes = substr($method,17);
+
+			// can't take any finders with OR in it when doing a find_or_create_by
+			if (strpos($attributes,'_or_') !== false)
+				throw new ActiveRecordException("Cannot use OR'd attributes in find_or_create_by");
+
+			$create = true;
+			$method = 'find_by' . substr($method,17);
+		}
 
 		if (substr($method,0,7) === 'find_by')
 		{
-			$options['conditions'] = SQLBuilder::create_conditions_from_underscored_string(substr($method,8),$args,static::$alias_attribute);
-			return static::find('first',$options);
+			$attributes = substr($method,8);
+			$options['conditions'] = SQLBuilder::create_conditions_from_underscored_string($attributes,$args,static::$alias_attribute);
+
+			if (!($ret = static::find('first',$options)) && $create)
+				return static::create(SQLBuilder::create_hash_from_underscored_string($attributes,$args,static::$alias_attribute));
+
+			return $ret;
 		}
 		elseif (substr($method,0,11) === 'find_all_by')
 		{
