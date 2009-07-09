@@ -223,7 +223,16 @@ class ActiveRecordWriteTest extends DatabaseTest
 		$author = Author::create(array('author_id' => 9999, 'name' => 'blah'));
 		$this->assert_not_null(Author::find($author->id));
 	}
-	
+
+	/**
+	 * @expectedException ActiveRecord\ReadOnlyException
+	 */
+	public function test_readonly()
+	{
+		$author = Author::first(array('readonly' => true));
+		$author->save();
+	}
+
 	private function make_new_book_and($save=true)
 	{
 		$book = new Book();
