@@ -174,6 +174,10 @@ class Table
 		if (array_key_exists('group',$options))
 			$sql->group($options['group']);
 
+		if (array_key_exists('having',$options))
+			$sql->having($options['having']);
+
+
 		$readonly = (array_key_exists('readonly',$options) && $options['readonly']) ? true : false;
 
 		return $this->find_by_sql($sql->to_s(),$sql->get_where_values(), $readonly);

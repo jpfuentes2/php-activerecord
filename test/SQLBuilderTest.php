@@ -88,6 +88,12 @@ class SQLBuilderTest extends DatabaseTest
 		$this->assert_equals('SELECT * FROM authors GROUP BY name',(string)$this->sql);
 	}
 
+	public function test_having()
+	{
+		$this->sql->having("created_at > '2009-01-01'");
+		$this->assert_equals("SELECT * FROM authors HAVING created_at > '2009-01-01'", (string)$this->sql);
+	}
+
 	/**
 	 * @expectedException ActiveRecord\ActiveRecordException
 	 */

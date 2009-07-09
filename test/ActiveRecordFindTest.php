@@ -362,6 +362,12 @@ class ActiveRecordFindTest extends DatabaseTest
 		$this->assert_equals(1, $author->id);
 	}
 
+	public function test_having()
+	{
+		$author = Author::first(array('group' => "date(created_at)", 'having' => "created_at > '2009-01-01'"));
+		$this->assert_true(strpos(Author::table()->last_sql, "GROUP BY date(created_at) HAVING created_at > '2009-01-01'") !== false);
+	}
+
 	/**
 	 * @expectedException ActiveRecord\DatabaseException
 	 */

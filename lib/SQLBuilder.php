@@ -6,7 +6,7 @@ namespace ActiveRecord;
 
 /**
  * Helper class for building sql statements progmatically.
- * 
+ *
  * @package ActiveRecord
  * @subpackage Internal
  */
@@ -21,6 +21,7 @@ class SQLBuilder
 	private $limit;
 	private $offset;
 	private $group;
+	private $having;
 
 	// for where
 	private $where;
@@ -82,6 +83,12 @@ class SQLBuilder
 	public function group($group)
 	{
 		$this->group = $group;
+		return $this;
+	}
+
+	public function having($having)
+	{
+		$this->having = $having;
 		return $this;
 	}
 
@@ -273,6 +280,9 @@ class SQLBuilder
 
 		if ($this->group)
 			$sql .= " GROUP BY $this->group";
+
+		if ($this->having)
+			$sql .= " HAVING $this->having";
 
 		if ($this->limit || $this->offset)
 			$sql = $this->connection->limit($sql,$this->offset,$this->limit);
