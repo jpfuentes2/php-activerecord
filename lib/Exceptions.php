@@ -92,7 +92,7 @@ class ReadOnlyException extends ModelException
 	 */
 	public function __construct($class_name, $method_name)
 	{
-		$this->message = "Model ".get_class($this)." cannot be $method_name because it is set to read only";
+		$this->message = "{$class_name}::{$method_name}() cannot be invoked because this model is set to read only";
 		parent::__construct();
 	}
 };
