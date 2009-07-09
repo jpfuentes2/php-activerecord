@@ -345,5 +345,24 @@ class ActiveRecordFindTest extends DatabaseTest
 		$author = Author::find_by_name("Tito's");
 		$this->assert_not_equals("Tito's",Author::table()->last_sql);
 	}
+
+	public function test_from()
+	{
+		$author = Author::find('first', array('from' => 'books'));
+		$this->assert_true($author instanceof Author);
+		$this->assert_not_null($author->book_id);
+
+		$author = Author::find('first', array('from' => 'authors'));
+		$this->assert_true($author instanceof Author);
+		$this->assert_equals(1, $author->id);
+	}
+
+	/**
+	 * @expectedException ActiveRecord\DatabaseException
+	 */
+	public function test_from_with_invalid_table()
+	{
+		$author = Author::find('first', array('from' => 'wrong_authors_table'));
+	}
 };
 ?>

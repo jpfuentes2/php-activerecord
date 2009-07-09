@@ -6,13 +6,13 @@ namespace ActiveRecord;
 use DateTime;
 
 /**
- * 
+ *
  */
 require_once 'Relationship.php';
 
 /**
  * Manages reading and writing to a database table.
- * 
+ *
  * This class manages a database table and is used by the Model class for
  * reading and writing to its database table. There is one instance of Table
  * for every table you have a model for.
@@ -70,9 +70,9 @@ class Table
 		if (!isset(self::$cache[$model_class_name]))
 		{
 			/* do not place set_assoc in constructor..it will lead to infinite loop due to
-			   relationships requesting the model's table, but the cache hasn't been set yet */	
+			   relationships requesting the model's table, but the cache hasn't been set yet */
 			self::$cache[$model_class_name] = new Table($model_class_name);
-			self::$cache[$model_class_name]->set_associations(); 
+			self::$cache[$model_class_name]->set_associations();
 		}
 
 		return self::$cache[$model_class_name];
@@ -135,7 +135,8 @@ class Table
 
 	public function find($options)
 	{
-		$sql = new SQLBuilder($this->conn,$this->get_fully_qualified_table_name());
+		$table = array_key_exists('from', $options) ? $options['from'] : $this->get_fully_qualified_table_name();
+		$sql = new SQLBuilder($this->conn, $table);
 
 		if (array_key_exists('select',$options))
 			$sql->select($options['select']);
