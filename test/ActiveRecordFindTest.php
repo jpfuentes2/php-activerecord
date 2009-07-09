@@ -321,15 +321,20 @@ class ActiveRecordFindTest extends DatabaseTest
 
 	public function test_joins_on_model_with_inferred_stuff()
 	{
-		$x = JoinBook::first(array('joins' => array('Author','LEFT JOIN authors a ON(books.secondary_author_id=a.author_id)')));
+		$x = JoinBook::first(array('joins' => array('Author')));
+		$this->assert_true(strpos(JoinBook::table()->last_sql,'INNER JOIN authors ON(books.author_id=authors.author_id)') !== false);
+	}
+
+	public function test_joins_on_model_with_inferred_stuff_also_creates_additional_joins()
+	{
+		JoinBook::first(array('joins' => array('JoinAuthor','LEFT JOIN authors a ON(books.secondary_author_id=a.author_id)')));
 		$this->assert_true(strpos(JoinBook::table()->last_sql,'INNER JOIN authors ON(books.author_id=authors.author_id)') !== false);
 		$this->assert_true(strpos(JoinBook::table()->last_sql,'LEFT JOIN authors a ON(books.secondary_author_id=a.author_id)') !== false);
 	}
 
 	public function test_joins_on_model_with_explicit_pk_and_table()
 	{
-		JoinBook::first(array('joins' => array('JoinAuthor','LEFT JOIN authors a ON(books.secondary_author_id=a.author_id)')));
-		$this->assert_true(strpos(JoinBook::table()->last_sql,'INNER JOIN authors ON(books.author_id=authors.author_id)') !== false);
+		JoinBook::first(array('joins' => array('LEFT JOIN authors a ON(books.secondary_author_id=a.author_id)')));
 		$this->assert_true(strpos(JoinBook::table()->last_sql,'LEFT JOIN authors a ON(books.secondary_author_id=a.author_id)') !== false);
 	}
 
