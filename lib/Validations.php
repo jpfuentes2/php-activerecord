@@ -10,6 +10,8 @@
 
 namespace ActiveRecord;
 use ActiveRecord\Model;
+use IteratorAggregate;
+use ArrayIterator;
 
 /**
  * @package ActiveRecord
@@ -370,7 +372,7 @@ class Validations
 	}
 }
 
-class Errors
+class Errors implements IteratorAggregate
 {
    	private $model;
 	private $errors;
@@ -457,28 +459,22 @@ class Errors
 	      	return count($errors) == 1 ? $errors[0] : $errors;
     }
 
-	public function each()
-   	{
-   	}
-
-    public function each_full()
-    {
-    	;
-    }
-
     public function full_messages($implode = array())
     {
     	$fullMessages = array();
 
-	    foreach($this->errors as $attribute => $messages)
-	    {
-    	    foreach ($messages as $msg)
-        	{
- 	     		if (is_null($msg))
-          			continue;
+    	if ($this->errors)
+    	{
+		    foreach ($this->errors as $attribute => $messages)
+		    {
+	    	    foreach ($messages as $msg)
+	        	{
+	 	     		if (is_null($msg))
+	          			continue;
 
-          		$fullMessages[] =  Utils::human_attribute($attribute) . " " . $msg;
-         	 }
+	          		$fullMessages[] =  Utils::human_attribute($attribute) . " " . $msg;
+	         	 }
+	    	}
     	}
 
     	if (isset($implode['implode']) && isset($implode['glue']))
@@ -508,6 +504,11 @@ class Errors
       		$count += count($error);
 
       	return $count;
+    }
+
+    public function getIterator()
+    {
+    	return new ArrayIterator($this->full_messages());
     }
 };
 ?>
