@@ -34,6 +34,18 @@ class ValidationsTest extends SnakeCase_PHPUnit_Framework_TestCase
 		$this->assert_false($book->is_valid());
 	}
 
+	public function test_is_invalid()
+	{
+		$book = new Book();
+		$this->assert_false($book->is_invalid());
+	}
+
+	public function test_is_invalid_is_true()
+	{
+		$book = new BookValidations();
+		$this->assert_true($book->is_invalid());
+	}
+
 	public function test_is_iterable()
 	{
 		$book = new BookValidations();

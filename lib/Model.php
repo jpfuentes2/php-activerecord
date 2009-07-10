@@ -674,11 +674,23 @@ class Model
 	/**
 	 * Run validations on model
 	 *
+	 * @see is_invalid
 	 * @return boolean True if passed validators otherwise false
 	 */
 	public function is_valid()
 	{
-		return $this->_validate(false);
+		return $this->_validate();
+	}
+
+	/**
+	 * Runs validations and returns true if invalid.
+	 *
+	 * @see is_valid
+	 * @return boolean True if validation failed
+	 */
+	public function is_invalid()
+	{
+		return !$this->_validate();
 	}
 
 	/**
