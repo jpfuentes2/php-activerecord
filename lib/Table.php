@@ -225,7 +225,8 @@ class Table
 		$sql = new SQLBuilder($this->conn,$this->get_fully_qualified_table_name());
 		$sql->insert($data,$this->pk[0],$this->sequence);
 
-		return $this->conn->query(($this->last_sql = $sql->to_s()),array_values($data));
+		$values = array_values($data);
+		return $this->conn->query(($this->last_sql = $sql->to_s()),$values);
 	}
 
 	public function update(&$data, $where)
