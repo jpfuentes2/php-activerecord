@@ -1054,7 +1054,7 @@ class Model
 		$num_args = count($args);
 		$single = true;
 
-		if ($num_args > 0 && ($args[0] == 'all' || $args[0] == 'first' || $args[0] == 'last'))
+		if ($num_args > 0 && ($args[0] === 'all' || $args[0] === 'first' || $args[0] === 'last'))
 		{
 			switch ($args[0])
 			{

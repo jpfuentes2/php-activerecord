@@ -395,5 +395,13 @@ class ActiveRecordFindTest extends DatabaseTest
 	{
 		Author::find_or_create_by_name_or_encrypted_password('New Guy','pencil');
 	}
+
+	/**
+	 * @expectedException ActiveRecord\RecordNotFound
+	 */
+	public function test_find_by_zero()
+	{
+		Author::find(0);
+	}
 };
 ?>
