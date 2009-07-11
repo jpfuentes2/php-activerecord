@@ -236,7 +236,8 @@ class Table
 		$sql = new SQLBuilder($this->conn,$this->get_fully_qualified_table_name());
 		$sql->update($data)->where($where);
 
-		return $this->conn->query(($this->last_sql = $sql->to_s()),$sql->bind_values());
+		$values = $sql->bind_values();
+		return $this->conn->query(($this->last_sql = $sql->to_s()),$values);
 	}
 
 	public function delete($data)
@@ -246,7 +247,8 @@ class Table
 		$sql = new SQLBuilder($this->conn,$this->get_fully_qualified_table_name());
 		$sql->delete($data);
 
-		return $this->conn->query(($this->last_sql = $sql->to_s()),$sql->bind_values());
+		$values = $sql->bind_values();
+		return $this->conn->query(($this->last_sql = $sql->to_s()),$values);
 	}
 
 	/**
