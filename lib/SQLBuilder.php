@@ -215,7 +215,7 @@ class SQLBuilder
 	/**
 	 * Like create_conditions_from_underscored_string but returns a hash of name => value array instead.
 	 * 
-	 * @params string $name A string containing attribute names connected with _and_ or _or_
+	 * @param string $name A string containing attribute names connected with _and_ or _or_
 	 * @param $args Array of values for each attribute in $name
 	 * @param $map A hash of "mapped_column_name" => "real_column_name"
 	 * @return array A hash of array(name => value, ...)

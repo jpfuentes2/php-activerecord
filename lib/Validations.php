@@ -372,6 +372,9 @@ class Validations
 	}
 }
 
+/**
+ * @package ActiveRecord
+ */
 class Errors implements IteratorAggregate
 {
    	private $model;

@@ -157,6 +157,8 @@ abstract class AbstractRelationship implements InterfaceRelationship
 };
 
 /**
+ * Has Many!
+ * 
  * @package ActiveRecord
  */
 class HasMany extends AbstractRelationship

@@ -25,7 +25,7 @@ use DateTime;
 class Model
 {
 	/**
-	 * An instance of ActiveRecord\Errors and will be instantiated once a write method is called.
+	 * An instance of {@link Errors} and will be instantiated once a write method is called.
 	 *
 	 * @var object
 	 */
@@ -196,7 +196,7 @@ class Model
 	 * Constructs a model.
 	 *
 	 * When a user instantiates a new object (e.g.: it was not ActiveRecord that instantiated via a find)
-	 * then @var $attributes will be mapped according to the schema's defaults. Otherwise, the given @param
+	 * then @var $attributes will be mapped according to the schema's defaults. Otherwise, the given
 	 * $attributes will be mapped via set_attributes_via_mass_assignment.
 	 *
 	 * <code>
@@ -207,7 +207,7 @@ class Model
 	 * @param boolean $guard_attributes Set to true to guard attributes
 	 * @param boolean $instantiating_via_find Set to true if this model is being created from a find call
 	 * @param boolean $new_record Set to true if this should be considered a new record
-	 * @return object
+	 * @return Model An instance of {@link Model}
 	 */
 	public function __construct(array $attributes=array(), $guard_attributes=true, $instantiating_via_find=false, $new_record=true)
 	{
@@ -229,7 +229,7 @@ class Model
 	 * accessed is 'id' then it will return the model's primary key no matter what the actual attribute name is
 	 * for the primary key.
 	 *
-	 * @throws ActiveRecord\UndefinedPropertyException Thrown if name could not be resolved to an attribute, relationship, ...
+	 * @throws {@link UndefinedPropertyException} Thrown if name could not be resolved to an attribute, relationship, ...
 	 * @param string $name Name of an attribute
 	 * @return mixed The value of the attribute
 	 */
@@ -300,7 +300,7 @@ class Model
 	/**
 	 * Magic allows un-defined attributes to set via $attributes
 	 *
-	 * @throws ActiveRecord\UndefinedPropertyException if $name does not exist
+	 * @throws {@link UndefinedPropertyException} if $name does not exist
 	 * @param string $name Name of attribute, relationship or other to set
 	 * @param mixed $value The value
 	 * @return mixed The value
@@ -332,7 +332,7 @@ class Model
 	 * Assign a value to an attribute.
 	 *
 	 * @param string $name Name of the attribute
-	 * @param mixed $value Value of the attribute
+	 * @param mixed &$value Value of the attribute
 	 * @return mixed The attribute value
 	 */
 	public function assign_attribute($name, &$value)
@@ -388,7 +388,7 @@ class Model
 	/**
 	 * Returns an associative array containing values for all the attributes in $attributes
 	 *
-	 * @param array $properties Array containing attribute names
+	 * @param array $attributes Array containing attribute names
 	 * @return array A hash containing $name => $value
 	 */
 	public function get_values_for($attributes)
@@ -477,7 +477,7 @@ class Model
 	/**
 	 * Retrieve the connection for this model.
 	 *
-	 * @return object An instance of ActiveRecord\Connection
+	 * @return object An instance of {@link Connection}
 	 */
 	public static function connection()
 	{
@@ -485,7 +485,7 @@ class Model
 	}
 
 	/**
-	 * Returns the ActiveRecord\Table object for this model.
+	 * Returns the {@link Table} object for this model.
 	 *
 	 * Be sure to call in static scoping:
 	 *
@@ -493,7 +493,7 @@ class Model
 	 * static::table();
 	 * </code>
 	 *
-	 * @return object An instance of ActiveRecord\Table
+	 * @return Table An instance of {@link Table}
 	 */
 	public static function table()
 	{
@@ -505,7 +505,7 @@ class Model
 	 *
 	 * @param array $attributes Array of the models attributes
 	 * @param boolean $validate True if the validators should be run
-	 * @return object An instance ActiveRecord\Model
+	 * @return object An instance {@link Model}
 	 */
 	public static function create($attributes, $validate=true)
 	{
@@ -856,10 +856,10 @@ class Model
 	 * Person::find_or_create_by_name_and_id(array('name' => 'Tito', 'id' => 1));
 	 * </code>
 	 *
-	 * @throws ActiveRecord\ActiveRecordException If invalid query
+	 * @throws {@link ActiveRecordException} If invalid query
 	 * @param string $method Name of method
 	 * @param mixed $args Method args
-	 * @return object An instance of ActiveRecord\Model
+	 * @return Model An instance of {@link Model}
 	 */
 	public static function __callStatic($method, $args)
 	{
@@ -902,7 +902,7 @@ class Model
 	 *
 	 * @param string $method Name of method
 	 * @param mixed $args Method args
-	 * @return object An instance of a given ActiveRecord\Relationship
+	 * @return mixed An instance of a given {@link AbstractRelationship}
 	 */
 	public function __call($method, $args)
 	{
@@ -971,7 +971,7 @@ class Model
 	 * Alias for self::find('first').
 	 *
 	 * @see find
-	 * @return object The first matched record or null if not found
+	 * @return Model The first matched record or null if not found
 	 */
 	public static function first(/* ... */)
 	{
@@ -982,7 +982,7 @@ class Model
 	 * Alias for self::find('last')
 	 *
 	 * @see find
-	 * @return object The last matched record or null if not found
+	 * @return Model The last matched record or null if not found
 	 */
 	public static function last(/* ... */)
 	{
@@ -1036,7 +1036,7 @@ class Model
 	 * <li>group: A SQL group by fragment</li>
 	 * </ul>
 	 *
-	 * @throws ActiveRecord\RecordNotFound if no options are passed
+	 * @throws {@link RecordNotFound} if no options are passed
 	 * @return mixed An array of records found if doing a find_all otherwise a
 	 *   single Model object or null if it wasn't found. NULL is only return when
 	 *   doing a first/last find. If doing an all find and no records matched this
@@ -1097,10 +1097,10 @@ class Model
 	 * Finder method which will find by a single or array of primary keys for this model.
 	 *
 	 * @see find
-	 * @throws ActiveRecord\RecordNotFound if a record could not be found with the @param $values passed
-	 * @param $values mixed An array containing values for the pk
-	 * @param $options mixed An options array
-	 * @return object An instance of ActiveRecord\Model
+	 * @throws {@link RecordNotFound} if a record could not be found with the $values passed
+	 * @param array $values An array containing values for the pk
+	 * @param array $options An options array
+	 * @return Model an instance of {@link Model}
 	 */
 	public static function find_by_pk($values, $options)
 	{
@@ -1153,7 +1153,7 @@ class Model
 	/**
 	 * Determines if the specified array is a valid ActiveRecord options array.
 	 *
-	 * @throws ActiveRecord\ActiveRecordException If the array contained any invalid options
+	 * @throws {@link ActiveRecordException} If the array contained any invalid options
 	 * @param array $array An options array
 	 * @param bool $throw True to throw an exception if not valid
 	 * @return boolean True if valid otherwise valse
@@ -1181,7 +1181,7 @@ class Model
 	 *
 	 * This needs to eventually support composite keys.
 	 *
-	 * @params mixed $args Primary key value(s)
+	 * @param mixed $args Primary key value(s)
 	 * @return array An array in the form array(name => value, ...)
 	 */
 	public static function pk_conditions($args)
@@ -1283,7 +1283,7 @@ class Model
 	 *
 	 * @param Closure $closure The closure to execute. To cause a rollback have your closure return false or throw an exception.
 	 */
-	public static function transaction(\Closure $closure)
+	public static function transaction($closure)
 	{
 		$connection = static::connection();
 
