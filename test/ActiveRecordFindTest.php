@@ -164,6 +164,12 @@ class ActiveRecordFindTest extends DatabaseTest
 		$this->assert_not_null($author);
 	}
 
+	public function test_find_with_conditions()
+	{
+		$author = Author::find(array('conditions' => array('author_id=? and name=?', 1, 'Tito')));
+		$this->assert_equals(1,$author->author_id);
+	}
+
 	public function test_find_last()
 	{
 		$author = Author::last();
@@ -221,6 +227,7 @@ class ActiveRecordFindTest extends DatabaseTest
 	{
 		$this->assert_true(Author::exists(1));
 		$this->assert_true(Author::exists(array('conditions' => 'author_id=1')));
+		$this->assert_true(Author::exists(array('conditions' => array('author_id=? and name=?', 1, 'Tito'))));
 		$this->assert_false(Author::exists(9999999));
 		$this->assert_false(Author::exists(array('conditions' => 'author_id=999999')));
 	}
