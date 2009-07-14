@@ -207,7 +207,7 @@ class Model
 	 * @param boolean $guard_attributes Set to true to guard attributes
 	 * @param boolean $instantiating_via_find Set to true if this model is being created from a find call
 	 * @param boolean $new_record Set to true if this should be considered a new record
-	 * @return Model An instance of {@link Model}
+	 * @return Model
 	 */
 	public function __construct(array $attributes=array(), $guard_attributes=true, $instantiating_via_find=false, $new_record=true)
 	{
@@ -229,9 +229,9 @@ class Model
 	 * accessed is 'id' then it will return the model's primary key no matter what the actual attribute name is
 	 * for the primary key.
 	 *
-	 * @throws {@link UndefinedPropertyException} Thrown if name could not be resolved to an attribute, relationship, ...
 	 * @param string $name Name of an attribute
 	 * @return mixed The value of the attribute
+	 * @throws {@link UndefinedPropertyException} if name could not be resolved to an attribute, relationship, ...
 	 */
 	public function &__get($name)
 	{
@@ -287,14 +287,14 @@ class Model
 	}
 
 	/**
-	 * Determines if an attribute name exists.
+	 * Determines if an attribute exists for this {@link Model}.
 	 *
-	 * @param string $name Name of an attribute
-	 * @return boolean Returns true if the attribute is valid for this Model
+	 * @param string $attribute_name
+	 * @return boolean
 	 */
-	public function __isset($name)
+	public function __isset($attribute_name)
 	{
-		return array_key_exists($name,$this->attributes);
+		return array_key_exists($attribute_name,$this->attributes);
 	}
 
 	/**
@@ -333,7 +333,7 @@ class Model
 	 *
 	 * @param string $name Name of the attribute
 	 * @param mixed &$value Value of the attribute
-	 * @return mixed The attribute value
+	 * @return mixed the attribute value
 	 */
 	public function assign_attribute($name, &$value)
 	{
@@ -353,7 +353,7 @@ class Model
 	/**
 	 * Returns hash of attributes that have been modified since loading the model.
 	 *
-	 * @return mixed Returns null if no dirty attributes otherwise returns array of dirty attributes.
+	 * @return mixed null if no dirty attributes otherwise returns array of dirty attributes.
 	 */
 	public function dirty_attributes()
 	{
@@ -367,7 +367,7 @@ class Model
 	/**
 	 * Returns a copy of the model's attributes hash.
 	 *
-	 * @return array The model's attribute data
+	 * @return array A copy of the model's attribute data
 	 */
 	public function attributes()
 	{
@@ -406,7 +406,7 @@ class Model
 	/**
 	 * Retrieves the name of the table for this Model.
 	 * 
-	 * @return string Returns the table name.
+	 * @return string
 	 */
 	public static function table_name()
 	{
@@ -434,8 +434,8 @@ class Model
 
 	/**
 	 * Determine if the model is in read-only mode.
-	 *
-	 * @return boolean Returns true if the model is read only
+	 * 
+	 * @return boolean
 	 */
 	public function is_readonly()
 	{
@@ -445,7 +445,7 @@ class Model
 	/**
 	 * Determine if the model is a new record.
 	 *
-	 * @return boolean Returns true if this is a new record that has not been saved
+	 * @return boolean
 	 */
 	public function is_new_record()
 	{
@@ -477,7 +477,7 @@ class Model
 	/**
 	 * Retrieve the connection for this model.
 	 *
-	 * @return object An instance of {@link Connection}
+	 * @return Connection
 	 */
 	public static function connection()
 	{
@@ -487,13 +487,9 @@ class Model
 	/**
 	 * Returns the {@link Table} object for this model.
 	 *
-	 * Be sure to call in static scoping:
+	 * Be sure to call in static scoping: static::table()
 	 *
-	 * <code>
-	 * static::table();
-	 * </code>
-	 *
-	 * @return Table An instance of {@link Table}
+	 * @return Table
 	 */
 	public static function table()
 	{
@@ -501,11 +497,11 @@ class Model
 	}
 
 	/**
-	 * Creates a model and save it to the database.
+	 * Creates a model and saves it to the database.
 	 *
 	 * @param array $attributes Array of the models attributes
 	 * @param boolean $validate True if the validators should be run
-	 * @return object An instance {@link Model}
+	 * @return Model
 	 */
 	public static function create($attributes, $validate=true)
 	{
@@ -598,9 +594,9 @@ class Model
 	}
 
 	/**
-	 * Delete this model from the database.
+	 * Deletes this model from the database and returns true if successful.
 	 *
-	 * @return boolean True if the model was deleted otherwise false
+	 * @return boolean
 	 */
 	public function delete()
 	{
@@ -672,10 +668,10 @@ class Model
 	}
 
 	/**
-	 * Run validations on model
+	 * Run validations on model and returns whether or not model passed validation.
 	 *
 	 * @see is_invalid
-	 * @return boolean True if passed validators otherwise false
+	 * @return boolean
 	 */
 	public function is_valid()
 	{
@@ -686,7 +682,7 @@ class Model
 	 * Runs validations and returns true if invalid.
 	 *
 	 * @see is_valid
-	 * @return boolean True if validation failed
+	 * @return boolean
 	 */
 	public function is_invalid()
 	{
@@ -797,9 +793,9 @@ class Model
 	}
 
 	/**
-	 * Reloads the attributes of this object from the database and the relationships.
+	 * Reloads the attributes and relationships of this object from the database.
 	 *
-	 * @return object $this
+	 * @return Model
 	 */
 	public function reload()
 	{
@@ -813,6 +809,8 @@ class Model
 
 	/**
 	 * Resets the dirty array.
+	 * 
+	 * @see dirty_attributes
 	 */
 	public function reset_dirty()
 	{
@@ -856,10 +854,11 @@ class Model
 	 * Person::find_or_create_by_name_and_id(array('name' => 'Tito', 'id' => 1));
 	 * </code>
 	 *
-	 * @throws {@link ActiveRecordException} If invalid query
 	 * @param string $method Name of method
 	 * @param mixed $args Method args
-	 * @return Model An instance of {@link Model}
+	 * @return Model
+	 * @throws {@link ActiveRecordException} if invalid query
+	 * @see find
 	 */
 	public static function __callStatic($method, $args)
 	{
@@ -929,7 +928,7 @@ class Model
 	 * Alias for self::find('all').
 	 *
 	 * @see find
-	 * @return array Array of records found
+	 * @return array array of records found
 	 */
 	public static function all(/* ... */)
 	{
@@ -940,11 +939,11 @@ class Model
 	 * Get a count of qualifying records.
 	 *
 	 * <code>
-	 * SomeModel::count(array('conditions' => 'amount > 3.14159265'));
+	 * YourModel::count(array('conditions' => 'amount > 3.14159265'));
 	 * </code>
 	 *
 	 * @see find
-	 * @return integer Number of records that matched the query
+	 * @return int Number of records that matched the query
 	 */
 	public static function count(/* ... */)
 	{
@@ -958,9 +957,15 @@ class Model
 
 	/**
 	 * Determine if a record exists.
+	 * 
+	 * <code>
+	 * SomeModel::exists(123);
+	 * SomeModel::exists(array('conditions' => array('id=? and name=?', 123, 'Tito')));
+	 * SomeModel::exists(array('id' => 123, 'name' => 'Tito'));
+	 * </code>
 	 *
 	 * @see find
-	 * @return boolean True if it exists otherwise false
+	 * @return boolean
 	 */
 	public static function exists(/* ... */)
 	{
@@ -996,47 +1001,48 @@ class Model
 	 *
 	 * <code>
 	 * # queries for the model with id=123
-	 * $model->find(123);
+	 * YourModel::find(123);
 	 *
 	 * # queries for model with id in(1,2,3)
-	 * $model->find(1,2,3);
+	 * YourModel::find(1,2,3);
 	 *
 	 * # finding by pk accepts an options array
-	 * $model->find(123,array('order' => 'name desc'));
+	 * YourModel::find(123,array('order' => 'name desc'));
 	 * </code>
 	 *
 	 * Finding by using a conditions array:
 	 *
 	 * <code>
-	 * $model->find('first', array('conditions' => array('name=?','Tito'), 'order' => 'name asc))
-	 * $model->find('all', array('conditions' => 'amount > 3.14159265'));
-	 * $model->find('all', array('conditions' => array('id in(?)', array(1,2,3))));
+	 * YourModel::find('first', array('conditions' => array('name=?','Tito'),
+	 *   'order' => 'name asc'))
+	 * YourModel::find('all', array('conditions' => 'amount > 3.14159265'));
+	 * YourModel::find('all', array('conditions' => array('id in(?)', array(1,2,3))));
 	 * </code>
 	 * 
 	 * Finding by using a hash:
 	 * 
 	 * <code>
-	 * $model->find(array('name' => 'Tito', 'id' => 1));
-	 * $model->find('first',array('name' => 'Tito', 'id' => 1));
-	 * $model->find('all',array('name' => 'Tito', 'id' => 1));
+	 * YourModel::find(array('name' => 'Tito', 'id' => 1));
+	 * YourModel::find('first',array('name' => 'Tito', 'id' => 1));
+	 * YourModel::find('all',array('name' => 'Tito', 'id' => 1));
 	 * </code>
 	 *
 	 * An options array can take the following parameters:
 	 *
 	 * <ul>
-	 * <li>select: A SQL fragment for what fields to return such as: '*', 'people.*', 'first_name, last_name, id'</li>
-	 * <li>joins: A SQL join fragment such as: 'JOIN roles ON(roles.user_id=user.id)'</li>
-	 * <li>include: TODO not implemented yet</li>
-	 * <li>conditions: A SQL fragment such as: 'id=1', array('id=1'), array('name=? and id=?','Tito',1), array('name IN(?)', array('Tito','Bob')),
+	 * <li><b>select:</b> A SQL fragment for what fields to return such as: '*', 'people.*', 'first_name, last_name, id'</li>
+	 * <li><b>joins:</b> A SQL join fragment such as: 'JOIN roles ON(roles.user_id=user.id)'</li>
+	 * <li><b>include:</b> TODO not implemented yet</li>
+	 * <li><b>conditions:</b> A SQL fragment such as: 'id=1', array('id=1'), array('name=? and id=?','Tito',1), array('name IN(?)', array('Tito','Bob')),
 	 * array('name' => 'Tito', 'id' => 1)</li>
-	 * <li>limit: Number of records to limit the query to</li>
-	 * <li>offset: The row offset to return results from for the query</li>
-	 * <li>order: A SQL fragment for order such as: 'name asc', 'name asc, id desc'</li>
-	 * <li>readonly: Return all the models in readonly mode</li>
-	 * <li>group: A SQL group by fragment</li>
+	 * <li><b>limit:</b> Number of records to limit the query to</li>
+	 * <li><b>offset:</b> The row offset to return results from for the query</li>
+	 * <li><b>order:</b> A SQL fragment for order such as: 'name asc', 'name asc, id desc'</li>
+	 * <li><b>readonly:</b> Return all the models in readonly mode</li>
+	 * <li><b>group:</b> A SQL group by fragment</li>
 	 * </ul>
 	 *
-	 * @throws {@link RecordNotFound} if no options are passed
+	 * @throws {@link RecordNotFound} if no options are passed or finding by pk and no records matched
 	 * @return mixed An array of records found if doing a find_all otherwise a
 	 *   single Model object or null if it wasn't found. NULL is only return when
 	 *   doing a first/last find. If doing an all find and no records matched this
@@ -1097,10 +1103,10 @@ class Model
 	 * Finder method which will find by a single or array of primary keys for this model.
 	 *
 	 * @see find
-	 * @throws {@link RecordNotFound} if a record could not be found with the $values passed
 	 * @param array $values An array containing values for the pk
 	 * @param array $options An options array
-	 * @return Model an instance of {@link Model}
+	 * @return Model
+	 * @throws {@link RecordNotFound} if a record could not be found
 	 */
 	public static function find_by_pk($values, $options)
 	{
@@ -1137,8 +1143,8 @@ class Model
 	 * Find using a raw SELECT query.
 	 *
 	 * <code>
-	 * $model->find_by_sql("SELECT * FROM people WHERE name=?",array('Tito'));
-	 * $model->find_by_sql("SELECT * FROM people WHERE name='Tito'");
+	 * YourModel::find_by_sql("SELECT * FROM people WHERE name=?",array('Tito'));
+	 * YourModel::find_by_sql("SELECT * FROM people WHERE name='Tito'");
 	 * </code>
 	 *
 	 * @param string $sql The raw SELECT query
@@ -1153,10 +1159,10 @@ class Model
 	/**
 	 * Determines if the specified array is a valid ActiveRecord options array.
 	 *
-	 * @throws {@link ActiveRecordException} If the array contained any invalid options
 	 * @param array $array An options array
 	 * @param bool $throw True to throw an exception if not valid
 	 * @return boolean True if valid otherwise valse
+	 * @throws {@link ActiveRecordException} if the array contained any invalid options
 	 */
 	public static function is_options_hash($array, $throw=true)
 	{
@@ -1179,8 +1185,7 @@ class Model
 	/**
 	 * Returns a hash containing the names => values of the primary key.
 	 *
-	 * This needs to eventually support composite keys.
-	 *
+	 * @internal This needs to eventually support composite keys.
 	 * @param mixed $args Primary key value(s)
 	 * @return array An array in the form array(name => value, ...)
 	 */
@@ -1194,9 +1199,8 @@ class Model
 	/**
 	 * Pulls out the options hash from $array if any.
 	 *
-	 * DO NOT remove the reference on $array.
-	 *
-	 * @param array $array An array
+	 * @internal DO NOT remove the reference on $array.
+	 * @param array &$array An array
 	 * @return array A valid options array
 	 */
 	public static function extract_and_validate_options(array &$array)
@@ -1230,7 +1234,7 @@ class Model
 	 * Returns a JSON representation of this model.
 	 *
 	 * @see Serialization
-	 * @param array $options An array containing options for json serialization (see Serialization class for valid options)
+	 * @param array $options An array containing options for json serialization (see {@link Serialization} for valid options)
 	 * @return string JSON representation of the model
 	 */
 	public function to_json(array $options=array())
@@ -1242,7 +1246,7 @@ class Model
 	 * Returns an XML representation of this model.
 	 *
 	 * @see Serialization
-	 * @param array $options An array containing options for xml serialization (see Serialization class for valid options)
+	 * @param array $options An array containing options for xml serialization (see {@link Serialization} for valid options)
 	 * @return string XML representation of the model
 	 */
 	public function to_xml(array $options=array())
@@ -1279,7 +1283,32 @@ class Model
 	}
 
 	/**
-	 * Execute a closure inside a transaction.
+	 * Executes a block of code inside a database transaction.
+	 * 
+	 * <code>
+	 * YourModel::transaction(function()
+	 * {
+	 *   YourModel::create(array("name" => "blah"));
+	 * });
+	 * </code>
+	 * 
+	 * If an exception is thrown inside the closure the transaction will
+	 * automatically be rolled back. You can also return false from your
+	 * closure to cause a rollback:
+	 * 
+	 * <code>
+	 * YourModel::transaction(function()
+	 * {
+	 *   YourModel::create(array("name" => "blah"));
+	 *   throw new Exception("rollback!");
+	 * });
+	 * 
+	 * YourModel::transaction(function()
+	 * {
+	 *   YourModel::create(array("name" => "blah"));
+	 *   return false; # rollback!
+	 * });
+	 * </code>
 	 *
 	 * @param Closure $closure The closure to execute. To cause a rollback have your closure return false or throw an exception.
 	 */

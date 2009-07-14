@@ -29,12 +29,12 @@ abstract class Connection
 	/**
 	 * Retrieve a database connection.
 	 *
-	 * @param string $url A database connection string (ex. mysql://user:pass@host[:port]/dbname)
+	 * @param string $connection_string_or_connection_name A database connection string (ex. mysql://user:pass@host[:port]/dbname)
 	 *   Everything after the protocol:// part is specific to the connection adapter.
 	 *   OR
 	 *   A connection name that is set in ActiveRecord\Config
 	 *   If null it will use the default connection specified by ActiveRecord\Config->set_default_connection
-	 * @return An ActiveRecord::Connection object
+	 * @return Connection
 	 */
 	public static function instance($connection_string_or_connection_name=null)
 	{
@@ -90,7 +90,7 @@ abstract class Connection
 	 * protocol://user:pass@host[:port]/dbname
 	 *
 	 * @param string $url A URL
-	 * @return The parsed URL as an object.
+	 * @return Object the parsed URL as an object.
 	 */
 	public static function parse_connection_url($url)
 	{
@@ -114,6 +114,8 @@ abstract class Connection
 
 	/**
 	 * Nope, you can't call this.
+	 * 
+	 * @return Connection
 	 */
 	protected function __construct($info)
 	{
@@ -130,7 +132,7 @@ abstract class Connection
 	 * Retrieves column meta data for the specified table.
 	 *
 	 * @param string $table Name of a table
-	 * @return An array of ActiveRecord::Column objects.
+	 * @return array An array of ActiveRecord::Column objects.
 	 */
 	public function columns($table)
 	{
@@ -148,7 +150,7 @@ abstract class Connection
 	/**
 	 * Escapes quotes in a string.
 	 *
-	 * @param $string string The string to be quoted.
+	 * @param string $string The string to be quoted.
 	 * @return string The string with any quotes in it properly escaped.
 	 */
 	public function escape($string)
@@ -159,7 +161,7 @@ abstract class Connection
 	/**
 	 * Return a default sequence name for the specified table.
 	 *
-	 * @return A sequence name or null if not supported.
+	 * @return string sequence name or null if not supported.
 	 */
 	public function get_sequence_name($table)
 	{
@@ -168,7 +170,7 @@ abstract class Connection
 
 	/**
 	 * Retrieve the insert id of the last model saved.
-	 * @return int.
+	 * @return int
 	 */
 	public function insert_id($sequence=null)
 	{
@@ -179,8 +181,8 @@ abstract class Connection
 	 * Execute a raw SQL query on the database.
 	 *
 	 * @param string $sql Raw SQL string to execute.
-	 * @param array $values Optional array of bind values
-	 * @return A result set handle or void if you used $handler closure.
+	 * @param array &$values Optional array of bind values
+	 * @return mixed A result set handle or void if you used $handler closure.
 	 */
 	public function query($sql, &$values=array())
 	{
