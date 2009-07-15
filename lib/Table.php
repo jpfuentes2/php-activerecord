@@ -103,14 +103,6 @@ class Table
 		$this->callback->register('after_save', function(Model $model) { $model->reset_dirty(); }, array('prepend' => true));
 	}
 
-	public function construct_inner_join_sql($self, $other_class_name)
-	{
-		$other = self::load($other_class_name);
-		$other_class_name = strtolower($other_class_name);
-
-		return "INNER JOIN $other->table ON($this->table." . Utils::singularize($other->table) . "_id={$other->table}.{$other->pk[0]})";
-	}
-
 	public function create_joins($joins)
 	{
 		if (!is_array($joins))
@@ -128,7 +120,7 @@ class Table
 				if (array_key_exists($value, $this->relationships))
 					$ret .= $this->get_relationship($value)->construct_inner_join_sql($this);
 				else
-					throw new RelationshipException("Relationship named 'author' has not been declared for class: {$this->class->getName()}");
+					throw new RelationshipException("Relationship named $value has not been declared for class: {$this->class->getName()}");
 			}
 			else
 				$ret .= $value;
