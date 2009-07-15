@@ -64,6 +64,28 @@ class RelationshipTest extends DatabaseTest
 		$this->assert_not_null($employee->id, $employee->$association_name->title);
 	}
 
+	/**
+	 * @expectedException ActiveRecord\RelationshipException
+	 */
+	public function test_joins_on_model_via_undeclared_association()
+	{
+		$x = JoinBook::first(array('joins' => array('author')));
+	}
+
+	public function test_joins_only_loads_given_model_attributes()
+	{
+		$x = Event::first(array('joins' => array('venue')));
+		$this->assert_true(strpos(Event::table()->last_sql,'SELECT `events`.*') !== false);
+		$this->assert_false(array_key_exists('city', $x->attributes()));
+	}
+
+	public function test_joins_combined_with_select_loads_all_attributes()
+	{
+		$x = Event::first(array('select' => 'events.*, venues.*', 'joins' => array('venue')));
+		$this->assert_true(strpos(Event::table()->last_sql,'SELECT events.*, venues.*') !== false);
+		$this->assert_true(array_key_exists('city', $x->attributes()));
+	}
+
 	public function test_belongs_to_basic()
 	{
 		$this->assert_default_belongs_to($this->get_relationship());
@@ -146,13 +168,19 @@ class RelationshipTest extends DatabaseTest
 		$venue = $event->create_venue($values);
 		$this->assert_not_null($venue->id);
 	}
-	
+
 	public function test_belongs_to_can_be_self_referential()
 	{
 		Author::$belongs_to = array(array('parent_author', 'class_name' => 'Author', 'foreign_key' => 'parent_author_id'));
-		$author = Author::first(); 
+		$author = Author::first();
 		$this->assert_equals(1, $author->id);
 		$this->assert_equals(3, $author->parent_author->id);
+	}
+
+	public function test_belongs_to_with_joins()
+	{
+		$x = Event::first(array('joins' => array('venue')));
+		$this->assert_true(strpos(Event::table()->last_sql,'INNER JOIN `venues` ON(`events`.venue_id = `venues`.id)') !== false);
 	}
 
 	public function test_has_many_basic()
@@ -281,6 +309,12 @@ class RelationshipTest extends DatabaseTest
 		$this->get_relationship()->hosts;
 	}
 
+	public function test_has_many_with_joins()
+	{
+		$x = Venue::first(array('joins' => array('events')));
+		$this->assert_true(strpos(Venue::table()->last_sql,'INNER JOIN `events` ON(`venues`.id = `events`.venue_id)') !== false);
+	}
+
 	public function test_has_one_basic()
 	{
 		$this->assert_default_has_one($this->get_relationship());
@@ -343,13 +377,19 @@ class RelationshipTest extends DatabaseTest
 		$employee->position->title = 'new title';
 		$this->assert_equals($employee->position->title, 'new title');
 	}
-	
+
 	public function test_has_one_can_be_self_referential()
 	{
 		Author::$has_one[1] = array('parent_author', 'class_name' => 'Author', 'foreign_key' => 'parent_author_id');
-		$author = Author::first(); 
+		$author = Author::first();
 		$this->assert_equals(1, $author->id);
 		$this->assert_equals(3, $author->parent_author->id);
+	}
+
+	public function test_has_one_with_joins()
+	{
+		$x = Employee::first(array('joins' => array('position')));
+		$this->assert_true(strpos(Employee::table()->last_sql,'INNER JOIN `positions` ON(`employees`.id = `positions`.employee_id)') !== false);
 	}
 
 	public function test_dont_attempt_to_load_if_all_foreign_keys_are_null()

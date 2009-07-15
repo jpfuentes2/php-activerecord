@@ -33,7 +33,7 @@ abstract class AbstractRelationship implements InterfaceRelationship
 		$this->options = $this->merge_association_options($options);
 
 		$relationship = strtolower(denamespace(get_called_class()));
-		
+
 		if ($relationship === 'hasmany' || $relationship === 'hasandbelongstomany')
 			$this->poly_relationship = true;
 
@@ -151,6 +151,31 @@ abstract class AbstractRelationship implements InterfaceRelationship
 	}
 
 	/**
+	 * Creates INNER JOIN SQL for associations.
+	 *
+	 * @param Table $from_table the table used for the FROM SQL statement
+	 * @return string SQL INNER JOIN fragment
+	 */
+	public function construct_inner_join_sql(Table $from_table)
+	{
+		$join_table = Table::load($this->class_name);
+		$join_table_name = $join_table->get_fully_qualified_table_name();
+		$from_table_name = $from_table->get_fully_qualified_table_name();
+		$foreign_key = $this->foreign_key[0];
+		$join_primary_key = $this->primary_key[0];
+
+		// need to flip the logic when the key is on the other table
+		if ($this instanceof HasMany)
+		{
+			$this->set_keys($from_table->class->getName());
+			$join_primary_key = $this->foreign_key[0];
+			$foreign_key = $this->primary_key[0];
+		}
+
+		return "INNER JOIN $join_table_name ON($from_table_name.$foreign_key = $join_table_name.$join_primary_key)";
+	}
+
+	/**
 	 * @param $model The model this relationship belongs to
 	 */
 	abstract function load(Model $model);
@@ -158,14 +183,14 @@ abstract class AbstractRelationship implements InterfaceRelationship
 
 /**
  * Has Many!
- * 
+ *
  * @package ActiveRecord
  */
 class HasMany extends AbstractRelationship
 {
 	private $has_one = false;
 	private $through;
-	private $primary_key;
+	protected $primary_key;
 	static protected $valid_association_options = array('primary_key', 'order', 'group', 'having', 'limit', 'offset', 'through', 'source');
 
 	public function __construct($options=array())
@@ -188,14 +213,14 @@ class HasMany extends AbstractRelationship
 		return Table::load($this->class_name);
 	}
 
-	private function set_keys(Model $model)
+	protected function set_keys($model_class_name)
 	{
 		//infer from class_name
 		if (!$this->foreign_key)
-			$this->foreign_key = array($this->keyify(get_class($model)));
+			$this->foreign_key = array($this->keyify($model_class_name));
 
 		if (!$this->primary_key)
-			$this->primary_key = $model->get_primary_key();
+			$this->primary_key = Table::load($model_class_name)->pk;
 	}
 
 	public function load(Model $model)
@@ -203,7 +228,7 @@ class HasMany extends AbstractRelationship
 		$inflector = Inflector::instance();
 		$class_name = $this->class_name;
 		$table = $this->get_table();
-		$this->set_keys($model);
+		$this->set_keys(get_class($model));
 
 		if ($this->through)
 		{
@@ -302,7 +327,7 @@ class BelongsTo extends AbstractRelationship
 
 		if (!$this->class_name)
 			$this->set_inferred_class_name();
-			
+
 		//infer from class_name
 		if (!$this->foreign_key)
 			$this->foreign_key = array($this->keyify($this->class_name));

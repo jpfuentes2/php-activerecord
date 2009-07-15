@@ -124,7 +124,12 @@ class Table
 			$ret .= $space;
 
 			if (stripos($value,'JOIN ') === false)
-				$ret .= $this->construct_inner_join_sql($this,$value);
+			{
+				if (array_key_exists($value, $this->relationships))
+					$ret .= $this->get_relationship($value)->construct_inner_join_sql($this);
+				else
+					throw new RelationshipException("Relationship named 'author' has not been declared for class: {$this->class->getName()}");
+			}
 			else
 				$ret .= $value;
 
@@ -138,11 +143,17 @@ class Table
 		$table = array_key_exists('from', $options) ? $options['from'] : $this->get_fully_qualified_table_name();
 		$sql = new SQLBuilder($this->conn, $table);
 
+		if (array_key_exists('joins',$options))
+		{
+			$sql->joins($this->create_joins($options['joins']));
+
+			// by default, an inner join will not fetch the fields from the joined table
+			if (!array_key_exists('select', $options))
+				$options['select'] = $this->get_fully_qualified_table_name() . '.*';
+		}
+
 		if (array_key_exists('select',$options))
 			$sql->select($options['select']);
-
-		if (array_key_exists('joins',$options))
-			$sql->joins($this->create_joins($options['joins']));
 
 		if (array_key_exists('conditions',$options))
 		{
@@ -176,7 +187,6 @@ class Table
 
 		if (array_key_exists('having',$options))
 			$sql->having($options['having']);
-
 
 		$readonly = (array_key_exists('readonly',$options) && $options['readonly']) ? true : false;
 

@@ -405,7 +405,7 @@ class Model
 
 	/**
 	 * Retrieves the name of the table for this Model.
-	 * 
+	 *
 	 * @return string
 	 */
 	public static function table_name()
@@ -434,7 +434,7 @@ class Model
 
 	/**
 	 * Determine if the model is in read-only mode.
-	 * 
+	 *
 	 * @return boolean
 	 */
 	public function is_readonly()
@@ -809,7 +809,7 @@ class Model
 
 	/**
 	 * Resets the dirty array.
-	 * 
+	 *
 	 * @see dirty_attributes
 	 */
 	public function reset_dirty()
@@ -826,7 +826,7 @@ class Model
 
 	/**
 	 * Enables the use of dynamic finders.
-	 * 
+	 *
 	 * Dynamic finders are just an easy way to do queries quickly without having to
 	 * specify an options array with conditions in it.
 	 *
@@ -836,19 +836,19 @@ class Model
 	 * SomeModel::find_by_first_name_or_last_name('Tito','the Grief');
 	 * SomeModel::find_all_by_last_name('Smith');
 	 * </code>
-	 * 
+	 *
 	 * You can also create the model if the find call returned no results:
-	 * 
+	 *
 	 * <code>
 	 * Person::find_or_create_by_name('Tito');
-	 * 
+	 *
 	 * # would be the equivalent of
 	 * if (!Person::find_by_name('Tito'))
 	 *   Person::create(array('Tito'));
 	 * </code>
-	 * 
+	 *
 	 * Some other examples of find_or_create_by:
-	 * 
+	 *
 	 * <code>
 	 * Person::find_or_create_by_name_and_id('Tito',1);
 	 * Person::find_or_create_by_name_and_id(array('name' => 'Tito', 'id' => 1));
@@ -957,7 +957,7 @@ class Model
 
 	/**
 	 * Determine if a record exists.
-	 * 
+	 *
 	 * <code>
 	 * SomeModel::exists(123);
 	 * SomeModel::exists(array('conditions' => array('id=? and name=?', 123, 'Tito')));
@@ -1018,9 +1018,9 @@ class Model
 	 * YourModel::find('all', array('conditions' => 'amount > 3.14159265'));
 	 * YourModel::find('all', array('conditions' => array('id in(?)', array(1,2,3))));
 	 * </code>
-	 * 
+	 *
 	 * Finding by using a hash:
-	 * 
+	 *
 	 * <code>
 	 * YourModel::find(array('name' => 'Tito', 'id' => 1));
 	 * YourModel::find('first',array('name' => 'Tito', 'id' => 1));
@@ -1031,7 +1031,7 @@ class Model
 	 *
 	 * <ul>
 	 * <li><b>select:</b> A SQL fragment for what fields to return such as: '*', 'people.*', 'first_name, last_name, id'</li>
-	 * <li><b>joins:</b> A SQL join fragment such as: 'JOIN roles ON(roles.user_id=user.id)'</li>
+	 * <li><b>joins:</b> A SQL join fragment such as: 'JOIN roles ON(roles.user_id=user.id)' or a named association on the model</li>
 	 * <li><b>include:</b> TODO not implemented yet</li>
 	 * <li><b>conditions:</b> A SQL fragment such as: 'id=1', array('id=1'), array('name=? and id=?','Tito',1), array('name IN(?)', array('Tito','Bob')),
 	 * array('name' => 'Tito', 'id' => 1)</li>
@@ -1225,7 +1225,7 @@ class Model
 					throw $e;
 
 				$options = array('conditions' => $last);
-			} 
+			}
 		}
 		return $options;
 	}
@@ -1284,25 +1284,25 @@ class Model
 
 	/**
 	 * Executes a block of code inside a database transaction.
-	 * 
+	 *
 	 * <code>
 	 * YourModel::transaction(function()
 	 * {
 	 *   YourModel::create(array("name" => "blah"));
 	 * });
 	 * </code>
-	 * 
+	 *
 	 * If an exception is thrown inside the closure the transaction will
 	 * automatically be rolled back. You can also return false from your
 	 * closure to cause a rollback:
-	 * 
+	 *
 	 * <code>
 	 * YourModel::transaction(function()
 	 * {
 	 *   YourModel::create(array("name" => "blah"));
 	 *   throw new Exception("rollback!");
 	 * });
-	 * 
+	 *
 	 * YourModel::transaction(function()
 	 * {
 	 *   YourModel::create(array("name" => "blah"));
