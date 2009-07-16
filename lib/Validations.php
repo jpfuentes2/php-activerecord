@@ -225,7 +225,8 @@ class Validations
 	}
 
 	/**
-	 * Alias of validatesLengthOf
+	 * Alias of {@link validates_length_of}
+	 * 
 	 * @param array $attrs
 	 */
 	public function validates_size_of($attrs)

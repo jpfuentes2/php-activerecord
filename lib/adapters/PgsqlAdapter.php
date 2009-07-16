@@ -5,6 +5,8 @@
 namespace ActiveRecord;
 
 /**
+ * Adapter for Postgres (not completed yet)
+ * 
  * @package ActiveRecord
  */
 class PgsqlAdapter extends Connection

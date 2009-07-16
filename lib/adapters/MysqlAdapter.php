@@ -5,6 +5,8 @@
 namespace ActiveRecord;
 
 /**
+ * Adapter for MySQL.
+ * 
  * @package ActiveRecord
  */
 class MysqlAdapter extends Connection

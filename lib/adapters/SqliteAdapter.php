@@ -7,6 +7,8 @@ namespace ActiveRecord;
 use PDO;
 
 /**
+ * Adapter for SQLite.
+ * 
  * @package ActiveRecord
  */
 class SqliteAdapter extends Connection

@@ -7,6 +7,8 @@ namespace ActiveRecord;
 use PDO;
 
 /**
+ * Adapter for OCI (not completed yet).
+ * 
  * @package ActiveRecord
  */
 class OciAdapter extends Connection

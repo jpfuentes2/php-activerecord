@@ -5,6 +5,8 @@
 namespace ActiveRecord;
 
 /**
+ * Interface for a table relationship.
+ * 
  * @package ActiveRecord
  * @subpackage Internal
  */

@@ -11,7 +11,9 @@ use DateTime;
  * Defining an ActiveRecord model:
  *
  * <code>
- * class Person extends ActiveRecord\Model {}
+ * class Person extends ActiveRecord\Model
+ * {
+ * }
  * </code>
  *
  * @package ActiveRecord
@@ -27,7 +29,7 @@ class Model
 	/**
 	 * An instance of {@link Errors} and will be instantiated once a write method is called.
 	 *
-	 * @var object
+	 * @var Errors
 	 */
 	public $errors;
 
@@ -65,6 +67,37 @@ class Model
 	 * @var boolean
 	 */
 	private $__new_record = true;
+
+	/**
+	 * Set to the name of the connection this {@link Model} should use.
+	 * 
+	 * @var string
+	 */
+	static $connection;
+
+	/**
+	 * Set to the name of the database this Model's table is in.
+	 * 
+	 * @var string
+	 */
+	static $db;
+
+	/**
+	 * Set this to explicitly specify the model's table name if different from inferred name.
+	 * 
+	 * If your table doesn't follow our table name convention you can set this to the 
+	 * name of your table to explicitly tell ActiveRecord what your table is called.
+	 * 
+	 * @var string
+	 */
+	static $table_name;
+
+	/**
+	 * Set this to override the default primary key name if different from default name of "id".
+	 * 
+	 * @var string
+	 */
+	static $primary_key;
 
 	/**
 	 * Allows you to create aliases for attributes.
