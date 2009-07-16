@@ -13,7 +13,8 @@ class Author extends ActiveRecord\Model
 
 	public function set_name($value)
 	{
-		$this->assign_attribute('name',strtoupper($value));
+		$value = strtoupper($value);
+		$this->assign_attribute('name',$value);
 	}
 };
 ?>

@@ -69,7 +69,7 @@ class RelationshipTest extends DatabaseTest
 	 */
 	public function test_joins_on_model_via_undeclared_association()
 	{
-		$x = JoinBook::first(array('joins' => array('author')));
+		$x = JoinBook::first(array('joins' => array('undeclared')));
 	}
 
 	public function test_joins_only_loads_given_model_attributes()

@@ -46,7 +46,8 @@ class ExpressionsTest extends SnakeCase_PHPUnit_Framework_TestCase
 	public function test_to_string_with_null_options()
 	{
 		$c = new Expressions('name=? and book=?','Tito','Sharks');
-		$this->assert_equals('name=? and book=?',$c->to_s(false,($x = null)));
+		$x = null;
+		$this->assert_equals('name=? and book=?',$c->to_s(false,$x));
 	}
 
 	/**
@@ -163,7 +164,8 @@ class ExpressionsTest extends SnakeCase_PHPUnit_Framework_TestCase
 	{
 		$a = new Expressions('name=?','Tito');
 		$this->assert_equals("name='Tito'",$a->to_s(true));
-		$this->assert_equals("name='Hocus'",$a->to_s(true,($x = array('values' => array('Hocus')))));
+		$x = array('values' => array('Hocus'));
+		$this->assert_equals("name='Hocus'",$a->to_s(true,$x));
 	}
 
 	public function test_null_value()

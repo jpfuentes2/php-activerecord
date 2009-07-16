@@ -163,7 +163,8 @@ class AdapterTest extends DatabaseTest
 
 	public function test_query_with_params()
 	{
-		$sth = $this->conn->query('SELECT * FROM authors WHERE name IN(?,?) ORDER BY name DESC',($x=array('Bill Clinton','Tito')));
+		$x=array('Bill Clinton','Tito');
+		$sth = $this->conn->query('SELECT * FROM authors WHERE name IN(?,?) ORDER BY name DESC',$x);
 		$row = $sth->fetch();
 		$this->assert_equals('Tito',$row['name']);
 
@@ -188,7 +189,8 @@ class AdapterTest extends DatabaseTest
 
 	public function test_insert_id_with_params()
 	{
-		$this->conn->query('INSERT INTO authors(name) VALUES(?)',($x=array('name')));
+		$x=array('name');
+		$this->conn->query('INSERT INTO authors(name) VALUES(?)',$x);
 		$this->assert_true($this->conn->insert_id() > 0);
 	}
 
