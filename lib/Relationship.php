@@ -6,7 +6,7 @@ namespace ActiveRecord;
 
 /**
  * Interface for a table relationship.
- * 
+ *
  * @package ActiveRecord
  * @subpackage Internal
  */
@@ -163,8 +163,6 @@ abstract class AbstractRelationship implements InterfaceRelationship
 		$join_table = Table::load($this->class_name);
 		$join_table_name = $join_table->get_fully_qualified_table_name();
 		$from_table_name = $from_table->get_fully_qualified_table_name();
-		$foreign_key = $this->foreign_key[0];
-		$join_primary_key = $this->primary_key[0];
 
 		// need to flip the logic when the key is on the other table
 		if ($this instanceof HasMany)
@@ -172,6 +170,11 @@ abstract class AbstractRelationship implements InterfaceRelationship
 			$this->set_keys($from_table->class->getName());
 			$join_primary_key = $this->foreign_key[0];
 			$foreign_key = $this->primary_key[0];
+		}
+		else
+		{
+			$foreign_key = $this->foreign_key[0];
+			$join_primary_key = $this->primary_key[0];
 		}
 
 		return "INNER JOIN $join_table_name ON($from_table_name.$foreign_key = $join_table_name.$join_primary_key)";
