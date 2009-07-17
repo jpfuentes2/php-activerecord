@@ -70,31 +70,31 @@ class Model
 
 	/**
 	 * Set to the name of the connection this {@link Model} should use.
-	 * 
+	 *
 	 * @var string
 	 */
 	static $connection;
 
 	/**
 	 * Set to the name of the database this Model's table is in.
-	 * 
+	 *
 	 * @var string
 	 */
 	static $db;
 
 	/**
 	 * Set this to explicitly specify the model's table name if different from inferred name.
-	 * 
-	 * If your table doesn't follow our table name convention you can set this to the 
+	 *
+	 * If your table doesn't follow our table name convention you can set this to the
 	 * name of your table to explicitly tell ActiveRecord what your table is called.
-	 * 
+	 *
 	 * @var string
 	 */
 	static $table_name;
 
 	/**
 	 * Set this to override the default primary key name if different from default name of "id".
-	 * 
+	 *
 	 * @var string
 	 */
 	static $primary_key;
@@ -1290,7 +1290,15 @@ class Model
 	/**
 	 * Creates a serializer based on pre-defined to_serializer()
 	 *
-	 * Use options['only'] and options['except'] to include/exclude desired attributes.
+	 * An options array can take the following parameters:
+	 *
+	 * <ul>
+	 * <li><b>only:</b> a string or array of attributes to be included.</li>
+	 * <li><b>excluded:</b> a string or array of attributes to be excluded.l</li>
+	 * <li><b>methods:</b>a string or array of methods to invoke. The method's name will be used as a key for the final attributes array
+	 * along with the method's returned value</li>
+	 * <li><b>include:</b> a string or array of associated models to include in the final serialized product.</li>
+	 * </ul>
 	 *
 	 * @param string $type Either Xml or Json
 	 * @param array $options Options array for the serializer
