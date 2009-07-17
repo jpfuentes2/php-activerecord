@@ -33,12 +33,6 @@ class Table
 	public $columns = array();
 
 	/**
-	 * Same as columns but carries inflected_name
-	 * @var array
-	 */
-	public $inflected_columns = array();
-
-	/**
 	 * Name of the table.
 	 */
 	public $table;
