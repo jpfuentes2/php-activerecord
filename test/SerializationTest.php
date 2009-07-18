@@ -14,6 +14,7 @@ class SerializationTest extends DatabaseTest
 	{
 		$book = Book::find(1);
 		$json = $book->to_json(array('only' => array('name', 'special')));
+		print_r($json);
 		$this->assert_equals(array('name','special'),array_keys((array)json_decode($json)));
 	}
 
@@ -78,7 +79,15 @@ class SerializationTest extends DatabaseTest
 		$this->assert_true(array_key_exists('parent_author_id', $decoded['author']));
 	}
 
-/*	public function test_to_json_include_nested_with_nested_options()
+	public function test_to_json_should_only_contain_attributes_from_only()
+	{
+		$book = Book::find(1);
+		$json = $book->to_json(array('only' => array('book_id'), 'methods' => 'upper_name'));
+		$decoded = (array)json_decode($json);
+		$this->assert_equals(1, count($decoded));
+	}
+
+	public function test_to_json_include_nested_with_nested_options()
 	{
 		$venue = Venue::find(1);
 		$json = $venue->to_json(array('include' => array('events' => array('except' => 'title', 'include' => array('host' => array('only' => 'id'))))));
@@ -90,7 +99,7 @@ class SerializationTest extends DatabaseTest
 		$this->assert_not_null($host->id);
 		$this->assert_null(@$event->host->name);
 		$this->assert_null(@$event->title);
-	}*/
+	}
 
 	public function test_to_xml()
 	{

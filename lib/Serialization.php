@@ -7,32 +7,34 @@ use XmlWriter;
 
 /**
  * Base class for Model serializers.
- * 
+ *
  * All serializers support the following options:
- * 
+ *
  * <ul>
- * <li>only: only include these attributes</li>
- * <li>except: exclude these attributes</li>
- * <li>methods: run these methods and include their return values</li>
- * <li>include: list of associations to include</li>
+ * <li><b>only:</b> a string or array of attributes to be included.</li>
+ * <li><b>excluded:</b> a string or array of attributes to be excluded.</li>
+ * <li><b>methods:</b> a string or array of methods to invoke. The method's name will be used as a key for the final attributes array
+ * along with the method's returned value</li>
+ * <li><b>include:</b> a string or array of associated models to include in the final serialized product.</li>
  * </ul>
- * 
+ *
  * Example usage:
- * 
+ *
  * <code>
  * # include the attributes id and name
  * # run $model->encoded_description() and include its return value
  * # include the comments association
+ * # include posts association with its own options (nested)
  * $model->to_json(array(
- *   'only' => array('id','name'),
+ *   'only' => array('id','name', 'encoded_description'),
  *   'methods' => array('encoded_description'),
- *   'include' => array('comments')
+ *   'include' => array('comments', 'posts' => array('only' => 'id'))
  * ));
- * 
+ *
  * # exclude the password field from being included
  * $model->to_xml(array('exclude' => 'password')));
  * </code>
- * 
+ *
  * @package ActiveRecord
  */
 abstract class Serialization
@@ -45,33 +47,38 @@ abstract class Serialization
 	{
 		$this->model = $model;
 		$this->options = $options;
+		$this->attributes = $model->attributes();
 		$this->parse_options();
 	}
 
-	private function check_only(&$attributes)
+	private function parse_options()
+	{
+		$this->check_except();
+		$this->check_methods();
+		$this->check_include();
+		$this->check_only();
+	}
+
+	private function check_only()
 	{
 		if (isset($this->options['only']))
 		{
 			$this->options_to_a('only');
-			$exclude = array_diff(array_keys($this->model->attributes()),$this->options['only']);
-			$attributes = array_diff_key($this->model->attributes(),array_flip($exclude));
+			$exclude = array_diff(array_keys($this->attributes),$this->options['only']);
+			$this->attributes = array_diff_key($this->attributes,array_flip($exclude));
 		}
-
-		return $attributes;
 	}
 
-	private function check_except(&$attributes)
+	private function check_except()
 	{
 		if (isset($this->options['except']))
 		{
 			$this->options_to_a('except');
-			$attributes = array_diff_key($this->model->attributes(),array_flip($this->options['except']));
+			$this->attributes = array_diff_key($this->attributes,array_flip($this->options['except']));
 		}
-
-		return $attributes;
 	}
 
-	private function check_methods(&$attributes)
+	private function check_methods()
 	{
 		if (isset($this->options['methods']))
 		{
@@ -80,14 +87,12 @@ abstract class Serialization
 			foreach ($this->options['methods'] as $method)
 			{
 				if (method_exists($this->model, $method))
-					$attributes[$method] = $this->model->$method();
+					$this->attributes[$method] = $this->model->$method();
 			}
 		}
-
-		return $attributes;
 	}
 
-	private function check_include(&$attributes)
+	private function check_include()
 	{
 		if (isset($this->options['include']))
 		{
@@ -109,7 +114,7 @@ abstract class Serialization
 					if (!is_array($assoc))
 					{
 						$serialized = new $serializer_class($assoc, $options);
-						$attributes[$association] = $serialized->to_a();;
+						$this->attributes[$association] = $serialized->to_a();;
 					}
 					else
 					{
@@ -121,7 +126,7 @@ abstract class Serialization
 							$includes[] = $serialized->to_a();
 						}
 
-						$attributes[$association] = $includes;
+						$this->attributes[$association] = $includes;
 					}
 
 				} catch (UndefinedPropertyException $e) {
@@ -129,19 +134,6 @@ abstract class Serialization
 				}
 			}
 		}
-
-		return $attributes;
-	}
-
-	private function parse_options()
-	{
-		$attributes = $this->model->attributes();
-		$attributes = $this->check_only($attributes);
-		$attributes = $this->check_except($attributes);
-		$attributes = $this->check_methods($attributes);
-		$attributes = $this->check_include($attributes);
-
-		$this->attributes = $attributes;
 	}
 
 	final protected function options_to_a($key)
@@ -165,7 +157,7 @@ abstract class Serialization
 
 /**
  * JSON serializer.
- * 
+ *
  * @package ActiveRecord
  * @subpackage Internal
  */
@@ -179,7 +171,7 @@ class JsonSerializer extends Serialization
 
 /**
  * XML serializer.
- * 
+ *
  * @package ActiveRecord
  * @subpackage Internal
  */
