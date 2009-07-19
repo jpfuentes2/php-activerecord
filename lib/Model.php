@@ -8,20 +8,48 @@ use DateTime;
 /**
  * The base class for your models.
  *
- * Defining an ActiveRecord model:
- *
+ * Defining an ActiveRecord model for a table called people:
+ * 
  * <code>
+ * CREATE TABLE people(
+ *   id int primary key auto_increment,
+ *   parent_id int,
+ *   first_name varchar(50),
+ *   last_name varchar(50)
+ * );
+ * </code>
+ *
+ * <code> 
  * class Person extends ActiveRecord\Model
  * {
+ *   static $belongs_to = array(
+ *     array('parent', 'foreign_key' => 'parent_id', 'class_name' => 'Person')
+ *   );
+ *
+ *   static $has_many = array(
+ *     array('children', 'foreign_key' => 'parent_id', 'class_name' => 'Person')
+ *   );
+ *
+ *   static $before_save = array('do_something_before_saving');
+ *
+ *   static $validates_length_of = array(
+ *     array('first_name', 'within' => array(1,50)),
+ *     array('last_name', 'within' => array(1,50))
+ *   );
+ *
+ *   function do_something_before_saving() {}
  * }
  * </code>
  *
+ * For a more in-depth look at defining models, relationships, callbacks and many other things
+ * please consult our {@link http://www.phpactiverecord.org/guides Guides}. 
+ *
  * @package ActiveRecord
- * @see CallBack
- * @see Serialization
  * @see BelongsTo
+ * @see CallBack
  * @see HasMany
  * @see HasAndBelongsToMany
+ * @see Serialization
  * @see Validations
  */
 class Model
@@ -121,7 +149,7 @@ class Model
 	/**
 	 * Whitelist of attributes that are checked from mass-assignment calls such as constructing a model or using update_attributes.
 	 *
-	 * This is the opposite of $attr_protected.
+	 * This is the opposite of {@link attr_protected $attr_protected}.
 	 *
 	 * <code>
 	 * class Person extends ActiveRecord\Model {
@@ -136,7 +164,6 @@ class Model
 	 * echo $person->id; # => null
 	 * </code>
 	 *
-	 * @see $attr_protected
 	 * @var array
 	 */
 	static $attr_accessible = array();
@@ -144,9 +171,9 @@ class Model
 	/**
 	 * Blacklist of attributes that cannot be mass-assigned.
 	 *
-	 * This is the opposite of $attr_accessible.
+	 * This is the opposite of {@link attr_accessible $attr_accessible} and the format
+	 * for defining these are exactly the same.
 	 *
-	 * @see $attr_accessible
 	 * @var array
 	 */
 	static $attr_protected = array();

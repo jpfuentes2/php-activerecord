@@ -6,8 +6,9 @@ namespace ActiveRecord;
 use DateTime;
 
 /**
+ * Class for a table column.
+ *
  * @package ActiveRecord
- * @subpackage Internal
  */
 class Column
 {
@@ -95,7 +96,8 @@ class Column
 
 	/**
 	 * Casts a value to the column's type.
-	 * @param value to cast
+	 *
+	 * @param mixed $value The value to cast
 	 * @return mixed type-casted value
 	 */
 	public function cast($value)

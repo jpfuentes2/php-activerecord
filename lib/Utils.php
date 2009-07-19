@@ -146,8 +146,9 @@ function collect(&$enumerable, $name_or_closure)
 }
 
 /**
+ * Some internal utility functions.
+ *
  * @package ActiveRecord
- * @subpackage Internal
  */
 class Utils
 {

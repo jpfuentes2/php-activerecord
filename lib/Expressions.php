@@ -13,7 +13,6 @@ namespace ActiveRecord;
  * 'id IN(:subselect)'
  * 
  * @package ActiveRecord
- * @subpackage Internal
  */
 class Expressions
 {

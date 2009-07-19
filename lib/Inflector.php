@@ -6,7 +6,6 @@ namespace ActiveRecord;
 
 /**
  * @package ActiveRecord
- * @subpackage Internal
  */
 abstract class Inflector
 {

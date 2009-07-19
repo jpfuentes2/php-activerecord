@@ -51,8 +51,16 @@ class ValidationsTest extends SnakeCase_PHPUnit_Framework_TestCase
 		$book = new BookValidations();
 		$book->is_valid();
 
-		foreach ($book->errors as $message)
+		foreach ($book->errors as $name => $message)
 			$this->assert_equals("Name can't be blank",$message);
+	}
+
+	public function test_full_messages()
+	{
+		$book = new BookValidations();
+		$book->is_valid();
+
+		$this->assert_equals(array("Name can't be blank"),array_values($book->errors->full_messages(array('hash' => true))));
 	}
 };
 ?>

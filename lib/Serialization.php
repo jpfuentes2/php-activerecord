@@ -36,6 +36,7 @@ use XmlWriter;
  * </code>
  *
  * @package ActiveRecord
+ * @link http://www.phpactiverecord.org/guides/utilities#topic-serialization
  */
 abstract class Serialization
 {
@@ -43,6 +44,13 @@ abstract class Serialization
 	protected $options;
 	protected $attributes;
 
+	/**
+	 * Constructs a {@link Serialization} object.
+	 *
+	 * @param Model $model The model to serialize
+	 * @param array &$options Options for serialization
+	 * @return Serialization
+	 */
 	public function __construct(Model $model, &$options)
 	{
 		$this->model = $model;
@@ -142,16 +150,29 @@ abstract class Serialization
 			$this->options[$key] = array($this->options[$key]);
 	}
 
+	/**
+	 * Returns the attributes array.
+	 * @return array
+	 */
 	final public function to_a()
 	{
 		return $this->attributes;
 	}
 
+	/**
+	 * Returns the serialized object as a string.
+	 * @see to_s
+	 * @return string
+	 */
 	final public function __toString()
 	{
 		return $this->to_s();
 	}
 
+	/**
+	 * Performs the serialization.
+	 * @return string
+	 */
 	abstract public function to_s();
 };
 
@@ -159,7 +180,6 @@ abstract class Serialization
  * JSON serializer.
  *
  * @package ActiveRecord
- * @subpackage Internal
  */
 class JsonSerializer extends Serialization
 {
@@ -173,7 +193,6 @@ class JsonSerializer extends Serialization
  * XML serializer.
  *
  * @package ActiveRecord
- * @subpackage Internal
  */
 class XmlSerializer extends Serialization
 {

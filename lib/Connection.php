@@ -12,14 +12,28 @@ use PDOException;
 use Closure;
 
 /**
+ * The base class for database connection adapters.
+ *
  * @package ActiveRecord
- * @subpackage Internal
  */
 abstract class Connection
 {
+	/**
+	 * The PDO connection object.
+	 * @var mixed
+	 */
 	public $connection;
+
+	/**
+	 * The last query run.
+	 * @var string
+	 */
 	public $last_query;
 
+	/**
+	 * Default PDO options to set for each connection.
+	 * @var array
+	 */
 	static $PDO_OPTIONS = array(
 		PDO::ATTR_CASE				=> PDO::CASE_LOWER,
 		PDO::ATTR_ERRMODE			=> PDO::ERRMODE_EXCEPTION,
@@ -65,7 +79,7 @@ abstract class Connection
 	}
 
 	/**
-	 * Loads the specified the class for an adapter.
+	 * Loads the specified class for an adapter.
 	 *
 	 * @param string $adapter Name of the adapter.
 	 * @return string The full name of the class including namespace.
@@ -89,8 +103,8 @@ abstract class Connection
 	 *
 	 * protocol://user:pass@host[:port]/dbname
 	 *
-	 * @param string $url A URL
-	 * @return Object the parsed URL as an object.
+	 * @param string $url A connection URL
+	 * @return object the parsed URL as an object.
 	 */
 	public static function parse_connection_url($url)
 	{
@@ -114,7 +128,8 @@ abstract class Connection
 
 	/**
 	 * Nope, you can't call this.
-	 * 
+	 *
+	 * @param array $info Array containing URL parts
 	 * @return Connection
 	 */
 	protected function __construct($info)
@@ -132,7 +147,7 @@ abstract class Connection
 	 * Retrieves column meta data for the specified table.
 	 *
 	 * @param string $table Name of a table
-	 * @return array An array of ActiveRecord::Column objects.
+	 * @return array An array of {@link Column} objects.
 	 */
 	public function columns($table)
 	{
@@ -161,6 +176,7 @@ abstract class Connection
 	/**
 	 * Return a default sequence name for the specified table.
 	 *
+	 * @param string $table Name of a table
 	 * @return string sequence name or null if not supported.
 	 */
 	public function get_sequence_name($table)
@@ -170,6 +186,8 @@ abstract class Connection
 
 	/**
 	 * Retrieve the insert id of the last model saved.
+	 *
+	 * @param string $sequence Optional name of a sequence to use
 	 * @return int
 	 */
 	public function insert_id($sequence=null)
@@ -182,7 +200,7 @@ abstract class Connection
 	 *
 	 * @param string $sql Raw SQL string to execute.
 	 * @param array &$values Optional array of bind values
-	 * @return mixed A result set handle or void if you used $handler closure.
+	 * @return mixed A result set object
 	 */
 	public function query($sql, &$values=array())
 	{
@@ -213,7 +231,7 @@ abstract class Connection
 	 * Execute a query that returns maximum of one row with one field and return it.
 	 *
 	 * @param string $sql Raw SQL string to execute.
-	 * @param array $values Optional array of values to bind to the query.
+	 * @param array &$values Optional array of values to bind to the query.
 	 * @return string
 	 */
 	public function query_and_fetch_one($sql, &$values=array())
@@ -228,7 +246,6 @@ abstract class Connection
 	 *
 	 * @param string $sql Raw SQL string to execute.
 	 * @param Closure $handler Closure that will be passed the fetched results.
-	 * @return array Array of table names.
 	 */
 	public function query_and_fetch($sql, Closure $handler)
 	{
@@ -290,8 +307,9 @@ abstract class Connection
 	 * Adds a limit clause to the SQL query.
 	 *
 	 * @param string $sql The SQL statement.
-	 * @param int $offset Row offste to start at.
+	 * @param int $offset Row offset to start at.
 	 * @param int $limit Maximum number of rows to return.
+	 * @return string The SQL query that will limit results to specified parameters
 	 */
 	abstract function limit($sql, $offset, $limit);
 
@@ -299,7 +317,7 @@ abstract class Connection
 	 * Query for column meta info and return statement handle.
 	 *
 	 * @param string $table Name of a table
-	 * @param PDOStatement
+	 * @return PDOStatement
 	 */
 	abstract public function query_column_info($table);
 

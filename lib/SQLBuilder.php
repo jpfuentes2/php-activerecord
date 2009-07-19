@@ -8,7 +8,6 @@ namespace ActiveRecord;
  * Helper class for building sql statements progmatically.
  *
  * @package ActiveRecord
- * @subpackage Internal
  */
 class SQLBuilder
 {
@@ -30,6 +29,14 @@ class SQLBuilder
 	// for insert/update
 	private $data;
 
+	/**
+	 * Constructicon.
+	 *
+	 * @param Connection $connection A database connection object
+	 * @param string $table Name of a table
+	 * @return SQLBuilder
+	 * @throws ActiveRecordException if connection was invalid
+	 */
 	public function __construct($connection, $table)
 	{
 		if (!$connection)
@@ -39,17 +46,33 @@ class SQLBuilder
 		$this->table		= $table;
 	}
 
+	/**
+	 * Returns the SQL string.
+	 *
+	 * @return string
+	 */
 	public function __toString()
 	{
 		return $this->to_s();
 	}
 
+	/**
+	 * Returns the SQL string.
+	 *
+	 * @see __toString
+	 * @return string
+	 */
 	public function to_s()
 	{
 		$func = 'build_' . strtolower($this->operation);
 		return $this->$func();
 	}
 
+	/**
+	 * Returns the bind values.
+	 *
+	 * @return array
+	 */
 	public function bind_values()
 	{
 		$ret = array();

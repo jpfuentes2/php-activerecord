@@ -8,7 +8,6 @@ namespace ActiveRecord;
  * Interface for a table relationship.
  *
  * @package ActiveRecord
- * @subpackage Internal
  */
 interface InterfaceRelationship
 {
@@ -18,17 +17,61 @@ interface InterfaceRelationship
 }
 
 /**
+ * Abstract class that all relationships must extend from.
+ *
  * @package ActiveRecord
+ * @see http://www.phpactiverecord.org/guides/associations
  */
 abstract class AbstractRelationship implements InterfaceRelationship
 {
+	/**
+	 * Name to be used that will trigger call to the relationship.
+	 *
+	 * @var string
+	 */
 	public $attribute_name;
+
+	/**
+	 * Class name of the associated model.
+	 *
+	 * @var string
+	 */
 	public $class_name;
+
+	/**
+	 * Name of the foreign key.
+	 *
+	 * @var string
+	 */
 	public $foreign_key = array();
-	static protected $valid_association_options = array('class_name', 'class', 'foreign_key', 'conditions', 'select', 'readonly');
+
+	/**
+	 * Options of the relationship.
+	 *
+	 * @var array
+	 */
 	protected $options = array();
+
+	/**
+	 * Is the relationship single or multi.
+	 *
+	 * @var boolean
+	 */
 	protected $poly_relationship = false;
 
+	/**
+	 * List of valid options for relationships.
+	 *
+	 * @var array
+	 */
+	static protected $valid_association_options = array('class_name', 'class', 'foreign_key', 'conditions', 'select', 'readonly');
+
+	/**
+	 * Constructs a relationship.
+	 *
+	 * @param array $options Options for the relationship (see {@link valid_association_options})
+	 * @return mixed
+	 */
 	public function __construct($options=array())
 	{
 		$this->attribute_name = $options[0];
@@ -54,11 +97,11 @@ abstract class AbstractRelationship implements InterfaceRelationship
 	}
 
 	/**
-	 *	Creates a new instance of Model with the attributes pre-loaded
+	 * Creates a new instance of specified {@link Model} with the attributes pre-loaded.
 	 *
-	 * @param ActiveRecord\Model the model which holds this association
-	 * @param array $attributes
-	 * @return ActiveRecord\Model
+	 * @param Model $model The model which holds this association
+	 * @param array $attributes Hash containing attributes to initialize the model with
+	 * @return Model
 	 */
 	public function build_association(Model $model, $attributes=array())
 	{
@@ -67,11 +110,11 @@ abstract class AbstractRelationship implements InterfaceRelationship
 	}
 
 	/**
-	 * 	Creates a new instance of Model and invokes save
+	 * Creates a new instance of {@link Model} and invokes save
 	 *
-	 * @param ActiveRecord\Model the model which holds this association
-	 * @param $attributes
-	 * @return saved ActiveRecord\Model
+	 * @param Model $model The model which holds this association
+	 * @param array $attributes Hash containing attributes to initialize the model with
+	 * @return Model
 	 */
 	public function create_association(Model $model, $attributes=array())
 	{
@@ -119,12 +162,12 @@ abstract class AbstractRelationship implements InterfaceRelationship
 	}
 
 	/**
-	 * Infers the $this->class_name based on $this->attribute_name
-	 * Will try to guess the appropriate class by singularizing and uppercasing
-	 * $this->attribute_name
+	 * Infers the $this->class_name based on $this->attribute_name.
+	 *
+	 * Will try to guess the appropriate class by singularizing and uppercasing $this->attribute_name
 	 *
 	 * @return void
-	 * @see $this->attribute_name
+	 * @see attribute_name
 	 */
 	protected function set_inferred_class_name()
 	{
@@ -181,22 +224,42 @@ abstract class AbstractRelationship implements InterfaceRelationship
 	}
 
 	/**
-	 * @param $model The model this relationship belongs to
+	 * This will load the related model data.
+	 *
+	 * @param Model $model The model this relationship belongs to
 	 */
 	abstract function load(Model $model);
 };
 
 /**
- * Has Many!
+ * One-to-many relationship.
+ *
+ * <code>
+ * # Table: people
+ * # Primary key: id
+ * # Foreign key: school_id
+ * class Person extends ActiveRecord\Model {}
+ *
+ * # Table: schools
+ * # Primary key: id
+ * class School extends ActiveRecord\Model {
+ *   static $has_many = array(
+ *     array('people')
+ *   );
+ * });
+ * </code>
  *
  * @package ActiveRecord
+ * @see http://www.phpactiverecord.org/guides/associations
  */
 class HasMany extends AbstractRelationship
 {
+	static protected $valid_association_options = array('primary_key', 'order', 'group', 'having', 'limit', 'offset', 'through', 'source');
+
+	protected $primary_key;
+
 	private $has_one = false;
 	private $through;
-	protected $primary_key;
-	static protected $valid_association_options = array('primary_key', 'order', 'group', 'having', 'limit', 'offset', 'through', 'source');
 
 	public function __construct($options=array())
 	{
@@ -292,15 +355,31 @@ class HasMany extends AbstractRelationship
 };
 
 /**
+ * One-to-one relationship.
+ *
+ * <code>
+ * # Table name: states
+ * # Primary key: id
+ * class State extends ActiveRecord\Model {}
+ *
+ * # Table name: people
+ * # Foreign key: state_id
+ * class Person extends ActiveRecord\Model {
+ *   static $has_one = array(array('state'));
+ * }
+ * </code>
+ *
  * @package ActiveRecord
+ * @see http://www.phpactiverecord.org/guides/associations
  */
 class HasOne extends HasMany
 {
-
 };
 
 /**
+ * @todo implement me
  * @package ActiveRecord
+ * @see http://www.phpactiverecord.org/guides/associations
  */
 class HasAndBelongsToMany extends AbstractRelationship
 {
@@ -322,7 +401,20 @@ class HasAndBelongsToMany extends AbstractRelationship
 };
 
 /**
+ * Belongs to relationship.
+ *
+ * <code>
+ * class School extends ActiveRecord\Model {}
+ *
+ * class Person extends ActiveRecord\Model {
+ *   static $belongs_to = array(
+ *     array('school')
+ *   );
+ * }
+ * </code>
+ *
  * @package ActiveRecord
+ * @see http://www.phpactiverecord.org/guides/associations
  */
 class BelongsTo extends AbstractRelationship
 {

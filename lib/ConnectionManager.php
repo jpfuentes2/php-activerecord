@@ -5,23 +5,24 @@
 namespace ActiveRecord;
 
 /**
+ * Singleton to manage any and all database connections.
+ *
  * @package ActiveRecord
- * @subpackage Internal
  */
 class ConnectionManager extends Singleton
 {
 	/**
-	 * Array of ActiveRecord\Connection objects
-	 * @static
+	 * Array of {@link Connection} objects
 	 * @var array
 	 */
 	static private $connections = array();
 
 	/**
-	 * If @param $name is null then the default connection will be returned.
-	 * @see ActiveRecord\Config @var $default_connection
-	 * @param string $name Name of a connection
-	 * @return ActiveRecord\Connection instance
+	 * If $name is null then the default connection will be returned.
+	 *
+	 * @see Config
+	 * @param string $name Optional name of a connection
+	 * @return Connection
 	 */
 	public static function get_connection($name=null)
 	{

@@ -14,7 +14,6 @@ class SerializationTest extends DatabaseTest
 	{
 		$book = Book::find(1);
 		$json = $book->to_json(array('only' => array('name', 'special')));
-		print_r($json);
 		$this->assert_equals(array('name','special'),array_keys((array)json_decode($json)));
 	}
 

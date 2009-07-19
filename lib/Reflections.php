@@ -9,21 +9,21 @@ use ReflectionClass;
  * Simple class that caches reflections of classes.
  *
  * @package ActiveRecord
- * @subpackage Internal
  */
 class Reflections extends Singleton
 {
 	/**
 	 * Current reflections
+	 *
 	 * @var array
 	 */
 	private $reflections = array();
 
 	/**
-	 * Instantiates a new ReflectionClass for the given class and
-	 * returns $this so you can do Reflections::instance()->add('class')->get();
-	 * @param string
-	 * @return object $this
+	 * Instantiates a new ReflectionClass for the given class.
+	 *
+	 * @param string $class Name of a class
+	 * @return Reflections $this so you can chain calls like Reflections::instance()->add('class')->get()
 	 */
 	public function add($class=null)
 	{
@@ -36,7 +36,9 @@ class Reflections extends Singleton
 	}
 
 	/**
-	 * Destroys the cached ReflectionClass. Put this here mainly for testing purposes.
+	 * Destroys the cached ReflectionClass.
+	 *
+	 * Put this here mainly for testing purposes.
 	 * 
 	 * @param string $class Name of a class.
 	 * @return void
@@ -49,8 +51,10 @@ class Reflections extends Singleton
 	
 	/**
 	 * Get a cached ReflectionClass.
-	 * @param string
-	 * @return null or ReflectionClass instance
+	 *
+	 * @param string $class Optional name of a class
+	 * @return mixed null or a ReflectionClass instance
+	 * @throws ActiveRecordException if class was not found
 	 */
 	public function get($class=null)
 	{
@@ -63,8 +67,9 @@ class Reflections extends Singleton
 	}
 
 	/**
-	 * Retreive a class name to be reflected
-	 * @param mixed
+	 * Retreive a class name to be reflected.
+	 *
+	 * @param mixed $mixed An object or name of a class
 	 * @return string
 	 */
 	private function get_class($mixed=null)

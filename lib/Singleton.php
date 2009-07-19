@@ -11,20 +11,19 @@ namespace ActiveRecord;
  * possible. This allows the user more freedom with this pattern.
  *
  * @package ActiveRecord
- * @subpackage Internal
  */
 abstract class Singleton
 {
 	/**
 	 * Array of cached singleton objects
-	 * @static
+	 *
 	 * @var array
 	 */
 	private static $instances = array();
 
 	/**
 	 * Static method for instantiating a singleton object.
-	 * @static
+	 *
 	 * @return object
 	 */
 	final public static function instance()
@@ -39,12 +38,14 @@ abstract class Singleton
 
 	/**
 	 * Singleton objects should not be cloned
+	 *
 	 * @return void
 	 */
 	final private function __clone() {}
 
 	/**
 	 * Similar to a get_called_class() for a child class to invoke.
+	 *
 	 * @return string
 	 */
 	final protected function get_called_class()
