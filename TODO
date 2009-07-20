@@ -1,16 +1,15 @@
 == General
 
 - named scopes
-- add has_to_and_belongs_to_many
+- add belongs_to_and_has_many
 - oracle adapter
-- mssql adapter
 - pgsql adapter
 - using create_xxx, build_xxx on a has_many :thru needs to create both records
 - support create! and save! functionality
 - config should store logger settings
-- has_many through should be created via its own class
+- has_one should not extend has_many ... need to have them descend from another class
+- added "dependent" option to associations
 
 == Testing
 
-- tests/fixes for funky table/field names
 - more tests for to_xml
