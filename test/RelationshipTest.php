@@ -9,7 +9,7 @@ class RelationshipTest extends DatabaseTest
 	public function set_up($connection_name=null)
 	{
 		parent::set_up($connection_name);
-		Event::$belongs_to = array(array('venue'));
+		Event::$belongs_to = array(array('venue'), array('host'));
 		Venue::$has_many = array(array('events'));
 		Venue::$has_one = array();
 		Employee::$has_one = array(array('position'));
