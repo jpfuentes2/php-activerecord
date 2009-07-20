@@ -404,15 +404,11 @@ class RelationshipTest extends DatabaseTest
 		$this->assert_equals(1,Author::find(1)->awesome_person->is_awesome);
 	}
 
-/*	public function test_has_one_through()
+	public function test_has_one_through()
 	{
-
-
-		Event::$belongs_to = array(array('host'));
-		Venue::$has_many[1] = array('hosts', 'through' => 'events');
-
-		$venue = $this->get_relationship();
+		Venue::$has_many = array(array('events'),array('hosts', 'through' => 'events'));
+		$venue = Venue::first();
 		$this->assert_true(count($venue->hosts) > 0);
-	}*/
+	}
 };
 ?>

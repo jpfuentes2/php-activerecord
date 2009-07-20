@@ -201,17 +201,33 @@ abstract class AbstractRelationship implements InterfaceRelationship
 	 * @param Table $from_table the table used for the FROM SQL statement
 	 * @return string SQL INNER JOIN fragment
 	 */
-	public function construct_inner_join_sql(Table $from_table)
+	public function construct_inner_join_sql(Table $from_table, $using_through=false)
 	{
-		$join_table = Table::load($this->class_name);
-		$join_table_name = $join_table->get_fully_qualified_table_name();
-		$from_table_name = $from_table->get_fully_qualified_table_name();
+		if ($using_through)
+		{
+			$join_table = $from_table;
+			$join_table_name = $from_table->get_fully_qualified_table_name();
+			$from_table_name = Table::load($this->class_name)->get_fully_qualified_table_name();
+
+		}
+		else
+		{
+			$join_table = Table::load($this->class_name);
+			$join_table_name = $join_table->get_fully_qualified_table_name();
+			$from_table_name = $from_table->get_fully_qualified_table_name();
+		}
 
 		// need to flip the logic when the key is on the other table
-		if ($this instanceof HasMany)
+		if ($this instanceof HasMany || $this instanceof HasOne)
 		{
+			$orig_foreign_key = $this->foreign_key[0];
 			$this->set_keys($from_table->class->getName());
-			$join_primary_key = $this->foreign_key[0];
+
+			if ($using_through)
+				$join_primary_key = $this->keyify($this->class_name);
+			else
+				$join_primary_key = $this->foreign_key[0];
+
 			$foreign_key = $this->primary_key[0];
 		}
 		else
@@ -313,10 +329,7 @@ class HasMany extends AbstractRelationship
 			$through_table_name = $through_table->get_fully_qualified_table_name();
 			$through_pk = $this->keyify($class_name);
 
-			$this->options['joins'] = "INNER JOIN $through_table_name ON ($table_name.{$this->primary_key[0]} = $through_table_name.$through_pk)";
-
-			if (!isset($this->options['select']))
-				$this->options['select'] = "$table_name.*";
+			$this->options['joins'] = $this->construct_inner_join_sql($through_table, true);
 
 			foreach ($this->foreign_key as $index => &$key)
 				$key = "$through_table_name.$key";
