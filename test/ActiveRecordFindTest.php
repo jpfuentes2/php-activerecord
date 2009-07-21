@@ -339,6 +339,13 @@ class ActiveRecordFindTest extends DatabaseTest
 		$this->assert_true(strpos(ActiveRecord\Table::load('Venue')->last_sql, 'GROUP BY state') !== false);
 	}
 
+	public function test_group_with_order_and_limit_and_having()
+	{
+		$venues = Venue::all(array('select' => 'state', 'group' => 'state', 'having' => 'length(state) = 2', 'order' => 'state', 'limit' => 2));
+		$this->assert_true(count($venues) > 0);
+		$this->assert_true(strpos(ActiveRecord\Table::load('Venue')->last_sql, 'GROUP BY state HAVING length(state) = 2 ORDER BY state LIMIT 0,2') !== false);
+	}
+
 	public function test_escape_quotes()
 	{
 		$author = Author::find_by_name("Tito's");

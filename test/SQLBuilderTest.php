@@ -94,6 +94,16 @@ class SQLBuilderTest extends DatabaseTest
 		$this->assert_equals("SELECT * FROM authors HAVING created_at > '2009-01-01'", (string)$this->sql);
 	}
 
+	public function test_all_clauses_after_where_should_be_correctly_ordered()
+	{
+		$this->sql->limit(10)->offset(1);
+		$this->sql->having("created_at > '2009-01-01'");
+		$this->sql->order('name');
+		$this->sql->group('name');
+		$this->sql->where(array('id' => 1));
+		$this->assert_equals("SELECT * FROM authors WHERE id=? GROUP BY name HAVING created_at > '2009-01-01' ORDER BY name LIMIT 1,10", (string)$this->sql);
+	}
+
 	/**
 	 * @expectedException ActiveRecord\ActiveRecordException
 	 */

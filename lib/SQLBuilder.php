@@ -237,7 +237,7 @@ class SQLBuilder
 
 	/**
 	 * Like create_conditions_from_underscored_string but returns a hash of name => value array instead.
-	 * 
+	 *
 	 * @param string $name A string containing attribute names connected with _and_ or _or_
 	 * @param $args Array of values for each attribute in $name
 	 * @param $map A hash of "mapped_column_name" => "real_column_name"
@@ -320,14 +320,14 @@ class SQLBuilder
 		if ($this->where)
 			$sql .= " WHERE $this->where";
 
-		if ($this->order)
-			$sql .= " ORDER BY $this->order";
-
 		if ($this->group)
 			$sql .= " GROUP BY $this->group";
 
 		if ($this->having)
 			$sql .= " HAVING $this->having";
+
+		if ($this->order)
+			$sql .= " ORDER BY $this->order";
 
 		if ($this->limit || $this->offset)
 			$sql = $this->connection->limit($sql,$this->offset,$this->limit);
