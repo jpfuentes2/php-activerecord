@@ -8,7 +8,7 @@ use DateTime;
 /**
  * The base class for your models.
  *
- * Defining an ActiveRecord model for a table called people:
+ * Defining an ActiveRecord model for a table called people and orders:
  * 
  * <code>
  * CREATE TABLE people(
@@ -17,27 +17,47 @@ use DateTime;
  *   first_name varchar(50),
  *   last_name varchar(50)
  * );
+ *
+ * CREATE TABLE orders(
+ *   id int primary key auto_increment,
+ *   person_id int not null,
+ *   cost decimal(10,2),
+ *   total decimal(10,2)
+ * );
  * </code>
  *
  * <code> 
- * class Person extends ActiveRecord\Model
- * {
+ * class Person extends ActiveRecord\Model {
  *   static $belongs_to = array(
  *     array('parent', 'foreign_key' => 'parent_id', 'class_name' => 'Person')
  *   );
  *
  *   static $has_many = array(
- *     array('children', 'foreign_key' => 'parent_id', 'class_name' => 'Person')
+ *     array('children', 'foreign_key' => 'parent_id', 'class_name' => 'Person'),
+ *     array('orders')
  *   );
- *
- *   static $before_save = array('do_something_before_saving');
  *
  *   static $validates_length_of = array(
  *     array('first_name', 'within' => array(1,50)),
  *     array('last_name', 'within' => array(1,50))
  *   );
+ * }
  *
- *   function do_something_before_saving() {}
+ * class Order extends ActiveRecord\Model {
+ *   static $belongs_to = array(
+ *     array('person')
+ *   );
+ *
+ *   static $validates_numericality_of = array(
+ *     array('cost', 'greater_than' => 0),
+ *     array('total', 'greater_than' => 0)
+ *   );
+ *
+ *   static $before_save = array('calculate_total_with_tax');
+ *
+ *   public function calculate_total_with_tax() {
+ *     $this->total = $this->cost * 0.045;
+ *   }
  * }
  * </code>
  *
