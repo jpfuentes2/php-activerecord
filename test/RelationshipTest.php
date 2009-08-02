@@ -177,10 +177,11 @@ class RelationshipTest extends DatabaseTest
 		$this->assert_equals(3, $author->parent_author->id);
 	}
 
-	public function test_belongs_to_with_joins()
+	public function test_belongs_to_with_an_invalid_option()
 	{
-		$x = Event::first(array('joins' => array('venue')));
-		$this->assert_true(strpos(Event::table()->last_sql,'INNER JOIN `venues` ON(`events`.venue_id = `venues`.id)') !== false);
+		Event::$belongs_to[0]['joins'] = 'venue';
+		$event = Event::first()->venue;
+		$this->assert_false(strpos(Event::table()->last_sql,'INNER JOIN `venues` ON(`events`.venue_id = `venues`.id)'));
 	}
 
 	public function test_has_many_basic()
@@ -244,6 +245,14 @@ class RelationshipTest extends DatabaseTest
 		$venue = $this->get_relationship();
 		$this->assert_equals(2,$venue->id);
 		$this->assert_equals($venue->events[0]->title,'Yeah Yeah Yeahs');
+	}
+
+	public function test_has_many_with_sql_clause_options()
+	{
+		Venue::$has_many[0] = array('events', 'group' => 'type', 'order' => 'title desc', 'limit' => 2, 'offset' => 1);
+		Venue::first()->events;
+		$this->assert_true(strpos(Event::table()->last_sql, 'WHERE venue_id=? GROUP BY type ORDER BY title desc LIMIT 1,2') !== false);
+
 	}
 
 	public function test_has_many_through1()

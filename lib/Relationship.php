@@ -431,6 +431,8 @@ class HasAndBelongsToMany extends AbstractRelationship
  */
 class BelongsTo extends AbstractRelationship
 {
+	static protected $valid_association_options = array('primary_key');
+
 	public function __construct($options=array())
 	{
 		parent::__construct($options);
