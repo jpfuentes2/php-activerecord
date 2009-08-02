@@ -264,12 +264,46 @@ abstract class AbstractRelationship implements InterfaceRelationship
  *   );
  * });
  * </code>
+ * 
+ * Example using options:
+ *
+ * <code>
+ * class Payment extends ActiveRecord\Model {
+ *   static $belongs_to = array(
+ *     array('person'),
+ *     array('order')
+ *   );
+ * }
+ *
+ * class Order extends ActiveRecord\Model {
+ *   static $has_many = array(
+ *     array('people',
+ *           'through'    => 'payments',
+ *           'select'     => 'people.*, payments.amount',
+ *           'conditions' => 'payments.amount < 200')
+ *     );
+ * }
+ * </code>
  *
  * @package ActiveRecord
  * @see http://www.phpactiverecord.org/guides/associations
+ * @see valid_association_options
  */
 class HasMany extends AbstractRelationship
 {
+	/**
+	 * Valid options to use for a {@link HasMany} relationship.
+	 * 
+	 * <ul>
+	 * <li><b>limit/offset:</b> limit the number of records</li>
+     * <li><b>primary_key:</b> name of the primary_key of the association (defaults to "id")</li>
+     * <li><b>group:</b> GROUP BY clause</li>
+     * <li><b>order:</b> ORDER BY clause</li>
+     * <li><b>through:</b> name of a model</li>
+     * </ul>
+	 *
+	 * @var array
+	 */
 	static protected $valid_association_options = array('primary_key', 'order', 'group', 'having', 'limit', 'offset', 'through', 'source');
 
 	protected $primary_key;
@@ -277,6 +311,12 @@ class HasMany extends AbstractRelationship
 	private $has_one = false;
 	private $through;
 
+	/**
+	 * Constructs a {@link HasMany} relationship.
+	 * 
+	 * @param array $options Options for the association
+	 * @return HasMany 
+	 */
 	public function __construct($options=array())
 	{
 		parent::__construct($options);
@@ -425,12 +465,34 @@ class HasAndBelongsToMany extends AbstractRelationship
  *   );
  * }
  * </code>
+ * 
+ * Example using options:
+ *
+ * <code>
+ * class School extends ActiveRecord\Model {}
+ *
+ * class Person extends ActiveRecord\Model {
+ *   static $belongs_to = array(
+ *     array('school', 'primary_key' => 'school_id')
+ *   );
+ * }
+ * </code>
  *
  * @package ActiveRecord
+ * @see valid_association_options
  * @see http://www.phpactiverecord.org/guides/associations
  */
 class BelongsTo extends AbstractRelationship
 {
+	/**
+	 * Valid options to use:
+	 * 
+	 * <ul>
+	 * <li><b>primary_key:</b> name of the primary_key of the association (defaults to "id")</li>
+	 * </ul>
+	 *
+	 * @var array
+	 */
 	static protected $valid_association_options = array('primary_key');
 
 	public function __construct($options=array())
