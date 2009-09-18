@@ -263,8 +263,7 @@ class SQLBuilder
 
 		if ($num_args == 1 && is_hash($args[0]))
 		{
-			$e = new Expressions($args[0]);
-			$e->set_connection($this->connection);
+			$e = new Expressions($this->connection,$args[0]);
 			$this->where = $e->to_s();
 			$this->where_values = array_flatten($e->values());
 		}
@@ -277,8 +276,7 @@ class SQLBuilder
 			{
 				if (is_array($value))
 				{
-					$e = new Expressions($args[0]);
-					$e->set_connection($this->connection);
+					$e = new Expressions($this->connection,$args[0]);
 					$e->bind_values($values);
 					$this->where = $e->to_s();
 					$this->where_values = array_flatten($e->values());
@@ -304,9 +302,9 @@ class SQLBuilder
 
 	private function build_insert()
 	{
-		$keys = join(',',array_keys($this->data));
-		$e = new Expressions("INSERT INTO $this->table($keys) VALUES(?)",array_values($this->data));
-		$e->set_connection($this->connection);
+		$keys = join(',',$this->quoted_key_names());
+
+		$e = new Expressions($this->connection,"INSERT INTO $this->table($keys) VALUES(?)",array_values($this->data));
 		return $e->to_s();
 	}
 
@@ -337,13 +335,23 @@ class SQLBuilder
 
 	private function build_update()
 	{
-		$fields = array_keys($this->data);
+		$fields = $this->quoted_key_names();
 		$sql = "UPDATE $this->table SET " . join('=?, ',$fields) . '=?';
 
 		if ($this->where)
 			$sql .= " WHERE $this->where";
 
 		return $sql;
+	}
+
+	private function quoted_key_names()
+	{
+		$keys = array();
+
+		foreach ($this->data as $key => $value)
+			$keys[] = $this->connection->quote_name($key);
+
+		return $keys;
 	}
 }
 ?>

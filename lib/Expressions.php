@@ -22,20 +22,21 @@ class Expressions
 	private $values = array();
 	private $connection;
 
-	public function __construct($expressions=null /* [, $values ... ] */)
+	public function __construct($connection, $expressions=null /* [, $values ... ] */)
 	{
 		$values = null;
+		$this->connection = $connection;
 
 		if (is_array($expressions))
 		{
-			$glue = func_num_args() > 1 ? func_get_arg(1) : ' AND ';
+			$glue = func_num_args() > 2 ? func_get_arg(2) : ' AND ';
 			list($expressions,$values) = $this->build_sql_from_hash($expressions,$glue);
 		}
 
 		if ($expressions != '')
 		{
 			if (!$values)
-				$values = array_slice(func_get_args(),1);
+				$values = array_slice(func_get_args(),2);
 
 			$this->values = $values;
 			$this->expressions = $expressions;
@@ -89,7 +90,7 @@ class Expressions
 	public function to_s($substitute=false, &$options=null)
 	{
 		if (!$options) $options = array();
-
+		
 		$values = array_key_exists('values',$options) ? $options['values'] : $this->values;
 
 		$ret = "";
@@ -126,6 +127,9 @@ class Expressions
 
 		foreach ($hash as $name => $value)
 		{
+			if ($this->connection)
+				$name = $this->connection->quote_name($name);
+
 			if (is_array($value))
 				$sql .= "$g$name IN(?)";
 			else

@@ -16,6 +16,13 @@ class ActiveRecordWriteTest extends DatabaseTest
 		$this->assert_not_null(Author::find($author->id));
 	}
 
+	public function test_insert_should_quote_keys()
+	{
+		$author = new Author(array('name' => 'Blah Blah'));
+		$author->save();
+		$this->assert_true(strpos($author->connection()->last_query,$author->connection()->quote_name('updated_at')) !== false);
+	}
+
 	public function test_save_auto_increment_id()
 	{
 		$venue = new Venue(array('name' => 'Bob'));
@@ -51,6 +58,14 @@ class ActiveRecordWriteTest extends DatabaseTest
 
 		$this->assert_same($new_name, $book->name);
 		$this->assert_same($new_name, $book->name, Book::find(1)->name);
+	}
+
+	public function test_update_should_quote_keys()
+	{
+		$book = Book::find(1);
+		$book->name = 'new name';
+		$book->save();
+		$this->assert_true(strpos($book->connection()->last_query,$book->connection()->quote_name('name')) !== false);
 	}
 
 	public function test_update_attributes()
@@ -117,7 +132,8 @@ class ActiveRecordWriteTest extends DatabaseTest
 	public function test_dirty_attributes_cleared_after_saving()
 	{
 		$book = $this->make_new_book_and();
-		$this->assert_true(strpos($book->table()->last_sql,'(name,special)') !== false);
+		$this->assert_true(strpos($book->table()->last_sql,'name') !== false);
+		$this->assert_true(strpos($book->table()->last_sql,'special') !== false);
 		$this->assert_equals(null,$book->dirty_attributes());
 	}
 
