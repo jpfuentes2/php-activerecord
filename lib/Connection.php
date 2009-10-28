@@ -205,7 +205,7 @@ abstract class Connection
 	public function query($sql, &$values=array())
 	{
 		if (isset($GLOBALS['ACTIVERECORD_LOG']) && $GLOBALS['ACTIVERECORD_LOG'])
-			$GLOBALS['ACTIVERECORD_LOGGER']->log($sql, PEAR_LOG_INFO);
+			$GLOBALS['ACTIVERECORD_LOG']->log($sql, PEAR_LOG_INFO);
 
 		$this->last_query = $sql;
 
