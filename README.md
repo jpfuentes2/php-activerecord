@@ -23,6 +23,10 @@ This implementation is inspired and thus borrows heavily from Ruby on Rails' Act
 We have tried to maintain their conventions while deviating mainly because of convenience or necessity.
 Of course, there are some differences which will be obvious to the user if they are familiar with rails.
 
+## Minimum Requirements ##
+
+PHP 5.3+
+
 ## Supported Databases ##
 
 - MySQL
