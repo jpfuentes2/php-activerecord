@@ -6,11 +6,6 @@ namespace ActiveRecord;
 use DateTime;
 
 /**
- *
- */
-require_once 'Relationship.php';
-
-/**
  * Manages reading and writing to a database table.
  *
  * This class manages a database table and is used by the Model class for
@@ -332,6 +327,8 @@ class Table
 
 	private function set_associations()
 	{
+		require_once 'Relationship.php';
+
 		foreach ($this->class->getStaticProperties() as $name => $definitions)
 		{
 			if (!$definitions || !is_array($definitions))

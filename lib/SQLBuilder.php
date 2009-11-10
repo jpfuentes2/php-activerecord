@@ -259,6 +259,7 @@ class SQLBuilder
 
 	private function apply_where_conditions($args)
 	{
+		require_once 'Expressions.php';
 		$num_args = count($args);
 
 		if ($num_args == 1 && is_hash($args[0]))
@@ -302,6 +303,7 @@ class SQLBuilder
 
 	private function build_insert()
 	{
+		require_once 'Expressions.php';
 		$keys = join(',',$this->quoted_key_names());
 
 		$e = new Expressions($this->connection,"INSERT INTO $this->table($keys) VALUES(?)",array_values($this->data));

@@ -727,6 +727,7 @@ class Model
 	 */
 	private function _validate()
 	{
+		require_once 'Validations.php';
 		$validator = new Validations($this);
 		$validation_on = 'validation_on_' . ($this->is_new_record() ? 'create' : 'update');
 
@@ -1353,6 +1354,7 @@ class Model
 	 */
 	private function serialize($type, $options)
 	{
+		require_once 'Serialization.php';
 		$class = "ActiveRecord\\{$type}Serializer";
 		$serializer = new $class($this, $options);
 		return $serializer->to_s();

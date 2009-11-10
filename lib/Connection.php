@@ -4,8 +4,7 @@
  */
 namespace ActiveRecord;
 
-require_once 'Column.php';
-require_once 'Expressions.php';
+require 'Column.php';
 
 use PDO;
 use PDOException;
