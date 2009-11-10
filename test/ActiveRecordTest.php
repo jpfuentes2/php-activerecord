@@ -115,7 +115,13 @@ class ActiveRecordTest extends DatabaseTest
 
 	public function test_auto_load_with_namespaced_model()
 	{
-		$this->assert_true(class_exists('NamespaceTest\SomeModel'));
+		$this->assert_true(class_exists('NamespaceTest\Book'));
+	}
+
+	public function test_namespace_gets_stripped_from_table_name()
+	{
+		$model = new NamespaceTest\Book();
+		$this->assert_equals('books',$model->table()->table);
 	}
 
 	public function test_should_have_all_column_attributes_when_initializing_with_array()
