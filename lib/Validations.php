@@ -527,7 +527,6 @@ class Validations
 	public function validates_uniqueness_of($attrs)
 	{
 		$configuration = array_merge(self::$DEFAULT_VALIDATION_OPTIONS, array(
-			'on' => 'save',
 			'message' => Errors::$DEFAULT_ERROR_MESSAGES['unique']
 		));
 
