@@ -1,6 +1,17 @@
 <?php
 include 'helpers/config.php';
 
+class DirtyAuthor extends ActiveRecord\Model
+{
+	static $table = 'authors';
+	static $before_save = 'before_save';
+
+	public function before_save()
+	{
+		$this->name = 'i saved';
+	}
+};
+
 class ActiveRecordWriteTest extends DatabaseTest
 {
 	public function test_save()
@@ -249,6 +260,23 @@ class ActiveRecordWriteTest extends DatabaseTest
 		$author->save();
 	}
 
+	public function test_modified_attributes_in_before_handlers_get_saved()
+	{
+		$author = DirtyAuthor::first();
+		$author->encrypted_password = 'coco';
+		$author->save();
+		$this->assert_equals('i saved',DirtyAuthor::first()->name);
+	}
+
+	public function test_is_dirty()
+	{
+		$author = Author::first();
+		$this->assert_equals(false,$author->is_dirty());
+
+		$author->name = 'coco';
+		$this->assert_equals(true,$author->is_dirty());
+	}
+	
 	private function make_new_book_and($save=true)
 	{
 		$book = new Book();

@@ -658,7 +658,7 @@ class Model
 		if ($validate && !$this->_validate())
 			return false;
 
-		if (($dirty = $this->dirty_attributes()))
+		if ($this->is_dirty())
 		{
 			$pk = $this->values_for_pk();
 
@@ -666,7 +666,7 @@ class Model
 				throw new ActiveRecordException("Cannot update, no primary key defined for: " . get_called_class());
 
 			$this->invoke_callback('before_update',false);
-			static::table()->update($dirty,$pk);
+			static::table()->update($this->dirty_attributes(),$pk);
 			$this->invoke_callback('after_update',false);
 		}
 
@@ -746,6 +746,16 @@ class Model
 			return false;
 
 		return true;
+	}
+
+	/**
+	 * Returns true if the model has been modified.
+	 *
+	 * @return boolean true if modified
+	 */
+	public function is_dirty()
+	{
+		return empty($this->__dirty) ? false : true;
 	}
 
 	/**
