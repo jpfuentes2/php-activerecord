@@ -6,6 +6,7 @@ use ActiveRecord as AR;
 class BookValidations extends ActiveRecord\Model {
 	static $table_name = 'books';
 	static $validates_presence_of = array(array('name'));
+	static $validates_uniqueness_of = array(array('name'));
 };
 
 class ValidationsTest extends SnakeCase_PHPUnit_Framework_TestCase
@@ -61,6 +62,16 @@ class ValidationsTest extends SnakeCase_PHPUnit_Framework_TestCase
 		$book->is_valid();
 
 		$this->assert_equals(array("Name can't be blank"),array_values($book->errors->full_messages(array('hash' => true))));
+	}
+
+	public function test_validates_uniqueness_of()
+	{
+		BookValidations::connection()->query("delete from books where name='bob'");
+		BookValidations::create(array('name' => 'bob'));
+		$book = BookValidations::create(array('name' => 'bob'));
+
+		$this->assert_equals(array("Name must be unique"),$book->errors->full_messages());
+		$this->assert_equals(1,BookValidations::count(array('conditions' => "name='bob'")));
 	}
 };
 ?>

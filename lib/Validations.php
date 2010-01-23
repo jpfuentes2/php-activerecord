@@ -510,12 +510,34 @@ class Validations
 		}
 	}
 
+
 	/**
-	 * @todo IMPLEMENT ME
+	 * Validates the uniqueness of a value.
+	 *
+	 * <code>
+	 * class Person extends ActiveRecord\Model {
+	 *   static $validates_uniqueness_of = array(
+	 *     array('name')
+	 *   );
+	 * }
+	 * </code>
+	 *
+	 * @param array $attrs Validation definition
 	 */
 	public function validates_uniqueness_of($attrs)
 	{
-		return ;
+		$configuration = array_merge(self::$DEFAULT_VALIDATION_OPTIONS, array(
+			'on' => 'save',
+			'message' => Errors::$DEFAULT_ERROR_MESSAGES['unique']
+		));
+
+		foreach ($attrs as $attr)
+		{
+			$options = array_merge($configuration, $attr);
+
+			if ($this->model->exists(array($options[0] => $this->model->$options[0])))
+				$this->record->add($options[0], $options['message']);
+		}
 	}
 
 	private function is_null_with_option($var, &$options)
@@ -557,6 +579,7 @@ class Errors implements IteratorAggregate
       	'less_than'		=> "must be less than %d",
       	'odd'			=> "must be odd",
       	'even'			=> "must be even",
+		'unique'		=> "must be unique",
       	'less_than_or_equal_to' => "must be less than or equal to %d",
       	'greater_than_or_equal_to' => "must be greater than or equal to %d"
    	);
