@@ -73,5 +73,11 @@ class ValidationsTest extends SnakeCase_PHPUnit_Framework_TestCase
 		$this->assert_equals(array("Name must be unique"),$book->errors->full_messages());
 		$this->assert_equals(1,BookValidations::count(array('conditions' => "name='bob'")));
 	}
+
+	public function test_validates_uniqueness_of_excludes_self()
+	{
+		$book = BookValidations::first();
+		$this->assert_equals(true,$book->is_valid()); 
+	}
 };
 ?>

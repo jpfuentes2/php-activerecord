@@ -533,8 +533,15 @@ class Validations
 		foreach ($attrs as $attr)
 		{
 			$options = array_merge($configuration, $attr);
+			$pk = $this->model->get_primary_key();
+			$pk_value = $this->model->$pk[0];
 
-			if ($this->model->exists(array($options[0] => $this->model->$options[0])))
+			if ($pk_value === null)
+				$conditions = array("{$pk[0]} is not null and {$options[0]}=?",$this->model->$options[0]);
+			else
+				$conditions = array("{$pk[0]}!=? and {$options[0]}=?",$pk_value,$this->model->$options[0]);
+
+			if ($this->model->exists(array('conditions' => $conditions)))
 				$this->record->add($options[0], $options['message']);
 		}
 	}
