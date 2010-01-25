@@ -834,7 +834,7 @@ class Model
 	}
 
 	/**
-	 * Passing strict as true will throw an exception if an attribute does not exist.
+	 * Passing $guard_attributes as true will throw an exception if an attribute does not exist.
 	 *
 	 * @throws ActiveRecord\UndefinedPropertyException
 	 * @param array $attributes An array in the form array(name => value, ...)
