@@ -1043,7 +1043,12 @@ class Model
 		$options['select'] = 'COUNT(*)';
 
 		if (!empty($args))
-			$options['conditions'] = call_user_func_array('static::pk_conditions',$args);
+		{
+			if (is_hash($args[0]))
+				$options['conditions'] = $args[0];
+			else
+				$options['conditions'] = call_user_func_array('static::pk_conditions',$args);
+		}
 
 		$table = static::table();
 		$sql = $table->options_to_sql($options);

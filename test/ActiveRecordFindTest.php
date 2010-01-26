@@ -223,6 +223,7 @@ class ActiveRecordFindTest extends DatabaseTest
 		$this->assert_true(Author::count() > 1);
 		$this->assert_equals(0,Author::count(array('conditions' => 'author_id=99999999999999')));
 		$this->assert_equals(2,Author::count(array('conditions' => 'author_id=1 or author_id=2')));
+		$this->assert_equals(1,Author::count(array('name' => 'Tito', 'author_id' => 1)));
 	}
 
 	public function test_exists()
