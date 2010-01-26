@@ -20,7 +20,7 @@ class ValidatesLengthOfTest extends DatabaseTest
 		parent::set_up($connection_name);
 		BookLength::$validates_length_of[0] = array('name', 'allow_blank' => false, 'allow_null' => false);
 	}
-
+	
 	public function test_within()
 	{
 		BookLength::$validates_length_of[0]['within'] = array(1, 5);
@@ -29,7 +29,7 @@ class ValidatesLengthOfTest extends DatabaseTest
 		$book->save();
 		$this->assert_false($book->errors->is_invalid('name'));
 	}
-
+	
 	public function test_valid_in()
 	{
 		BookLength::$validates_length_of[0]['in'] = array(1, 5);
@@ -236,6 +236,30 @@ class ValidatesLengthOfTest extends DatabaseTest
 		$book = new BookLength;
 		$book->name = null;
 		$book->save();
+	}
+
+	public function test_validates_length_of_maximum()
+	{
+		BookLength::$validates_length_of[0] = array('name', 'maximum' => 10);
+		$book = new BookLength(array('name' => '12345678901'));
+		$book->is_valid();
+		$this->assert_equals(array("Name is too long (maximum is 10 characters)"),$book->errors->full_messages());
+	}
+
+	public function test_validates_length_of_minimum()
+	{
+		BookLength::$validates_length_of[0] = array('name', 'minimum' => 2);
+		$book = new BookLength(array('name' => '1'));
+		$book->is_valid();
+		$this->assert_equals(array("Name is too short (minimum is 2 characters)"),$book->errors->full_messages());
+	}
+
+	public function test_validates_length_of_is()
+	{
+		BookLength::$validates_length_of[0] = array('name', 'is' => 2);
+		$book = new BookLength(array('name' => '123'));
+		$book->is_valid();
+		$this->assert_equals(array("Name is the wrong length (should be 2 characters)"),$book->errors->full_messages());
 	}
 };
 ?>

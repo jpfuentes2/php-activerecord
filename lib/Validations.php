@@ -488,28 +488,25 @@ class Validations
 				else
 					$message = $options['message'];
 
-				$message = str_replace('%d', $option, $message);
-
-				$attribute_value = $this->model->$attribute;
-				$option = (int)$attribute_value;
-
 				if (!is_null($this->model->$attribute))
 				{
+					$message = str_replace('%d', $option, $message);
+					$attribute_value = $this->model->$attribute;
 					$check = $validityChecks[$range_option];
+					$len = strlen($attribute_value);
 
-					if ('maximum' == $range_option && strlen($attribute_value) > $option)
+					if ('maximum' == $range_option && $len > $attr['maximum'])
 						$this->record->add($attribute, $message);
 
-					if ('minimum' == $range_option && strlen($attribute_value) < $option)
+					if ('minimum' == $range_option && $len < $attr['minimum'])
 						$this->record->add($attribute, $message);
 
-					if ('is' == $range_option && strlen($attribute_value) === $option)
+					if ('is' == $range_option && $len != $attr['is'])
 						$this->record->add($attribute, $message);
 				}
 			}
 		}
 	}
-
 
 	/**
 	 * Validates the uniqueness of a value.

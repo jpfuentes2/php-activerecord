@@ -3,7 +3,8 @@ include 'helpers/config.php';
 
 use ActiveRecord as AR;
 
-class BookValidations extends ActiveRecord\Model {
+class BookValidations extends ActiveRecord\Model
+{
 	static $table_name = 'books';
 	static $validates_presence_of = array(array('name'));
 	static $validates_uniqueness_of = array(array('name'));
