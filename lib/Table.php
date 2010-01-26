@@ -118,7 +118,7 @@ class Table
 		return $ret;
 	}
 
-	public function find($options)
+	public function options_to_sql($options)
 	{
 		$table = array_key_exists('from', $options) ? $options['from'] : $this->get_fully_qualified_table_name();
 		$sql = new SQLBuilder($this->conn, $table);
@@ -168,8 +168,13 @@ class Table
 		if (array_key_exists('having',$options))
 			$sql->having($options['having']);
 
-		$readonly = (array_key_exists('readonly',$options) && $options['readonly']) ? true : false;
+		return $sql;
+	}
 
+	public function find($options)
+	{
+		$sql = $this->options_to_sql($options);
+		$readonly = (array_key_exists('readonly',$options) && $options['readonly']) ? true : false;
 		return $this->find_by_sql($sql->to_s(),$sql->get_where_values(), $readonly);
 	}
 

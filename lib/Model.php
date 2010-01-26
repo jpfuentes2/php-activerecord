@@ -1040,10 +1040,14 @@ class Model
 	{
 		$args = func_get_args();
 		$options = static::extract_and_validate_options($args);
-		$options['select'] = 'COUNT(*) AS n';
+		$options['select'] = 'COUNT(*)';
 
-		$row = call_user_func_array('static::find',array_merge(array('first'),$args,array($options)));
-		return $row->attributes['n'];
+		if (!empty($args))
+			$options['conditions'] = call_user_func_array('static::pk_conditions',$args);
+
+		$table = static::table();
+		$sql = $table->options_to_sql($options);
+		return $table->conn->query_and_fetch_one($sql->to_s(),$sql->get_where_values());
 	}
 
 	/**
