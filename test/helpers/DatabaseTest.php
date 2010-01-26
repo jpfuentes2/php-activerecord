@@ -39,5 +39,18 @@ class DatabaseTest extends SnakeCase_PHPUnit_Framework_TestCase
 		if ($this->original_default_connection)
 			ActiveRecord\Config::instance()->set_default_connection($this->original_default_connection);
 	}
+
+	public function assert_exception_message_contains($contains, $closure)
+	{
+		$message = "";
+
+		try {
+			$closure();
+		} catch (ActiveRecord\UndefinedPropertyException $e) {
+			$message = $e->getMessage();
+		}
+
+		$this->assert_true(strpos($message,$contains) !== false);
+	}
 }
 ?>

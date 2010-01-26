@@ -80,7 +80,7 @@ class UndefinedPropertyException extends ModelException
 	 * @param str $property_name name of undefined property
 	 * @return void
 	 */
-	public function __construct($property_name)
+	public function __construct($class_name, $property_name)
 	{
 		if (is_array($property_name))
 		{
@@ -88,7 +88,7 @@ class UndefinedPropertyException extends ModelException
 			return;
 		}
 
-		$this->message = "Undefined property: $property_name in {$this->file} on line {$this->line}";
+		$this->message = "Undefined property: {$class_name}->{$property_name} in {$this->file} on line {$this->line}";
 		parent::__construct();
 	}
 };

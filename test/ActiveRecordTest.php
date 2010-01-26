@@ -80,6 +80,32 @@ class ActiveRecordTest extends DatabaseTest
 		$this->assert_equals(1, substr_count($exceptions[1], 'another_invalid_attribute'));
 	}
 
+	public function test_getter_undefined_property_exception_includes_model_name()
+	{
+		$this->assert_exception_message_contains("Author->this_better_not_exist",function()
+		{
+			$author = new Author();
+			$author->this_better_not_exist;
+		});
+	}
+
+	public function test_mass_assignment_undefined_property_exception_includes_model_name()
+	{
+		$this->assert_exception_message_contains("Author->this_better_not_exist",function()
+		{
+			new Author(array("this_better_not_exist" => "hi"));
+		});
+	}
+
+	public function test_setter_undefined_property_exception_includes_model_name()
+	{
+		$this->assert_exception_message_contains("Author->this_better_not_exist",function()
+		{
+			$author = new Author();
+			$author->this_better_not_exist = "hi";
+		});
+	}
+
 	public function test_get_values_for()
 	{
 		$book = Book::find_by_name('Ancient Art of Main Tanking');

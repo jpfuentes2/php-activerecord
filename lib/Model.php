@@ -363,7 +363,7 @@ class Model
 			}
 		}
 
-		throw new UndefinedPropertyException($name);
+		throw new UndefinedPropertyException(get_called_class(),$name);
 	}
 
 	/**
@@ -405,7 +405,7 @@ class Model
 				return $this->$item['to']->$delegated_name = $value;
 		}
 
-		throw new UndefinedPropertyException($name);
+		throw new UndefinedPropertyException(get_called_class(),$name);
 	}
 
 	/**
@@ -880,7 +880,7 @@ class Model
 		}
 
 		if (!empty($exceptions))
-			throw new UndefinedPropertyException($exceptions);
+			throw new UndefinedPropertyException(get_called_class(),$exceptions);
 	}
 
 	/**
