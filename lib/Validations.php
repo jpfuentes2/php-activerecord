@@ -422,7 +422,6 @@ class Validations
 		foreach ($attrs as $attr)
 		{
 			$options = array_merge($configuration, $attr);
-
 			$range_options = array_intersect(array_keys(self::$ALL_RANGE_OPTIONS), array_keys($attr));
 			sort($range_options);
 
@@ -480,19 +479,17 @@ class Validations
 				if (is_float($option))
 					throw new  ValidationsArgumentError("$range_option value cannot use a float for length.");
 
-				$validityChecks = array('is' => "!=", 'minimum' => "<=", 'maximum' => ">=" );
-				$messageOptions = array('is' => 'wrong_length', 'minimum' => 'too_short', 'maximum' => 'too_long');
-
-				if (isset($options[$messageOptions[$range_option]]))
-					$message = $options[$messageOptions[$range_option]];
-				else
-					$message = $options['message'];
-
 				if (!is_null($this->model->$attribute))
 				{
+					$messageOptions = array('is' => 'wrong_length', 'minimum' => 'too_short', 'maximum' => 'too_long');
+
+					if (isset($options[$messageOptions[$range_option]]))
+						$message = $options[$messageOptions[$range_option]];
+					else
+						$message = $options['message'];
+
 					$message = str_replace('%d', $option, $message);
 					$attribute_value = $this->model->$attribute;
-					$check = $validityChecks[$range_option];
 					$len = strlen($attribute_value);
 					$value = (int)$attr[$range_option];
 
