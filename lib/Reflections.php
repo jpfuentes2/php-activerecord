@@ -13,7 +13,7 @@ use ReflectionClass;
 class Reflections extends Singleton
 {
 	/**
-	 * Current reflections
+	 * Current reflections.
 	 *
 	 * @var array
 	 */
@@ -67,7 +67,7 @@ class Reflections extends Singleton
 	}
 
 	/**
-	 * Retreive a class name to be reflected.
+	 * Retrieve a class name to be reflected.
 	 *
 	 * @param mixed $mixed An object or name of a class
 	 * @return string

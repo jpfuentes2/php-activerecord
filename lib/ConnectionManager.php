@@ -12,7 +12,7 @@ namespace ActiveRecord;
 class ConnectionManager extends Singleton
 {
 	/**
-	 * Array of {@link Connection} objects
+	 * Array of {@link Connection} objects.
 	 * @var array
 	 */
 	static private $connections = array();

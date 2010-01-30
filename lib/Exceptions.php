@@ -47,14 +47,14 @@ class DatabaseException extends ActiveRecordException
 };
 
 /**
- * Thrown by {@link Model}
+ * Thrown by {@link Model}.
  *
  * @package ActiveRecord
  */
 class ModelException extends ActiveRecordException {};
 
 /**
- * Thrown by {@link Expressions}
+ * Thrown by {@link Expressions}.
  *
  * @package ActiveRecord
  */
@@ -68,14 +68,14 @@ class ExpressionsException extends ActiveRecordException {};
 class ConfigException extends ActiveRecordException {};
 
 /**
- * Thrown when attempting to access an invalid property on a {@link Model}
+ * Thrown when attempting to access an invalid property on a {@link Model}.
  *
  * @package ActiveRecord
  */
 class UndefinedPropertyException extends ModelException
 {
 	/**
-	 * Sets the exception message to show the undefined property's name
+	 * Sets the exception message to show the undefined property's name.
 	 *
 	 * @param str $property_name name of undefined property
 	 * @return void
@@ -101,7 +101,7 @@ class UndefinedPropertyException extends ModelException
 class ReadOnlyException extends ModelException
 {
 	/**
-	 * Sets the exception message to show the undefined property's name
+	 * Sets the exception message to show the undefined property's name.
 	 *
 	 * @param str $class_name name of the model that is read only
 	 * @param str $method_name name of method which attempted to modify the model

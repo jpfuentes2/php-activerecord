@@ -494,14 +494,15 @@ class Validations
 					$attribute_value = $this->model->$attribute;
 					$check = $validityChecks[$range_option];
 					$len = strlen($attribute_value);
+					$value = (int)$attr[$range_option];
 
-					if ('maximum' == $range_option && $len > $attr['maximum'])
+					if ('maximum' == $range_option && $len > $value)
 						$this->record->add($attribute, $message);
 
-					if ('minimum' == $range_option && $len < $attr['minimum'])
+					if ('minimum' == $range_option && $len < $value)
 						$this->record->add($attribute, $message);
 
-					if ('is' == $range_option && $len != $attr['is'])
+					if ('is' == $range_option && $len !== $value)
 						$this->record->add($attribute, $message);
 				}
 			}

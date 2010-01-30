@@ -110,7 +110,7 @@ abstract class AbstractRelationship implements InterfaceRelationship
 	}
 
 	/**
-	 * Creates a new instance of {@link Model} and invokes save
+	 * Creates a new instance of {@link Model} and invokes save.
 	 *
 	 * @param Model $model The model which holds this association
 	 * @param array $attributes Hash containing attributes to initialize the model with
@@ -164,7 +164,7 @@ abstract class AbstractRelationship implements InterfaceRelationship
 	/**
 	 * Infers the $this->class_name based on $this->attribute_name.
 	 *
-	 * Will try to guess the appropriate class by singularizing and uppercasing $this->attribute_name
+	 * Will try to guess the appropriate class by singularizing and uppercasing $this->attribute_name.
 	 *
 	 * @return void
 	 * @see attribute_name

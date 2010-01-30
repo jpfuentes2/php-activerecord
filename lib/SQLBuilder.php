@@ -30,7 +30,7 @@ class SQLBuilder
 	private $data;
 
 	/**
-	 * Constructicon.
+	 * Constructor.
 	 *
 	 * @param Connection $connection A database connection object
 	 * @param string $table Name of a table
@@ -192,7 +192,7 @@ class SQLBuilder
 	}
 
 	/**
-	 * Converts a string like "id_and_name_or_z" into a conditions value like array("id=? AND name=? OR z=?", values, ...)
+	 * Converts a string like "id_and_name_or_z" into a conditions value like array("id=? AND name=? OR z=?", values, ...).
 	 *
 	 * @param $name Underscored string
 	 * @param $values Array of values for the field names. This is used

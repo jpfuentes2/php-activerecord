@@ -107,7 +107,7 @@ class CallBack
 
 		foreach (static::$VALID_CALLBACKS as $name)
 		{
-			// look for excplitily defined static callback
+			// look for explicitly defined static callback
 			if (($definition = $this->klass->getStaticPropertyValue($name,null)))
 			{
 				if (!is_array($definition))
@@ -126,7 +126,7 @@ class CallBack
 	}
 
 	/**
-	 * Returnsm all the callbacks registered for a callback type.
+	 * Returns all the callbacks registered for a callback type.
 	 *
 	 * @param $name string Name of a callback (see {@link VALID_CALLBACKS $VALID_CALLBACKS})
 	 * @return array array of callbacks or null if invalid callback name.

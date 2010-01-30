@@ -9,11 +9,22 @@ namespace ActiveRecord;
  */
 abstract class Inflector
 {
+	/**
+	 * Get an instance of the {@link Inflector} class.
+	 *
+	 * @return object
+	 */
 	public static function instance()
 	{
 		return new StandardInflector();
 	}
 
+	/**
+	 * Turn a string into its camelized version.
+	 *
+	 * @param string $s string to convert
+	 * @return string
+	 */
 	public function camelize($s)
 	{
 		$s = preg_replace('/[_-]+/','_',trim($s));
@@ -59,6 +70,12 @@ abstract class Inflector
 		return (strtolower($s) === $s);
 	}
 
+	/**
+	 * Convert a camelized string to a lowercase, underscored string.
+	 *
+	 * @param string $s string to convert
+	 * @return string
+	 */
 	public function uncamelize($s)
 	{
 		$normalized = '';
@@ -73,6 +90,12 @@ abstract class Inflector
 		return trim($normalized,' _');
 	}
 
+	/**
+	 * Convert a string with space into a underscored equivalent.
+	 *
+	 * @param string $s string to convert
+	 * @return string
+	 */
 	public function underscorify($s)
 	{
 		return preg_replace(array('/[_\- ]+/','/([a-z])([A-Z])/'),array('_','\\1_\\2'),trim($s));

@@ -15,7 +15,7 @@ namespace ActiveRecord;
 abstract class Singleton
 {
 	/**
-	 * Array of cached singleton objects
+	 * Array of cached singleton objects.
 	 *
 	 * @var array
 	 */
@@ -37,7 +37,7 @@ abstract class Singleton
 	}
 
 	/**
-	 * Singleton objects should not be cloned
+	 * Singleton objects should not be cloned.
 	 *
 	 * @return void
 	 */

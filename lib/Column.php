@@ -20,6 +20,7 @@ class Column
 	const DATE		= 5;
 
 	/**
+	 * Map a type to an column type.
 	 * @static
 	 * @var array
 	 */
@@ -47,7 +48,7 @@ class Column
 	public $name;
 
 	/**
-	 * The inflected name of this columns .. hyphens/spaces will be => _
+	 * The inflected name of this columns .. hyphens/spaces will be => _.
 	 * @var string
 	 */
 	public $inflected_name;
