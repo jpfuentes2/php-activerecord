@@ -1,12 +1,9 @@
 # PHP ActiveRecord #
 
-Version 0.9 beta - Sun 17 May 2009
+Version 0.9 beta
 
 by Kien La and Jacques Fuentes
-<phpactiverecord@gmail.com>
-<http://www.phpactiverecord.org/>
-
-Information can be found on our blog here: <http://www.derivante.com/>
+http://www.phpactiverecord.org/
 
 ## Introduction ##
 A brief summarization of what ActiveRecord is:
@@ -67,11 +64,11 @@ cache it so that it does not make multiple calls to the database for a single sc
 - Validations
 - Callbacks
 - Serializations (json/xml)
+- Transactions
 - Support for multiple adapters
 - Miscellaneous options such as: aliased/protected/accessible attributes
 
 Here are some other features we hope to include in later versions:
-- Transactions
 - Named scopes
 - More adapters
 - Relationship includes
