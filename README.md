@@ -3,7 +3,8 @@
 Version 0.9 beta
 
 by Kien La and Jacques Fuentes
-http://www.phpactiverecord.org/
+
+<http://www.phpactiverecord.org/>
 
 ## Introduction ##
 A brief summarization of what ActiveRecord is:
