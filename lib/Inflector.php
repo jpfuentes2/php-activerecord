@@ -110,6 +110,6 @@ abstract class Inflector
 class StandardInflector extends Inflector
 {
 	public function tableize($s) { return Utils::pluralize(strtolower($this->underscorify($s))); }
-	public function variablize($s) { return $this->underscorify($s); }
+	public function variablize($s) { return str_replace(array('-',' '),array('_','_'),strtolower(trim($s))); }
 }
 ?>

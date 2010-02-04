@@ -8,7 +8,8 @@ CREATE TABLE authors(
 	updated_at timestamp,
 	created_at timestamp,
 	some_date date,
-	encrypted_password varchar(50)
+	encrypted_password varchar(50),
+	mixedCaseField varchar(50)
 );
 
 CREATE TABLE books(

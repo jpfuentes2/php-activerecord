@@ -116,8 +116,20 @@ class ActiveRecordTest extends DatabaseTest
 
 	public function test_hyphenated_column_names_to_underscore()
 	{
-		$res = RmBldg::first();
-		$this->assert_equals('name',$res->rm_name);
+		$keys = array_keys(RmBldg::first()->first()->attributes());
+		$this->assert_true(in_array('rm_name',$keys));
+	}
+
+	public function test_column_names_with_spaces()
+	{
+		$keys = array_keys(RmBldg::first()->attributes());
+		$this->assert_true(in_array('space_out',$keys));
+	}
+
+	public function test_mixed_case_column_name()
+	{
+		$keys = array_keys(Author::first()->attributes());
+		$this->assert_true(in_array('mixedcasefield',$keys));
 	}
 
 	public function test_reload()
@@ -153,7 +165,7 @@ class ActiveRecordTest extends DatabaseTest
 	public function test_should_have_all_column_attributes_when_initializing_with_array()
 	{
 		$author = new Author(array('name' => 'Tito'));
-		$this->assert_equals(array('author_id','parent_author_id','name','updated_at','created_at','some_date','encrypted_password'),array_keys($author->attributes()));
+		$this->assert_equals(8,count(array_keys($author->attributes())));
 	}
 
 	public function test_defaults()

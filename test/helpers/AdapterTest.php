@@ -209,7 +209,7 @@ class AdapterTest extends DatabaseTest
 	public function test_columns()
 	{
 		$columns = $this->conn->columns('authors');
-		$this->assert_equals(array('author_id','parent_author_id','name','updated_at','created_at','some_date','encrypted_password'),array_keys($columns));
+		$this->assert_equals(array('author_id','parent_author_id','name','updated_at','created_at','some_date','encrypted_password','mixedCaseField'),array_keys($columns));
 
 		$this->assert_equals(true,$columns['author_id']->pk);
 		$this->assert_equals('int',$columns['author_id']->raw_type);
