@@ -338,7 +338,7 @@ class Model
 
 		if ($name == 'id')
 		{
-			if (count(($this->get_primary_key(true))) > 1)
+			if (count($this->get_primary_key()) > 1)
 				throw new Exception("TODO composite key support");
 
 			if (isset($this->attributes[$table->pk[0]]))
@@ -457,10 +457,9 @@ class Model
 	/**
 	 * Retrieve the primary key name.
 	 *
-	 * @param boolean $inflect Set to true to inflect the key name
 	 * @return string The primary key for the model
 	 */
-	public function get_primary_key($inflect=true)
+	public function get_primary_key()
 	{
 		return Table::load(get_class($this))->pk;
 	}
@@ -631,7 +630,7 @@ class Model
 			$table->insert($this->attributes);
 		$this->invoke_callback('after_create',false);
 
-		$pk = $this->get_primary_key(false);
+		$pk = $this->get_primary_key();
 
 		// if we've got an autoincrementing pk set it
 		if (count($pk) == 1 && $table->columns[$pk[0]]->auto_increment)
