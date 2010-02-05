@@ -415,5 +415,10 @@ class ActiveRecordFindTest extends DatabaseTest
 	{
 		Author::find(0);
 	}
+
+	public function test_count_by()
+	{
+		$this->assert_equals(2,Venue::count_by_state('VA'));
+	}
 };
 ?>
