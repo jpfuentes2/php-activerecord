@@ -116,7 +116,7 @@ class ActiveRecordTest extends DatabaseTest
 
 	public function test_hyphenated_column_names_to_underscore()
 	{
-		$keys = array_keys(RmBldg::first()->first()->attributes());
+		$keys = array_keys(RmBldg::first()->attributes());
 		$this->assert_true(in_array('rm_name',$keys));
 	}
 
@@ -130,6 +130,14 @@ class ActiveRecordTest extends DatabaseTest
 	{
 		$keys = array_keys(Author::first()->attributes());
 		$this->assert_true(in_array('mixedcasefield',$keys));
+	}
+
+	public function test_mixed_case_primary_key_save()
+	{
+		$venue = Venue::find(1);
+		$venue->name = 'should not throw exception';
+		$venue->save();
+		$this->assert_equals($venue->name,Venue::find(1)->name);
 	}
 
 	public function test_reload()

@@ -11,7 +11,7 @@ CREATE TABLE authors(
 
 CREATE TABLE books(
 	book_id INTEGER NOT NULL PRIMARY KEY,
-	author_id INT,
+	Author_Id INT,
 	secondary_author_id INT,
 	name VARCHAR(50),
 	numeric_test VARCHAR(10) DEFAULT '0',
@@ -19,7 +19,7 @@ CREATE TABLE books(
 );
 
 CREATE TABLE venues (
-  id INTEGER NOT NULL PRIMARY KEY,
+  Id INTEGER NOT NULL PRIMARY KEY,
   name varchar(50),
   city varchar(60),
   state char(2),

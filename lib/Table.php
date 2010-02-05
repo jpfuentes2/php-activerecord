@@ -197,6 +197,16 @@ class Table
 		return $list;
 	}
 
+	public function get_column_by_inflected_name($inflected_name)
+	{
+		foreach ($this->columns as $raw_name => $column)
+		{
+			if ($column->inflected_name == $inflected_name)
+				return $column;
+		}
+		return null;
+	}
+
 	public function get_fully_qualified_table_name()
 	{
 		$table = $this->conn->quote_name($this->table);
@@ -306,7 +316,7 @@ class Table
 			foreach ($this->columns as $c)
 			{
 				if ($c->pk)
-					$this->pk[] = $c->name;
+					$this->pk[] = $c->inflected_name;
 			}
 		}
 	}

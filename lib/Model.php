@@ -633,11 +633,8 @@ class Model
 		$pk = $this->get_primary_key();
 
 		// if we've got an autoincrementing pk set it
-		if (count($pk) == 1 && $table->columns[$pk[0]]->auto_increment)
-		{
-			$inflector = Inflector::instance();
-			$this->attributes[$inflector->variablize($pk[0])] = $table->conn->insert_id($table->sequence);
-		}
+		if (count($pk) == 1 && $table->get_column_by_inflected_name($pk[0])->auto_increment)
+			$this->attributes[$pk[0]] = $table->conn->insert_id($table->sequence);
 
 		$this->__new_record = false;
 		return true;
