@@ -10,6 +10,8 @@
 - has_one should not extend has_many ... need to have them descend from another class
 - added "dependent" option to associations
 
+- verify actual support of find_by_xxx
+
 == Testing
 
 - more tests for to_xml

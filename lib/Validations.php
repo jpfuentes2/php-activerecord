@@ -4,7 +4,7 @@
  * this piece can be considered a straight port. The reason for this is that the vaildation process is
  * tricky due to order of operations/events. The former combined with PHP's odd typecasting means
  * that it was easier to formulate this piece base on the rails code.
- * 
+ *
  * @package ActiveRecord
  */
 
@@ -32,7 +32,7 @@ use ArrayIterator;
  * $person->state = 'this is not two characters';
  *
  * if (!$person->is_valid())
- *   print_r($person->errors); 
+ *   print_r($person->errors);
  * </code>
  *
  * @package ActiveRecord
@@ -135,13 +135,13 @@ class Validations
 	 *
 	 * <ul>
 	 * <li><b>message:</b> custom error message</li>
-	 * </ul> 
+	 * </ul>
 	 *
 	 * @param array $attrs Validation definition
 	 */
 	public function validates_presence_of($attrs)
 	{
-		$configuration = array_merge(self::$DEFAULT_VALIDATION_OPTIONS ,array('message' =>  Errors::$DEFAULT_ERROR_MESSAGES['blank'], 'on' => 'save'));
+		$configuration = array_merge(self::$DEFAULT_VALIDATION_OPTIONS, array('message' => Errors::$DEFAULT_ERROR_MESSAGES['blank'], 'on' => 'save'));
 
 		foreach ($attrs as $attr)
 		{
@@ -196,7 +196,7 @@ class Validations
 	 */
 	public function validates_inclusion_or_exclusion_of($type, $attrs)
 	{
-		$configuration = array_merge(self::$DEFAULT_VALIDATION_OPTIONS, array('message' =>  Errors :: $DEFAULT_ERROR_MESSAGES[$type], 'on' => 'save'));
+		$configuration = array_merge(self::$DEFAULT_VALIDATION_OPTIONS, array('message' => Errors::$DEFAULT_ERROR_MESSAGES[$type], 'on' => 'save'));
 
 		foreach ($attrs as $attr)
 		{
@@ -217,7 +217,7 @@ class Validations
 			if ($this->is_null_with_option($var, $options) || $this->is_blank_with_option($var, $options))
 				continue;
 
-			if ( ( 'inclusion' == $type && !in_array($var, $enum) ) || ( 'exclusion' == $type && in_array($var, $enum)) )
+			if (('inclusion' == $type && !in_array($var, $enum)) || ('exclusion' == $type && in_array($var, $enum)))
 				$this->record->add($attribute, $message);
 		}
 	}
@@ -339,7 +339,7 @@ class Validations
 
 	/**
 	 * Alias of {@link validates_length_of}
-	 * 
+	 *
 	 * @param array $attrs Validation definition
 	 */
 	public function validates_size_of($attrs)
@@ -369,7 +369,7 @@ class Validations
 	 */
 	public function validates_format_of($attrs)
 	{
-		$configuration = array_merge(self::$DEFAULT_VALIDATION_OPTIONS, array('message' =>  Errors::$DEFAULT_ERROR_MESSAGES['invalid'], 'on' => 'save', 'with' => null ));
+		$configuration = array_merge(self::$DEFAULT_VALIDATION_OPTIONS, array('message' => Errors::$DEFAULT_ERROR_MESSAGES['invalid'], 'on' => 'save', 'with' => null));
 
 		foreach ($attrs as $attr)
 		{
@@ -414,9 +414,9 @@ class Validations
 	public function validates_length_of($attrs)
 	{
 		$configuration = array_merge(self::$DEFAULT_VALIDATION_OPTIONS, array(
-			'too_long'     =>  Errors::$DEFAULT_ERROR_MESSAGES['too_long'],
-			'too_short'    =>  Errors::$DEFAULT_ERROR_MESSAGES['too_short'],
-			'wrong_length' =>  Errors::$DEFAULT_ERROR_MESSAGES['wrong_length']
+			'too_long'     => Errors::$DEFAULT_ERROR_MESSAGES['too_long'],
+			'too_short'    => Errors::$DEFAULT_ERROR_MESSAGES['too_short'],
+			'wrong_length' => Errors::$DEFAULT_ERROR_MESSAGES['wrong_length']
 		));
 
 		foreach ($attrs as $attr)
@@ -643,7 +643,7 @@ class Errors implements IteratorAggregate
 	 * Adds an error message only if the attribute value is {@link http://www.php.net/empty empty}.
 	 *
 	 * @param string $attribute Name of an attribute on the model
-	 * @param string $msg The error message 
+	 * @param string $msg The error message
 	 */
 	public function add_on_empty($attribute, $msg)
 	{
@@ -715,12 +715,12 @@ class Errors implements IteratorAggregate
 
 	/**
 	 * Returns all the error messages as an array.
-	 * 
+	 *
 	 * <code>
 	 * $model->errors->full_messages();
 	 *
 	 * # array(
-	 * #  "Name can't be blank", 
+	 * #  "Name can't be blank",
 	 * #  "State is the wrong length (should be 2 chars)"
 	 * # )
 	 * </code>
