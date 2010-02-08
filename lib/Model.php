@@ -980,6 +980,11 @@ class Model
 			$options['conditions'] = SQLBuilder::create_conditions_from_underscored_string(substr($method,12),$args,static::$alias_attribute);
 			return static::find('all',$options);
 		}
+		elseif (substr($method,0,8) === 'count_by')
+		{
+		    $options['conditions'] = SQLBuilder::create_conditions_from_underscored_string(substr($method,9),$args,static::$alias_attribute);
+		    return static::count($options);
+		}
 
 		throw new ActiveRecordException("Call to undefined method: $method");
 	}
