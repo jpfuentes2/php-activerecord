@@ -923,6 +923,9 @@ class Model
 	 * SomeModel::find_by_first_name_and_last_name('Tito','the Grief');
 	 * SomeModel::find_by_first_name_or_last_name('Tito','the Grief');
 	 * SomeModel::find_all_by_last_name('Smith');
+	 * SomeModel::count_by_name('Bob')
+	 * SomeModel::count_by_name_or_state('Bob','VA')
+	 * SomeModel::count_by_name_and_state('Bob','VA')
 	 * </code>
 	 *
 	 * You can also create the model if the find call returned no results:
