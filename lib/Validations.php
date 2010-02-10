@@ -461,7 +461,7 @@ class Validations
 				$too_long =  isset($options['message']) ? $options['message'] : $options['too_long'];
 
 				$too_short = str_replace('%d', $range[0], $too_short);
-				$too_long = str_replace('%d', $range[0], $too_long);
+				$too_long = str_replace('%d', $range[1], $too_long);
 
 				if (strlen($this->model->$attribute) < (int)$range[0])
 					$this->record->add($attribute, $too_short);

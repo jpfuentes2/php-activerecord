@@ -29,7 +29,20 @@ class ValidatesLengthOfTest extends DatabaseTest
 		$book->save();
 		$this->assert_false($book->errors->is_invalid('name'));
 	}
-	
+
+	public function test_within_error_message()
+	{
+		BookLength::$validates_length_of[0]['within'] = array(2,5);
+		$book = new BookLength();
+		$book->name = '1';
+		$book->is_valid();
+		$this->assert_equals(array('Name is too short (minimum is 2 characters)'),$book->errors->full_messages());
+
+		$book->name = '123456';
+		$book->is_valid();
+		$this->assert_equals(array('Name is too long (maximum is 5 characters)'),$book->errors->full_messages());
+	}
+
 	public function test_valid_in()
 	{
 		BookLength::$validates_length_of[0]['in'] = array(1, 5);
