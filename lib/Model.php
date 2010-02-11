@@ -1018,6 +1018,8 @@ class Model
 				return $association->$method($this, $args);
 			}
 		}
+
+		throw new ActiveRecordException("Call to undefined method: $method");
 	}
 
 	/**

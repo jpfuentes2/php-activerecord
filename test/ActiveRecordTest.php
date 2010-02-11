@@ -379,5 +379,13 @@ class ActiveRecordTest extends DatabaseTest
 	{
 		$this->assert_equals('authors',Author::table_name());
 	}
+
+	/**
+	 * @expectedException ActiveRecord\ActiveRecordException
+	 */
+	public function test_undefined_instance_method()
+	{
+		Author::first()->find_by_name('sdf');
+	}
 };
 ?>
