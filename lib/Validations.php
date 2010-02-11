@@ -531,13 +531,37 @@ class Validations
 			$pk = $this->model->get_primary_key();
 			$pk_value = $this->model->$pk[0];
 
-			if ($pk_value === null)
-				$conditions = array("{$pk[0]} is not null and {$options[0]}=?",$this->model->$options[0]);
-			else
-				$conditions = array("{$pk[0]}!=? and {$options[0]}=?",$pk_value,$this->model->$options[0]);
+			$add_record = $options[0];
+			$fields = array($options[0]);
+			
+			if(is_array($options[0]))
+			{
+				$add_record = join("_and_", $options[0]);
+				$fields = $options[0];	
+			}
 
+			$conditions_string = array();
+			$conditions_args = array();
+			
+			if($pk_value === null)
+				array_push($conditions_string, "{$pk[0]} is not null");
+			else
+			{
+				array_push($conditions_string, "{$pk[0]}!=?");
+				array_push($conditions_args, $pk_value);
+			}
+			
+			foreach($fields as $field){
+				array_push($conditions_string, "{$field}=?");
+				array_push($conditions_args, $this->model->$field);
+			}
+
+			$conditions = array(join(" and ", $conditions_string));
+			foreach($conditions_args as $arg)
+				array_push($conditions, $arg);
+			
 			if ($this->model->exists(array('conditions' => $conditions)))
-				$this->record->add($options[0], $options['message']);
+				$this->record->add($add_record, $options['message']);
 		}
 	}
 
