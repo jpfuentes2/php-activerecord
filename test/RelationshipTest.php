@@ -10,7 +10,7 @@ class RelationshipTest extends DatabaseTest
 	{
 		parent::set_up($connection_name);
 		Event::$belongs_to = array(array('venue'), array('host'));
-		Venue::$has_many = array(array('events'));
+		Venue::$has_many = array(array('events'),array('hosts', 'through' => 'events'));
 		Venue::$has_one = array();
 		Employee::$has_one = array(array('position'));
 		Host::$has_many = array(array('events'));
@@ -257,11 +257,19 @@ class RelationshipTest extends DatabaseTest
 
 	public function test_has_many_through1()
 	{
-		Event::$belongs_to = array(array('host'));
-		Venue::$has_many[1] = array('hosts', 'through' => 'events');
+		$hosts = Venue::find(2)->hosts;
+		$this->assert_equals(2,$hosts[0]->id);
+		$this->assert_equals(3,$hosts[1]->id);
+	}
 
-		$venue = $this->get_relationship();
-		$this->assert_true(count($venue->hosts) > 0);
+	public function test_gh16_has_many_through_inside_a_loop_should_not_cause_an_exception()
+	{
+		$count = 0;
+
+		foreach (Venue::all() as $venue)
+			$count += count($venue->hosts);
+
+		$this->assert_true($count >= 5);
 	}
 
 	/**

@@ -348,30 +348,33 @@ class HasMany extends AbstractRelationship
 
 	public function load(Model $model)
 	{
-		$inflector = Inflector::instance();
 		$class_name = $this->class_name;
-		$table = $this->get_table();
 		$this->set_keys(get_class($model));
 
-		if ($this->through)
+		// since through relationships depend on other relationships we can't do
+		// this initiailization in the constructor since the other relationship
+		// may not have been created yet and we only want this to run once
+		if (!isset($this->initialized))
 		{
-			$table_name = $table->get_fully_qualified_table_name();
+			if ($this->through)
+			{
+				// verify through is a belongs_to or has_many for access of keys
+				if (!($through_relationship = $this->get_table()->get_relationship($this->through)))
+					throw new HasManyThroughAssociationException("Could not find the association $this->through in model " . get_class($model));
 
-			//verify through is a belongs_to or has_many for access of keys
-			if (!($through_relationship = $table->get_relationship($this->through)))
-				throw new HasManyThroughAssociationException("Could not find the association $this->through in model ".get_class($model));
+				if (!($through_relationship instanceof HasMany) && !($through_relationship instanceof BelongsTo))
+					throw new HasManyThroughAssociationException('has_many through can only use a belongs_to or has_many association');
 
-			if (!($through_relationship instanceof HasMany) && !($through_relationship instanceof BelongsTo))
-				throw new HasManyThroughAssociationException('has_many through can only use a belongs_to or has_many association');
+				$through_table = Table::load(classify($this->through, true));
+				$through_table_name = $through_table->get_fully_qualified_table_name();
 
-			$through_table = Table::load(classify($this->through, true));
-			$through_table_name = $through_table->get_fully_qualified_table_name();
-			$through_pk = $this->keyify($class_name);
+				$this->options['joins'] = $this->construct_inner_join_sql($through_table, true);
 
-			$this->options['joins'] = $this->construct_inner_join_sql($through_table, true);
+				foreach ($this->foreign_key as $index => &$key)
+					$key = "$through_table_name.$key";
+			}
 
-			foreach ($this->foreign_key as $index => &$key)
-				$key = "$through_table_name.$key";
+			$this->initialized = true;
 		}
 
 		if (!($conditions = $this->create_conditions_from_keys($model, $this->foreign_key, $this->primary_key)))
