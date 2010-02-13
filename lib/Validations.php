@@ -650,10 +650,10 @@ class Errors implements IteratorAggregate
 	 */
 	public function add_on_blank($attribute, $msg)
 	{
-		if (is_null($msg))
-			$msg = self :: $DEFAULT_ERROR_MESSAGES['blank'];
+		if (!$msg)
+			$msg = self::$DEFAULT_ERROR_MESSAGES['blank'];
 
-		if (!strlen($this->model->$attribute))
+		if (!$this->model->$attribute)
 			$this->add($attribute, $msg);
 	}
 

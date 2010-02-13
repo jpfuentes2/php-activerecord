@@ -10,47 +10,59 @@ class BookPresence extends ActiveRecord\Model
 	);
 }
 
+class AuthorPresence extends ActiveRecord\Model
+{
+	static $table_name = 'authors';
+
+	static $validates_presence_of = array(
+		array('some_date')
+	);
+};
+
 class ValidatesPresenceOfTest extends DatabaseTest
 {
 	public function test_presence()
 	{
-		$book = new BookPresence;
-		$book->name = 'blah';
-		$book->save();
-		$this->assert_false($book->errors->is_invalid('name'));
+		$book = new BookPresence(array('name' => 'blah'));
+		$this->assert_false($book->is_invalid());
 	}
 
+	public function test_presence_on_date_field_is_valid()
+	{
+		$author = new AuthorPresence(array('some_date' => '2010-01-01'));
+		$this->assert_true($author->is_valid());
+	}
+
+	public function test_presence_on_date_field_is_not_valid()
+	{
+		$author = new AuthorPresence();
+		$this->assert_false($author->is_valid());
+	}
+	
 	public function test_invalid_null()
 	{
-		$book = new BookPresence;
-		$book->name = null;
-		$book->save();
-		$this->assert_true($book->errors->is_invalid('name'));
+		$book = new BookPresence(array('name' => null));
+		$this->assert_true($book->is_invalid());
 	}
 
 	public function test_invalid_blank()
 	{
-		$book = new BookPresence;
-		$book->name = '';
-		$book->save();
-		$this->assert_true($book->errors->is_invalid('name'));
+		$book = new BookPresence(array('name' => ''));
+		$this->assert_true($book->is_invalid());
 	}
 
 	public function test_valid_white_space()
 	{
-		$book = new BookPresence;
-		$book->name = ' ';
-		$book->save();
-		$this->assert_false($book->errors->is_invalid('name'));
+		$book = new BookPresence(array('name' => ' '));
+		$this->assert_false($book->is_invalid());
 	}
 
 	public function test_custom_message()
 	{
 		BookPresence::$validates_presence_of[0]['message'] = 'is using a custom message.';
 
-		$book = new BookPresence;
-		$book->name = null;
-		$book->save();
+		$book = new BookPresence(array('name' => null));
+		$book->is_valid();
 		$this->assert_equals('is using a custom message.', $book->errors->on('name'));
 	}
 };
