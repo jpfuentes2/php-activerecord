@@ -113,6 +113,9 @@ class Column
 			case self::DECIMAL:	return (double)$value;
 			case self::DATETIME:
 			case self::DATE:
+				if (!$value)
+					return null;
+				
 				if ($value instanceof DateTime)
 					return $value;
 

@@ -95,5 +95,21 @@ class ColumnTest extends SnakeCase_PHPUnit_Framework_TestCase
 			$this->assert_cast($type,null,null);
 		}
 	}
+
+	public function test_empty_and_null_date_strings_should_return_null()
+	{
+		$column = new Column();
+		$column->type = Column::DATE;
+		$this->assert_equals(null,$column->cast(null));
+		$this->assert_equals(null,$column->cast(''));
+	}
+
+	public function test_empty_and_null_datetime_strings_should_return_null()
+	{
+		$column = new Column();
+		$column->type = Column::DATETIME;
+		$this->assert_equals(null,$column->cast(null));
+		$this->assert_equals(null,$column->cast(''));
+	}
 }
 ?>
