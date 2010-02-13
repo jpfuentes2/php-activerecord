@@ -7,13 +7,16 @@ class BookValidations extends ActiveRecord\Model
 {
 	static $table_name = 'books';
 	static $validates_presence_of = array(array('name'));
-	static $validates_uniqueness_of = array(array('name'));
+	static $validates_uniqueness_of = array();
 };
 
-class ValidationsTest extends SnakeCase_PHPUnit_Framework_TestCase
+class ValidationsTest extends DatabaseTest
 {
-	public function set_up()
+	public function set_up($connection_name=null)
 	{
+		parent::set_up($connection_name);
+
+		BookValidations::$validates_uniqueness_of[0] = array('name');
 	}
 
 	public function test_is_valid_invokes_validations()
@@ -67,7 +70,6 @@ class ValidationsTest extends SnakeCase_PHPUnit_Framework_TestCase
 
 	public function test_validates_uniqueness_of()
 	{
-		BookValidations::connection()->query("delete from books where name='bob'");
 		BookValidations::create(array('name' => 'bob'));
 		$book = BookValidations::create(array('name' => 'bob'));
 
@@ -79,6 +81,23 @@ class ValidationsTest extends SnakeCase_PHPUnit_Framework_TestCase
 	{
 		$book = BookValidations::first();
 		$this->assert_equals(true,$book->is_valid()); 
+	}
+
+	public function test_validates_uniqueness_of_with_multiple_fields()
+	{
+		BookValidations::$validates_uniqueness_of[0] = array(array('name','special'));
+		$book1 = BookValidations::first();
+		$book2 = new BookValidations(array('name' => $book1->name, 'special' => $book1->special+1));
+		$this->assert_true($book2->is_valid());
+	}
+
+	public function test_validates_uniqueness_of_with_multiple_fields_is_not_unique()
+	{
+		BookValidations::$validates_uniqueness_of[0] = array(array('name','special'));
+		$book1 = BookValidations::first();
+		$book2 = new BookValidations(array('name' => $book1->name, 'special' => $book1->special));
+		$this->assert_false($book2->is_valid());
+		$this->assert_equals(array('Name and special must be unique'),$book2->errors->full_messages());
 	}
 };
 ?>
