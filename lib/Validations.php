@@ -512,7 +512,8 @@ class Validations
 	 * <code>
 	 * class Person extends ActiveRecord\Model {
 	 *   static $validates_uniqueness_of = array(
-	 *     array('name')
+	 *     array('name'),
+	 *     array(array('blah','bleh'), 'message' => 'blech')
 	 *   );
 	 * }
 	 * </code>
@@ -531,35 +532,36 @@ class Validations
 			$pk = $this->model->get_primary_key();
 			$pk_value = $this->model->$pk[0];
 
-			$add_record = $options[0];
-			$fields = array($options[0]);
-			
-			if(is_array($options[0]))
+			if (is_array($options[0]))
 			{
 				$add_record = join("_and_", $options[0]);
 				$fields = $options[0];	
 			}
-
-			$conditions_string = array();
-			$conditions_args = array();
-			
-			if($pk_value === null)
-				array_push($conditions_string, "{$pk[0]} is not null");
 			else
 			{
-				array_push($conditions_string, "{$pk[0]}!=?");
-				array_push($conditions_args, $pk_value);
-			}
-			
-			foreach($fields as $field){
-				array_push($conditions_string, "{$field}=?");
-				array_push($conditions_args, $this->model->$field);
+				$add_record = $options[0];
+				$fields = array($options[0]);
 			}
 
-			$conditions = array(join(" and ", $conditions_string));
-			foreach($conditions_args as $arg)
-				array_push($conditions, $arg);
-			
+			$sql = "";
+			$conditions = array("");
+
+			if ($pk_value === null)
+				$sql = "{$pk[0]} is not null";
+			else
+			{
+				$sql = "{$pk[0]}!=?";
+				array_push($conditions,$pk_value);
+			}
+
+			foreach ($fields as $field)
+			{
+				$sql .= " and {$field}=?";
+				array_push($conditions,$this->model->$field);
+			}
+
+			$conditions[0] = $sql;
+
 			if ($this->model->exists(array('conditions' => $conditions)))
 				$this->record->add($add_record, $options['message']);
 		}
