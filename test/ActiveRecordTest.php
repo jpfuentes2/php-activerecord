@@ -208,6 +208,11 @@ class ActiveRecordTest extends DatabaseTest
 		$this->assert_equals($venue->marquee,$venue->name);
 	}
 
+	public function test_gh18_isset_on_aliased_attribute()
+	{
+		$this->assert_true(isset(Venue::first()->marquee));
+	}
+
 	public function test_attr_accessible()
 	{
 		$book = new BookAttrAccessible(array('name' => 'should not be set', 'author_id' => 1));
