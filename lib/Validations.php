@@ -108,13 +108,8 @@ class Validations
 		if (empty($this->validators))
 			return $this->record;
 
-		$inflector = Inflector :: instance();
-
 		foreach ($this->validators as $validate)
-		{
-			$func =	$inflector->variablize($validate);
-			$this->$func($reflection->getStaticPropertyValue($validate));
-		}
+			$this->$validate($reflection->getStaticPropertyValue($validate));
 
 		return $this->record;
 	}
