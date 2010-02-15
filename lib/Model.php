@@ -465,6 +465,32 @@ class Model
 	}
 
 	/**
+	 * Returns array of validator data for this Model.
+	 * 
+	 * Will return an array looking like:
+	 * 
+	 * <code>
+	 * array(
+	 *   'name' => array(
+	 *     array('validator' => 'validates_presence_of'),
+	 *     array('validator' => 'validates_inclusion_of', 'in' => array('Bob','Joe','John')),
+	 *   'password' => array(
+	 *     array('validator' => 'validates_length_of', 'minimum' => 6))
+	 *   )
+	 * );
+	 * </code>
+	 *
+	 * @return array An array containing validator data for this model.
+	 */
+	public function get_validation_rules()
+	{
+		require_once 'Validations.php';
+
+		$validator = new Validations($this);
+		return $validator->rules();
+	}
+
+	/**
 	 * Returns an associative array containing values for all the attributes in $attributes
 	 *
 	 * @param array $attributes Array containing attribute names
@@ -724,6 +750,7 @@ class Model
 	private function _validate()
 	{
 		require_once 'Validations.php';
+
 		$validator = new Validations($this);
 		$validation_on = 'validation_on_' . ($this->is_new_record() ? 'create' : 'update');
 

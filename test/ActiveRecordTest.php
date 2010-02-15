@@ -392,5 +392,12 @@ class ActiveRecordTest extends DatabaseTest
 	{
 		Author::first()->find_by_name('sdf');
 	}
+
+	public function test_get_validation_rules()
+	{
+		$validators = RmBldg::first()->get_validation_rules();
+		$this->assert_true(array_key_exists('space_out',$validators));
+		$this->assert_true(in_array(array('with' => '/\A([^@\s]+)@((?:[-a-z0-9]+\.)+[a-z]{2,})\Z/i', 'validator' => 'validates_format_of'),$validators['space_out']));
+	}
 };
 ?>
