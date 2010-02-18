@@ -1,6 +1,6 @@
 <?php
 /**
- *   
+ *
  * @package ActiveRecord
  */
 
@@ -53,19 +53,22 @@ function classify($class_name, $singularize=false)
 	return ucfirst($class_name);
 }
 
-
+// http://snippets.dzone.com/posts/show/4660
 function array_flatten(array $array)
 {
-	$result = array();
+	$i = 0;
+	$n = count($array);
 
-	foreach ($array as $element)
+	while ($i < $n)
 	{
-	    if (is_array($element))
-	        $result = array_merge($result, array_flatten($element));
-	    else
-	        array_push($result, $element);
-	}
-	return $result;
+		if (is_array($array[$i]))
+			array_splice($array,$i,1,$array[$i]);
+        else
+			++$i;
+
+		$n = count($array);
+    }
+    return $array;
 }
 
 /**

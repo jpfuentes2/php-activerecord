@@ -51,7 +51,7 @@ class UtilsTest extends SnakeCase_PHPUnit_Framework_TestCase
 		$this->assert_equals(array(1, 2, 3), ActiveRecord\array_flatten(array(1, array(2), 3)));
 		$this->assert_equals(array(1, 2, 3, 4), ActiveRecord\array_flatten(array(1, array(2, 3), 4)));
 		$this->assert_equals(array(1, 2, 3, 4, 5, 6), ActiveRecord\array_flatten(array(1, array(2, 3), 4, array(5, 6))));
-    }
+	}
 
 	public function test_all()
 	{
