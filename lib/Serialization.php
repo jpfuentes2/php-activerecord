@@ -131,7 +131,7 @@ abstract class Serialization
 						foreach ($assoc as $a)
 						{
 							$serialized = new $serializer_class($a, $options);
-							$includes[] = $serialized->to_a();
+							$includes[strtolower(get_class($a))][] = $serialized->to_a();
 						}
 
 						$this->attributes[$association] = $includes;
