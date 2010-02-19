@@ -215,15 +215,20 @@ class XmlSerializer extends Serialization
 		return $this->writer->outputMemory(true);
 	}
 
-	private function write($data)
+	private function write($data, $tag = "")
 	{
 		foreach ($data as $attr => $value)
 		{
+			if( $tag != "" ) $attr = $tag;
 			if (is_array($value))
 			{
-				$this->writer->startElement($attr);
-				$this->write($value);
-				$this->writer->endElement();
+				if( !is_int( key($value) ) ) {
+					$this->writer->startElement($attr);
+					$this->write($value);
+					$this->writer->endElement();
+				} else {
+					$this->write($value, $attr);
+				}
 				continue;
 			}
 
