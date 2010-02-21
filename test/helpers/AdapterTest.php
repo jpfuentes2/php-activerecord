@@ -125,6 +125,15 @@ class AdapterTest extends DatabaseTest
 		$this->assert_equals(25,$author_columns['name']->length);
 	}
 
+	public function test_column_with_no_length()
+	{
+		$author_columns = $this->conn->columns('authors');
+		$this->assert_equals('text',$author_columns['some_text']->raw_type);
+		$this->assert_equals('time',$author_columns['some_time']->raw_type);
+		$this->assert_equals(Column::STRING,$author_columns['some_time']->type);
+		$this->assert_same(null,$author_columns['some_time']->length);
+	}
+
 	public function test_query()
 	{
 		$sth = $this->conn->query('SELECT * FROM authors');
@@ -209,7 +218,9 @@ class AdapterTest extends DatabaseTest
 	public function test_columns()
 	{
 		$columns = $this->conn->columns('authors');
-		$this->assert_equals(array('author_id','parent_author_id','name','updated_at','created_at','some_date','encrypted_password','mixedCaseField'),array_keys($columns));
+
+		foreach (array('author_id','parent_author_id','name','updated_at','created_at','some_date','some_time','some_text','encrypted_password','mixedCaseField') as $field)
+			$this->assert_true(array_key_exists($field,$columns));
 
 		$this->assert_equals(true,$columns['author_id']->pk);
 		$this->assert_equals('int',$columns['author_id']->raw_type);

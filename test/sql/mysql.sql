@@ -5,6 +5,9 @@ CREATE TABLE authors(
 	updated_at datetime,
 	created_at datetime,
 	some_date date,
+	some_time time,
+	some_text text,
+	some_enum enum('a','b','c'),
 	encrypted_password varchar(50),
 	mixedCaseField varchar(50)
 ) ENGINE=InnoDB;

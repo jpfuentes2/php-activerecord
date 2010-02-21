@@ -173,7 +173,7 @@ class ActiveRecordTest extends DatabaseTest
 	public function test_should_have_all_column_attributes_when_initializing_with_array()
 	{
 		$author = new Author(array('name' => 'Tito'));
-		$this->assert_equals(8,count(array_keys($author->attributes())));
+		$this->assert_true(count(array_keys($author->attributes())) >= 9);
 	}
 
 	public function test_defaults()

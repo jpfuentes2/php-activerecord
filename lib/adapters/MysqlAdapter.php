@@ -59,13 +59,12 @@ class MysqlAdapter extends Connection
 		}
 		else
 		{
-			preg_match('/^(.*?)\(([0-9]+(,[0-9]+)?)\)/',$column['type'],$matches);
+			preg_match('/^([A-Za-z0-9_]+)(\(([0-9]+(,[0-9]+)?)\))?/',$column['type'],$matches);
 
-			if (sizeof($matches) > 0)
-			{
-				$c->raw_type = $matches[1];
-				$c->length = intval($matches[2]);
-			}
+			$c->raw_type = (count($matches) > 0 ? $matches[1] : $column['type']);
+
+			if (count($matches) >= 4)
+				$c->length = intval($matches[3]);
 		}
 
 		$c->map_raw_type();
