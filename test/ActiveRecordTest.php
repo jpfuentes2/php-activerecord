@@ -170,6 +170,13 @@ class ActiveRecordTest extends DatabaseTest
 		$this->assert_equals('books',$model->table()->table);
 	}
 
+	public function test_namespace_gets_stripped_from_inferred_foreign_key()
+	{
+		$model = new NamespaceTest\Book();
+		$table = ActiveRecord\Table::load(get_class($model));
+		$this->assert_equals($table->get_relationship('parent_book')->foreign_key[0], 'book_id');
+	}
+
 	public function test_should_have_all_column_attributes_when_initializing_with_array()
 	{
 		$author = new Author(array('name' => 'Tito'));

@@ -158,7 +158,7 @@ abstract class AbstractRelationship implements InterfaceRelationship
 
 	protected function keyify($class_name)
 	{
-		return strtolower(classify($class_name)). '_id';
+		return strtolower(classify(denamespace($class_name))). '_id';
 	}
 
 	/**
@@ -263,7 +263,7 @@ abstract class AbstractRelationship implements InterfaceRelationship
  *   );
  * });
  * </code>
- * 
+ *
  * Example using options:
  *
  * <code>
@@ -292,7 +292,7 @@ class HasMany extends AbstractRelationship
 {
 	/**
 	 * Valid options to use for a {@link HasMany} relationship.
-	 * 
+	 *
 	 * <ul>
 	 * <li><b>limit/offset:</b> limit the number of records</li>
      * <li><b>primary_key:</b> name of the primary_key of the association (defaults to "id")</li>
@@ -312,9 +312,9 @@ class HasMany extends AbstractRelationship
 
 	/**
 	 * Constructs a {@link HasMany} relationship.
-	 * 
+	 *
 	 * @param array $options Options for the association
-	 * @return HasMany 
+	 * @return HasMany
 	 */
 	public function __construct($options=array())
 	{
@@ -467,7 +467,7 @@ class HasAndBelongsToMany extends AbstractRelationship
  *   );
  * }
  * </code>
- * 
+ *
  * Example using options:
  *
  * <code>
@@ -488,7 +488,7 @@ class BelongsTo extends AbstractRelationship
 {
 	/**
 	 * Valid options to use:
-	 * 
+	 *
 	 * <ul>
 	 * <li><b>primary_key:</b> name of the primary_key of the association (defaults to "id")</li>
 	 * </ul>
