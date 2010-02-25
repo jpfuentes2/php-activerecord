@@ -406,5 +406,16 @@ class ActiveRecordTest extends DatabaseTest
 		$this->assert_true(array_key_exists('space_out',$validators));
 		$this->assert_true(in_array(array('with' => '/\A([^@\s]+)@((?:[-a-z0-9]+\.)+[a-z]{2,})\Z/i', 'validator' => 'validates_format_of'),$validators['space_out']));
 	}
+
+	public function test_clear_cache_for_specific_class()
+	{
+		$book_table1 = ActiveRecord\Table::load('Book');
+		$book_table2 = ActiveRecord\Table::load('Book');
+		ActiveRecord\Table::clear_cache('Book');
+		$book_table3 = ActiveRecord\Table::load('Book');
+
+		$this->assert_true($book_table1 === $book_table2);
+		$this->assert_true($book_table1 !== $book_table3);
+	}
 };
 ?>

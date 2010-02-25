@@ -66,9 +66,12 @@ class Table
 		return self::$cache[$model_class_name];
 	}
 
-	public static function clear_cache()
+	public static function clear_cache($model_class_name=null)
 	{
-		self::$cache = array();
+		if (!is_null($model_class_name) && array_key_exists(self::$cache[$model_class_name]))
+			unset(self::$cache[$model_class_name]);
+		else
+			self::$cache = array();
 	}
 
 	public function __construct($class_name)
