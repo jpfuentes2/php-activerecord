@@ -9,7 +9,7 @@ use DateTime;
  * The base class for your models.
  *
  * Defining an ActiveRecord model for a table called people and orders:
- * 
+ *
  * <code>
  * CREATE TABLE people(
  *   id int primary key auto_increment,
@@ -26,7 +26,7 @@ use DateTime;
  * );
  * </code>
  *
- * <code> 
+ * <code>
  * class Person extends ActiveRecord\Model {
  *   static $belongs_to = array(
  *     array('parent', 'foreign_key' => 'parent_id', 'class_name' => 'Person')
@@ -62,7 +62,7 @@ use DateTime;
  * </code>
  *
  * For a more in-depth look at defining models, relationships, callbacks and many other things
- * please consult our {@link http://www.phpactiverecord.org/guides Guides}. 
+ * please consult our {@link http://www.phpactiverecord.org/guides Guides}.
  *
  * @package ActiveRecord
  * @see BelongsTo
@@ -247,7 +247,7 @@ class Model
 	 * This is necessary due to the way __set() works.
 	 *
 	 * For example, assume 'name' is a field on the table and we're defining a
-	 * custom setter for called 'name':
+	 * custom setter for 'name':
 	 *
 	 * <code>
 	 * class User extends ActiveRecord\Base {
@@ -271,6 +271,54 @@ class Model
 	 * @var array
 	 */
 	static $setters = array();
+
+	/**
+	 * Define customer getter methods for the model.
+	 *
+	 * <code>
+	 * class User extends ActiveRecord\Base {
+	 *   static $getters = array('middle_initial','more','even_more');
+	 *
+	 *   # now to define the getter method. Note you must
+	 *   # prepend get_ to your method name:
+	 *   function get_middle_initial() {
+	 *     return $this->middle_name{0};
+	 *   }
+	 * }
+	 *
+	 * $user = new User();
+	 * echo $user->middle_name;  # will call $user->get_middle_name()
+	 * </code>
+	 *
+	 * If you define a custom getter with the same name as an attribute then you
+	 * will need to use read_attribute() to get the attribute's value.
+	 * This is necessary due to the way __get() works.
+	 *
+	 * For example, assume 'name' is a field on the table and we're defining a
+	 * custom getter for 'name':
+	 *
+	 * <code>
+	 * class User extends ActiveRecord\Base {
+	 *   static $getters = array('name');
+	 *
+	 *   # INCORRECT way to do it
+	 *   # function get_name() {
+	 *   #   return strtoupper($this->name);
+	 *   # }
+	 *
+	 *   function get_name() {
+	 *     return strtoupper($this->read_attribute('name'));
+	 *   }
+	 * }
+	 *
+	 * $user = new User();
+	 * $user->name = 'bob';
+	 * echo $user->name; # => BOB
+	 * </code>
+	 *
+	 * @var array
+	 */
+	static $getters = array();
 
 	/**
 	 * Constructs a model.
@@ -305,65 +353,24 @@ class Model
 	}
 
 	/**
-	 * Retrieves an attribute's value or a relationship object based on the name passed. If the attribute
-	 * accessed is 'id' then it will return the model's primary key no matter what the actual attribute name is
-	 * for the primary key.
+	 * Magic method which delegates to read_attribute(). This handles firing off getter methods,
+	 * as they are not checked/invoked inside of read_attribute(). This circumvents the problem with
+	 * a getter being accessed with the same name as an actual attribute.
 	 *
+	 * @see read_attribute()
 	 * @param string $name Name of an attribute
 	 * @return mixed The value of the attribute
-	 * @throws {@link UndefinedPropertyException} if name could not be resolved to an attribute, relationship, ...
 	 */
 	public function &__get($name)
 	{
-		// check for aliased attribute
-		if (array_key_exists($name, static::$alias_attribute))
-			$name = static::$alias_attribute[$name];
-
-		// check for attribute
-		if (array_key_exists($name,$this->attributes))
-			return $this->attributes[$name];
-
-		// check relationships if no attribute
-		if (array_key_exists($name,$this->__relationships))
-			return $this->__relationships[$name];
-
-		$table = static::table();
-
-		// this may be first access to the relationship so check Table
-		if (($relationship = $table->get_relationship($name)))
+		// check for getter
+		if (in_array("get_$name",static::$getters))
 		{
-			$this->__relationships[$name] = $relationship->load($this);
-			return $this->__relationships[$name];
+			$name = "get_$name";
+			return $this->$name();
 		}
 
-		if ($name == 'id')
-		{
-			if (count($this->get_primary_key()) > 1)
-				throw new Exception("TODO composite key support");
-
-			if (isset($this->attributes[$table->pk[0]]))
-				return $this->attributes[$table->pk[0]];
-		}
-
-		//do not remove - have to return null by reference in strict mode
-		$null = null;
-
-		foreach (static::$delegate as &$item)
-		{
-			if (($delegated_name = $this->is_delegated($name,$item)))
-			{
-				$to = $item['to'];
-				if ($this->$to)
-				{
-					$val =& $this->$to->$delegated_name;
-					return $val;
-				}
-				else
-					return $null;
-			}
-		}
-
-		throw new UndefinedPropertyException(get_called_class(),$name);
+		return $this->read_attribute($name);
 	}
 
 	/**
@@ -431,6 +438,68 @@ class Model
 	}
 
 	/**
+	 * Retrieves an attribute's value or a relationship object based on the name passed. If the attribute
+	 * accessed is 'id' then it will return the model's primary key no matter what the actual attribute name is
+	 * for the primary key.
+	 *
+	 * @param string $name Name of an attribute
+	 * @return mixed The value of the attribute
+	 * @throws {@link UndefinedPropertyException} if name could not be resolved to an attribute, relationship, ...
+	 */
+	public function read_attribute($name)
+	{
+		// check for aliased attribute
+		if (array_key_exists($name, static::$alias_attribute))
+			$name = static::$alias_attribute[$name];
+
+		// check for attribute
+		if (array_key_exists($name,$this->attributes))
+			return $this->attributes[$name];
+
+		// check relationships if no attribute
+		if (array_key_exists($name,$this->__relationships))
+			return $this->__relationships[$name];
+
+		$table = static::table();
+
+		// this may be first access to the relationship so check Table
+		if (($relationship = $table->get_relationship($name)))
+		{
+			$this->__relationships[$name] = $relationship->load($this);
+			return $this->__relationships[$name];
+		}
+
+		if ($name == 'id')
+		{
+			if (count($this->get_primary_key()) > 1)
+				throw new Exception("TODO composite key support");
+
+			if (isset($this->attributes[$table->pk[0]]))
+				return $this->attributes[$table->pk[0]];
+		}
+
+		//do not remove - have to return null by reference in strict mode
+		$null = null;
+
+		foreach (static::$delegate as &$item)
+		{
+			if (($delegated_name = $this->is_delegated($name,$item)))
+			{
+				$to = $item['to'];
+				if ($this->$to)
+				{
+					$val =& $this->$to->$delegated_name;
+					return $val;
+				}
+				else
+					return $null;
+			}
+		}
+
+		throw new UndefinedPropertyException(get_called_class(),$name);
+	}
+
+	/**
 	 * Returns hash of attributes that have been modified since loading the model.
 	 *
 	 * @return mixed null if no dirty attributes otherwise returns array of dirty attributes.
@@ -466,9 +535,9 @@ class Model
 
 	/**
 	 * Returns array of validator data for this Model.
-	 * 
+	 *
 	 * Will return an array looking like:
-	 * 
+	 *
 	 * <code>
 	 * array(
 	 *   'name' => array(

@@ -380,6 +380,21 @@ class ActiveRecordTest extends DatabaseTest
 		$this->assert_equals('BOB',$author->name);
 	}
 
+	public function test_getter()
+	{
+		$book = Book::first();
+		$this->assert_equals(strtoupper($book->name), $book->upper_name);
+	}
+
+	public function test_getter_with_same_name_as_an_attribute()
+	{
+		Book::$getters[] = 'name';
+		$book = new Book;
+		$book->name = 'bob';
+		$this->assert_equals('BOB', $book->name);
+		Book::$getters = array();
+	}
+
 	public function test_setting_invalid_date_should_set_date_to_null()
 	{
 		$author = new Author();
