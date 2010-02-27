@@ -68,7 +68,7 @@ class Table
 
 	public static function clear_cache($model_class_name=null)
 	{
-		if (!is_null($model_class_name) && array_key_exists(self::$cache[$model_class_name]))
+		if ($model_class_name && array_key_exists($model_class_name,self::$cache))
 			unset(self::$cache[$model_class_name]);
 		else
 			self::$cache = array();
