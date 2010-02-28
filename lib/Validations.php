@@ -113,7 +113,7 @@ class Validations
 			{
 				$field = $attr[0];
 
-				if (!is_array($data[$field]))
+				if (!isset($data[$field]) || !is_array($data[$field]))
 					$data[$field] = array();
 
 				$attr['validator'] = $validate;
@@ -126,7 +126,7 @@ class Validations
 
 	/**
 	 * Runs the validators.
-	 * 
+	 *
 	 * @return Errors the validation errors if any
 	 */
 	public function validate()
@@ -555,7 +555,7 @@ class Validations
 			if (is_array($options[0]))
 			{
 				$add_record = join("_and_", $options[0]);
-				$fields = $options[0];	
+				$fields = $options[0];
 			}
 			else
 			{
