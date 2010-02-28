@@ -367,7 +367,8 @@ class Model
 		if (in_array("get_$name",static::$getters))
 		{
 			$name = "get_$name";
-			return $this->$name();
+			$value = $this->$name();
+			return $value;
 		}
 
 		return $this->read_attribute($name);
@@ -446,7 +447,7 @@ class Model
 	 * @return mixed The value of the attribute
 	 * @throws {@link UndefinedPropertyException} if name could not be resolved to an attribute, relationship, ...
 	 */
-	public function read_attribute($name)
+	public function &read_attribute($name)
 	{
 		// check for aliased attribute
 		if (array_key_exists($name, static::$alias_attribute))
@@ -757,7 +758,8 @@ class Model
 				throw new ActiveRecordException("Cannot update, no primary key defined for: " . get_called_class());
 
 			$this->invoke_callback('before_update',false);
-			static::table()->update($this->dirty_attributes(),$pk);
+			$dirty = $this->dirty_attributes();
+			static::table()->update($dirty,$pk);
 			$this->invoke_callback('after_update',false);
 		}
 
@@ -1155,7 +1157,8 @@ class Model
 
 		$table = static::table();
 		$sql = $table->options_to_sql($options);
-		return $table->conn->query_and_fetch_one($sql->to_s(),$sql->get_where_values());
+		$values = $sql->get_where_values();
+		return $table->conn->query_and_fetch_one($sql->to_s(),$values);
 	}
 
 	/**
