@@ -21,4 +21,6 @@ ActiveRecord\Config::initialize(function($cfg)
 		'sqlite'	=> 'sqlite://test.db'));
 	$cfg->set_default_connection('mysql');
 });
+
+error_reporting(E_ALL | E_STRICT);
 ?>
