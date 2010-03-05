@@ -724,13 +724,14 @@ class Model
 			$table->insert($dirty);
 		else
 			$table->insert($this->attributes);
-		$this->invoke_callback('after_create',false);
 
 		$pk = $this->get_primary_key();
 
 		// if we've got an autoincrementing pk set it
 		if (count($pk) == 1 && $table->get_column_by_inflected_name($pk[0])->auto_increment)
 			$this->attributes[$pk[0]] = $table->conn->insert_id($table->sequence);
+
+		$this->invoke_callback('after_create',false);
 
 		$this->__new_record = false;
 		return true;
