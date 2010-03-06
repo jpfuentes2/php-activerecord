@@ -191,5 +191,17 @@ class CallBackTest extends DatabaseTest
 		$this->callback->register('after_validation',function($model) { return false; });
 		$this->assert_true($this->callback->invoke(null,'after_validation'));
 	}
+
+	public function test_gh_28_after_create_should_be_invoked_after_auto_incrementing_pk_is_set()
+	{
+		$that = $this;
+		VenueCB::$after_create = function($model) use ($that) { $that->assert_not_null($model->id); };
+		ActiveRecord\Table::clear_cache('VenueCB');
+		$venue = VenueCB::find(1);
+		$venue = new VenueCB($venue->attributes());
+		$venue->id = null;
+		$venue->name = 'alksdjfs';
+		$venue->save();
+	}
 };
 ?>
