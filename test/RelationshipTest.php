@@ -1,6 +1,15 @@
 <?php
 include 'helpers/config.php';
 
+class NotModel {};
+
+class AuthorWithNonModelRelationship extends ActiveRecord\Model
+{
+	static $pk = 'id';
+	static $table_name = 'authors';
+	static $has_many = array(array('books', 'class_name' => 'NotModel'));
+} 
+
 class RelationshipTest extends DatabaseTest
 {
 	protected $relationship_name;
@@ -315,7 +324,7 @@ class RelationshipTest extends DatabaseTest
 	}
 
 	/**
-	 * @expectedException ActiveRecord\HasManyThroughAssociationException
+	 * @expectedException ReflectionException
 	 */
 	public function test_has_many_through_with_invalid_class_name()
 	{
@@ -426,6 +435,14 @@ class RelationshipTest extends DatabaseTest
 		Venue::$has_many = array(array('events'),array('hosts', 'through' => 'events'));
 		$venue = Venue::first();
 		$this->assert_true(count($venue->hosts) > 0);
+	}
+
+	/**
+	 * @expectedException ActiveRecord\RelationshipException
+	 */
+	public function test_throw_error_if_relationship_is_not_a_model()
+	{
+		AuthorWithNonModelRelationship::first()->books;
 	}
 };
 ?>

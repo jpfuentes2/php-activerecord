@@ -86,9 +86,9 @@ abstract class AbstractRelationship implements InterfaceRelationship
 			$this->options['conditions'] = array($this->options['conditions']);
 
 		if (isset($this->options['class']))
-			$this->class_name = $this->options['class'];
+			$this->set_class_name($this->options['class']);
 		elseif (isset($this->options['class_name']))
-			$this->class_name = $this->options['class_name'];
+			$this->set_class_name($this->options['class_name']);
 
 		$this->attribute_name = strtolower(Inflector::instance()->variablize($this->attribute_name));
 
@@ -171,7 +171,16 @@ abstract class AbstractRelationship implements InterfaceRelationship
 	 */
 	protected function set_inferred_class_name()
 	{
-		$class_name = classify($this->attribute_name, true);
+		$this->set_class_name(classify($this->attribute_name, true));
+	}
+
+	protected function set_class_name($class_name)
+	{
+		$reflection = Reflections::instance()->add($class_name)->get($class_name);
+
+		if (!$reflection->isSubClassOf('ActiveRecord\\Model'))
+			throw new RelationshipException("'$class_name' must extend from ActiveRecord\\Model");
+
 		$this->class_name = $class_name;
 	}
 
@@ -323,8 +332,9 @@ class HasMany extends AbstractRelationship
 		if (isset($this->options['through']))
 		{
 			$this->through = $this->options['through'];
+
 			if (isset($this->options['source']))
-				$this->class_name = $this->options['source'];
+				$this->set_class_name($this->options['source']);
 		}
 
 		if (!$this->class_name)
