@@ -54,10 +54,13 @@ function classify($class_name, $singularize=false)
 }
 
 
-function array_flatten (array $array) {
-	$result = array ();
-	foreach ($array as $element) {
-	    if (is_array ($element))
+function array_flatten(array $array)
+{
+	$result = array();
+
+	foreach ($array as $element)
+	{
+	    if (is_array($element))
 	        $result = array_merge($result, array_flatten($element));
 	    else
 	        array_push($result, $element);
