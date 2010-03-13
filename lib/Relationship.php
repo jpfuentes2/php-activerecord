@@ -193,7 +193,7 @@ abstract class AbstractRelationship implements InterfaceRelationship
 		if (all(null,$condition_values))
 			return null;
 
-		$conditions = SQLBuilder::create_conditions_from_underscored_string($condition_string,$condition_values);
+		$conditions = SQLBuilder::create_conditions_from_underscored_string(Table::load(get_class($model))->conn,$condition_string,$condition_values);
 
 		# DO NOT CHANGE THE NEXT TWO LINES. add_condition operates on a reference and will screw options array up
 		if (isset($this->options['conditions']))
@@ -379,9 +379,13 @@ class HasMany extends AbstractRelationship
 				$through_table_name = $through_table->get_fully_qualified_table_name();
 
 				$this->options['joins'] = $this->construct_inner_join_sql($through_table, true);
+				$conn = $this->get_table()->conn;
 
 				foreach ($this->foreign_key as $index => &$key)
-					$key = "$through_table_name.$key";
+				{
+					$k = $key;
+					$key = "$through_table_name." . $conn->quote_name($k);
+				}
 			}
 
 			$this->initialized = true;
@@ -389,7 +393,6 @@ class HasMany extends AbstractRelationship
 
 		if (!($conditions = $this->create_conditions_from_keys($model, $this->foreign_key, $this->primary_key)))
 			return null;
-
 		$options = $this->unset_non_finder_options($this->options);
 		$options['conditions'] = $conditions;
 		return $class_name::find($this->poly_relationship ? 'all' : 'first',$options);

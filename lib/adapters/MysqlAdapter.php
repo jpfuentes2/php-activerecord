@@ -6,7 +6,7 @@ namespace ActiveRecord;
 
 /**
  * Adapter for MySQL.
- * 
+ *
  * @package ActiveRecord
  */
 class MysqlAdapter extends Connection
@@ -35,7 +35,7 @@ class MysqlAdapter extends Connection
 
 	public function quote_name($string)
 	{
-		return "`$string`";
+		return $string{0} === '`' || $string{strlen($string)-1} === '`' ? $string : "`$string`";
 	}
 
 	public function create_column(&$column)

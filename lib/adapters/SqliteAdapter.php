@@ -8,7 +8,7 @@ use PDO;
 
 /**
  * Adapter for SQLite.
- * 
+ *
  * @package ActiveRecord
  */
 class SqliteAdapter extends Connection
@@ -25,7 +25,7 @@ class SqliteAdapter extends Connection
 	{
 		return 0;
 	}
-	
+
 	public function limit($sql, $offset, $limit)
 	{
 		$offset = intval($offset);
@@ -45,7 +45,7 @@ class SqliteAdapter extends Connection
 
 	public function quote_name($string)
 	{
-		return "`$string`";
+		return $string{0} === '`' || $string{strlen($string)-1} === '`' ? $string : "`$string`";
 	}
 
 	public function create_column($column)

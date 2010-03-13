@@ -1070,7 +1070,7 @@ class Model
 		if (substr($method,0,7) === 'find_by')
 		{
 			$attributes = substr($method,8);
-			$options['conditions'] = SQLBuilder::create_conditions_from_underscored_string($attributes,$args,static::$alias_attribute);
+			$options['conditions'] = SQLBuilder::create_conditions_from_underscored_string(static::table()->conn,$attributes,$args,static::$alias_attribute);
 
 			if (!($ret = static::find('first',$options)) && $create)
 				return static::create(SQLBuilder::create_hash_from_underscored_string($attributes,$args,static::$alias_attribute));
@@ -1079,12 +1079,12 @@ class Model
 		}
 		elseif (substr($method,0,11) === 'find_all_by')
 		{
-			$options['conditions'] = SQLBuilder::create_conditions_from_underscored_string(substr($method,12),$args,static::$alias_attribute);
+			$options['conditions'] = SQLBuilder::create_conditions_from_underscored_string(static::table()->conn,substr($method,12),$args,static::$alias_attribute);
 			return static::find('all',$options);
 		}
 		elseif (substr($method,0,8) === 'count_by')
 		{
-			$options['conditions'] = SQLBuilder::create_conditions_from_underscored_string(substr($method,9),$args,static::$alias_attribute);
+			$options['conditions'] = SQLBuilder::create_conditions_from_underscored_string(static::table()->conn,substr($method,9),$args,static::$alias_attribute);
 			return static::count($options);
 		}
 

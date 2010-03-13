@@ -2,13 +2,24 @@
 include 'helpers/config.php';
 
 use ActiveRecord\SQLBuilder;
+use ActiveRecord\Table;
 
 class SQLBuilderTest extends DatabaseTest
 {
+	protected $table_name = 'authors';
+	protected $class_name = 'Author';
+	protected $table;
+
 	public function set_up($connection_name=null)
 	{
 		parent::set_up($connection_name);
-		$this->sql = new SQLBuilder($this->conn,'authors');
+		$this->sql = new SQLBuilder($this->conn,$this->table_name);
+		$this->table = Table::load($this->class_name);
+	}
+
+	protected function cond_from_s($name, &$values=null, &$map=null)
+	{
+		return SQLBuilder::create_conditions_from_underscored_string($this->table->conn, $name, $values, $map);
 	}
 
 	/**
@@ -179,47 +190,47 @@ class SQLBuilderTest extends DatabaseTest
 	public function test_create_conditions_from_underscored_string()
 	{
 		$x = array(1,'Tito','X');
-		$this->assert_equals(array_merge(array('id=? AND name=? OR z=?'),$x),SQLBuilder::create_conditions_from_underscored_string('id_and_name_or_z',$x));
+		$this->assert_equals(array_merge(array('`id`=? AND `name`=? OR `z`=?'),$x),$this->cond_from_s('id_and_name_or_z',$x));
 
 		$x = array(1);
-		$this->assert_equals(array('id=?',1),SQLBuilder::create_conditions_from_underscored_string('id',$x));
+		$this->assert_equals(array('`id`=?',1),$this->cond_from_s('id',$x));
 
 		$x = array(array(1,2));
-		$this->assert_equals(array_merge(array('id IN(?)'),$x),SQLBuilder::create_conditions_from_underscored_string('id',$x));
+		$this->assert_equals(array_merge(array('`id` IN(?)'),$x),$this->cond_from_s('id',$x));
 	}
 
 	public function test_create_conditions_from_underscored_string_with_nulls()
 	{
 		$x = array(1,null);
-		$this->assert_equals(array('id=? AND name IS NULL',1),SQLBuilder::create_conditions_from_underscored_string('id_and_name',$x));
+		$this->assert_equals(array('`id`=? AND `name` IS NULL',1),$this->cond_from_s('id_and_name',$x));
 	}
 
 	public function test_create_conditions_from_underscored_string_with_missing_args()
 	{
 		$x = array(1,null);
-		$this->assert_equals(array('id=? AND name IS NULL OR z IS NULL',1),SQLBuilder::create_conditions_from_underscored_string('id_and_name_or_z',$x));
+		$this->assert_equals(array('`id`=? AND `name` IS NULL OR `z` IS NULL',1),$this->cond_from_s('id_and_name_or_z',$x));
 
-		$this->assert_equals(array('id IS NULL'),SQLBuilder::create_conditions_from_underscored_string('id'));
+		$this->assert_equals(array('`id` IS NULL'),$this->cond_from_s('id'));
 	}
 
 	public function test_create_conditions_from_underscored_string_with_blank()
 	{
 		$x = array(1,null,'');
-		$this->assert_equals(array('id=? AND name IS NULL OR z=?',1,''),SQLBuilder::create_conditions_from_underscored_string('id_and_name_or_z',$x));
+		$this->assert_equals(array('`id`=? AND `name` IS NULL OR `z`=?',1,''),$this->cond_from_s('id_and_name_or_z',$x));
 	}
 
 	public function test_create_conditions_from_underscored_string_invalid()
 	{
-		$this->assert_equals(null,SQLBuilder::create_conditions_from_underscored_string(''));
-		$this->assert_equals(null,SQLBuilder::create_conditions_from_underscored_string(null));
+		$this->assert_equals(null,$this->cond_from_s(''));
+		$this->assert_equals(null,$this->cond_from_s(null));
 	}
 
 	public function test_create_conditions_from_underscored_string_with_mapped_columns()
 	{
 		$x = array(1,'Tito');
 		$map = array('my_name' => 'name');
-		$conditions = SQLBuilder::create_conditions_from_underscored_string('id_and_my_name',$x,$map);
-		$this->assert_equals(array('id=? AND name=?',1,'Tito'),$conditions);
+		$conditions = $this->cond_from_s('id_and_my_name',$x,$map);
+		$this->assert_equals(array('`id`=? AND `name`=?',1,'Tito'),$conditions);
 	}
 
 	public function test_create_hash_from_underscored_string()
