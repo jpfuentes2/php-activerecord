@@ -97,6 +97,70 @@ abstract class AbstractRelationship implements InterfaceRelationship
 	}
 
 	/**
+	 * What is this relationship's cardinality?
+	 *
+	 * @return bool
+	 */
+	public function is_poly()
+	{
+		return $this->poly_relationship;
+	}
+
+	/**
+	 * Eagerly loads relationships for $models.
+	 *
+	 * This method takes an array of models, collects PK or FK (whichever is needed for relationship), then queries
+	 * the related table by PK/FK and attaches the array of returned relationships to the appropriately named relationship on
+	 * $models.
+	 *
+	 * @param Table $table
+	 * @param $models array of model objects
+	 * @param $attributes array of attributes from $models
+	 * @param $includes array of eager load directives
+	 * @param $query_keys -> key(s) to be queried for on included/related table
+	 * @param $model_values_keys -> key(s)/value(s) to be used in query from model which is including
+	 * @return void
+	 */
+	protected function query_and_attach_related_models_eagerly(Table $table, $models, $attributes, $includes=array(), $query_keys=array(), $model_values_keys=array())
+	{
+		$values = array();
+		$options = array();
+		$query_key = $query_keys[0];
+		$model_values_key = $model_values_keys[0];
+
+		foreach ($attributes as $column => $value)
+			$values[] = $value[$model_values_key];
+
+		$values = array($values);
+		$options['conditions'] = SQLBuilder::create_conditions_from_underscored_string($table->conn,$query_key,$values);
+
+		if (!empty($includes))
+			$options['include'] = $includes;
+
+		$class = $this->class_name;
+
+		$related_models = $class::find('all', $options);
+
+		foreach ($models as $model)
+		{
+			$matches = 0;
+			$key_to_match = $model->$model_values_key;
+
+			foreach ($related_models as $related)
+			{
+				if ($related->$query_key == $key_to_match)
+				{
+					$model->set_relationship_from_eager_load($related, $this->attribute_name);
+					$matches++;
+				}
+			}
+
+			if (0 === $matches)
+				$model->set_relationship_from_eager_load(null, $this->attribute_name);
+		}
+	}
+
+	/**
 	 * Creates a new instance of specified {@link Model} with the attributes pre-loaded.
 	 *
 	 * @param Model $model The model which holds this association
@@ -420,6 +484,12 @@ class HasMany extends AbstractRelationship
 		$attributes = $this->inject_foreign_key_for_new_association($model, $attributes);
 		return parent::create_association($model, $attributes);
 	}
+
+	public function load_eagerly($models=array(), $attributes=array(), $includes, Table $table)
+	{
+		$this->set_keys($table->class->name);
+		$this->query_and_attach_related_models_eagerly($table,$models,$attributes,$includes,$this->foreign_key, $table->pk);
+	}
 };
 
 /**
@@ -539,6 +609,11 @@ class BelongsTo extends AbstractRelationship
 		$options['conditions'] = $conditions;
 		$class = $this->class_name;
 		return $class::first($options);
+	}
+
+	public function load_eagerly($models=array(), $attributes, $includes, Table $table)
+	{
+		$this->query_and_attach_related_models_eagerly($table,$models,$attributes,$includes, $this->primary_key,$this->foreign_key);
 	}
 };
 ?>

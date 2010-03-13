@@ -178,14 +178,18 @@ class Table
 	{
 		$sql = $this->options_to_sql($options);
 		$readonly = (array_key_exists('readonly',$options) && $options['readonly']) ? true : false;
-		return $this->find_by_sql($sql->to_s(),$sql->get_where_values(), $readonly);
+		$eager_load = array_key_exists('include',$options) ? $options['include'] : null;
+
+		return $this->find_by_sql($sql->to_s(),$sql->get_where_values(), $readonly, $eager_load);
 	}
 
-	public function find_by_sql($sql, $values=null, $readonly=false)
+	public function find_by_sql($sql, $values=null, $readonly=false, $includes=null)
 	{
 		$this->last_sql = $sql;
 
-		$list = array();
+		$collect_attrs_for_includes = is_null($includes) ? false : true;
+		$list = $attrs = array();
+
 		$sth = $this->conn->query($sql,$values);
 
 		while (($row = $sth->fetch()))
@@ -195,9 +199,45 @@ class Table
 			if ($readonly)
 				$model->readonly();
 
+			if ($collect_attrs_for_includes)
+				$attrs[] = $model->attributes();
+
 			$list[] = $model;
 		}
+
+		if ($collect_attrs_for_includes)
+			$this->execute_eager_load($list, $attrs, $includes);
+
 		return $list;
+	}
+
+	/**
+	 * Executes an eager load of a given named relationship for this table.
+	 *
+	 * @param $models array found modesl for this table
+	 * @param $attrs array of attrs from $models
+	 * @param $includes array eager load directives
+	 * @return void
+	 */
+	private function execute_eager_load($models=array(), $attrs=array(), $includes=array())
+	{
+		if (!is_array($includes))
+			$includes = array($includes);
+
+		foreach ($includes as $index => $name)
+		{
+			// nested include
+			if (is_array($name))
+			{
+				$nested_includes = count($name) > 1 ? $name : $name[0];
+				$name = $index;
+			}
+			else
+				$nested_includes = array();
+
+			$rel = $this->get_relationship($name, true);
+			$rel->load_eagerly($models, $attrs, $nested_includes, $this);
+		}
 	}
 
 	public function get_column_by_inflected_name($inflected_name)
@@ -220,10 +260,35 @@ class Table
 		return $table;
 	}
 
-	public function get_relationship($name)
+	/**
+	 * Retrieve a relationship object for this table. Strict as true will throw an error
+	 * if the relationship name does not exist.
+	 *
+	 * @param $name string name of Relationship
+	 * @param $strict bool
+	 * @throws RelationshipException
+	 * @return Relationship or null
+	 */
+	public function get_relationship($name, $strict=false)
 	{
-		if (isset($this->relationships[$name]))
+		if ($this->has_relationship($name))
 			return $this->relationships[$name];
+
+		if ($strict)
+			throw new RelationshipException("Relationship named $name has not been declared for class: {$this->class->getName()}");
+
+		return null;
+	}
+
+	/**
+	 * Does a given relationship exist?
+	 *
+	 * @param $name string name of Relationship
+	 * @return bool
+	 */
+	public function has_relationship($name)
+	{
+		return array_key_exists($name, $this->relationships);
 	}
 
 	public function insert(&$data)

@@ -444,5 +444,137 @@ class RelationshipTest extends DatabaseTest
 	{
 		AuthorWithNonModelRelationship::first()->books;
 	}
+
+	public function test_eager_loading_has_many()
+	{
+		$venues = Venue::find(array(2, 6), array('include' => 'events'));
+
+		$this->assert_true(strpos(ActiveRecord\Table::load('Event')->last_sql, 'WHERE `venue_id` IN(?,?)') !== false);
+
+		foreach ($venues[0]->events as $event)
+			$this->assert_equals($event->venue_id, $venues[0]->id);
+
+		$this->assert_equals(2, count($venues[0]->events));
+	}
+
+	public function test_eager_loading_has_many_with_no_related_rows()
+	{
+		$venues = Venue::find(array(7, 8), array('include' => 'events'));
+
+		foreach ($venues as $v)
+			$this->assert_true(empty($v->events));
+
+		$this->assert_true(strpos(ActiveRecord\Table::load('Venue')->last_sql, 'WHERE `id` IN(?,?)') !== false);
+		$this->assert_true(strpos(ActiveRecord\Table::load('Event')->last_sql, 'WHERE `venue_id` IN(?,?)') !== false);
+	}
+
+	public function test_eager_loading_has_many_array_of_includes()
+	{
+		Author::$has_many = array(array('books'), array('awesome_people'));
+		$authors = Author::find(array(1,2), array('include' => array('books', 'awesome_people')));
+
+		$assocs = array('books', 'awesome_people');
+
+		foreach ($assocs as $assoc)
+		{
+			$this->assert_type('array', $authors[0]->$assoc);
+
+			foreach ($authors[0]->$assoc as $a)
+				$this->assert_equals($authors[0]->author_id,$a->author_id);
+		}
+
+		foreach ($assocs as $assoc)
+		{
+			$this->assert_type('array', $authors[1]->$assoc);
+			$this->assert_true(empty($authors[1]->$assoc));
+		}
+
+		$this->assert_true(strpos(ActiveRecord\Table::load('Author')->last_sql, 'WHERE `author_id` IN(?,?)') !== false);
+		$this->assert_true(strpos(ActiveRecord\Table::load('Book')->last_sql, 'WHERE `author_id` IN(?,?)') !== false);
+		$this->assert_true(strpos(ActiveRecord\Table::load('AwesomePerson')->last_sql, 'WHERE `author_id` IN(?,?)') !== false);
+	}
+
+	// *	Post.find(:all, :include => [ :author, { :comments => { :author => :gravatar } } ])
+	public function test_eager_loading_has_many_nested()
+	{
+		$venues = Venue::find(array(1,2), array('include' => array('events' => array('host'))));
+
+		$this->assert_equals(2, count($venues));
+
+		foreach ($venues as $v)
+		{
+			$this->assert_true(count($v->events) > 0);
+
+			foreach ($v->events as $e)
+			{
+				$this->assert_equals($e->host_id, $e->host->id);
+				$this->assert_equals($v->id, $e->venue_id);
+			}
+		}
+
+		$this->assert_true(strpos(ActiveRecord\Table::load('Venue')->last_sql, 'WHERE `id` IN(?,?)') !== false);
+		$this->assert_true(strpos(ActiveRecord\Table::load('Event')->last_sql, 'WHERE `venue_id` IN(?,?)') !== false);
+		$this->assert_true(strpos(ActiveRecord\Table::load('Host')->last_sql, 'WHERE `id` IN(?,?,?)') !== false);
+	}
+
+	public function test_eager_loading_belongs_to()
+	{
+		$events = Event::find(array(1,2,3,5,7), array('include' => 'venue'));
+
+		foreach ($events as $event)
+			$this->assert_equals($event->venue_id, $event->venue->id);
+
+		$this->assert_true(strpos(ActiveRecord\Table::load('Venue')->last_sql, 'WHERE `id` IN(?,?,?,?,?)') !== false);
+	}
+
+	public function test_eager_loading_belongs_to_array_of_includes()
+	{
+		$events = Event::find(array(1,2,3,5,7), array('include' => array('venue', 'host')));
+
+		foreach ($events as $event)
+		{
+			$this->assert_equals($event->venue_id, $event->venue->id);
+			$this->assert_equals($event->host_id, $event->host->id);
+		}
+
+		$this->assert_true(strpos(ActiveRecord\Table::load('Event')->last_sql, 'WHERE `id` IN(?,?,?,?,?)') !== false);
+		$this->assert_true(strpos(ActiveRecord\Table::load('Host')->last_sql, 'WHERE `id` IN(?,?,?,?,?)') !== false);
+		$this->assert_true(strpos(ActiveRecord\Table::load('Venue')->last_sql, 'WHERE `id` IN(?,?,?,?,?)') !== false);
+	}
+
+	public function test_eager_loading_belongs_to_nested()
+	{
+		Author::$has_many = array(array('awesome_people'));
+
+		$books = Book::find(array(1,2), array('include' => array('author' => array('awesome_people'))));
+
+		$assocs = array('author', 'awesome_people');
+
+		foreach ($books as $book)
+		{
+			$this->assert_equals($book->author_id,$book->author->author_id);
+			$this->assert_equals($book->author->author_id,$book->author->awesome_people[0]->author_id);
+		}
+
+		$this->assert_true(strpos(ActiveRecord\Table::load('Book')->last_sql, 'WHERE `book_id` IN(?,?)') !== false);
+		$this->assert_true(strpos(ActiveRecord\Table::load('Author')->last_sql, 'WHERE `author_id` IN(?,?)') !== false);
+		$this->assert_true(strpos(ActiveRecord\Table::load('AwesomePerson')->last_sql, 'WHERE `author_id` IN(?,?)') !== false);
+	}
+
+
+	public function test_eager_loading_belongs_to_with_no_related_rows()
+	{
+		$e1 = Event::create(array('venue_id' => 200, 'host_id' => 200, 'title' => 'blah','type' => 'Music'));
+		$e2 = Event::create(array('venue_id' => 200, 'host_id' => 200, 'title' => 'blah2','type' => 'Music'));
+
+		$events = Event::find(array($e1->id, $e2->id), array('include' => 'venue'));
+
+		foreach ($events as $e)
+			$this->assert_null($e->venue);
+
+		$this->assert_true(strpos(ActiveRecord\Table::load('Event')->last_sql, 'WHERE `id` IN(?,?)') !== false);
+		$this->assert_true(strpos(ActiveRecord\Table::load('Venue')->last_sql, 'WHERE `id` IN(?,?)') !== false);
+	}
+
 };
 ?>
