@@ -140,6 +140,7 @@ abstract class AbstractRelationship implements InterfaceRelationship
 		$class = $this->class_name;
 
 		$related_models = $class::find('all', $options);
+		$used_models = array();
 
 		foreach ($models as $model)
 		{
@@ -150,7 +151,14 @@ abstract class AbstractRelationship implements InterfaceRelationship
 			{
 				if ($related->$query_key == $key_to_match)
 				{
-					$model->set_relationship_from_eager_load($related, $this->attribute_name);
+					$hash = spl_object_hash($related);
+
+					if (in_array($hash, $used_models))
+						$model->set_relationship_from_eager_load(clone($related), $this->attribute_name);
+					else
+						$model->set_relationship_from_eager_load($related, $this->attribute_name);
+
+					$used_models[] = $hash;
 					$matches++;
 				}
 			}

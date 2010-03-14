@@ -494,7 +494,6 @@ class RelationshipTest extends DatabaseTest
 		$this->assert_true(strpos(ActiveRecord\Table::load('AwesomePerson')->last_sql, 'WHERE `author_id` IN(?,?)') !== false);
 	}
 
-	// *	Post.find(:all, :include => [ :author, { :comments => { :author => :gravatar } } ])
 	public function test_eager_loading_has_many_nested()
 	{
 		$venues = Venue::find(array(1,2), array('include' => array('events' => array('host'))));
@@ -561,7 +560,6 @@ class RelationshipTest extends DatabaseTest
 		$this->assert_true(strpos(ActiveRecord\Table::load('AwesomePerson')->last_sql, 'WHERE `author_id` IN(?,?)') !== false);
 	}
 
-
 	public function test_eager_loading_belongs_to_with_no_related_rows()
 	{
 		$e1 = Event::create(array('venue_id' => 200, 'host_id' => 200, 'title' => 'blah','type' => 'Music'));
@@ -576,5 +574,29 @@ class RelationshipTest extends DatabaseTest
 		$this->assert_true(strpos(ActiveRecord\Table::load('Venue')->last_sql, 'WHERE `id` IN(?,?)') !== false);
 	}
 
+	public function test_eager_loading_clones_related_objects()
+	{
+		$events = Event::find(array(2,3), array('include' => array('venue')));
+
+		$venue = $events[0]->venue;
+		$venue->name = "new name";
+
+		$this->assert_equals($venue->id, $events[1]->venue->id);
+		$this->assert_not_equals($venue->name, $events[1]->venue->name);
+		$this->assert_not_equals(spl_object_hash($venue), spl_object_hash($events[1]->venue));
+	}
+
+	public function test_eager_loading_clones_nested_related_objects()
+	{
+		$venues = Venue::find(array(1,2,6,9), array('include' => array('events' => array('host'))));
+
+		$unchanged_host = $venues[2]->events[0]->host;
+		$changed_host = $venues[3]->events[0]->host;
+		$changed_host->name = "changed";
+
+		$this->assert_equals($changed_host->id, $unchanged_host->id);
+		$this->assert_not_equals($changed_host->name, $unchanged_host->name);
+		$this->assert_not_equals(spl_object_hash($changed_host), spl_object_hash($unchanged_host));
+	}
 };
 ?>

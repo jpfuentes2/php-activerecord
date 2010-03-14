@@ -1023,6 +1023,13 @@ class Model
 		return $this;
 	}
 
+	public function __clone()
+	{
+		$this->__relationships = array();
+		$this->reset_dirty();
+		return $this;
+	}
+
 	/**
 	 * Resets the dirty array.
 	 *
