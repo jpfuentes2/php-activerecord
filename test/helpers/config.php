@@ -19,7 +19,14 @@ ActiveRecord\Config::initialize(function($cfg)
 		'pgsql'		=> 'pgsql://test:test@127.0.0.1/test',
 		'oci'		=> 'oci://test:test@127.0.0.1/xe',
 		'sqlite'	=> 'sqlite://test.db'));
+
 	$cfg->set_default_connection('mysql');
+
+	for ($i=0; $i<count($GLOBALS['argv']); ++$i)
+	{
+		if ($GLOBALS['argv'][$i] == '--adapter')
+			$cfg->set_default_connection($GLOBALS['argv'][$i+1]);
+	}
 });
 
 error_reporting(E_ALL | E_STRICT);
