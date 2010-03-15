@@ -325,7 +325,7 @@ class ActiveRecordFindTest extends DatabaseTest
 	{
 		JoinBook::$belongs_to = array(array('author'));
 		JoinBook::first(array('joins' => array('author','LEFT JOIN authors a ON(books.secondary_author_id=a.author_id)')));
-		$this->assert_true(strpos(JoinBook::table()->last_sql,'INNER JOIN `authors` ON(`books`.author_id = `authors`.author_id)') !== false);
+		$this->assert_true(strpos(JoinBook::table()->last_sql,'INNER JOIN ' . $this->conn->quote_name('authors') . ' ON(' . $this->conn->quote_name('books') . '.author_id = ' . $this->conn->quote_name('authors') . '.author_id)') !== false);
 		$this->assert_true(strpos(JoinBook::table()->last_sql,'LEFT JOIN authors a ON(books.secondary_author_id=a.author_id)') !== false);
 	}
 

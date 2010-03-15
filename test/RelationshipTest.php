@@ -84,7 +84,7 @@ class RelationshipTest extends DatabaseTest
 	public function test_joins_only_loads_given_model_attributes()
 	{
 		$x = Event::first(array('joins' => array('venue')));
-		$this->assert_true(strpos(Event::table()->last_sql,'SELECT `events`.*') !== false);
+		$this->assert_true(strpos(Event::table()->last_sql,'SELECT ' . $this->conn->quote_name('events') . '.*') !== false);
 		$this->assert_false(array_key_exists('city', $x->attributes()));
 	}
 
@@ -190,7 +190,7 @@ class RelationshipTest extends DatabaseTest
 	{
 		Event::$belongs_to[0]['joins'] = 'venue';
 		$event = Event::first()->venue;
-		$this->assert_false(strpos(Event::table()->last_sql,'INNER JOIN `venues` ON(`events`.venue_id = `venues`.id)'));
+		$this->assert_false(strpos(Event::table()->last_sql,'INNER JOIN ' . $this->conn->quote_name('venues') . ' ON(`events`.venue_id = `venues`.id)'));
 	}
 
 	public function test_has_many_basic()
@@ -339,7 +339,7 @@ class RelationshipTest extends DatabaseTest
 	public function test_has_many_with_joins()
 	{
 		$x = Venue::first(array('joins' => array('events')));
-		$this->assert_true(strpos(Venue::table()->last_sql,'INNER JOIN `events` ON(`venues`.id = `events`.venue_id)') !== false);
+		$this->assert_true(strpos(Venue::table()->last_sql,'INNER JOIN ' . $this->conn->quote_name('events') . ' ON(' . $this->conn->quote_name('venues') . '.id = ' . $this->conn->quote_name('events') . '.venue_id)') !== false);
 	}
 
 	public function test_has_one_basic()
@@ -416,7 +416,7 @@ class RelationshipTest extends DatabaseTest
 	public function test_has_one_with_joins()
 	{
 		$x = Employee::first(array('joins' => array('position')));
-		$this->assert_true(strpos(Employee::table()->last_sql,'INNER JOIN `positions` ON(`employees`.id = `positions`.employee_id)') !== false);
+		$this->assert_true(strpos(Employee::table()->last_sql,'INNER JOIN ' . $this->conn->quote_name('positions') . ' ON(' . $this->conn->quote_name('employees') . '.id = ' . $this->conn->quote_name('positions') . '.employee_id)') !== false);
 	}
 
 	public function test_dont_attempt_to_load_if_all_foreign_keys_are_null()

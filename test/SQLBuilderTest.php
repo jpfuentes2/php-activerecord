@@ -9,6 +9,8 @@ class SQLBuilderTest extends DatabaseTest
 	{
 		parent::set_up($connection_name);
 		$this->sql = new SQLBuilder($this->conn,'authors');
+		$this->id = $this->conn->quote_name('id');
+		$this->_name = $this->conn->quote_name('name');
 	}
 
 	/**
@@ -26,22 +28,22 @@ class SQLBuilderTest extends DatabaseTest
 
 	public function test_where_with_array()
 	{
-		$this->sql->where('`id`=? AND `name` IN(?)',1,array('Tito','Mexican'));
-		$this->assert_equals('SELECT * FROM authors WHERE `id`=? AND `name` IN(?,?)',(string)$this->sql);
+		$this->sql->where("$this->id=? AND $this->_name IN(?)",1,array('Tito','Mexican'));
+		$this->assert_equals("SELECT * FROM authors WHERE $this->id=? AND $this->_name IN(?,?)",(string)$this->sql);
 		$this->assert_equals(array(1,'Tito','Mexican'),$this->sql->get_where_values());
 	}
 
 	public function test_where_with_hash()
 	{
 		$this->sql->where(array('id' => 1, 'name' => 'Tito'));
-		$this->assert_equals('SELECT * FROM authors WHERE `id`=? AND `name`=?',(string)$this->sql);
+		$this->assert_equals("SELECT * FROM authors WHERE $this->id=? AND $this->_name=?",(string)$this->sql);
 		$this->assert_equals(array(1,'Tito'),$this->sql->get_where_values());
 	}
 
 	public function test_where_with_hash_and_array()
 	{
 		$this->sql->where(array('id' => 1, 'name' => array('Tito','Mexican')));
-		$this->assert_equals('SELECT * FROM authors WHERE `id`=? AND `name` IN(?,?)',(string)$this->sql);
+		$this->assert_equals("SELECT * FROM authors WHERE $this->id=? AND $this->_name IN(?,?)",(string)$this->sql);
 		$this->assert_equals(array(1,'Tito','Mexican'),$this->sql->get_where_values());
 	}
 
@@ -124,26 +126,26 @@ class SQLBuilderTest extends DatabaseTest
 	public function test_insert()
 	{
 		$this->sql->insert(array('id' => 1, 'name' => 'Tito'));
-		$this->assert_equals('INSERT INTO authors(`id`,`name`) VALUES(?,?)',(string)$this->sql);
+		$this->assert_equals("INSERT INTO authors($this->id,$this->_name) VALUES(?,?)",(string)$this->sql);
 	}
 
 	public function test_insert_with_null()
 	{
 		$this->sql->insert(array('id' => 1, 'name' => null));
-		$this->assert_equals('INSERT INTO authors(`id`,`name`) VALUES(?,?)',$this->sql->to_s());
+		$this->assert_equals("INSERT INTO authors($this->id,$this->_name) VALUES(?,?)",$this->sql->to_s());
 	}
 
 	public function test_update()
 	{
 		$this->sql->update(array('id' => 1, 'name' => 'Tito'))->where('id=1 AND name IN(?)',array('Tito','Mexican'));
- 		$this->assert_equals('UPDATE authors SET `id`=?, `name`=? WHERE id=1 AND name IN(?,?)',(string)$this->sql);
+ 		$this->assert_equals("UPDATE authors SET $this->id=?, $this->_name=? WHERE id=1 AND name IN(?,?)",(string)$this->sql);
  		$this->assert_equals(array(1,'Tito','Tito','Mexican'),$this->sql->bind_values());
 	}
 
 	public function test_update_with_null()
 	{
 		$this->sql->update(array('id' => 1, 'name' => null))->where('id=1');
-		$this->assert_equals('UPDATE authors SET `id`=?, `name`=? WHERE id=1',$this->sql->to_s());
+		$this->assert_equals("UPDATE authors SET $this->id=?, $this->_name=? WHERE id=1",$this->sql->to_s());
 	}
 
 	public function test_delete()
@@ -162,7 +164,7 @@ class SQLBuilderTest extends DatabaseTest
 	public function test_delete_with_hash()
 	{
 		$this->sql->delete(array('id' => 1, 'name' => array('Tito','Mexican')));
-		$this->assert_equals('DELETE FROM authors WHERE `id`=? AND `name` IN(?,?)',$this->sql->to_s());
+		$this->assert_equals("DELETE FROM authors WHERE $this->id=? AND $this->_name IN(?,?)",$this->sql->to_s());
 		$this->assert_equals(array(1,'Tito','Mexican'),$this->sql->get_where_values());
 	}
 
