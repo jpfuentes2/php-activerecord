@@ -210,11 +210,9 @@ class Table
 		return null;
 	}
 
-	public function get_fully_qualified_table_name()
+	public function get_fully_qualified_table_name($quote_name=true)
 	{
-		// as more adapters are added probably want to do this a better way
-		// than using instanceof but gud enuff for now
-		$table = ($this->conn instanceof PgsqlAdapter) ? $this->table : $this->conn->quote_name($this->table);
+		$table = $quote_name ? $this->conn->quote_name($this->table) : $this->table;
 
 		if ($this->db_name)
 			$table = $this->conn->quote_name($this->db_name) . ".$table";
@@ -273,7 +271,11 @@ class Table
 
 	private function get_meta_data()
 	{
-		$this->columns = $this->conn->columns($this->get_fully_qualified_table_name());
+		// as more adapters are added probably want to do this a better way
+		// than using instanceof but gud enuff for now
+		$quote_name = !($this->conn instanceof PgsqlAdapter);
+
+		$this->columns = $this->conn->columns($this->get_fully_qualified_table_name($quote_name));
 	}
 
 	/**
