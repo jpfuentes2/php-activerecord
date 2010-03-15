@@ -212,7 +212,9 @@ class Table
 
 	public function get_fully_qualified_table_name()
 	{
-		$table = $this->conn->quote_name($this->table);
+		// as more adapters are added probably want to do this a better way
+		// than using instanceof but gud enuff for now
+		$table = ($this->conn instanceof PgsqlAdapter) ? $this->table : $this->conn->quote_name($this->table);
 
 		if ($this->db_name)
 			$table = $this->conn->quote_name($this->db_name) . ".$table";
