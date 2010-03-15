@@ -206,13 +206,13 @@ class AdapterTest extends DatabaseTest
 
 	public function test_insert_id()
 	{
-		$this->conn->query('INSERT INTO authors(name) VALUES(\'name\')');
+		$this->conn->query("INSERT INTO authors(name) VALUES('name')");
 		$this->assert_true($this->conn->insert_id() > 0);
 	}
 
 	public function test_insert_id_with_params()
 	{
-		$x=array('name');
+		$x = array('name');
 		$this->conn->query('INSERT INTO authors(name) VALUES(?)',$x);
 		$this->assert_true($this->conn->insert_id() > 0);
 	}
