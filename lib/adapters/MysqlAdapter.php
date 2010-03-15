@@ -57,6 +57,11 @@ class MysqlAdapter extends Connection
 			$c->raw_type = 'date';
 			$c->length = 10;
 		}
+		elseif ($column['type'] == 'time')
+		{
+			$c->raw_type = 'time';
+			$c->length = 8;
+		}
 		else
 		{
 			preg_match('/^([A-Za-z0-9_]+)(\(([0-9]+(,[0-9]+)?)\))?/',$column['type'],$matches);

@@ -134,12 +134,18 @@ class AdapterTest extends DatabaseTest
 		$this->assert_equals(25,$author_columns['name']->length);
 	}
 
-	public function test_column_with_no_length()
+	public function test_columns_text()
 	{
 		$author_columns = $this->conn->columns('authors');
 		$this->assert_equals('text',$author_columns['some_text']->raw_type);
+		$this->assert_equals(null,$author_columns['some_text']->length);
+	}
+
+	public function test_columns_time()
+	{
+		$author_columns = $this->conn->columns('authors');
 		$this->assert_equals('time',$author_columns['some_time']->raw_type);
-		$this->assert_equals(Column::STRING,$author_columns['some_time']->type);
+		$this->assert_equals(Column::TIME,$author_columns['some_time']->type);
 	}
 
 	public function test_query()

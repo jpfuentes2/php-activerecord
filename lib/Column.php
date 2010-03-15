@@ -18,6 +18,7 @@ class Column
 	const DECIMAL	= 3;
 	const DATETIME	= 4;
 	const DATE		= 5;
+	const TIME		= 6;
 
 	/**
 	 * Map a type to an column type.
@@ -28,6 +29,7 @@ class Column
 		'datetime'	=> self::DATETIME,
 		'timestamp'	=> self::DATETIME,
 		'date'		=> self::DATE,
+		'time'		=> self::TIME,
 
 		'int'		=> self::INTEGER,
 		'tinyint'	=> self::INTEGER,
