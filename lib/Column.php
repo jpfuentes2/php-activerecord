@@ -96,6 +96,12 @@ class Column
 	public $auto_increment;
 
 	/**
+	 * Name of the sequence to use for this column if any.
+	 * @var boolean
+	 */
+	public $sequence;
+
+	/**
 	 * Casts a value to the column's type.
 	 *
 	 * @param mixed $value The value to cast

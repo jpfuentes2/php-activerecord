@@ -298,6 +298,13 @@ abstract class Connection
 	}
 
 	/**
+	 * Tells you if this adapter supports sequences or not.
+	 *
+	 * @return boolean
+	 */
+	function supports_sequences() { return false; }
+	
+	/**
 	 * Returns the default port of the database server.
 	 */
 	abstract function default_port();

@@ -1,6 +1,3 @@
--- CREATE USER test;
--- GRANT ALL PRIVILEGES ON test to test;
-
 CREATE TABLE authors(
 	author_id SERIAL PRIMARY KEY,
 	parent_author_id INT,
@@ -11,7 +8,7 @@ CREATE TABLE authors(
 	some_time time,
 	some_text text,
 	encrypted_password varchar(50),
-	mixedCaseField varchar(50)
+	"mixedCaseField" varchar(50)
 );
 
 CREATE TABLE books(
@@ -37,7 +34,7 @@ CREATE TABLE events (
 	id SERIAL PRIMARY KEY,
 	venue_id int NOT NULL,
 	host_id int NOT NULL,
-	title varchar(50) NOT NULL,
+	title varchar(60) NOT NULL,
 	description varchar(10),
 	type varchar(15) default NULL
 );
