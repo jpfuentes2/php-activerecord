@@ -260,7 +260,8 @@ class RelationshipTest extends DatabaseTest
 	{
 		Venue::$has_many[0] = array('events', 'group' => 'type', 'order' => 'title desc', 'limit' => 2, 'offset' => 1);
 		Venue::first()->events;
-		$this->assert_true(strpos(Event::table()->last_sql, 'WHERE venue_id=? GROUP BY type ORDER BY title desc LIMIT 1,2') !== false);
+		$this->assert_true(strpos(Event::table()->last_sql, 
+			$this->conn->limit('WHERE venue_id=? GROUP BY type ORDER BY title desc',1,2)) !== false);
 
 	}
 

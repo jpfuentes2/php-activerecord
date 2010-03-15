@@ -101,7 +101,8 @@ class SQLBuilderTest extends DatabaseTest
 		$this->sql->order('name');
 		$this->sql->group('name');
 		$this->sql->where(array('id' => 1));
-		$this->assert_equals("SELECT * FROM authors WHERE `id`=? GROUP BY name HAVING created_at > '2009-01-01' ORDER BY name LIMIT 1,10", (string)$this->sql);
+		$id = $this->conn->quote_name('id');
+		$this->assert_equals($this->conn->limit("SELECT * FROM authors WHERE $id=? GROUP BY name HAVING created_at > '2009-01-01' ORDER BY name",1,10), (string)$this->sql);
 	}
 
 	/**
