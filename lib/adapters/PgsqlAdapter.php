@@ -11,157 +11,97 @@ namespace ActiveRecord;
  */
 class PgsqlAdapter extends Connection
 {
-	/**
-	 * @param string $connection_string Should be in the format sqlite3://path-to-the-db
-	 */
-	protected function connect($connection_string)
-	{
-		$info = static::connection_info_from($connection_string);
-		$this->connection = pg_connect(
-			"host=$info->host " .
-			"user=$info->user " .
-			"password=$info->pass " .
-			"dbname=$info->db " .
-			($info->port ? "port=$info->port" : ""));
+	public function supports_sequences() { return true; }
 
-		if (!$this->connection)
-			throw new DatabaseException("Could not connect to database $info->host");
+	public function default_port() { return 5432; }
+
+	public function get_sequence_name($table, $column_name)
+	{
+		return "{$table}_{$column_name}_seq";
 	}
 
-	public function close()
+	public function next_sequence_value($sequence_name)
 	{
-		if ($this->connection)
-		{
-			$this->connection->pg_close($this->connection);
-			$this->connection = null;
-		}
-	}
-
-	public function columns($table)
-	{
-		$columns = array();
-		$conn = $this;
-/*
-		$sql =<< SQL
-			SELECT a.attname,
-			  pg_catalog.format_type(a.atttypid, a.atttypmod),
-			  (SELECT substring(pg_catalog.pg_get_expr(d.adbin, d.adrelid) for 128)
-			   FROM pg_catalog.pg_attrdef d
-			   WHERE d.adrelid = a.attrelid AND d.adnum = a.attnum AND a.atthasdef),
-			  a.attnotnull, a.attnum
-			FROM pg_catalog.pg_attribute a
-			WHERE a.attrelid = (select c.oid from pg_catalog.pg_class c inner join pg_catalog.pg_namespace n on(n.oid=c.relnamespace) where c.relname='venues' and pg_catalog.pg_table_is_visible(c.oid)) AND a.attnum > 0 AND NOT a.attisdropped
-			ORDER BY a.attnum
-		SQL;
-*/
-		$this->query_and_fetch($sql,function($row) use ($conn, &$columns)
-		{
-			$c = $conn->create_column($row);
-			$columns[$c->name] = $c;
-		});
-		return $columns;
-	}
-
-	public function escape($string)
-	{
-		return pg_escape_string($this->connection,$string);
-	}
-
-	public function fetch($res)
-	{
-		if (!($row = pg_fetch_assoc($res)))
-			$this->free_result_set($res);
-
-		return $row;
-	}
-
-	public function free_result_set($res)
-	{
-		pg_free_result($res);
-	}
-
-	public function insert_id()
-	{
-		return $this->connection->lastInsertRowID();
+		return "nextval('" . str_replace("'","\\'",$sequence_name) . "')";
 	}
 
 	public function limit($sql, $offset, $limit)
 	{
-		$offset = intval($offset);
-		$limit = intval($limit);
-		return "$sql LIMIT $offset,$limit";
+		return $sql . ' LIMIT ' . intval($limit) . ' OFFSET ' . intval($offset);
 	}
 
-	public function prepare($sql)
+	public function query_column_info($table)
 	{
-		return new PgsqlPreparedStatement($this,$sql);
+		$sql = <<<SQL
+SELECT a.attname AS field, a.attlen,
+REPLACE(pg_catalog.format_type(a.atttypid, a.atttypmod),'character varying','varchar') AS type,
+a.attnotnull AS not_nullable, 
+i.indisprimary as pk,
+REGEXP_REPLACE(REGEXP_REPLACE(REGEXP_REPLACE(s.column_default,'::[a-z_ ]+',''),'\'$',''),'^\'','') AS default
+FROM pg_catalog.pg_attribute a
+LEFT JOIN pg_catalog.pg_class c ON(a.attrelid=c.oid)
+LEFT JOIN pg_catalog.pg_index i ON(c.oid=i.indrelid AND a.attnum=any(i.indkey))
+LEFT JOIN information_schema.columns s ON(s.table_name=? AND a.attname=s.column_name)
+WHERE a.attrelid = (select c.oid from pg_catalog.pg_class c inner join pg_catalog.pg_namespace n on(n.oid=c.relnamespace) where c.relname=? and pg_catalog.pg_table_is_visible(c.oid))
+AND a.attnum > 0
+AND NOT a.attisdropped
+ORDER BY a.attnum
+SQL;
+		$values = array($table,$table);
+		return $this->query($sql,$values);
 	}
 
-	public function query($sql)
+	public function query_for_tables()
 	{
-		if (getenv('LOG') == 'true')
-			$GLOBALS['logger']->log($sql, PEAR_LOG_INFO);
-
-		if (!($res = pg_query($this->connection,$sql)))
-			throw new DatabaseException(pg_last_error($this->connection));
-
-		return $res;
+		return $this->query("SELECT tablename FROM pg_tables WHERE schemaname NOT IN('information_schema','pg_catalog')");
 	}
 
 	public function quote_name($string)
 	{
-		return "`$string`";
+		return '"' . $string . '"';
 	}
 
-	public function tables()
-	{
-		$tables = array();
-
-		$this->query_and_fetch("SELECT tablename FROM pg_tables WHERE schemaname NOT IN('information_schema','pg_catalog')",function($row) use (&$tables)
-		{
-			$name = array_values($row);
-			$tables[] = $name[0];
-		});
-		return $tables;
-	}
-
-	public function create_column($column)
+	public function create_column(&$column)
 	{
 		$c = new Column();
-		$c->inflected_name	= Inflector::instance()->variablize($column['name']);
-		$c->name			= $column['name'];
-		$c->nullable		= $column['notnull'] ? false : true;
-		$c->pk				= $column['pk'] ? true : false;
-		$c->auto_increment	= $column['type'] == 'INTEGER' && $c->pk;
+		$c->inflected_name	= Inflector::instance()->variablize($column['field']);
+		$c->name			= $column['field'];
+		$c->nullable		= ($column['not_nullable'] ? false : true);
+		$c->pk				= ($column['pk'] ? true : false);
+		$c->auto_increment	= false;
 
-		$column['type'] = preg_replace('/ +/',' ',$column['type']);
-		$column['type'] = str_replace(array('(',')'),' ',$column['type']);
-		$column['type'] = Utils::squeeze(' ',$column['type']);
-		$matches = explode(' ',$column['type']);
-
-		if (count($matches) > 0)
+		if (substr($column['type'],0,9) == 'timestamp')
 		{
-			$c->raw_type = strtolower($matches[0]);
+			$c->raw_type = 'datetime';
+			$c->length = 19;
+		}
+		elseif ($column['type'] == 'date')
+		{
+			$c->raw_type = 'date';
+			$c->length = 10;
+		}
+		else
+		{
+			preg_match('/^([A-Za-z0-9_]+)(\(([0-9]+(,[0-9]+)?)\))?/',$column['type'],$matches);
 
-			if (count($matches) > 1)
-				$c->length = intval($matches[1]);
+			$c->raw_type = (count($matches) > 0 ? $matches[1] : $column['type']);
+			$c->length = count($matches) >= 4 ? intval($matches[3]) : intval($column['attlen']);
+
+			if ($c->length < 0)
+				$c->length = null;
 		}
 
 		$c->map_raw_type();
 
-		if ($c->type == Column::DATETIME)
-			$c->length = 19;
-		elseif ($c->type == Column::DATE)
-			$c->length = 10;
+		if ($column['default'])
+		{
+			preg_match("/^nextval\('(.*)'\)$/",$column['default'],$matches);
 
-		// From SQLite3 docs: The value is a signed integer, stored in 1, 2, 3, 4, 6,
-		// or 8 bytes depending on the magnitude of the value.
-		// so is it ok to assume it's possible an int can always go up to 8 bytes?
-		if ($c->type == Column::INTEGER && !$c->length)
-			$c->length = 8;
-
-		$c->default = $c->cast($column['dflt_value']);
-
+			if (count($matches) == 2)
+				$c->sequence = $matches[1];
+			else
+				$c->default = $c->cast($column['default']);
+		}
 		return $c;
 	}
 };

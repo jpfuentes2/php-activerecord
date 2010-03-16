@@ -148,6 +148,13 @@ class Model
 	static $primary_key;
 
 	/**
+	 * Set this to explicitly specify the sequence name for the table.
+	 *
+	 * @var string
+	 */
+	static $sequence;
+
+	/**
 	 * Allows you to create aliases for attributes.
 	 *
 	 * <code>
@@ -720,19 +727,35 @@ class Model
 
 		$table = static::table();
 		$this->invoke_callback('before_create',false);
-		if (($dirty = $this->dirty_attributes()))
-			$table->insert($dirty);
-		else
-			$table->insert($this->attributes);
+
+		if (!($attributes = $this->dirty_attributes()))
+			$attributes = $this->attributes;
 
 		$pk = $this->get_primary_key();
+		$use_sequence = false;
 
-		// if we've got an autoincrementing pk set it
-		if (count($pk) == 1 && $table->get_column_by_inflected_name($pk[0])->auto_increment)
-			$this->attributes[$pk[0]] = $table->conn->insert_id($table->sequence);
+		if ($table->sequence && !isset($attributes[$pk[0]]))
+		{
+			// unset pk that was set to null
+			if (array_key_exists($pk[0],$attributes))
+				unset($attributes[$pk[0]]);
+
+			$table->insert($attributes,$pk[0],$table->sequence);
+			$use_sequence = true;
+		}
+		else
+			$table->insert($attributes);
+
+		// if we've got an autoincrementing/sequenced pk set it
+		if (count($pk) == 1)
+		{
+			$column = $table->get_column_by_inflected_name($pk[0]);
+
+			if ($column->auto_increment || $use_sequence)
+				$this->attributes[$pk[0]] = $table->conn->insert_id($table->sequence);
+		}
 
 		$this->invoke_callback('after_create',false);
-
 		$this->__new_record = false;
 		return true;
 	}

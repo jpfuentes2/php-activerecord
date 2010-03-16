@@ -111,6 +111,15 @@ class AdapterTest extends DatabaseTest
 		$this->assert_false($author_columns['parent_author_id']->pk);
 	}
 
+	public function test_columns_sequence()
+	{
+		if ($this->conn->supports_sequences())
+		{
+			$author_columns = $this->conn->columns('authors');
+			$this->assert_equals('authors_author_id_seq',$author_columns['author_id']->sequence);
+		}
+	}
+
 	public function test_columns_default()
 	{
 		$author_columns = $this->conn->columns('authors');
@@ -125,13 +134,18 @@ class AdapterTest extends DatabaseTest
 		$this->assert_equals(25,$author_columns['name']->length);
 	}
 
-	public function test_column_with_no_length()
+	public function test_columns_text()
 	{
 		$author_columns = $this->conn->columns('authors');
 		$this->assert_equals('text',$author_columns['some_text']->raw_type);
+		$this->assert_equals(null,$author_columns['some_text']->length);
+	}
+
+	public function test_columns_time()
+	{
+		$author_columns = $this->conn->columns('authors');
 		$this->assert_equals('time',$author_columns['some_time']->raw_type);
-		$this->assert_equals(Column::STRING,$author_columns['some_time']->type);
-		$this->assert_same(null,$author_columns['some_time']->length);
+		$this->assert_equals(Column::TIME,$author_columns['some_time']->type);
 	}
 
 	public function test_query()
@@ -192,13 +206,13 @@ class AdapterTest extends DatabaseTest
 
 	public function test_insert_id()
 	{
-		$this->conn->query('INSERT INTO authors(name) VALUES(\'name\')');
+		$this->conn->query("INSERT INTO authors(name) VALUES('name')");
 		$this->assert_true($this->conn->insert_id() > 0);
 	}
 
 	public function test_insert_id_with_params()
 	{
-		$x=array('name');
+		$x = array('name');
 		$this->conn->query('INSERT INTO authors(name) VALUES(?)',$x);
 		$this->assert_true($this->conn->insert_id() > 0);
 	}
@@ -234,7 +248,6 @@ class AdapterTest extends DatabaseTest
 		$this->assert_equals('varchar',substr($columns['name']->raw_type,0,7));
 		$this->assert_equals(Column::STRING,$columns['name']->type);
 		$this->assert_equals(25,$columns['name']->length);
-		$this->assert_equals('default_name',$columns['name']->default);
 	}
 
 	public function test_columns_decimal()

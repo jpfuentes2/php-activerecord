@@ -173,17 +173,6 @@ abstract class Connection
 	}
 
 	/**
-	 * Return a default sequence name for the specified table.
-	 *
-	 * @param string $table Name of a table
-	 * @return string sequence name or null if not supported.
-	 */
-	public function get_sequence_name($table)
-	{
-		return null;
-	}
-
-	/**
 	 * Retrieve the insert id of the last model saved.
 	 *
 	 * @param string $sequence Optional name of a sequence to use
@@ -296,6 +285,33 @@ abstract class Connection
 		if (!$this->connection->rollback())
 			throw new DatabaseException($this);
 	}
+
+	/**
+	 * Tells you if this adapter supports sequences or not.
+	 *
+	 * @return boolean
+	 */
+	function supports_sequences() { return false; }
+
+	/**
+	 * Return a default sequence name for the specified table.
+	 *
+	 * @param string $table Name of a table
+	 * @param string $column_name Name of column sequence is for
+	 * @return string sequence name or null if not supported.
+	 */
+	public function get_sequence_name($table, $column_name)
+	{
+		return "{$table}_seq";
+	}
+
+	/**
+	 * Return SQL for getting the next value in a sequence.
+	 *
+	 * @param string $sequence_name Name of the sequence 
+	 * @return string
+	 */
+	public function next_sequence_value($sequence_name) { return null; }
 
 	/**
 	 * Returns the default port of the database server.
