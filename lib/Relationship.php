@@ -125,11 +125,12 @@ abstract class AbstractRelationship implements InterfaceRelationship
 	{
 		$values = array();
 		$options = array();
+		$inflector = Inflector::instance();
 		$query_key = $query_keys[0];
 		$model_values_key = $model_values_keys[0];
 
 		foreach ($attributes as $column => $value)
-			$values[] = $value[$model_values_key];
+			$values[] = $value[$inflector->variablize($model_values_key)];
 
 		$values = array($values);
 		$options['conditions'] = SQLBuilder::create_conditions_from_underscored_string($table->conn,$query_key,$values);
@@ -141,6 +142,8 @@ abstract class AbstractRelationship implements InterfaceRelationship
 
 		$related_models = $class::find('all', $options);
 		$used_models = array();
+		$model_values_key = $inflector->variablize($model_values_key);
+		$query_key = $inflector->variablize($query_key);
 
 		foreach ($models as $model)
 		{
