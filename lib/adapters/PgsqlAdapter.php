@@ -58,7 +58,7 @@ SQL;
 
 	public function quote_name($string)
 	{
-		return '"' . $string . '"';
+		return $string[0] === '"' || $string[strlen($string)-1] === '"' ? $string : "\"$string\"";
 	}
 
 	public function create_column(&$column)
