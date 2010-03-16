@@ -11,10 +11,7 @@ namespace ActiveRecord;
  */
 class MysqlAdapter extends Connection
 {
-	public function default_port()
-	{
-		return 3306;
-	}
+	static $DEFAULT_PORT = 3306;
 
 	public function limit($sql, $offset, $limit)
 	{

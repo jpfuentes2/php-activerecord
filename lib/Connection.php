@@ -46,6 +46,12 @@ abstract class Connection
 	static $QUOTE_CHARACTER = '`';
 
 	/**
+	 * Default port.
+	 * @var int
+	 */
+	static $DEFAULT_PORT = 0;
+
+	/**
 	 * Retrieve a database connection.
 	 *
 	 * @param string $connection_string_or_connection_name A database connection string (ex. mysql://user:pass@host[:port]/dbname)
@@ -330,11 +336,6 @@ abstract class Connection
 		return $string[0] === static::$QUOTE_CHARACTER || $string[strlen($string)-1] === static::$QUOTE_CHARACTER ?
 			$string : static::$QUOTE_CHARACTER . $string . static::$QUOTE_CHARACTER;
 	}
-
-	/**
-	 * Returns the default port of the database server.
-	 */
-	abstract function default_port();
 
 	/**
 	 * Adds a limit clause to the SQL query.

@@ -5,6 +5,15 @@ class AdapterTest extends DatabaseTest
 {
 	const InvalidDb = '__1337__invalid_db__';
 
+	public function test_i_has_a_default_port_unless_im_sqlite()
+	{
+		if ($this->conn instanceof ActiveRecord\SqliteAdapter)
+			return;
+
+		$c = $this->conn;
+		$this->assert_true($c::$DEFAULT_PORT > 0);
+	}
+
 	public function test_should_set_adapter_variables()
 	{
 		$this->assert_not_null($this->conn->protocol);
@@ -62,9 +71,11 @@ class AdapterTest extends DatabaseTest
 		$config = ActiveRecord\Config::instance();
 		$name = $config->get_default_connection();
 		$url = parse_url($config->get_connection($name));
+		$conn = $this->conn;
+		$port = $conn::$DEFAULT_PORT;
 
 		if ($this->conn->protocol != 'sqlite')
-			ActiveRecord\Connection::instance("{$url['scheme']}://{$url['user']}:{$url['pass']}@{$url['host']}:{$this->conn->default_port()}{$url['path']}");
+			ActiveRecord\Connection::instance("{$url['scheme']}://{$url['user']}:{$url['pass']}@{$url['host']}:$port{$url['path']}");
 	}
 
 	/**

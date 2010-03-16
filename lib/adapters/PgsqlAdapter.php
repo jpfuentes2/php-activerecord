@@ -11,11 +11,10 @@ namespace ActiveRecord;
  */
 class PgsqlAdapter extends Connection
 {
-	static $QUOTE_CHARACTER = '"';
+	static $QUOTE_CHARACTER	= '"';
+	static $DEFAULT_PORT	= 5432;
 
 	public function supports_sequences() { return true; }
-
-	public function default_port() { return 5432; }
 
 	public function get_sequence_name($table, $column_name)
 	{

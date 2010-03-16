@@ -14,15 +14,11 @@ use PDO;
 class OciAdapter extends Connection
 {
 	static $QUOTE_CHARACTER = '"';
+	static $DEFAULT_PORT = 1521;
 
 	protected function __construct($info)
 	{
 		$this->connection = new PDO("oci:dbname=//$info->host/$info->db",$info->user,$info->pass,static::$PDO_OPTIONS);
-	}
-
-	public function default_port()
-	{
-		return 1521;
 	}
 
 	public function limit($sql, $offset, $limit)
