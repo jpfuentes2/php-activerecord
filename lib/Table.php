@@ -83,9 +83,9 @@ class Table
 
 		$this->conn = ConnectionManager::get_connection($connection);
 		$this->set_table_name();
-		$this->set_sequence_name();
 		$this->get_meta_data();
 		$this->set_primary_key();
+		$this->set_sequence_name();
 		$this->set_delegates();
 		$this->set_setters_and_getters();
 
@@ -226,12 +226,12 @@ class Table
 			return $this->relationships[$name];
 	}
 
-	public function insert(&$data)
+	public function insert(&$data, $pk=null, $sequence_name=null)
 	{
 		$data = $this->process_data($data);
 
 		$sql = new SQLBuilder($this->conn,$this->get_fully_qualified_table_name());
-		$sql->insert($data,$this->pk[0],$this->sequence);
+		$sql->insert($data,$pk,$sequence_name);
 
 		$values = array_values($data);
 		return $this->conn->query(($this->last_sql = $sql->to_s()),$values);
@@ -348,7 +348,11 @@ class Table
 
 	private function set_sequence_name()
 	{
-		$this->sequence = $this->class->getStaticPropertyValue('sequence',$this->conn->get_sequence_name($this->table));
+		if (!$this->conn->supports_sequences())
+			return;
+
+		if (!($this->sequence = $this->class->getStaticPropertyValue('sequence')))
+			$this->sequence = $this->conn->get_sequence_name($this->table,$this->pk[0]);
 	}
 
 	private function set_associations()

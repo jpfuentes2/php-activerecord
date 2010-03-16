@@ -22,11 +22,6 @@ class OciAdapter extends Connection
 	{
 		return 1521;
 	}
-	
-	public function get_sequence_name($table)
-	{
-		return $table . '_seq';
-	}
 
 	public function limit($sql, $offset, $limit)
 	{

@@ -15,6 +15,16 @@ class PgsqlAdapter extends Connection
 
 	public function default_port() { return 5432; }
 
+	public function get_sequence_name($table, $column_name)
+	{
+		return "{$table}_{$column_name}_seq";
+	}
+
+	public function next_sequence_value($sequence_name)
+	{
+		return "nextval('" . str_replace("'","\\'",$sequence_name) . "')";
+	}
+
 	public function limit($sql, $offset, $limit)
 	{
 		return $sql . ' LIMIT ' . intval($limit) . ' OFFSET ' . intval($offset);
