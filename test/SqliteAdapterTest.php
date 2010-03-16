@@ -33,15 +33,5 @@ class SqliteAdapterTest extends AdapterTest
 	// not supported
 	public function testCompositeKey() {}
 	public function testConnectWithPort() {}
-
-	public function test_quote_name_does_not_over_quote()
-	{
-		$c = $this->conn;
-		$q = function($s) use ($c) { return $c->quote_name($s); };
-
-		$this->assert_equals("`string", $q("`string"));
-		$this->assert_equals("string`", $q("string`"));
-		$this->assert_equals("`string`", $q("`string`"));
-	}
 }
 ?>

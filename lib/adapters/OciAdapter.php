@@ -13,6 +13,8 @@ use PDO;
  */
 class OciAdapter extends Connection
 {
+	static $QUOTE_CHARACTER = '"';
+
 	protected function __construct($info)
 	{
 		$this->connection = new PDO("oci:dbname=//$info->host/$info->db",$info->user,$info->pass,static::$PDO_OPTIONS);
@@ -53,11 +55,6 @@ class OciAdapter extends Connection
 	public function query_for_tables()
 	{
 		return $this->query("SELECT table_name FROM user_tables");
-	}
-
-	public function quote_name($string)
-	{
-		return "\"$string\"";
 	}
 
 	public function create_column($column)

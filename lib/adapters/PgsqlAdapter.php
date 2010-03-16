@@ -11,6 +11,8 @@ namespace ActiveRecord;
  */
 class PgsqlAdapter extends Connection
 {
+	static $QUOTE_CHARACTER = '"';
+
 	public function supports_sequences() { return true; }
 
 	public function default_port() { return 5432; }
@@ -54,11 +56,6 @@ SQL;
 	public function query_for_tables()
 	{
 		return $this->query("SELECT tablename FROM pg_tables WHERE schemaname NOT IN('information_schema','pg_catalog')");
-	}
-
-	public function quote_name($string)
-	{
-		return $string[0] === '"' || $string[strlen($string)-1] === '"' ? $string : "\"$string\"";
 	}
 
 	public function create_column(&$column)

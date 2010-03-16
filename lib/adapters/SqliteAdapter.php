@@ -43,11 +43,6 @@ class SqliteAdapter extends Connection
 		return $this->query("SELECT name FROM sqlite_master");
 	}
 
-	public function quote_name($string)
-	{
-		return $string{0} === '`' || $string{strlen($string)-1} === '`' ? $string : "`$string`";
-	}
-
 	public function create_column($column)
 	{
 		$c = new Column();

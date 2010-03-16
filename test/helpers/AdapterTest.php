@@ -348,5 +348,16 @@ class AdapterTest extends DatabaseTest
 			$this->assert_equals(1,preg_match('/(an_invalid_column)|(exist)/',$e->getMessage()));
 		}
 	}
+
+	public function test_quote_name_does_not_over_quote()
+	{
+		$c = $this->conn;
+		$q = $c::$QUOTE_CHARACTER;
+		$qn = function($s) use ($c) { return $c->quote_name($s); };
+
+		$this->assert_equals("{$q}string", $qn("{$q}string"));
+		$this->assert_equals("string{$q}", $qn("string{$q}"));
+		$this->assert_equals("{$q}string{$q}", $qn("{$q}string{$q}"));
+	}
 }
 ?>

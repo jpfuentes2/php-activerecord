@@ -40,6 +40,12 @@ abstract class Connection
 		PDO::ATTR_STRINGIFY_FETCHES	=> false);
 
 	/**
+	 * The quote character for stuff like column and field names.
+	 * @var string
+	 */
+	static $QUOTE_CHARACTER = '`';
+
+	/**
 	 * Retrieve a database connection.
 	 *
 	 * @param string $connection_string_or_connection_name A database connection string (ex. mysql://user:pass@host[:port]/dbname)
@@ -314,6 +320,18 @@ abstract class Connection
 	public function next_sequence_value($sequence_name) { return null; }
 
 	/**
+	 * Quote a name like table names and field names.
+	 *
+	 * @param string $string String to quote.
+	 * @return string
+	 */
+	public function quote_name($string)
+	{
+		return $string[0] === static::$QUOTE_CHARACTER || $string[strlen($string)-1] === static::$QUOTE_CHARACTER ?
+			$string : static::$QUOTE_CHARACTER . $string . static::$QUOTE_CHARACTER;
+	}
+
+	/**
 	 * Returns the default port of the database server.
 	 */
 	abstract function default_port();
@@ -343,13 +361,5 @@ abstract class Connection
 	 * @return PDOStatement
 	 */
 	abstract function query_for_tables();
-
-	/**
-	 * Quote a name like table names and field names.
-	 *
-	 * @param string $string String to quote.
-	 * @return string
-	 */
-	abstract function quote_name($string);
 };
 ?>
