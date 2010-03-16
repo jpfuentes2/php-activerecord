@@ -22,7 +22,7 @@ class ActiveRecordFindTest extends DatabaseTest
 	 */
 	public function test_find_by_pkno_results()
 	{
-		Author::find(999999999999);
+		Author::find(99999999);
 	}
 
 	public function test_find_by_multiple_pk_with_partial_match()
@@ -370,8 +370,11 @@ class ActiveRecordFindTest extends DatabaseTest
 
 	public function test_having()
 	{
-		$author = Author::first(array('group' => "date(created_at)", 'having' => "created_at > '2009-01-01'"));
-		$this->assert_true(strpos(Author::table()->last_sql, "GROUP BY date(created_at) HAVING created_at > '2009-01-01'") !== false);
+		$author = Author::first(array(
+			'select' => 'date(created_at) as created_at', 
+			'group'  => 'date(created_at)',
+			'having' => "date(created_at) > '2009-01-01'"));
+		$this->assert_true(strpos(Author::table()->last_sql, "GROUP BY date(created_at) HAVING date(created_at) > '2009-01-01'") !== false);
 	}
 
 	/**
