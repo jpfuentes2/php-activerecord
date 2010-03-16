@@ -144,7 +144,7 @@ class ActiveRecordWriteTest extends DatabaseTest
 		$book = Book::first();
 		$book->name = null;
 		$book->save();
-		$this->assert_true(Book::first()->name === null);
+		$this->assert_same(null,Book::find($book->id)->name);
 	}
 
 	public function test_save_blank_value()
