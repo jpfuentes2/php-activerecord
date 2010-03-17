@@ -28,6 +28,7 @@ class SQLBuilder
 
 	// for insert/update
 	private $data;
+	private $sequence;
 
 	/**
 	 * Constructor.
@@ -140,13 +141,17 @@ class SQLBuilder
 		return $this;
 	}
 
-	public function insert($hash)
+	public function insert($hash, $pk=null, $sequence_name=null)
 	{
 		if (!is_hash($hash))
 			throw new ActiveRecordException('Inserting requires a hash.');
 
 		$this->operation = 'INSERT';
 		$this->data = $hash;
+
+		if ($pk && $sequence_name)
+			$this->sequence = array($pk,$sequence_name);
+
 		return $this;
 	}
 
@@ -307,7 +312,16 @@ class SQLBuilder
 		require_once 'Expressions.php';
 		$keys = join(',',$this->quoted_key_names());
 
-		$e = new Expressions($this->connection,"INSERT INTO $this->table($keys) VALUES(?)",array_values($this->data));
+		if ($this->sequence)
+		{
+			$sql =
+				"INSERT INTO $this->table($keys," . $this->connection->quote_name($this->sequence[0]) . 
+				") VALUES(?," . $this->connection->next_sequence_value($this->sequence[1]) . ")";
+		}
+		else
+			$sql = "INSERT INTO $this->table($keys) VALUES(?)";
+
+		$e = new Expressions($this->connection,$sql,array_values($this->data));
 		return $e->to_s();
 	}
 

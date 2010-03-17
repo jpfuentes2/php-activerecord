@@ -12,6 +12,11 @@ class DirtyAuthor extends ActiveRecord\Model
 	}
 };
 
+class AuthorExplicitSequence extends ActiveRecord\Model
+{
+	static $sequence = 'blah_seq';
+}
+
 class ActiveRecordWriteTest extends DatabaseTest
 {
 	public function test_save()
@@ -39,6 +44,22 @@ class ActiveRecordWriteTest extends DatabaseTest
 		$venue = new Venue(array('name' => 'Bob'));
 		$venue->save();
 		$this->assert_true($venue->id > 0);
+	}
+
+	public function test_sequence_was_set()
+	{
+		if ($this->conn->supports_sequences())
+			$this->assert_equals($this->conn->get_sequence_name('authors','author_id'),Author::table()->sequence);
+		else
+			$this->assert_null(Author::table()->sequence);
+	}
+
+	public function test_sequence_was_explicitly_set()
+	{
+		if ($this->conn->supports_sequences())
+			$this->assert_equals(AuthorExplicitSequence::$sequence,AuthorExplicitSequence::table()->sequence);
+		else
+			$this->assert_null(Author::table()->sequence);
 	}
 
 	public function test_delete()
@@ -123,7 +144,7 @@ class ActiveRecordWriteTest extends DatabaseTest
 		$book = Book::first();
 		$book->name = null;
 		$book->save();
-		$this->assert_true(Book::first()->name === null);
+		$this->assert_same(null,Book::find($book->id)->name);
 	}
 
 	public function test_save_blank_value()
@@ -248,7 +269,7 @@ class ActiveRecordWriteTest extends DatabaseTest
 	public function test_inserting_with_explicit_pk()
 	{
 		$author = Author::create(array('author_id' => 9999, 'name' => 'blah'));
-		$this->assert_not_null(Author::find($author->id));
+		$this->assert_equals(9999,$author->author_id);
 	}
 
 	/**
@@ -265,7 +286,7 @@ class ActiveRecordWriteTest extends DatabaseTest
 		$author = DirtyAuthor::first();
 		$author->encrypted_password = 'coco';
 		$author->save();
-		$this->assert_equals('i saved',DirtyAuthor::first()->name);
+		$this->assert_equals('i saved',DirtyAuthor::find($author->id)->name);
 	}
 
 	public function test_is_dirty()

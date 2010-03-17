@@ -26,6 +26,12 @@ class DatabaseLoader
 			$this->db->query('DELETE FROM ' . $this->quote_name($table));
 			$this->load_fixture_data($table);
 		}
+
+		try {
+			$this->exec_sql_script("{$this->db->protocol}-after-fixtures");
+		} catch (Exception $e) {
+			// ignore
+		}
 	}
 
 	public function drop_tables()

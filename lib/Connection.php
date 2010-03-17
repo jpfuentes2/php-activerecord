@@ -40,6 +40,18 @@ abstract class Connection
 		PDO::ATTR_STRINGIFY_FETCHES	=> false);
 
 	/**
+	 * The quote character for stuff like column and field names.
+	 * @var string
+	 */
+	static $QUOTE_CHARACTER = '`';
+
+	/**
+	 * Default port.
+	 * @var int
+	 */
+	static $DEFAULT_PORT = 0;
+
+	/**
 	 * Retrieve a database connection.
 	 *
 	 * @param string $connection_string_or_connection_name A database connection string (ex. mysql://user:pass@host[:port]/dbname)
@@ -173,17 +185,6 @@ abstract class Connection
 	}
 
 	/**
-	 * Return a default sequence name for the specified table.
-	 *
-	 * @param string $table Name of a table
-	 * @return string sequence name or null if not supported.
-	 */
-	public function get_sequence_name($table)
-	{
-		return null;
-	}
-
-	/**
 	 * Retrieve the insert id of the last model saved.
 	 *
 	 * @param string $sequence Optional name of a sequence to use
@@ -298,9 +299,43 @@ abstract class Connection
 	}
 
 	/**
-	 * Returns the default port of the database server.
+	 * Tells you if this adapter supports sequences or not.
+	 *
+	 * @return boolean
 	 */
-	abstract function default_port();
+	function supports_sequences() { return false; }
+
+	/**
+	 * Return a default sequence name for the specified table.
+	 *
+	 * @param string $table Name of a table
+	 * @param string $column_name Name of column sequence is for
+	 * @return string sequence name or null if not supported.
+	 */
+	public function get_sequence_name($table, $column_name)
+	{
+		return "{$table}_seq";
+	}
+
+	/**
+	 * Return SQL for getting the next value in a sequence.
+	 *
+	 * @param string $sequence_name Name of the sequence 
+	 * @return string
+	 */
+	public function next_sequence_value($sequence_name) { return null; }
+
+	/**
+	 * Quote a name like table names and field names.
+	 *
+	 * @param string $string String to quote.
+	 * @return string
+	 */
+	public function quote_name($string)
+	{
+		return $string[0] === static::$QUOTE_CHARACTER || $string[strlen($string)-1] === static::$QUOTE_CHARACTER ?
+			$string : static::$QUOTE_CHARACTER . $string . static::$QUOTE_CHARACTER;
+	}
 
 	/**
 	 * Adds a limit clause to the SQL query.
@@ -327,13 +362,5 @@ abstract class Connection
 	 * @return PDOStatement
 	 */
 	abstract function query_for_tables();
-
-	/**
-	 * Quote a name like table names and field names.
-	 *
-	 * @param string $string String to quote.
-	 * @return string
-	 */
-	abstract function quote_name($string);
 };
 ?>

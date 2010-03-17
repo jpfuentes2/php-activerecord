@@ -13,19 +13,12 @@ use PDO;
  */
 class OciAdapter extends Connection
 {
+	static $QUOTE_CHARACTER = '"';
+	static $DEFAULT_PORT = 1521;
+
 	protected function __construct($info)
 	{
 		$this->connection = new PDO("oci:dbname=//$info->host/$info->db",$info->user,$info->pass,static::$PDO_OPTIONS);
-	}
-
-	public function default_port()
-	{
-		return 1521;
-	}
-	
-	public function get_sequence_name($table)
-	{
-		return $table . '_seq';
 	}
 
 	public function limit($sql, $offset, $limit)
@@ -58,11 +51,6 @@ class OciAdapter extends Connection
 	public function query_for_tables()
 	{
 		return $this->query("SELECT table_name FROM user_tables");
-	}
-
-	public function quote_name($string)
-	{
-		return "\"$string\"";
 	}
 
 	public function create_column($column)

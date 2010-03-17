@@ -5,6 +5,15 @@ class AdapterTest extends DatabaseTest
 {
 	const InvalidDb = '__1337__invalid_db__';
 
+	public function test_i_has_a_default_port_unless_im_sqlite()
+	{
+		if ($this->conn instanceof ActiveRecord\SqliteAdapter)
+			return;
+
+		$c = $this->conn;
+		$this->assert_true($c::$DEFAULT_PORT > 0);
+	}
+
 	public function test_should_set_adapter_variables()
 	{
 		$this->assert_not_null($this->conn->protocol);
@@ -62,9 +71,11 @@ class AdapterTest extends DatabaseTest
 		$config = ActiveRecord\Config::instance();
 		$name = $config->get_default_connection();
 		$url = parse_url($config->get_connection($name));
+		$conn = $this->conn;
+		$port = $conn::$DEFAULT_PORT;
 
 		if ($this->conn->protocol != 'sqlite')
-			ActiveRecord\Connection::instance("{$url['scheme']}://{$url['user']}:{$url['pass']}@{$url['host']}:{$this->conn->default_port()}{$url['path']}");
+			ActiveRecord\Connection::instance("{$url['scheme']}://{$url['user']}:{$url['pass']}@{$url['host']}:$port{$url['path']}");
 	}
 
 	/**
@@ -111,6 +122,15 @@ class AdapterTest extends DatabaseTest
 		$this->assert_false($author_columns['parent_author_id']->pk);
 	}
 
+	public function test_columns_sequence()
+	{
+		if ($this->conn->supports_sequences())
+		{
+			$author_columns = $this->conn->columns('authors');
+			$this->assert_equals('authors_author_id_seq',$author_columns['author_id']->sequence);
+		}
+	}
+
 	public function test_columns_default()
 	{
 		$author_columns = $this->conn->columns('authors');
@@ -125,13 +145,18 @@ class AdapterTest extends DatabaseTest
 		$this->assert_equals(25,$author_columns['name']->length);
 	}
 
-	public function test_column_with_no_length()
+	public function test_columns_text()
 	{
 		$author_columns = $this->conn->columns('authors');
 		$this->assert_equals('text',$author_columns['some_text']->raw_type);
+		$this->assert_equals(null,$author_columns['some_text']->length);
+	}
+
+	public function test_columns_time()
+	{
+		$author_columns = $this->conn->columns('authors');
 		$this->assert_equals('time',$author_columns['some_time']->raw_type);
-		$this->assert_equals(Column::STRING,$author_columns['some_time']->type);
-		$this->assert_same(null,$author_columns['some_time']->length);
+		$this->assert_equals(Column::TIME,$author_columns['some_time']->type);
 	}
 
 	public function test_query()
@@ -192,13 +217,13 @@ class AdapterTest extends DatabaseTest
 
 	public function test_insert_id()
 	{
-		$this->conn->query('INSERT INTO authors(name) VALUES(\'name\')');
+		$this->conn->query("INSERT INTO authors(name) VALUES('name')");
 		$this->assert_true($this->conn->insert_id() > 0);
 	}
 
 	public function test_insert_id_with_params()
 	{
-		$x=array('name');
+		$x = array('name');
 		$this->conn->query('INSERT INTO authors(name) VALUES(?)',$x);
 		$this->assert_true($this->conn->insert_id() > 0);
 	}
@@ -234,7 +259,6 @@ class AdapterTest extends DatabaseTest
 		$this->assert_equals('varchar',substr($columns['name']->raw_type,0,7));
 		$this->assert_equals(Column::STRING,$columns['name']->type);
 		$this->assert_equals(25,$columns['name']->length);
-		$this->assert_equals('default_name',$columns['name']->default);
 	}
 
 	public function test_columns_decimal()
@@ -334,6 +358,17 @@ class AdapterTest extends DatabaseTest
 		} catch (Exception $e) {
 			$this->assert_equals(1,preg_match('/(an_invalid_column)|(exist)/',$e->getMessage()));
 		}
+	}
+
+	public function test_quote_name_does_not_over_quote()
+	{
+		$c = $this->conn;
+		$q = $c::$QUOTE_CHARACTER;
+		$qn = function($s) use ($c) { return $c->quote_name($s); };
+
+		$this->assert_equals("{$q}string", $qn("{$q}string"));
+		$this->assert_equals("string{$q}", $qn("string{$q}"));
+		$this->assert_equals("{$q}string{$q}", $qn("{$q}string{$q}"));
 	}
 }
 ?>

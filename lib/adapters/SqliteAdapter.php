@@ -21,11 +21,6 @@ class SqliteAdapter extends Connection
 		$this->connection = new PDO("sqlite:$info->host",null,null,static::$PDO_OPTIONS);
 	}
 
-	public function default_port()
-	{
-		return 0;
-	}
-
 	public function limit($sql, $offset, $limit)
 	{
 		$offset = intval($offset);
@@ -41,11 +36,6 @@ class SqliteAdapter extends Connection
 	public function query_for_tables()
 	{
 		return $this->query("SELECT name FROM sqlite_master");
-	}
-
-	public function quote_name($string)
-	{
-		return $string{0} === '`' || $string{strlen($string)-1} === '`' ? $string : "`$string`";
 	}
 
 	public function create_column($column)

@@ -22,7 +22,7 @@ class ActiveRecordFindTest extends DatabaseTest
 	 */
 	public function test_find_by_pkno_results()
 	{
-		Author::find(999999999999);
+		Author::find(99999999);
 	}
 
 	public function test_find_by_multiple_pk_with_partial_match()
@@ -325,28 +325,28 @@ class ActiveRecordFindTest extends DatabaseTest
 	{
 		JoinBook::$belongs_to = array(array('author'));
 		JoinBook::first(array('joins' => array('author','LEFT JOIN authors a ON(books.secondary_author_id=a.author_id)')));
-		$this->assert_true(strpos(JoinBook::table()->last_sql,'INNER JOIN `authors` ON(`books`.author_id = `authors`.author_id)') !== false);
-		$this->assert_true(strpos(JoinBook::table()->last_sql,'LEFT JOIN authors a ON(books.secondary_author_id=a.author_id)') !== false);
+		$this->assert_sql_has('INNER JOIN authors ON(books.author_id = authors.author_id)',JoinBook::table()->last_sql);
+		$this->assert_sql_has('LEFT JOIN authors a ON(books.secondary_author_id=a.author_id)',JoinBook::table()->last_sql);
 	}
 
 	public function test_joins_on_model_with_explicit_joins()
 	{
 		JoinBook::first(array('joins' => array('LEFT JOIN authors a ON(books.secondary_author_id=a.author_id)')));
-		$this->assert_true(strpos(JoinBook::table()->last_sql,'LEFT JOIN authors a ON(books.secondary_author_id=a.author_id)') !== false);
+		$this->assert_sql_has('LEFT JOIN authors a ON(books.secondary_author_id=a.author_id)',JoinBook::table()->last_sql);
 	}
 
 	public function test_group()
 	{
 		$venues = Venue::all(array('select' => 'state', 'group' => 'state'));
 		$this->assert_true(count($venues) > 0);
-		$this->assert_true(strpos(ActiveRecord\Table::load('Venue')->last_sql, 'GROUP BY state') !== false);
+		$this->assert_sql_has('GROUP BY state',ActiveRecord\Table::load('Venue')->last_sql);
 	}
 
 	public function test_group_with_order_and_limit_and_having()
 	{
 		$venues = Venue::all(array('select' => 'state', 'group' => 'state', 'having' => 'length(state) = 2', 'order' => 'state', 'limit' => 2));
 		$this->assert_true(count($venues) > 0);
-		$this->assert_true(strpos(ActiveRecord\Table::load('Venue')->last_sql, 'GROUP BY state HAVING length(state) = 2 ORDER BY state LIMIT 0,2') !== false);
+		$this->assert_sql_has($this->conn->limit('GROUP BY state HAVING length(state) = 2 ORDER BY state',0,2),ActiveRecord\Table::load('Venue')->last_sql);
 	}
 
 	public function test_escape_quotes()
@@ -368,8 +368,11 @@ class ActiveRecordFindTest extends DatabaseTest
 
 	public function test_having()
 	{
-		$author = Author::first(array('group' => "date(created_at)", 'having' => "created_at > '2009-01-01'"));
-		$this->assert_true(strpos(Author::table()->last_sql, "GROUP BY date(created_at) HAVING created_at > '2009-01-01'") !== false);
+		$author = Author::first(array(
+			'select' => 'date(created_at) as created_at', 
+			'group'  => 'date(created_at)',
+			'having' => "date(created_at) > '2009-01-01'"));
+		$this->assert_sql_has("GROUP BY date(created_at) HAVING date(created_at) > '2009-01-01'",Author::table()->last_sql);
 	}
 
 	/**
