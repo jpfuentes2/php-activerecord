@@ -274,6 +274,14 @@ class RelationshipTest extends DatabaseTest
 		$this->assert_equals(3,$hosts[1]->id);
 	}
 
+	public function test_gh27_has_many_through_with_explicit_keys()
+	{
+		$property = Property::first();
+
+		$this->assert_equals(1, $property->amenities[0]->amenity_id);
+		$this->assert_equals(2, $property->amenities[1]->amenity_id);
+	}
+
 	public function test_gh16_has_many_through_inside_a_loop_should_not_cause_an_exception()
 	{
 		$count = 0;

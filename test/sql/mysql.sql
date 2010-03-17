@@ -70,3 +70,18 @@ CREATE TABLE awesome_people(
 	author_id int,
 	is_awesome int default 1
 );
+
+CREATE TABLE amenities(
+  `amenity_id` int(11) NOT NULL AUTO_INCREMENT PRIMARY KEY,
+  `type` varchar(40) NOT NULL DEFAULT ''
+);
+
+CREATE TABLE property(
+  `property_id` int(11) NOT NULL AUTO_INCREMENT PRIMARY KEY
+);
+
+CREATE TABLE property_amenities(
+  `id` int(11) NOT NULL AUTO_INCREMENT PRIMARY KEY,
+  `amenity_id` int(11) NOT NULL DEFAULT '0',
+  `property_id` int(11) NOT NULL DEFAULT '0'
+);

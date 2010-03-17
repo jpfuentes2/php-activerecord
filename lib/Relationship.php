@@ -96,6 +96,11 @@ abstract class AbstractRelationship implements InterfaceRelationship
 			$this->foreign_key = is_array($this->options['foreign_key']) ? $this->options['foreign_key'] : array($this->options['foreign_key']);
 	}
 
+	protected function get_table()
+	{
+		return Table::load($this->class_name);
+	}
+
 	/**
 	 * What is this relationship's cardinality?
 	 *
@@ -292,8 +297,7 @@ abstract class AbstractRelationship implements InterfaceRelationship
 			$join_table = $from_table;
 			$join_table_name = $from_table->get_fully_qualified_table_name();
 			$from_table_name = Table::load($this->class_name)->get_fully_qualified_table_name();
-
-		}
+ 		}
 		else
 		{
 			$join_table = Table::load($this->class_name);
@@ -307,11 +311,15 @@ abstract class AbstractRelationship implements InterfaceRelationship
 			$this->set_keys($from_table->class->getName());
 
 			if ($using_through)
+			{
+				$foreign_key = $this->primary_key[0];
 				$join_primary_key = $this->keyify($this->class_name);
+			}
 			else
+			{
 				$join_primary_key = $this->foreign_key[0];
-
-			$foreign_key = $this->primary_key[0];
+				$foreign_key = $this->primary_key[0];
+			}
 		}
 		else
 		{
@@ -416,25 +424,19 @@ class HasMany extends AbstractRelationship
 			$this->set_inferred_class_name();
 	}
 
-	private function get_table()
-	{
-		return Table::load($this->class_name);
-	}
-
-	protected function set_keys($model_class_name)
+	protected function set_keys($model_class_name, $override=false)
 	{
 		//infer from class_name
-		if (!$this->foreign_key)
+		if (!$this->foreign_key || $override)
 			$this->foreign_key = array($this->keyify($model_class_name));
 
-		if (!$this->primary_key)
+		if (!$this->primary_key || $override)
 			$this->primary_key = Table::load($model_class_name)->pk;
 	}
 
 	public function load(Model $model)
 	{
 		$class_name = $this->class_name;
-		$this->set_keys(get_class($model));
 
 		// since through relationships depend on other relationships we can't do
 		// this initiailization in the constructor since the other relationship
@@ -450,24 +452,20 @@ class HasMany extends AbstractRelationship
 				if (!($through_relationship instanceof HasMany) && !($through_relationship instanceof BelongsTo))
 					throw new HasManyThroughAssociationException('has_many through can only use a belongs_to or has_many association');
 
+				$this->set_keys($this->get_table()->class->getName());
+
 				$through_table = Table::load(classify($this->through, true));
-				$through_table_name = $through_table->get_fully_qualified_table_name();
-
 				$this->options['joins'] = $this->construct_inner_join_sql($through_table, true);
-				$conn = $this->get_table()->conn;
-
-				foreach ($this->foreign_key as $index => &$key)
-				{
-					$k = $key;
-					$key = "$through_table_name." . $conn->quote_name($k);
-				}
 			}
 
 			$this->initialized = true;
 		}
 
+		$this->set_keys(get_class($model), true);
+
 		if (!($conditions = $this->create_conditions_from_keys($model, $this->foreign_key, $this->primary_key)))
 			return null;
+
 		$options = $this->unset_non_finder_options($this->options);
 		$options['conditions'] = $conditions;
 		return $class_name::find($this->poly_relationship ? 'all' : 'first',$options);
