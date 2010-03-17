@@ -69,3 +69,18 @@ CREATE TABLE awesome_people(
 	author_id int,
 	is_awesome int default 1
 );
+
+CREATE TABLE amenities(
+  amenity_id serial primary key,
+  type varchar(40) NOT NULL
+);
+
+CREATE TABLE property(
+  property_id serial primary key
+);
+
+CREATE TABLE property_amenities(
+  id serial primary key,
+  amenity_id int not null,
+  property_id int not null
+);
