@@ -288,9 +288,11 @@ abstract class AbstractRelationship implements InterfaceRelationship
 	 * Creates INNER JOIN SQL for associations.
 	 *
 	 * @param Table $from_table the table used for the FROM SQL statement
+	 * @param bool $using_through is this a THROUGH relationship?
+	 * @param string $alias a table alias for when a table is being joined twice
 	 * @return string SQL INNER JOIN fragment
 	 */
-	public function construct_inner_join_sql(Table $from_table, $using_through=false)
+	public function construct_inner_join_sql(Table $from_table, $using_through=false, $alias=null)
 	{
 		if ($using_through)
 		{
@@ -327,7 +329,15 @@ abstract class AbstractRelationship implements InterfaceRelationship
 			$join_primary_key = $this->primary_key[0];
 		}
 
-		return "INNER JOIN $join_table_name ON($from_table_name.$foreign_key = $join_table_name.$join_primary_key)";
+		if (!is_null($alias))
+		{
+			$aliased_join_table_name = $alias = $this->get_table()->conn->quote_name($alias);
+			$alias .= ' ';
+		}
+		else
+			$aliased_join_table_name = $join_table_name;
+
+		return "INNER JOIN $join_table_name {$alias}ON($from_table_name.$foreign_key = $aliased_join_table_name.$join_primary_key)";
 	}
 
 	/**

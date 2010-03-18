@@ -608,5 +608,21 @@ class RelationshipTest extends DatabaseTest
 		$this->assert_not_equals($changed_host->name, $unchanged_host->name);
 		$this->assert_not_equals(spl_object_hash($changed_host), spl_object_hash($unchanged_host));
 	}
+
+	public function test_gh_23_relationships_with_joins_to_same_table_should_alias_table_name()
+	{
+		Book::$belongs_to = array(
+			array('from', 'class_name' => 'Author', 'foreign_key' => 'author_id'),
+			array('to', 'class_name' => 'Author', 'foreign_key' => 'secondary_author_id'),
+			array('another', 'class_name' => 'Author', 'foreign_key' => 'secondary_author_id')
+		);
+
+		$book = Book::find(2, array('joins' => array('to', 'from', 'another'),
+			'select' => 'books.*, from.name as from_author_name, authors.name as to_author_name, another.name as another_author_name'));
+
+		$this->assert_not_null($book->from_author_name);
+		$this->assert_not_null($book->to_author_name);
+		$this->assert_not_null($book->another_author_name);
+	}
 };
 ?>
