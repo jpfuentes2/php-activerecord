@@ -30,6 +30,20 @@ abstract class Connection
 	public $last_query;
 
 	/**
+	 * Switch for logging.
+	 *
+	 * @var bool
+	 */
+	private $logging = false;
+
+	/**
+	 * Contains a Logger object that must impelement a log() method.
+	 *
+	 * @var object
+	 */
+	private $logger;
+
+	/**
 	 * Default PDO options to set for each connection.
 	 * @var array
 	 */
@@ -83,6 +97,8 @@ abstract class Connection
 		try {
 			$connection = new $fqclass($info);
 			$connection->protocol = $info->protocol;
+			$connection->logging = $config->get_logging();
+			$connection->logger = $connection->logging ? $config->get_logger() : null;
 		} catch (PDOException $e) {
 			throw new DatabaseException($e);
 		}
@@ -204,9 +220,7 @@ abstract class Connection
 	 */
 	public function query($sql, &$values=array())
 	{
-		if (isset($GLOBALS['ACTIVERECORD_LOG']) && $GLOBALS['ACTIVERECORD_LOG'])
-			$GLOBALS['ACTIVERECORD_LOGGER']->log($sql, PEAR_LOG_INFO);
-
+		$this->logger->log($sql);
 		$this->last_query = $sql;
 
 		try {
@@ -320,7 +334,7 @@ abstract class Connection
 	/**
 	 * Return SQL for getting the next value in a sequence.
 	 *
-	 * @param string $sequence_name Name of the sequence 
+	 * @param string $sequence_name Name of the sequence
 	 * @return string
 	 */
 	public function next_sequence_value($sequence_name) { return null; }
