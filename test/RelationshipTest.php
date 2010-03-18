@@ -611,6 +611,7 @@ class RelationshipTest extends DatabaseTest
 
 	public function test_gh_23_relationships_with_joins_to_same_table_should_alias_table_name()
 	{
+		$old = Book::$belongs_to;
 		Book::$belongs_to = array(
 			array('from', 'class_name' => 'Author', 'foreign_key' => 'author_id'),
 			array('to', 'class_name' => 'Author', 'foreign_key' => 'secondary_author_id'),
@@ -623,6 +624,7 @@ class RelationshipTest extends DatabaseTest
 		$this->assert_not_null($book->from_author_name);
 		$this->assert_not_null($book->to_author_name);
 		$this->assert_not_null($book->another_author_name);
+		Book::$belongs_to = $old;
 	}
 };
 ?>
