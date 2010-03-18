@@ -618,8 +618,11 @@ class RelationshipTest extends DatabaseTest
 			array('another', 'class_name' => 'Author', 'foreign_key' => 'secondary_author_id')
 		);
 
+		$c = ActiveRecord\Table::load('Book')->conn;
+
+		$select = "books.*, authors.name as to_author_name, {$c->quote_name('from')}.name as from_author_name, {$c->quote_name('another')}.name as another_author_name";
 		$book = Book::find(2, array('joins' => array('to', 'from', 'another'),
-			'select' => 'books.*, from.name as from_author_name, authors.name as to_author_name, another.name as another_author_name'));
+			'select' => $select));
 
 		$this->assert_not_null($book->from_author_name);
 		$this->assert_not_null($book->to_author_name);
