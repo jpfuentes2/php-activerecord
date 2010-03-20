@@ -116,12 +116,18 @@ class ActiveRecordTest extends DatabaseTest
 
 	public function test_hyphenated_column_names_to_underscore()
 	{
+		if ($this->conn instanceof ActiveRecord\OciAdapter)
+			return;
+
 		$keys = array_keys(RmBldg::first()->attributes());
 		$this->assert_true(in_array('rm_name',$keys));
 	}
 
 	public function test_column_names_with_spaces()
 	{
+		if ($this->conn instanceof ActiveRecord\OciAdapter)
+			return;
+
 		$keys = array_keys(RmBldg::first()->attributes());
 		$this->assert_true(in_array('space_out',$keys));
 	}
@@ -413,13 +419,6 @@ class ActiveRecordTest extends DatabaseTest
 	public function test_undefined_instance_method()
 	{
 		Author::first()->find_by_name('sdf');
-	}
-
-	public function test_get_validation_rules()
-	{
-		$validators = RmBldg::first()->get_validation_rules();
-		$this->assert_true(array_key_exists('space_out',$validators));
-		$this->assert_true(in_array(array('with' => '/\A([^@\s]+)@((?:[-a-z0-9]+\.)+[a-z]{2,})\Z/i', 'validator' => 'validates_format_of'),$validators['space_out']));
 	}
 
 	public function test_clear_cache_for_specific_class()

@@ -12,6 +12,12 @@ class DirtyAuthor extends ActiveRecord\Model
 	}
 };
 
+class AuthorWithoutSequence extends ActiveRecord\Model
+{
+	static $table = 'authors';
+	static $sequence = 'invalid_seq';
+}
+
 class AuthorExplicitSequence extends ActiveRecord\Model
 {
 	static $sequence = 'blah_seq';
@@ -30,6 +36,17 @@ class ActiveRecordWriteTest extends DatabaseTest
 		$author = new Author(array('name' => 'Blah Blah'));
 		$author->save();
 		$this->assert_not_null(Author::find($author->id));
+	}
+
+	/**
+	 * @expectedException ActiveRecord\DatabaseException
+	 */
+	public function test_insert_with_no_sequence_defined()
+	{
+		if (!$this->conn->supports_sequences())
+			throw new ActiveRecord\DatabaseException('');
+
+		AuthorWithoutSequence::create(array('name' => 'Bob!'));
 	}
 
 	public function test_insert_should_quote_keys()
@@ -149,6 +166,10 @@ class ActiveRecordWriteTest extends DatabaseTest
 
 	public function test_save_blank_value()
 	{
+		// oracle doesn't do blanks. probably an option to enable?
+		if ($this->conn instanceof ActiveRecord\OciAdapter)
+			return;
+
 		$book = Book::find(1);
 		$book->name = '';
 		$book->save();

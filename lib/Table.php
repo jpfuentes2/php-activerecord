@@ -206,7 +206,6 @@ class Table
 
 		$collect_attrs_for_includes = is_null($includes) ? false : true;
 		$list = $attrs = array();
-
 		$sth = $this->conn->query($sql,$values);
 
 		while (($row = $sth->fetch()))
@@ -385,9 +384,8 @@ class Table
 	{
 		foreach ($hash as $name => &$value)
 		{
-			// TODO this will probably need to be changed for oracle
 			if ($value instanceof DateTime)
-				$hash[$name] = $value->format('Y-m-d H:i:s T');
+				$hash[$name] = $this->conn->datetime_to_string($value);
 			else
 				$hash[$name] = $value;
 		}

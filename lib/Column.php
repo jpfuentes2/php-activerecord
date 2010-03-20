@@ -107,9 +107,10 @@ class Column
 	 * Casts a value to the column's type.
 	 *
 	 * @param mixed $value The value to cast
+	 * @param Connection $connection The Connection this column belongs to
 	 * @return mixed type-casted value
 	 */
-	public function cast($value)
+	public function cast($value, $connection)
 	{
 		if ($value === null)
 			return null;
@@ -123,17 +124,11 @@ class Column
 			case self::DATE:
 				if (!$value)
 					return null;
-				
+
 				if ($value instanceof DateTime)
 					return $value;
 
-				$value = date_create($value);
-				$errors = \DateTime::getLastErrors();
-
-				if ($errors['warning_count'] > 0 || $errors['error_count'] > 0)
-					return null;
-
-				return $value;
+				return $connection->string_to_datetime($value);
 		}
 		return $value;
 	}

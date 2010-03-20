@@ -18,6 +18,7 @@ class RelationshipTest extends DatabaseTest
 	public function set_up($connection_name=null)
 	{
 		parent::set_up($connection_name);
+
 		Event::$belongs_to = array(array('venue'), array('host'));
 		Venue::$has_many = array(array('events'),array('hosts', 'through' => 'events'));
 		Venue::$has_one = array();
@@ -90,9 +91,9 @@ class RelationshipTest extends DatabaseTest
 
 	public function test_joins_combined_with_select_loads_all_attributes()
 	{
-		$x = Event::first(array('select' => 'events.*, venues.*', 'joins' => array('venue')));
-		$this->assert_sql_has('SELECT events.*, venues.*',Event::table()->last_sql);
-		$this->assert_true(array_key_exists('city', $x->attributes()));
+		$x = Event::first(array('select' => 'events.*, venues.city as venue_city', 'joins' => array('venue')));
+		$this->assert_sql_has('SELECT events.*, venues.city as venue_city',Event::table()->last_sql);
+		$this->assert_true(array_key_exists('venue_city', $x->attributes()));
 	}
 
 	public function test_belongs_to_basic()
@@ -613,15 +614,15 @@ class RelationshipTest extends DatabaseTest
 	{
 		$old = Book::$belongs_to;
 		Book::$belongs_to = array(
-			array('from', 'class_name' => 'Author', 'foreign_key' => 'author_id'),
+			array('from_', 'class_name' => 'Author', 'foreign_key' => 'author_id'),
 			array('to', 'class_name' => 'Author', 'foreign_key' => 'secondary_author_id'),
 			array('another', 'class_name' => 'Author', 'foreign_key' => 'secondary_author_id')
 		);
 
 		$c = ActiveRecord\Table::load('Book')->conn;
 
-		$select = "books.*, authors.name as to_author_name, {$c->quote_name('from')}.name as from_author_name, {$c->quote_name('another')}.name as another_author_name";
-		$book = Book::find(2, array('joins' => array('to', 'from', 'another'),
+		$select = "books.*, authors.name as to_author_name, {$c->quote_name('from_')}.name as from_author_name, {$c->quote_name('another')}.name as another_author_name";
+		$book = Book::find(2, array('joins' => array('to', 'from_', 'another'),
 			'select' => $select));
 
 		$this->assert_not_null($book->from_author_name);

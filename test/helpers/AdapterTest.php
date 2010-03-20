@@ -240,11 +240,15 @@ class AdapterTest extends DatabaseTest
 		$this->assert_not_equals($s,$this->conn->escape($s));
 	}
 
-	public function test_columns()
+	public function test_columnsx()
 	{
 		$columns = $this->conn->columns('authors');
+		$names = array('author_id','parent_author_id','name','updated_at','created_at','some_date','some_time','some_text','encrypted_password','mixedCaseField');
 
-		foreach (array('author_id','parent_author_id','name','updated_at','created_at','some_date','some_time','some_text','encrypted_password','mixedCaseField') as $field)
+		if ($this->conn instanceof ActiveRecord\OciAdapter)
+			$names = array_filter(array_map('strtolower',$names),function($s) { $s !== 'some_time'; });
+
+		foreach ($names as $field)
 			$this->assert_true(array_key_exists($field,$columns));
 
 		$this->assert_equals(true,$columns['author_id']->pk);
@@ -369,6 +373,12 @@ class AdapterTest extends DatabaseTest
 		$this->assert_equals("{$q}string", $qn("{$q}string"));
 		$this->assert_equals("string{$q}", $qn("string{$q}"));
 		$this->assert_equals("{$q}string{$q}", $qn("{$q}string{$q}"));
+	}
+
+	public function test_datetime_to_string()
+	{
+		$datetime = '2009-01-01 01:01:01 EST';
+		$this->assert_equals($datetime,$this->conn->datetime_to_string(date_create($datetime)));
 	}
 }
 ?>

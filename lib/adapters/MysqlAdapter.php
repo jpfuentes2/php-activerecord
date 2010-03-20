@@ -65,7 +65,7 @@ class MysqlAdapter extends Connection
 		}
 
 		$c->map_raw_type();
-		$c->default = $c->cast($column['default']);
+		$c->default = $c->cast($column['default'],$this);
 
 		return $c;
 	}

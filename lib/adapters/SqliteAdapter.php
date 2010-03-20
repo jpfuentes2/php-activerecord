@@ -73,7 +73,7 @@ class SqliteAdapter extends Connection
 		if ($c->type == Column::INTEGER && !$c->length)
 			$c->length = 8;
 
-		$c->default = $c->cast($column['dflt_value']);
+		$c->default = $c->cast($column['dflt_value'],$this);
 
 		return $c;
 	}

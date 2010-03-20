@@ -6,10 +6,10 @@ CREATE TABLE authors(
 	updated_at timestamp,
 	created_at timestamp,
 	some_date date,
-	some_time time,
-	some_text text,
+	--some_time time,
+	some_text varchar2(100),
 	encrypted_password varchar(50),
-	mixedCaseField varchar(50)
+	"mixedCaseField" varchar(50)
 );
 
 CREATE SEQUENCE books_seq;
@@ -64,15 +64,27 @@ CREATE TABLE positions (
   active SMALLINT NOT NULL
 );
 
-CREATE TABLE "RM-BLDG"(
-    "RM-ID" INT NOT NULL,
-    "RM-NAME" VARCHAR(10) NOT NULL,
-    "SPACE OUT" VARCHAR(1) NOT NULL
-);
-
 CREATE SEQUENCE awesome_people_seq;
 CREATE TABLE awesome_people(
 	id int not null primary key,
 	author_id int,
 	is_awesome int default 1
+);
+
+CREATE SEQUENCE amenities_seq;
+CREATE TABLE amenities(
+  amenity_id int primary key,
+  type varchar(40) NOT NULL
+);
+
+CREATE SEQUENCE property_seq;
+CREATE TABLE property(
+  property_id int primary key
+);
+
+CREATE SEQUENCE property_amenities_seq;
+CREATE TABLE property_amenities(
+  id int primary key,
+  amenity_id int not null,
+  property_id int not null
 );

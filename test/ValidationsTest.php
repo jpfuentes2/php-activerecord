@@ -99,5 +99,11 @@ class ValidationsTest extends DatabaseTest
 		$this->assert_false($book2->is_valid());
 		$this->assert_equals(array('Name and special must be unique'),$book2->errors->full_messages());
 	}
+
+	public function test_get_validation_rules()
+	{
+		$validators = BookValidations::first()->get_validation_rules();
+		$this->assert_true(in_array(array('validator' => 'validates_presence_of'),$validators['name']));
+	}
 };
 ?>

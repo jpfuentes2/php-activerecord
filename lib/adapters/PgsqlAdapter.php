@@ -96,7 +96,7 @@ SQL;
 			if (count($matches) == 2)
 				$c->sequence = $matches[1];
 			else
-				$c->default = $c->cast($column['default']);
+				$c->default = $c->cast($column['default'],$this);
 		}
 		return $c;
 	}

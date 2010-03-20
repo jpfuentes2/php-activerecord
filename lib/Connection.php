@@ -352,6 +352,34 @@ abstract class Connection
 	}
 
 	/**
+	 * Return a date time formatted into the database's datetime format.
+	 *
+	 * @param DateTime $datetime The DateTime object
+	 * @return string
+	 */
+	public function datetime_to_string($datetime)
+	{
+		return $datetime->format('Y-m-d H:i:s T');
+	}
+
+	/**
+	 * Converts a string representation of a datetime into a DateTime object.
+	 *
+	 * @param string $string A datetime in the form accepted by date_create()
+	 * @return DateTime
+	 */
+	public function string_to_datetime($string)
+	{
+		$date = date_create($string);
+		$errors = \DateTime::getLastErrors();
+
+		if ($errors['warning_count'] > 0 || $errors['error_count'] > 0)
+			return null;
+
+		return $date;
+	}
+
+	/**
 	 * Adds a limit clause to the SQL query.
 	 *
 	 * @param string $sql The SQL statement.
