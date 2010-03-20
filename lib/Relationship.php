@@ -315,7 +315,7 @@ abstract class AbstractRelationship implements InterfaceRelationship
 			if ($using_through)
 			{
 				$foreign_key = $this->primary_key[0];
-				$join_primary_key = $this->keyify($this->class_name);
+				$join_primary_key = $this->foreign_key[0];
 			}
 			else
 			{
@@ -447,6 +447,7 @@ class HasMany extends AbstractRelationship
 	public function load(Model $model)
 	{
 		$class_name = $this->class_name;
+		$this->set_keys(get_class($model));
 
 		// since through relationships depend on other relationships we can't do
 		// this initiailization in the constructor since the other relationship
@@ -462,16 +463,23 @@ class HasMany extends AbstractRelationship
 				if (!($through_relationship instanceof HasMany) && !($through_relationship instanceof BelongsTo))
 					throw new HasManyThroughAssociationException('has_many through can only use a belongs_to or has_many association');
 
-				$this->set_keys($this->get_table()->class->getName());
+				// save old keys as we will be reseting them below for inner join convenience
+				$pk = $this->primary_key;
+				$fk = $this->foreign_key;
+
+				$this->set_keys($this->get_table()->class->getName(), true);
+				$reset_keys = true;
 
 				$through_table = Table::load(classify($this->through, true));
 				$this->options['joins'] = $this->construct_inner_join_sql($through_table, true);
+
+				// reset keys
+				$this->primary_key = $pk;
+				$this->foreign_key = $fk;
 			}
 
 			$this->initialized = true;
 		}
-
-		$this->set_keys(get_class($model), true);
 
 		if (!($conditions = $this->create_conditions_from_keys($model, $this->foreign_key, $this->primary_key)))
 			return null;
