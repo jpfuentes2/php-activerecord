@@ -39,6 +39,9 @@ class AdapterTest extends DatabaseTest
 	 */
 	public function test_no_host_connection()
 	{
+		if (!$GLOBALS['slow_tests'])
+			throw new ActiveRecord\DatabaseException("");
+
 		ActiveRecord\Connection::instance("{$this->conn->protocol}://user:pass");
 	}
 
@@ -47,7 +50,10 @@ class AdapterTest extends DatabaseTest
 	 */
 	public function test_connection_failed_invalid_host()
 	{
-		ActiveRecord\Connection::instance("{$this->conn->protocol}://user:pass/lskjdflkjsdlkjflksjf/db");
+		if (!$GLOBALS['slow_tests'])
+			throw new ActiveRecord\DatabaseException("");
+
+		ActiveRecord\Connection::instance("{$this->conn->protocol}://user:pass/1.1.1.1/db");
 	}
 
 	/**
