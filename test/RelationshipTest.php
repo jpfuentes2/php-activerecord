@@ -20,10 +20,10 @@ class RelationshipTest extends DatabaseTest
 		parent::set_up($connection_name);
 
 		Event::$belongs_to = array(array('venue'), array('host'));
-		Venue::$has_many = array(array('events'),array('hosts', 'through' => 'events'));
+		Venue::$has_many = array(array('events', 'order' => 'id asc'),array('hosts', 'through' => 'events', 'order' => 'hosts.id asc'));
 		Venue::$has_one = array();
 		Employee::$has_one = array(array('position'));
-		Host::$has_many = array(array('events'));
+		Host::$has_many = array(array('events', 'order' => 'id asc'));
 
 		foreach ($this->relationship_names as $name)
 		{
@@ -42,11 +42,14 @@ class RelationshipTest extends DatabaseTest
 			case 'belongs_to';
 				$ret = Event::find(5);
 				break;
+
 			case 'has_one';
 				$ret = Employee::find(1);
 				break;
+
 			case 'has_many';
 				$ret = Venue::find(2);
+				break;
 		}
 
 		return $ret;
@@ -72,6 +75,11 @@ class RelationshipTest extends DatabaseTest
 		$this->assert_true($employee->$association_name instanceof Position);
 		$this->assert_equals('physicist',$employee->$association_name->title);
 		$this->assert_not_null($employee->id, $employee->$association_name->title);
+	}
+
+	public function test_has_many_basic()
+	{
+		$this->assert_default_has_many($this->get_relationship());
 	}
 
 	/**
@@ -182,7 +190,7 @@ class RelationshipTest extends DatabaseTest
 	public function test_belongs_to_can_be_self_referential()
 	{
 		Author::$belongs_to = array(array('parent_author', 'class_name' => 'Author', 'foreign_key' => 'parent_author_id'));
-		$author = Author::first();
+		$author = Author::find(1);
 		$this->assert_equals(1, $author->id);
 		$this->assert_equals(3, $author->parent_author->id);
 	}
@@ -194,14 +202,9 @@ class RelationshipTest extends DatabaseTest
 		$this->assert_sql_doesnt_has('INNER JOIN venues ON(events.venue_id = venues.id)',Event::table()->last_sql);
 	}
 
-	public function test_has_many_basic()
-	{
-		$this->assert_default_has_many($this->get_relationship());
-	}
-
 	public function test_has_many_with_explicit_class_name()
 	{
-		Venue::$has_many = array(array('explicit_class_name', 'class_name' => 'Event'));;
+		Venue::$has_many = array(array('explicit_class_name', 'class_name' => 'Event', 'order' => 'id asc'));;
 		$this->assert_default_has_many($this->get_relationship(), 'explicit_class_name');
 	}
 
@@ -237,7 +240,7 @@ class RelationshipTest extends DatabaseTest
 
 	public function test_has_many_with_singular_attribute_name()
 	{
-		Venue::$has_many = array(array('event', 'class_name' => 'Event'));
+		Venue::$has_many = array(array('event', 'class_name' => 'Event', 'order' => 'id asc'));
 		$this->assert_default_has_many($this->get_relationship(), 'event');
 	}
 
@@ -265,7 +268,7 @@ class RelationshipTest extends DatabaseTest
 			'limit'  => 2,
 			'offset' => 1);
 		Venue::first()->events;
-		$this->assert_sql_has($this->conn->limit("WHERE venue_id=? GROUP BY type",1,2),Event::table()->last_sql);
+		$this->assert_sql_has($this->conn->limit("SELECT type FROM events WHERE venue_id=? GROUP BY type",1,2),Event::table()->last_sql);
 	}
 
 	public function test_has_many_through()
@@ -419,7 +422,7 @@ class RelationshipTest extends DatabaseTest
 	public function test_has_one_can_be_self_referential()
 	{
 		Author::$has_one[1] = array('parent_author', 'class_name' => 'Author', 'foreign_key' => 'parent_author_id');
-		$author = Author::first();
+		$author = Author::find(1);
 		$this->assert_equals(1, $author->id);
 		$this->assert_equals(3, $author->parent_author->id);
 	}
