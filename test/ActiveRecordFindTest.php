@@ -436,5 +436,11 @@ class ActiveRecordFindTest extends DatabaseTest
 		$this->assert_equals(3,Venue::count_by_state_or_name('VA','Warner Theatre'));
 		$this->assert_equals(0,Venue::count_by_state_and_name('VA','zzzzzzzzzzzzz'));
 	}
+
+	public function test_find_by_pk_should_not_use_limit()
+	{
+		Author::find(1);
+		$this->assert_sql_has('SELECT * FROM authors WHERE author_id=?',Author::table()->last_sql);
+	}
 };
 ?>

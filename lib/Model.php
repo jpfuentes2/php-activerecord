@@ -1391,18 +1391,11 @@ class Model
 	 */
 	public static function find_by_pk($values, $options)
 	{
-		if (($expected = count($values)) <= 1)
-		{
-			$options['limit'] = 1;
-			$options['offset'] = 0;
-		}
-
 		$options['conditions'] = static::pk_conditions($values);
-
 		$list = static::table()->find($options);
 		$results = count($list);
 
-		if ($results != $expected)
+		if ($results != ($expected = count($values)))
 		{
 			$class = get_called_class();
 
