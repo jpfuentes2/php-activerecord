@@ -30,7 +30,7 @@ PHP 5.3+
 - MySQL
 - SQLite
 - PostgreSQL
-- (oracle soon)
+- Oracle
 
 ## Installation ##
 
