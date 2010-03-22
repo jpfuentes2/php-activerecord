@@ -7,10 +7,10 @@ class AdapterTest extends DatabaseTest
 
 	public function setUp($connection_name=null)
 	{
-		parent::setUp($connection_name);
-
 		if ($connection_name && !in_array($connection_name, PDO::getAvailableDrivers()))
 			$this->mark_test_skipped($connection_name . ' drivers are not present');
+
+		parent::setUp($connection_name);
 	}
 
 	public function test_i_has_a_default_port_unless_im_sqlite()
