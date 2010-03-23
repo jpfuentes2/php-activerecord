@@ -121,6 +121,18 @@ class RelationshipTest extends DatabaseTest
 		$this->assert_default_belongs_to($this->get_relationship(), 'explicit_class_name');
 	}
 
+	public function test_belongs_to_with_explicit_foreign_key()
+	{
+		$old = Book::$belongs_to;
+		Book::$belongs_to = array(array('explicit_author', 'class_name' => 'Author', 'foreign_key' => 'secondary_author_id'));
+
+		$book = Book::find(1);
+		$this->assert_equals(2, $book->secondary_author_id);
+		$this->assert_equals($book->secondary_author_id, $book->explicit_author->author_id);
+
+		Book::$belongs_to = $old;
+	}
+
 	public function test_belongs_to_with_select()
 	{
 		Event::$belongs_to[0]['select'] = 'id, city';
@@ -356,6 +368,19 @@ class RelationshipTest extends DatabaseTest
 		$this->assert_sql_has('INNER JOIN events ON(venues.id = events.venue_id)',Venue::table()->last_sql);
 	}
 
+	public function test_has_many_with_explicit_keys()
+	{
+		$old = Author::$has_many;
+		Author::$has_many = array(array('explicit_books', 'class_name' => 'Book', 'primary_key' => 'parent_author_id', 'foreign_key' => 'secondary_author_id'));
+		$author = Author::find(4);
+
+		foreach ($author->explicit_books as $book)
+			$this->assert_equals($book->secondary_author_id, $author->parent_author_id);
+
+		$this->assert_true(strpos(ActiveRecord\Table::load('Book')->last_sql, "secondary_author_id") !== false);
+		Author::$has_many = $old;
+	}
+
 	public function test_has_one_basic()
 	{
 		$this->assert_default_has_one($this->get_relationship());
@@ -431,6 +456,15 @@ class RelationshipTest extends DatabaseTest
 	{
 		$x = Employee::first(array('joins' => array('position')));
 		$this->assert_sql_has('INNER JOIN positions ON(employees.id = positions.employee_id)',Employee::table()->last_sql);
+	}
+
+	public function test_has_one_with_explicit_keys()
+	{
+		Book::$has_one = array(array('explicit_author', 'class_name' => 'Author', 'foreign_key' => 'parent_author_id', 'primary_key' => 'secondary_author_id'));
+
+		$book = Book::find(1);
+		$this->assert_equals($book->secondary_author_id, $book->explicit_author->parent_author_id);
+		$this->assert_true(strpos(ActiveRecord\Table::load('Author')->last_sql, "parent_author_id") !== false);
 	}
 
 	public function test_dont_attempt_to_load_if_all_foreign_keys_are_null()

@@ -430,6 +430,9 @@ class HasMany extends AbstractRelationship
 				$this->set_class_name($this->options['source']);
 		}
 
+		if (!$this->primary_key && isset($this->options['primary_key']))
+			$this->primary_key = is_array($this->options['primary_key']) ? $this->options['primary_key'] : array($this->options['primary_key']);
+
 		if (!$this->class_name)
 			$this->set_inferred_class_name();
 	}
@@ -596,17 +599,6 @@ class HasAndBelongsToMany extends AbstractRelationship
  */
 class BelongsTo extends AbstractRelationship
 {
-	/**
-	 * Valid options to use:
-	 *
-	 * <ul>
-	 * <li><b>primary_key:</b> name of the primary_key of the association (defaults to "id")</li>
-	 * </ul>
-	 *
-	 * @var array
-	 */
-	static protected $valid_association_options = array('primary_key');
-
 	public function __construct($options=array())
 	{
 		parent::__construct($options);

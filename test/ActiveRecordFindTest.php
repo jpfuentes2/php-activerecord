@@ -173,15 +173,15 @@ class ActiveRecordFindTest extends DatabaseTest
 	public function test_find_last()
 	{
 		$author = Author::last();
-		$this->assert_equals(3, $author->author_id);
-		$this->assert_equals('Bill Clinton',$author->name);
+		$this->assert_equals(4, $author->author_id);
+		$this->assert_equals('Uncle Bob',$author->name);
 	}
 
 	public function test_find_last_using_string_condition()
 	{
-		$author = Author::find('last', array('conditions' => 'author_id IN(1,2,3)'));
-		$this->assert_equals(3, $author->author_id);
-		$this->assert_equals('Bill Clinton',$author->name);
+		$author = Author::find('last', array('conditions' => 'author_id IN(1,2,3,4)'));
+		$this->assert_equals(4, $author->author_id);
+		$this->assert_equals('Uncle Bob',$author->name);
 	}
 
 	public function test_limit_before_order()
@@ -292,7 +292,7 @@ class ActiveRecordFindTest extends DatabaseTest
 	public function test_find_all_takes_limit_options()
 	{
 		$authors = Author::all(array('limit' => 1, 'offset' => 2, 'order' => 'name desc'));
-		$this->assert_equals('Bill Clinton',$authors[0]->name);
+		$this->assert_equals('George W. Bush',$authors[0]->name);
 	}
 
 	/**
@@ -306,7 +306,7 @@ class ActiveRecordFindTest extends DatabaseTest
 	public function test_find_with_select()
 	{
 		$author = Author::first(array('select' => 'name, 123 as bubba', 'order' => 'name desc'));
-		$this->assert_equals('Tito',$author->name);
+		$this->assert_equals('Uncle Bob',$author->name);
 		$this->assert_equals(123,$author->bubba);
 	}
 
@@ -371,7 +371,7 @@ class ActiveRecordFindTest extends DatabaseTest
 		if ($this->conn instanceof ActiveRecord\OciAdapter)
 		{
 			$author = Author::first(array(
-				'select' => 'to_char(created_at,\'YYYY-MM-DD\') as created_at', 
+				'select' => 'to_char(created_at,\'YYYY-MM-DD\') as created_at',
 				'group'  => 'to_char(created_at,\'YYYY-MM-DD\')',
 				'having' => "to_char(created_at,'YYYY-MM-DD') > '2009-01-01'"));
 			$this->assert_sql_has("GROUP BY to_char(created_at,'YYYY-MM-DD') HAVING to_char(created_at,'YYYY-MM-DD') > '2009-01-01'",Author::table()->last_sql);
@@ -379,7 +379,7 @@ class ActiveRecordFindTest extends DatabaseTest
 		else
 		{
 			$author = Author::first(array(
-				'select' => 'date(created_at) as created_at', 
+				'select' => 'date(created_at) as created_at',
 				'group'  => 'date(created_at)',
 				'having' => "date(created_at) > '2009-01-01'"));
 			$this->assert_sql_has("GROUP BY date(created_at) HAVING date(created_at) > '2009-01-01'",Author::table()->last_sql);
