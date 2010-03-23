@@ -471,7 +471,6 @@ class HasMany extends AbstractRelationship
 				$fk = $this->foreign_key;
 
 				$this->set_keys($this->get_table()->class->getName(), true);
-				$reset_keys = true;
 
 				$through_table = Table::load(classify($this->through, true));
 				$this->options['joins'] = $this->construct_inner_join_sql($through_table, true);
