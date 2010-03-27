@@ -183,9 +183,11 @@ abstract class Serialization
  */
 class JsonSerializer extends Serialization
 {
+	public static $include_root = false;
+
 	public function to_s()
 	{
-		return json_encode($this->attributes);
+		return json_encode(self::$include_root ? array(strtolower(get_class($this->model)) => $this->attributes) : $this->attributes);
 	}
 }
 

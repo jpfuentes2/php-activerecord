@@ -4,6 +4,12 @@ require '../lib/Serialization.php';
 
 class SerializationTest extends DatabaseTest
 {
+	public function tear_down()
+	{
+		parent::tear_down();
+		ActiveRecord\JsonSerializer::$include_root = false;
+	}
+
 	public function _a($options=array(), $model=null)
 	{
 		if (!$model)
@@ -82,9 +88,15 @@ class SerializationTest extends DatabaseTest
 		$this->assert_equals($book->attributes(),(array)json_decode($json));
 	}
 
+	public function test_to_json_include_root()
+	{
+		ActiveRecord\JsonSerializer::$include_root = true;
+		$this->assert_not_null(json_decode(Book::find(1)->to_json())->book);
+	}
+
 	public function test_to_xml_include()
 	{
-		$xml = Host::find(4)->to_xml(array('include' => array('events')));
+		$xml = Host::find(4)->to_xml(array('include' => 'events'));
 		$decoded = get_object_vars(new SimpleXMLElement($xml));
 
 		$this->assert_equals(3, count($decoded['events']->event));
