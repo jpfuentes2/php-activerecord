@@ -76,9 +76,9 @@ class SerializationTest extends DatabaseTest
 			array('include' => array('events' => array('except' => 'title', 'include' => array('host' => array('only' => 'id'))))),
 			Host::find(4));
 
-		$this->assert_equals(3, count($a['events']['event']));
-		$this->assert_doesnt_has_keys('title', $a['events']['event'][0]);
-		$this->assert_equals(array('id' => 4), $a['events']['event'][0]['host']);
+		$this->assert_equals(3, count($a['events']));
+		$this->assert_doesnt_has_keys('title', $a['events'][0]);
+		$this->assert_equals(array('id' => 4), $a['events'][0]['host']);
 	}
 
 	public function test_to_json()

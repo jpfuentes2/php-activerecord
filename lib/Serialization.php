@@ -45,6 +45,39 @@ abstract class Serialization
 	protected $attributes;
 
 	/**
+	 * Set this to true if the serializer needs to create a nested array keyed
+	 * on the name of the included classes such as for xml serialization.
+	 *
+	 * Setting this to true will produce the following attributes array when
+	 * the include option was used:
+	 *
+	 * <code>
+	 * $user = array('id' => 1, 'name' => 'Tito',
+	 *   'permissions' => array(
+	 *     'permission' => array(
+	 *       array('id' => 100, 'name' => 'admin'),
+	 *       array('id' => 101, 'name' => 'normal')
+	 *     )
+	 *   )
+	 * );
+	 * </code>
+	 *
+	 * Setting to false will produce this:
+	 *
+	 * <code>
+	 * $user = array('id' => 1, 'name' => 'Tito',
+	 *   'permissions' => array(
+	 *     array('id' => 100, 'name' => 'admin'),
+	 *     array('id' => 101, 'name' => 'normal')
+	 *   )
+	 * );
+	 * </code>
+	 *
+	 * @var boolean
+	 */
+	protected $includes_with_class_name_element = false;
+
+	/**
 	 * Constructs a {@link Serialization} object.
 	 *
 	 * @param Model $model The model to serialize
@@ -131,7 +164,11 @@ abstract class Serialization
 						foreach ($assoc as $a)
 						{
 							$serialized = new $serializer_class($a, $options);
-							$includes[strtolower(get_class($a))][] = $serialized->to_a();
+
+							if ($this->includes_with_class_name_element)
+								$includes[strtolower(get_class($a))][] = $serialized->to_a();
+							else
+								$includes[] = $serialized->to_a();
 						}
 
 						$this->attributes[$association] = $includes;
@@ -199,6 +236,12 @@ class JsonSerializer extends Serialization
 class XmlSerializer extends Serialization
 {
 	private $writer;
+
+	public function __construct(Model $model, &$options)
+	{
+		$this->includes_with_class_name_element = true;
+		parent::__construct($model,$options);
+	}
 
 	public function to_s()
 	{
