@@ -24,5 +24,29 @@ class SnakeCase_PHPUnit_Framework_TestCase extends PHPUnit_Framework_TestCase
 		if (method_exists($this,'tear_down'))
 			call_user_func_array(array($this,'tear_down'),func_get_args());
 	}
+
+	private function setup_assert_keys($args)
+	{
+		$last = count($args)-1;
+		$keys = array_slice($args,0,$last);
+		$array = $args[$last];
+		return array($keys,$array);
+	}
+
+	public function assert_has_keys(/* $keys..., $array */)
+	{
+		list($keys,$array) = $this->setup_assert_keys(func_get_args());
+
+		foreach ($keys as $name)
+			$this->assert_true(array_key_exists($name,$array),"Key '$name' not found in [" . join(', ',array_keys($array)) . "]");
+	}
+
+	public function assert_doesnt_has_keys(/* $keys..., $array */)
+	{
+		list($keys,$array) = $this->setup_assert_keys(func_get_args());
+
+		foreach ($keys as $name)
+			$this->assert_false(array_key_exists($name,$array),"Key '$name' should not be found in [" . join(', ',array_keys($array)) . "]");
+	}
 }
 ?>
