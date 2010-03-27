@@ -88,16 +88,25 @@ class SerializationTest extends DatabaseTest
 
 	public function test_to_json_include_nested_with_nested_options()
 	{
-		$venue = Venue::find(1);
-		$json = $venue->to_json(array('include' => array('events' => array('except' => 'title', 'include' => array('host' => array('only' => 'id'))))));
+		$host = Host::find(4);
+		$json = $host->to_json(array('include' => array('events' => array('except' => 'title', 'include' => array('host' => array('only' => 'id'))))));
 		$decoded = (array)json_decode($json);
-		$event = $decoded['events'][0];
+		$event = $decoded['events']->event[0];
 		$host = $event->host;
 
-		$this->assert_equals(1, $decoded['id']);
+		$this->assert_equals(4, $decoded['id']);
+		$this->assert_equals(3, count($decoded['events']->event));
 		$this->assert_not_null($host->id);
 		$this->assert_null(@$event->host->name);
 		$this->assert_null(@$event->title);
+	}
+
+	public function test_to_xml_include()
+	{
+		$xml = Host::find(4)->to_xml(array('include' => array('events')));
+		$decoded = get_object_vars(new SimpleXMLElement($xml));
+
+		$this->assert_equals(3, count($decoded['events']->event));
 	}
 
 	public function test_to_xml()
