@@ -107,5 +107,11 @@ class SerializationTest extends DatabaseTest
 		$book = Book::find(1);
 		$this->assert_equals($book->attributes(),get_object_vars(new SimpleXMLElement($book->to_xml())));
 	}
+
+	public function test_to_xml_skip_instruct()
+	{
+		$this->assert_same(false,strpos(Book::find(1)->to_xml(array('skip_instruct' => true)),'<?xml version'));
+		$this->assert_same(0,    strpos(Book::find(1)->to_xml(array('skip_instruct' => false)),'<?xml version'));
+	}
 };
 ?>

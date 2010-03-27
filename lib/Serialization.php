@@ -16,6 +16,7 @@ use XmlWriter;
  * <li><b>methods:</b> a string or array of methods to invoke. The method's name will be used as a key for the final attributes array
  * along with the method's returned value</li>
  * <li><b>include:</b> a string or array of associated models to include in the final serialized product.</li>
+ * <li><b>skip_instruct:</b> set to true to skip the <?xml ...?> declaration.</li>
  * </ul>
  *
  * Example usage:
@@ -257,7 +258,12 @@ class XmlSerializer extends Serialization
 		$this->write($this->attributes);
 		$this->writer->endElement();
 		$this->writer->endDocument();
-		return $this->writer->outputMemory(true);
+		$xml = $this->writer->outputMemory(true);
+
+		if (@$this->options['skip_instruct'] == true)
+			$xml = preg_replace('/<\?xml version.*?\?>/','',$xml);
+
+		return $xml;
 	}
 
 	private function write($data, $tag=null)
