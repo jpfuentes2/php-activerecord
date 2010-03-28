@@ -129,6 +129,7 @@ abstract class Connection
 	 * to set the adapters connection info.
 	 *
 	 * protocol://user:pass@host[:port]/dbname
+	 * protocol://user:pass@unix(/some/file/path)/dbname
 	 *
 	 * @param string $url A connection URL
 	 * @return object the parsed URL as an object.
@@ -147,6 +148,17 @@ abstract class Connection
 		$info->user		= isset($url['user']) ? $url['user'] : null;
 		$info->pass		= isset($url['pass']) ? $url['pass'] : null;
 
+		if ($info->host == 'unix(')
+		{
+			$socket_database = $info->host . '/' . $info->db;
+
+			if (preg_match_all('/^unix\((.+)\)\/(.+)$/', $socket_database, $matches) > 0)
+			{
+				$info->host = $matches[1][0];
+				$info->db = $matches[2][0];
+			}
+		}
+
 		if (isset($url['port']))
 			$info->port = $url['port'];
 
@@ -161,10 +173,20 @@ abstract class Connection
 	 */
 	protected function __construct($info)
 	{
-		try {
-			$this->connection = new PDO("$info->protocol:host=$info->host" .
-				(isset($info->port) ? ";port=$info->port":'') .	";dbname=$info->db",$info->user,$info->pass,
-				static::$PDO_OPTIONS);
+		try
+		{
+			// unix sockets start with a /
+			if ($info->host[0] != '/')
+			{
+				$host = "host=$info->host";
+
+				if (isset($info->port))
+					$host .= ";port=$info->port";
+			}
+			else
+				$host = "unix_socket=$info->host";
+
+			$this->connection = new PDO("$info->protocol:$host;dbname=$info->db",$info->user,$info->pass,static::$PDO_OPTIONS);
 		} catch (PDOException $e) {
 			throw new DatabaseException($e);
 		}

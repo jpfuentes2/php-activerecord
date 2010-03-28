@@ -24,5 +24,11 @@ class ConnectionTest extends SnakeCase_PHPUnit_Framework_TestCase
 		$this->assert_equals(3306,$info->port);
 		$this->assert_equals('dbname',$info->db);
 	}
+
+	public function test_parse_connection_url_with_unix_sockets()
+	{
+		$info = ActiveRecord\Connection::parse_connection_url('mysql://user:password@unix(/tmp/mysql.sock)/database');
+		$this->assert_equals('/tmp/mysql.sock',$info->host);
+	}
 }
 ?>
