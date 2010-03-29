@@ -128,8 +128,10 @@ abstract class Connection
 	 * Use this for any adapters that can take connection info in the form below
 	 * to set the adapters connection info.
 	 *
+	 * <code>
 	 * protocol://user:pass@host[:port]/dbname
 	 * protocol://user:pass@unix(/some/file/path)/dbname
+	 * </code>
 	 *
 	 * @param string $url A connection URL
 	 * @return object the parsed URL as an object.
