@@ -1,6 +1,6 @@
 # PHP ActiveRecord #
 
-Version 0.9 beta
+Version 1.0 RC1
 
 by Kien La and Jacques Fuentes
 
