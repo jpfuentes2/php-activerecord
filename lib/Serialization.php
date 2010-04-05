@@ -95,10 +95,10 @@ abstract class Serialization
 
 	private function parse_options()
 	{
+		$this->check_only();
 		$this->check_except();
 		$this->check_methods();
 		$this->check_include();
-		$this->check_only();
 	}
 
 	private function check_only()
@@ -106,6 +106,7 @@ abstract class Serialization
 		if (isset($this->options['only']))
 		{
 			$this->options_to_a('only');
+
 			$exclude = array_diff(array_keys($this->attributes),$this->options['only']);
 			$this->attributes = array_diff_key($this->attributes,array_flip($exclude));
 		}

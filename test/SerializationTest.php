@@ -29,6 +29,12 @@ class SerializationTest extends DatabaseTest
 		$this->assert_has_keys('name', $this->_a(array('only' => 'name')));
 	}
 
+	public function test_only_should_only_apply_to_attributes()
+	{
+		$this->assert_has_keys('name','author', $this->_a(array('only' => 'name', 'include' => 'author')));
+		$this->assert_has_keys('book_id','upper_name', $this->_a(array('only' => 'book_id', 'methods' => 'upper_name')));
+	}
+
 	public function test_except()
 	{
 		$this->assert_doesnt_has_keys('name', 'special', $this->_a(array('except' => array('name','special'))));
@@ -63,11 +69,6 @@ class SerializationTest extends DatabaseTest
 	{
 		$a = $this->_a(array('include' => array('author')));
 		$this->assert_has_keys('parent_author_id', $a['author']);
-	}
-
-	public function test_should_only_contain_attributes_from_only()
-	{
-		$this->assert_equals(array('book_id' => 1), $this->_a(array('only' => array('book_id'), 'methods' => 'upper_name')));
 	}
 
 	public function test_include_nested_with_nested_options()
