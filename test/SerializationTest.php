@@ -35,6 +35,11 @@ class SerializationTest extends DatabaseTest
 		$this->assert_has_keys('book_id','upper_name', $this->_a(array('only' => 'book_id', 'methods' => 'upper_name')));
 	}
 
+	public function test_only_overrides_except()
+	{
+		$this->assert_has_keys('name', $this->_a(array('only' => 'name', 'except' => 'name')));
+	}
+
 	public function test_except()
 	{
 		$this->assert_doesnt_has_keys('name', 'special', $this->_a(array('except' => array('name','special'))));

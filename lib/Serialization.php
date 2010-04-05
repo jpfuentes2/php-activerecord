@@ -114,7 +114,7 @@ abstract class Serialization
 
 	private function check_except()
 	{
-		if (isset($this->options['except']))
+		if (isset($this->options['except']) && !isset($this->options['only']))
 		{
 			$this->options_to_a('except');
 			$this->attributes = array_diff_key($this->attributes,array_flip($this->options['except']));
