@@ -87,6 +87,13 @@ class SerializationTest extends DatabaseTest
 		$this->assert_equals(array('id' => 4), $a['events'][0]['host']);
 	}
 
+	public function test_datetime_values_get_converted_to_strings()
+	{
+		$now = new \DateTime();
+		$a = $this->_a(array('only' => 'created_at'),new Author(array('created_at' => $now)));
+		$this->assert_equals($now->format(ActiveRecord\Config::instance()->get_date_format()),$a['created_at']);
+	}
+
 	public function test_to_json()
 	{
 		$book = Book::find(1);

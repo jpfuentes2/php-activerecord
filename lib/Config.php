@@ -73,6 +73,13 @@ class Config extends Singleton
 	private $logger;
 
 	/**
+	 * The format to serialize DateTime values into.
+	 *
+	 * @var string
+	 */
+	private $date_format = \DateTime::ISO8601;
+
+	/**
 	 * Allows config initialization using a closure.
 	 *
 	 * This method is just syntatic sugar.
@@ -253,6 +260,29 @@ class Config extends Singleton
 	public function get_logger()
 	{
 		return $this->logger;
+	}
+
+	/**
+	 * Returns the date format.
+	 *
+	 * @return string
+	 */
+	public function get_date_format()
+	{
+		return $this->date_format;
+	}
+
+	/**
+	 * Sets the date format.
+	 *
+	 * Accepts date formats accepted by PHP's date() function.
+	 *
+	 * @link http://us.php.net/manual/en/function.date.php
+	 * @param string $format
+	 */
+	public function set_date_format($format)
+	{
+		$this->date_format = $format;
 	}
 };
 ?>

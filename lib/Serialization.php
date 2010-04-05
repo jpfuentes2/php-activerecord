@@ -195,6 +195,13 @@ abstract class Serialization
 	 */
 	final public function to_a()
 	{
+		$date_format = Config::instance()->get_date_format();
+
+		foreach ($this->attributes as &$value)
+		{
+			if ($value instanceof \DateTime)
+				$value = $value->format($date_format);
+		}
 		return $this->attributes;
 	}
 

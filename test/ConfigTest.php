@@ -92,5 +92,16 @@ class ConfigTest extends SnakeCase_PHPUnit_Framework_TestCase
 			$this->assert_equals($e->getMessage(), "Logger object must implement a public log method");
 		}
 	}
+
+	public function test_get_date_format()
+	{
+		$this->assert_equals(\DateTime::ISO8601,$this->config->get_date_format());
+	}
+
+	public function test_set_date_format()
+	{
+		$this->config->set_date_format('Y-m-d');
+		$this->assert_equals('Y-m-d',$this->config->get_date_format());
+	}
 }
 ?>
