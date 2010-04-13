@@ -37,6 +37,8 @@ class SnakeCase_PHPUnit_Framework_TestCase extends PHPUnit_Framework_TestCase
 	{
 		list($keys,$array) = $this->setup_assert_keys(func_get_args());
 
+		$this->assert_not_null($array,'Array was null');
+
 		foreach ($keys as $name)
 			$this->assert_true(array_key_exists($name,$array),"Key '$name' not found in [" . join(', ',array_keys($array)) . "]");
 	}

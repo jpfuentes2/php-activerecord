@@ -431,5 +431,12 @@ class ActiveRecordTest extends DatabaseTest
 		$this->assert_true($book_table1 === $book_table2);
 		$this->assert_true($book_table1 !== $book_table3);
 	}
+
+	public function test_flag_dirty()
+	{
+		$author = new Author();
+		$author->flag_dirty('some_date');
+		$this->assert_has_keys('some_date', $author->dirty_attributes());
+	}
 };
 ?>

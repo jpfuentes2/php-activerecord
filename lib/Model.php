@@ -434,14 +434,11 @@ class Model
 	{
 		$table = static::table();
 
-		if (!$this->__dirty)
-			$this->__dirty = array();
-
 		if (array_key_exists($name,$table->columns) && !is_object($value))
 			$value = $table->columns[$name]->cast($value,static::connection());
 
 		$this->attributes[$name] = $value;
-		$this->__dirty[$name] = true;
+		$this->flag_dirty($name);
 		return $value;
 	}
 
@@ -505,6 +502,19 @@ class Model
 		}
 
 		throw new UndefinedPropertyException(get_called_class(),$name);
+	}
+
+	/**
+	 * Flags an attribute as dirty.
+	 *
+	 * @param string $name Attribute name
+	 */
+	public function flag_dirty($name)
+	{
+		if (!$this->__dirty)
+			$this->__dirty = array();
+
+		$this->__dirty[$name] = true;
 	}
 
 	/**
