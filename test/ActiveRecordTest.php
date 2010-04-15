@@ -438,5 +438,19 @@ class ActiveRecordTest extends DatabaseTest
 		$author->flag_dirty('some_date');
 		$this->assert_has_keys('some_date', $author->dirty_attributes());
 	}
+
+	public function test_assigning_php_datetime_gets_converted_to_ar_datetime()
+	{
+		$author = new Author();
+		$author->created_at = $now = new \DateTime();
+		$this->assert_is_a("ActiveRecord\\DateTime",$author->created_at);
+		$this->assert_equals($now->format(\DateTime::ISO8601),$author->created_at->format(\DateTime::ISO8601));
+	}
+
+	public function test_assigning_from_mass_assignment_php_datetime_gets_converted_to_ar_datetime()
+	{
+		$author = new Author(array('created_at' => new \DateTime()));
+		$this->assert_is_a("ActiveRecord\\DateTime",$author->created_at);
+	}
 };
 ?>

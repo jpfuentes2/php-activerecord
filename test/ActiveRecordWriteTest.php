@@ -338,4 +338,11 @@ class ActiveRecordWriteTest extends DatabaseTest
 		$author->some_date->setDate(2010,1,1);
 		$this->assert_has_keys('some_date', $author->dirty_attributes());
 	}
+
+	public function test_set_date_flags_dirty_with_php_datetime()
+	{
+		$author = Author::create(array('some_date' => new \DateTime()));
+		$author->some_date->setDate(2010,1,1);
+		$this->assert_has_keys('some_date', $author->dirty_attributes());
+	}
 };

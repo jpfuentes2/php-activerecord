@@ -50,5 +50,10 @@ class SnakeCase_PHPUnit_Framework_TestCase extends PHPUnit_Framework_TestCase
 		foreach ($keys as $name)
 			$this->assert_array_not_has_key($name,$array);
 	}
+
+	public function assert_is_a($expected_class, $object)
+	{
+		$this->assert_equals($expected_class,get_class($object));
+	}
 }
 ?>
