@@ -55,5 +55,10 @@ class SnakeCase_PHPUnit_Framework_TestCase extends PHPUnit_Framework_TestCase
 	{
 		$this->assert_equals($expected_class,get_class($object));
 	}
+
+	public function assert_datetime_equals($expected, $actual)
+	{
+		$this->assert_equals($expected->format(DateTime::ISO8601),$actual->format(DateTime::ISO8601));
+	}
 }
 ?>

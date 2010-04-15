@@ -32,7 +32,7 @@ class DateTimeTest extends SnakeCase_PHPUnit_Framework_TestCase
 		$b = new ActiveRecord\DateTime();
 		$b->setISODate(2001,1);
 
-		$this->assert_equals($a->format(\DateTime::ISO8601),$b->format(\DateTime::ISO8601));
+		$this->assert_datetime_equals($a,$b);
 	}
 
 	public function test_set_time()
@@ -43,7 +43,7 @@ class DateTimeTest extends SnakeCase_PHPUnit_Framework_TestCase
 		$b = new ActiveRecord\DateTime();
 		$b->setTime(1,1);
 
-		$this->assert_equals($a->format(\DateTime::ISO8601),$b->format(\DateTime::ISO8601));
+		$this->assert_datetime_equals($a,$b);
 	}
 }
 ?>

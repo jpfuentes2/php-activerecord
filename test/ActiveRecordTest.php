@@ -444,7 +444,7 @@ class ActiveRecordTest extends DatabaseTest
 		$author = new Author();
 		$author->created_at = $now = new \DateTime();
 		$this->assert_is_a("ActiveRecord\\DateTime",$author->created_at);
-		$this->assert_equals($now->format(\DateTime::ISO8601),$author->created_at->format(\DateTime::ISO8601));
+		$this->assert_datetime_equals($now,$author->created_at);
 	}
 
 	public function test_assigning_from_mass_assignment_php_datetime_gets_converted_to_ar_datetime()
