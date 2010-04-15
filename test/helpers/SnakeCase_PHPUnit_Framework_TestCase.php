@@ -40,7 +40,7 @@ class SnakeCase_PHPUnit_Framework_TestCase extends PHPUnit_Framework_TestCase
 		$this->assert_not_null($array,'Array was null');
 
 		foreach ($keys as $name)
-			$this->assert_true(array_key_exists($name,$array),"Key '$name' not found in [" . join(', ',array_keys($array)) . "]");
+			$this->assert_array_has_key($name,$array);
 	}
 
 	public function assert_doesnt_has_keys(/* $keys..., $array */)
@@ -48,7 +48,7 @@ class SnakeCase_PHPUnit_Framework_TestCase extends PHPUnit_Framework_TestCase
 		list($keys,$array) = $this->setup_assert_keys(func_get_args());
 
 		foreach ($keys as $name)
-			$this->assert_false(array_key_exists($name,$array),"Key '$name' should not be found in [" . join(', ',array_keys($array)) . "]");
+			$this->assert_array_not_has_key($name,$array);
 	}
 }
 ?>
