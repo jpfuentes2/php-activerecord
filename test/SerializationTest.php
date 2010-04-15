@@ -2,6 +2,8 @@
 include 'helpers/config.php';
 require '../lib/Serialization.php';
 
+use ActiveRecord\DateTime;
+
 class SerializationTest extends DatabaseTest
 {
 	public function tear_down()
@@ -89,7 +91,7 @@ class SerializationTest extends DatabaseTest
 
 	public function test_datetime_values_get_converted_to_strings()
 	{
-		$now = new \DateTime();
+		$now = new DateTime();
 		$a = $this->_a(array('only' => 'created_at'),new Author(array('created_at' => $now)));
 		$this->assert_equals($now->format(ActiveRecord\Config::instance()->get_date_format()),$a['created_at']);
 	}

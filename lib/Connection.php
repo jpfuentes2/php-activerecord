@@ -402,7 +402,7 @@ abstract class Connection
 		if ($errors['warning_count'] > 0 || $errors['error_count'] > 0)
 			return null;
 
-		return $date;
+		return new DateTime($date->format('Y-m-d H:i:s T'));
 	}
 
 	/**

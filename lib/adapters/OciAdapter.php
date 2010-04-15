@@ -45,13 +45,7 @@ class OciAdapter extends Connection
 	// $string = DD-MON-YYYY HH12:MI:SS(\.[0-9]+) AM
 	public function string_to_datetime($string)
 	{
-		$date = date_create(str_replace('.000000','',$string));
-		$errors = \DateTime::getLastErrors();
-
-		if ($errors['warning_count'] > 0 || $errors['error_count'] > 0)
-			return null;
-
-		return $date;
+		return parent::string_to_datetime(str_replace('.000000','',$string));
 	}
 
 	public function limit($sql, $offset, $limit)

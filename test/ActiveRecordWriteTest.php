@@ -1,5 +1,6 @@
 <?php
 include 'helpers/config.php';
+use ActiveRecord\DateTime;
 
 class DirtyAuthor extends ActiveRecord\Model
 {
@@ -25,6 +26,18 @@ class AuthorExplicitSequence extends ActiveRecord\Model
 
 class ActiveRecordWriteTest extends DatabaseTest
 {
+	private function make_new_book_and($save=true)
+	{
+		$book = new Book();
+		$book->name = 'rivers cuomo';
+		$book->special = 1;
+
+		if ($save)
+			$book->save();
+
+		return $book;
+	}
+
 	public function test_save()
 	{
 		$venue = new Venue(array('name' => 'Tito'));
@@ -318,16 +331,11 @@ class ActiveRecordWriteTest extends DatabaseTest
 		$author->name = 'coco';
 		$this->assert_equals(true,$author->is_dirty());
 	}
-	
-	private function make_new_book_and($save=true)
+
+	public function test_set_date_flags_dirty()
 	{
-		$book = new Book();
-		$book->name = 'rivers cuomo';
-		$book->special = 1;
-
-		if ($save)
-			$book->save();
-
-		return $book;
+		$author = Author::create(array('some_date' => new DateTime()));
+		$author->some_date->setDate(2010,1,1);
+		$this->assert_has_keys('some_date', $author->dirty_attributes());
 	}
 };

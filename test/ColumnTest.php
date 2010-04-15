@@ -2,6 +2,7 @@
 include 'helpers/config.php';
 
 use ActiveRecord\Column;
+use ActiveRecord\DateTime;
 
 class ColumnTest extends SnakeCase_PHPUnit_Framework_TestCase
 {
@@ -23,7 +24,7 @@ class ColumnTest extends SnakeCase_PHPUnit_Framework_TestCase
 		$value = $this->column->cast($original_value,$this->conn);
 
 		if ($original_value != null && ($type == Column::DATETIME || $type == Column::DATE))
-			$this->assert_true($value instanceof \DateTime);
+			$this->assert_true($value instanceof DateTime);
 		else
 			$this->assert_same($casted_value,$value);
 	}
@@ -73,7 +74,7 @@ class ColumnTest extends SnakeCase_PHPUnit_Framework_TestCase
 
 	public function test_cast()
 	{
-		$datetime = new \DateTime('2001-01-01');
+		$datetime = new DateTime('2001-01-01');
 		$this->assert_cast(Column::INTEGER,1,'1');
 		$this->assert_cast(Column::INTEGER,1,'1.5');
 		$this->assert_cast(Column::DECIMAL,1.5,'1.5');

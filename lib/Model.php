@@ -3,7 +3,6 @@
  * @package ActiveRecord
  */
 namespace ActiveRecord;
-use DateTime;
 
 /**
  * The base class for your models.
@@ -436,6 +435,11 @@ class Model
 
 		if (array_key_exists($name,$table->columns) && !is_object($value))
 			$value = $table->columns[$name]->cast($value,static::connection());
+
+		// make sure DateTime values know what model they belong to so
+		// dirty stuff works when calling set methods on the DateTime object
+		if ($value instanceof DateTime)
+			$value->attribute_of($this,$name);
 
 		$this->attributes[$name] = $value;
 		$this->flag_dirty($name);

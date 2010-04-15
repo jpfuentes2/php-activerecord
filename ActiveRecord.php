@@ -7,6 +7,7 @@ define('PHP_ACTIVERECORD_VERSION_ID','1.0rc1');
 require 'lib/Singleton.php';
 require 'lib/Config.php';
 require 'lib/Utils.php';
+require 'lib/DateTime.php';
 require 'lib/Model.php';
 require 'lib/Table.php';
 require 'lib/ConnectionManager.php';
