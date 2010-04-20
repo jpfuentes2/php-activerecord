@@ -4,9 +4,9 @@ require_once dirname(__FILE__) . '/../lib/adapters/OciAdapter.php';
 
 class OciAdapterTest extends AdapterTest
 {
-	public function setUp($connection_name=null)
+	public function set_up($connection_name=null)
 	{
-		parent::setUp('oci');
+		parent::set_up('oci');
 	}
 
 	public function test_get_sequence_name()
