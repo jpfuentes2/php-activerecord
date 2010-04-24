@@ -6,6 +6,7 @@ use ActiveRecord as AR;
 class BookValidations extends ActiveRecord\Model
 {
 	static $table_name = 'books';
+	static $alias_attribute = array('name_alias' => 'name', 'x' => 'secondary_author_id');
 	static $validates_presence_of = array(array('name'));
 	static $validates_uniqueness_of = array();
 };
@@ -98,6 +99,14 @@ class ValidationsTest extends DatabaseTest
 		$book2 = new BookValidations(array('name' => $book1->name, 'special' => $book1->special));
 		$this->assert_false($book2->is_valid());
 		$this->assert_equals(array('Name and special must be unique'),$book2->errors->full_messages());
+	}
+
+	public function test_validates_uniqueness_of_works_with_alias_attribute()
+	{
+		BookValidations::$validates_uniqueness_of[0] = array(array('name_alias','x'));
+		$book = BookValidations::create(array('name_alias' => 'Another Book', 'x' => 2));
+		$this->assert_false($book->is_valid());
+		$this->assert_equals(array('Name alias and x must be unique'), $book->errors->full_messages());
 	}
 
 	public function test_get_validation_rules()

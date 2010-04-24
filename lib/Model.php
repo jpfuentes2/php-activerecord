@@ -560,6 +560,23 @@ class Model
 	}
 
 	/**
+	 * Returns the actual attribute name if $name is aliased.
+	 *
+	 * @param string $name An attribute name
+	 * @return string
+	 */
+	public function get_real_attribute_name($name)
+	{
+		if (array_key_exists($name,$this->attributes))
+			return $name;
+
+		if (array_key_exists($name,static::$alias_attribute))
+			return static::$alias_attribute[$name];
+
+		return null;
+	}
+
+	/**
 	 * Returns array of validator data for this Model.
 	 *
 	 * Will return an array looking like:

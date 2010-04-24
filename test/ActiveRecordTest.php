@@ -452,5 +452,13 @@ class ActiveRecordTest extends DatabaseTest
 		$author = new Author(array('created_at' => new \DateTime()));
 		$this->assert_is_a("ActiveRecord\\DateTime",$author->created_at);
 	}
+
+	public function test_get_real_attribute_name()
+	{
+		$venue = new Venue();
+		$this->assert_equals('name', $venue->get_real_attribute_name('name'));
+		$this->assert_equals('name', $venue->get_real_attribute_name('marquee'));
+		$this->assert_equals(null, $venue->get_real_attribute_name('invalid_field'));
+	}
 };
 ?>

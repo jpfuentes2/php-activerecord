@@ -18,7 +18,7 @@ ActiveRecord\Config::initialize(function($cfg)
 	$cfg->set_connections(array(
 		'mysql'		=> 'mysql://test:test@127.0.0.1/test',
 		'pgsql'		=> 'pgsql://test:test@127.0.0.1/test',
-		'oci'		=> 'oci://test:test@127.0.0.1/xe',
+		'oci'		=> 'oci://test:test@127.0.0.1/dev',
 		'sqlite'	=> 'sqlite://test.db'));
 
 	$cfg->set_default_connection('mysql');

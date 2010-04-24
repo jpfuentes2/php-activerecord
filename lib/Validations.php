@@ -576,6 +576,7 @@ class Validations
 
 			foreach ($fields as $field)
 			{
+				$field = $this->model->get_real_attribute_name($field);
 				$sql .= " and {$field}=?";
 				array_push($conditions,$this->model->$field);
 			}
