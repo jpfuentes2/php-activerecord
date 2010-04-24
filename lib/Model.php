@@ -722,11 +722,10 @@ class Model
 	{
 		$this->verify_not_readonly('insert');
 
-		if ($validate && !$this->_validate())
+		if (($validate && !$this->_validate() || !$this->invoke_callback('before_create',false)))
 			return false;
 
 		$table = static::table();
-		$this->invoke_callback('before_create',false);
 
 		if (!($attributes = $this->dirty_attributes()))
 			$attributes = $this->attributes;
@@ -791,7 +790,9 @@ class Model
 			if (empty($pk))
 				throw new ActiveRecordException("Cannot update, no primary key defined for: " . get_called_class());
 
-			$this->invoke_callback('before_update',false);
+			if (!$this->invoke_callback('before_update',false))
+				return false;
+
 			$dirty = $this->dirty_attributes();
 			static::table()->update($dirty,$pk);
 			$this->invoke_callback('after_update',false);
@@ -814,7 +815,9 @@ class Model
 		if (empty($pk))
 			throw new ActiveRecordException("Cannot delete, no primary key defined for: " . get_called_class());
 
-		$this->invoke_callback('before_destroy',false);
+		if (!$this->invoke_callback('before_destroy',false))
+			return false;
+
 		static::table()->delete($pk);
 		$this->invoke_callback('after_destroy',false);
 

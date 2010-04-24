@@ -203,5 +203,80 @@ class CallBackTest extends DatabaseTest
 		$venue->name = 'alksdjfs';
 		$venue->save();
 	}
+
+	public function test_before_create_returned_false_halts_execution()
+	{
+		VenueCB::$before_create = array('before_create_halt_execution');
+		ActiveRecord\Table::clear_cache('VenueCB');
+		$table = ActiveRecord\Table::load('VenueCB');
+
+		$i_ran = false;
+		$i_should_have_ran = false;
+		$table->callback->register('before_save', function($model) use (&$i_should_have_ran) { $i_should_have_ran = true; });
+		$table->callback->register('before_create',function($model) use (&$i_ran) { $i_ran = true; });
+		$table->callback->register('after_create',function($model) use (&$i_ran) { $i_ran = true; });
+
+		$v = VenueCB::find(1);
+		$v->id = null;
+		VenueCB::create($v->attributes());
+
+		$this->assert_true($i_should_have_ran);
+		$this->assert_false($i_ran);
+		$this->assert_true(strpos(ActiveRecord\Table::load('VenueCB')->last_sql, 'INSERT') === false);
+	}
+
+	public function test_before_save_returned_false_halts_execution()
+	{
+		VenueCB::$before_update = array('before_update_halt_execution');
+		ActiveRecord\Table::clear_cache('VenueCB');
+		$table = ActiveRecord\Table::load('VenueCB');
+
+		$i_ran = false;
+		$i_should_have_ran = false;
+		$table->callback->register('before_save', function($model) use (&$i_should_have_ran) { $i_should_have_ran = true; });
+		$table->callback->register('before_update',function($model) use (&$i_ran) { $i_ran = true; });
+		$table->callback->register('after_save',function($model) use (&$i_ran) { $i_ran = true; });
+
+		$v = VenueCB::find(1);
+		$v->name .= 'test';
+		$ret = $v->save();
+
+		$this->assert_true($i_should_have_ran);
+		$this->assert_false($i_ran);
+		$this->assert_false($ret);
+		$this->assert_true(strpos(ActiveRecord\Table::load('VenueCB')->last_sql, 'UPDATE') === false);
+	}
+
+	public function test_before_destroy_returned_false_halts_execution()
+	{
+		VenueCB::$before_destroy = array('before_destroy_halt_execution');
+		ActiveRecord\Table::clear_cache('VenueCB');
+		$table = ActiveRecord\Table::load('VenueCB');
+
+		$i_ran = false;
+		$table->callback->register('before_destroy',function($model) use (&$i_ran) { $i_ran = true; });
+		$table->callback->register('after_destroy',function($model) use (&$i_ran) { $i_ran = true; });
+
+		$v = VenueCB::find(1);
+		$ret = $v->delete();
+
+		$this->assert_false($i_ran);
+		$this->assert_false($ret);
+		$this->assert_true(strpos(ActiveRecord\Table::load('VenueCB')->last_sql, 'DELETE') === false);
+	}
+
+	public function test_before_validation_returned_false_halts_execution()
+	{
+		VenueCB::$before_validation = array('before_validation_halt_execution');
+		ActiveRecord\Table::clear_cache('VenueCB');
+		$table = ActiveRecord\Table::load('VenueCB');
+
+		$v = VenueCB::find(1);
+		$v->name .= 'test';
+		$ret = $v->save();
+
+		$this->assert_false($ret);
+		$this->assert_true(strpos(ActiveRecord\Table::load('VenueCB')->last_sql, 'UPDATE') === false);
+	}
 };
 ?>
