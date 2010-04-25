@@ -1,4 +1,6 @@
 <?php
+use ActiveRecord\Connection;
+
 include 'helpers/config.php';
 
 // Only use this to test static methods in Connection that are not specific
@@ -29,6 +31,13 @@ class ConnectionTest extends SnakeCase_PHPUnit_Framework_TestCase
 	{
 		$info = ActiveRecord\Connection::parse_connection_url('mysql://user:password@unix(/tmp/mysql.sock)/database');
 		$this->assert_equals('/tmp/mysql.sock',$info->host);
+	}
+
+	public function test_parse_connection_url_with_decode_option()
+	{
+		$info = ActiveRecord\Connection::parse_connection_url('mysql://h%20az:h%40i@127.0.0.1/test?decode=true');
+		$this->assert_equals('h az',$info->user);
+		$this->assert_equals('h@i',$info->pass);
 	}
 }
 ?>

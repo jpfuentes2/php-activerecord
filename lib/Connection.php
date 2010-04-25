@@ -74,6 +74,7 @@ abstract class Connection
 	 *   A connection name that is set in ActiveRecord\Config
 	 *   If null it will use the default connection specified by ActiveRecord\Config->set_default_connection
 	 * @return Connection
+	 * @see parse_connection_url
 	 */
 	public static function instance($connection_string_or_connection_name=null)
 	{
@@ -129,16 +130,17 @@ abstract class Connection
 	 * to set the adapters connection info.
 	 *
 	 * <code>
-	 * protocol://user:pass@host[:port]/dbname
-	 * protocol://user:pass@unix(/some/file/path)/dbname
+	 * protocol://username:password@host[:port]/dbname
+	 * protocol://urlencoded%20username:urlencoded%20password@host[:port]/dbname?decode=true
+	 * protocol://username:password@unix(/some/file/path)/dbname
 	 * </code>
 	 *
-	 * @param string $url A connection URL
+	 * @param string $connection_url A connection URL
 	 * @return object the parsed URL as an object.
 	 */
-	public static function parse_connection_url($url)
+	public static function parse_connection_url($connection_url)
 	{
-		$url = @parse_url($url);
+		$url = @parse_url($connection_url);
 
 		if (!isset($url['host']))
 			throw new DatabaseException('Database host must be specified in the connection string.');
@@ -163,6 +165,15 @@ abstract class Connection
 
 		if (isset($url['port']))
 			$info->port = $url['port'];
+
+		if (strpos($connection_url,'decode=true') !== false)
+		{
+			if ($info->user)
+				$info->user = urldecode($info->user);
+
+			if ($info->pass)
+				$info->pass = urldecode($info->pass);
+		}
 
 		return $info;
 	}
