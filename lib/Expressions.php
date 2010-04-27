@@ -175,7 +175,7 @@ class Expressions
 	private function quote_string($value)
 	{
 		if ($this->connection)
-			return "'" . $this->connection->escape($value) . "'";
+			return $this->connection->escape($value);
 
 		return "'" . str_replace("'","''",$value) . "'";
 	}

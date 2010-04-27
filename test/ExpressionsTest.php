@@ -1,5 +1,6 @@
 <?php
 include 'helpers/config.php';
+require '../lib/Expressions.php';
 
 use ActiveRecord\Expressions;
 
