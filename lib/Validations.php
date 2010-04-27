@@ -256,7 +256,7 @@ class Validations
 	 * Available options:
 	 *
 	 * <ul>
-	 * <li><b>integer_only:</b> value must be an integer (e.g. not a float)</li>
+	 * <li><b>only_integer:</b> value must be an integer (e.g. not a float)</li>
 	 * <li><b>even:</b> must be even</li>
 	 * <li><b>odd:</b> must be odd"</li>
 	 * <li><b>greater_than:</b> must be greater than specified number</li>
@@ -700,7 +700,7 @@ class Errors implements IteratorAggregate
 		if (!$msg)
 			$msg = self::$DEFAULT_ERROR_MESSAGES['blank'];
 
-		if (!$this->model->$attribute)
+		if (($value = $this->model->$attribute) === '' || $value === null)
 			$this->add($attribute, $msg);
 	}
 
