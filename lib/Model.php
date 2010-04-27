@@ -429,7 +429,7 @@ class Model
 	 * @param mixed &$value Value of the attribute
 	 * @return mixed the attribute value
 	 */
-	public function assign_attribute($name, &$value)
+	public function assign_attribute($name, $value)
 	{
 		$table = static::table();
 
