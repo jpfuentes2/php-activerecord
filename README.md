@@ -23,7 +23,8 @@ Of course, there are some differences which will be obvious to the user if they 
 
 ## Minimum Requirements ##
 
-PHP 5.3+
+- PHP 5.3+
+- PDO driver for your respective database
 
 ## Supported Databases ##
 
