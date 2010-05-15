@@ -16,6 +16,7 @@ use XmlWriter;
  * <li><b>methods:</b> a string or array of methods to invoke. The method's name will be used as a key for the final attributes array
  * along with the method's returned value</li>
  * <li><b>include:</b> a string or array of associated models to include in the final serialized product.</li>
+ * <li><b>only_method:</b> a method that's called and only the resulting array is serialized
  * <li><b>skip_instruct:</b> set to true to skip the <?xml ...?> declaration.</li>
  * </ul>
  *
@@ -106,6 +107,7 @@ abstract class Serialization
 		$this->check_except();
 		$this->check_methods();
 		$this->check_include();
+		$this->check_only_method();        
 	}
 
 	private function check_only()
@@ -139,6 +141,16 @@ abstract class Serialization
 				if (method_exists($this->model, $method))
 					$this->attributes[$method] = $this->model->$method();
 			}
+		}
+	}
+	
+	private function check_only_method()
+	{
+		if (isset($this->options['only_method']))
+		{
+			$method = $this->options['only_method'];
+			if (method_exists($this->model, $method))
+				$this->attributes = $this->model->$method();
 		}
 	}
 
