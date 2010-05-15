@@ -281,7 +281,7 @@ class XmlSerializer extends Serialization
 			if ($tag != null)
 				$attr = $tag;
 
-			if (is_array($value))
+			if (is_array($value) || is_object($value))
 			{
 				if (!is_int(key($value)))
 				{
