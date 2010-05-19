@@ -667,5 +667,12 @@ class RelationshipTest extends DatabaseTest
 		$this->assert_not_null($book->another_author_name);
 		Book::$belongs_to = $old;
 	}
+
+	public function test_gh_40_relationships_with_joins_aliases_table_name_in_conditions()
+	{
+		$event = Event::find(1, array('joins' => array('venue')));
+
+		$this->assert_equals($event->id, $event->venue->id);
+	}
 };
 ?>

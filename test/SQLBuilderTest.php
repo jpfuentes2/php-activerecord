@@ -246,5 +246,15 @@ class SQLBuilderTest extends DatabaseTest
 		$hash = SQLBuilder::create_hash_from_underscored_string('id_and_my_name',$values,$map);
 		$this->assert_equals(array('id' => 1, 'name' => 'Tito'),$hash);
 	}
+
+	public function test_where_with_joins_prepends_table_name_to_fields()
+	{
+		$joins = 'INNER JOIN books ON (books.id = authors.id)';
+		// joins needs to be called prior to where
+		$this->sql->joins($joins);
+		$this->sql->where(array('id' => 1, 'name' => 'Tito'));
+
+		$this->assert_sql_has("SELECT * FROM authors $joins WHERE authors.id=? AND authors.name=?",(string)$this->sql);
+	}
 };
 ?>
