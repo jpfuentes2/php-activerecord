@@ -126,7 +126,8 @@ class SerializationTest extends DatabaseTest
 	public function test_to_xml_works_with_datetime()
 	{
 		Author::find(1)->update_attribute('created_at',new DateTime());
-		$this->assert_reg_exp('/<updated_at><date>/',Author::find(1)->to_xml());
+		$this->assert_reg_exp('/<updated_at>[0-9]{4}-[0-9]{2}-[0-9]{2}/',Author::find(1)->to_xml());
+		$this->assert_reg_exp('/"updated_at":"[0-9]{4}-[0-9]{2}-[0-9]{2}/',Author::find(1)->to_json());
 	}
 
 	public function test_to_xml_skip_instruct()

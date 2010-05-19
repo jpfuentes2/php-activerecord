@@ -233,7 +233,7 @@ class JsonSerializer extends Serialization
 
 	public function to_s()
 	{
-		return json_encode(self::$include_root ? array(strtolower(get_class($this->model)) => $this->attributes) : $this->attributes);
+		return json_encode(self::$include_root ? array(strtolower(get_class($this->model)) => $this->to_a()) : $this->to_a());
 	}
 }
 
@@ -263,7 +263,7 @@ class XmlSerializer extends Serialization
 		$this->writer->openMemory();
 		$this->writer->startDocument('1.0', 'UTF-8');
 		$this->writer->startElement(strtolower(denamespace(($this->model))));
-		$this->write($this->attributes);
+		$this->write($this->to_a());
 		$this->writer->endElement();
 		$this->writer->endDocument();
 		$xml = $this->writer->outputMemory(true);
