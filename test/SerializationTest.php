@@ -123,7 +123,7 @@ class SerializationTest extends DatabaseTest
 		$this->assert_equals($book->attributes(),get_object_vars(new SimpleXMLElement($book->to_xml())));
 	}
 
-	public function test_to_xml_works_with_datetime()
+	public function test_works_with_datetime()
 	{
 		Author::find(1)->update_attribute('created_at',new DateTime());
 		$this->assert_reg_exp('/<updated_at>[0-9]{4}-[0-9]{2}-[0-9]{2}/',Author::find(1)->to_xml());
