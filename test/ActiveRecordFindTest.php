@@ -442,5 +442,16 @@ class ActiveRecordFindTest extends DatabaseTest
 		Author::find(1);
 		$this->assert_sql_has('SELECT * FROM authors WHERE author_id=?',Author::table()->last_sql);
 	}
+
+	public function test_find_by_datetime()
+	{
+		$now = new DateTime();
+		$arnow = new ActiveRecord\DateTime();
+		$arnow->setTimestamp($now->getTimestamp());
+
+		Author::find(1)->update_attribute('created_at',$now);
+		$this->assert_not_null(Author::find_by_created_at($now));
+		$this->assert_not_null(Author::find_by_created_at($arnow));
+	}
 };
 ?>
