@@ -16,10 +16,10 @@ ActiveRecord\Config::initialize(function($cfg)
 {
 	$cfg->set_model_directory(realpath(dirname(__FILE__) . '/../models'));
 	$cfg->set_connections(array(
-		'mysql'		=> 'mysql://test:test@127.0.0.1/test',
-		'pgsql'		=> 'pgsql://test:test@127.0.0.1/test',
+		'mysql'		=> getenv('PHPAR_MYSQL') ? getenv('PHPAR_MYSQL') : 'mysql://test:test@127.0.0.1/test',
+		'pgsql'		=> getenv('PHPAR_PGSQL') ? getenv('PHPAR_PGSQL') : 'pgsql://test:test@127.0.0.1/test',
 		'oci'		=> getenv('PHPAR_OCI') ? getenv('PHPAR_OCI') : 'oci://test:test@127.0.0.1/dev',
-		'sqlite'	=> 'sqlite://test.db'));
+		'sqlite'	=> getenv('PHPAR_SQLITE') ? getenv('PHPAR_SQLITE') : 'sqlite://test.db'));
 
 	$cfg->set_default_connection('mysql');
 
