@@ -355,6 +355,12 @@ class Model
 		}
 
 		$this->set_attributes_via_mass_assignment($attributes, $guard_attributes);
+
+		// since all attribute assignment now goes thru assign_attributes() we want to reset
+		// dirty if instantiating via find since nothing is really dirty when doing that
+		if ($instantiating_via_find)
+			$this->__dirty = array();
+
 		$this->invoke_callback('after_construct',false);
 	}
 
@@ -1046,7 +1052,7 @@ class Model
 					continue;
 
 				// set arbitrary data
-				$this->attributes[$name] = $value;
+				$this->assign_attribute($name,$value);
 			}
 		}
 
