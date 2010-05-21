@@ -89,15 +89,7 @@ class SQLBuilder
 
 	public function get_where_values()
 	{
-		$conn = $this->connection;
-
-		// there might be a better place to do this filtering. here will do for now
-		return collect($this->where_values,function($value) use ($conn)
-		{
-			if ($value instanceof \DateTime)
-				return $conn->datetime_to_string($value);
-			return $value;
-		});
+		return $this->where_values;
 	}
 
 	public function where(/* (conditions, values) || (hash) */)
