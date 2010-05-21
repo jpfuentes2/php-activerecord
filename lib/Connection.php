@@ -389,6 +389,17 @@ abstract class Connection
 	}
 
 	/**
+	 * Return a date time formatted into the database's date format.
+	 *
+	 * @param DateTime $datetime The DateTime object
+	 * @return string
+	 */
+	public function date_to_string($datetime)
+	{
+		return $datetime->format('Y-m-d');
+	}
+
+	/**
 	 * Return a date time formatted into the database's datetime format.
 	 *
 	 * @param DateTime $datetime The DateTime object

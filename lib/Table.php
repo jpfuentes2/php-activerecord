@@ -384,7 +384,12 @@ class Table
 		foreach ($hash as $name => &$value)
 		{
 			if ($value instanceof DateTime)
-				$hash[$name] = $this->conn->datetime_to_string($value);
+			{
+				if ($this->columns[$name]->type == Column::DATE)
+					$hash[$name] = $this->conn->date_to_string($value);
+				else
+					$hash[$name] = $this->conn->datetime_to_string($value);
+			}
 			else
 				$hash[$name] = $value;
 		}

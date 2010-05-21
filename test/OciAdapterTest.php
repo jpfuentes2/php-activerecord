@@ -26,6 +26,11 @@ class OciAdapterTest extends AdapterTest
 		$this->assert_equals('01-JAN-2009 01:01:01 AM',$this->conn->datetime_to_string(date_create('2009-01-01 01:01:01 EST')));
 	}
 
+	public function test_date_to_string()
+	{
+		$this->assert_equals('01-JAN-2009',$this->conn->date_to_string(date_create('2009-01-01 01:01:01 EST')));
+	}
+
 	public function test_insert_id() {}
 	public function test_insert_id_with_params() {}
 	public function test_insert_id_should_return_explicitly_inserted_id() {}
