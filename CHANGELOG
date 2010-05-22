@@ -1,0 +1,16 @@
+Version 1.0 - June 1, 2010
+
+- fixed set methods on DateTime objects to properly flag attributes as dirty
+- fixed DateTime attributes to be serialized as strings
+- support for Oracle
+- support for PostgreSQL
+- added delegators
+- added setters
+- added getters
+- added HAVING as a finder option
+- added ability to find using a hash
+- added find_or_create_by
+- added validates_uniqueness_of
+- added dynamic count_by
+- added eager loading
+- and many bug fixes
