@@ -288,30 +288,33 @@ class ActiveRecordTest extends DatabaseTest
 	public function test_transaction_committed()
 	{
 		$original = Author::count();
-		Author::transaction(function() { Author::create(array("name" => "blah")); });
+		$ret = Author::transaction(function() { Author::create(array("name" => "blah")); });
 		$this->assert_equals($original+1,Author::count());
+		$this->assert_true($ret);
 	}
-
+	
 	public function test_transaction_committed_when_returning_true()
 	{
 		$original = Author::count();
-		Author::transaction(function() { Author::create(array("name" => "blah")); return true; });
+		$ret = Author::transaction(function() { Author::create(array("name" => "blah")); return true; });
 		$this->assert_equals($original+1,Author::count());
+		$this->assert_true($ret);
 	}
-
+	
 	public function test_transaction_rolledback_by_returning_false()
 	{
 		$original = Author::count();
-
-		Author::transaction(function()
+		
+		$ret = Author::transaction(function()
 		{
 			Author::create(array("name" => "blah"));
 			return false;
 		});
-
+		
 		$this->assert_equals($original,Author::count());
+		$this->assert_false($ret);
 	}
-
+	
 	public function test_transaction_rolledback_by_throwing_exception()
 	{
 		$original = Author::count();

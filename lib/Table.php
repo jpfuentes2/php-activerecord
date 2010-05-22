@@ -205,7 +205,7 @@ class Table
 
 		$collect_attrs_for_includes = is_null($includes) ? false : true;
 		$list = $attrs = array();
-		$sth = $this->conn->query($sql,$values);
+		$sth = $this->conn->query($sql,$this->process_data($values));
 
 		while (($row = $sth->fetch()))
 		{
@@ -381,10 +381,18 @@ class Table
 
 	private function &process_data($hash)
 	{
+		if (!$hash)
+			return $hash;
+
 		foreach ($hash as $name => &$value)
 		{
-			if ($value instanceof DateTime)
-				$hash[$name] = $this->conn->datetime_to_string($value);
+			if ($value instanceof \DateTime)
+			{
+				if (isset($this->columns[$name]) && $this->columns[$name]->type == Column::DATE)
+					$hash[$name] = $this->conn->date_to_string($value);
+				else
+					$hash[$name] = $this->conn->datetime_to_string($value);
+			}
 			else
 				$hash[$name] = $value;
 		}

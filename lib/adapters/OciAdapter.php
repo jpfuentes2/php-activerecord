@@ -37,6 +37,11 @@ class OciAdapter extends Connection
 		return "$sequence_name.nextval";
 	}
 
+	public function date_to_string($datetime)
+	{
+		return strtoupper($datetime->format('d-M-Y'));
+	}
+
 	public function datetime_to_string($datetime)
 	{
 		return strtoupper($datetime->format('d-M-Y h:i:s A'));

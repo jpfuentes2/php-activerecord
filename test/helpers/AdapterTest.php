@@ -7,7 +7,8 @@ class AdapterTest extends DatabaseTest
 
 	public function set_up($connection_name=null)
 	{
-		if ($connection_name && !in_array($connection_name, PDO::getAvailableDrivers()))
+		if (($connection_name && !in_array($connection_name, PDO::getAvailableDrivers())) ||
+			ActiveRecord\Config::instance()->get_connection($connection_name) == 'skip')
 			$this->mark_test_skipped($connection_name . ' drivers are not present');
 
 		parent::set_up($connection_name);
@@ -393,6 +394,12 @@ class AdapterTest extends DatabaseTest
 	{
 		$datetime = '2009-01-01 01:01:01 EST';
 		$this->assert_equals($datetime,$this->conn->datetime_to_string(date_create($datetime)));
+	}
+
+	public function test_date_to_string()
+	{
+		$datetime = '2009-01-01';
+		$this->assert_equals($datetime,$this->conn->date_to_string(date_create($datetime)));
 	}
 }
 ?>
