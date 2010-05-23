@@ -39,12 +39,12 @@ class OciAdapter extends Connection
 
 	public function date_to_string($datetime)
 	{
-		return strtoupper($datetime->format('d-M-Y'));
+		return $datetime->format('d-M-Y');
 	}
 
 	public function datetime_to_string($datetime)
 	{
-		return strtoupper($datetime->format('d-M-Y h:i:s A'));
+		return $datetime->format('d-M-Y h:i:s A');
 	}
 
 	// $string = DD-MON-YYYY HH12:MI:SS(\.[0-9]+) AM
