@@ -419,6 +419,12 @@ class Model
 		if (array_key_exists($name,$this->attributes))
 			return $this->assign_attribute($name,$value);
 
+		if ($name == 'id')
+		{
+			$pk = $this->get_primary_key();
+			return $this->assign_attribute($pk[0],$value);
+		}
+
 		foreach (static::$delegate as &$item)
 		{
 			if (($delegated_name = $this->is_delegated($name,$item)))
