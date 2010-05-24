@@ -29,6 +29,9 @@ class Cache
 
 	public static function get($key, $closure)
 	{
+		if (!static::$adapter)
+			return $closure();
+
 		if (!($value = static::$adapter->read($key)))
 			static::$adapter->write($key,($value = $closure()));
 

@@ -47,5 +47,11 @@ class CacheTest extends SnakeCase_PHPUnit_Framework_TestCase
 	{
 		$this->assert_same(false, Cache::$adapter->read("some-key"));
 	}
+
+	public function test_get_works_without_caching_enabled()
+	{
+		Cache::$adapter = null;
+		$this->assert_equals("abcd", $this->cache_get());
+	}
 }
 ?>
