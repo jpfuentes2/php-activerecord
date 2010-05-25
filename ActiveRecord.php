@@ -17,6 +17,7 @@ require 'lib/Reflections.php';
 require 'lib/Inflector.php';
 require 'lib/CallBack.php';
 require 'lib/Exceptions.php';
+require 'lib/Cache.php';
 
 spl_autoload_register('activerecord_autoload');
 
