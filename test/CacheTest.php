@@ -1,6 +1,5 @@
 <?php
 include 'helpers/config.php';
-require_once dirname(__FILE__) . '/../lib/Cache.php';
 
 use ActiveRecord\Cache;
 
@@ -24,6 +23,12 @@ class CacheTest extends SnakeCase_PHPUnit_Framework_TestCase
 	public function test_initialize()
 	{
 		$this->assert_not_null(Cache::$adapter);
+	}
+
+	public function test_initialize_with_null()
+	{
+		Cache::initialize(null);
+		$this->assert_null(Cache::$adapter);
 	}
 
 	public function test_get_returns_the_value()
