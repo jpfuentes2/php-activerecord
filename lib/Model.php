@@ -234,7 +234,7 @@ class Model
 	 * You can also use this to define custom setters for attributes as well.
 	 *
 	 * <code>
-	 * class User extends ActiveRecord\Base {
+	 * class User extends ActiveRecord\Model {
 	 *   static $setters = array('password','more','even_more');
 	 *
 	 *   # now to define the setter methods. Note you must
@@ -256,7 +256,7 @@ class Model
 	 * custom setter for 'name':
 	 *
 	 * <code>
-	 * class User extends ActiveRecord\Base {
+	 * class User extends ActiveRecord\Model {
 	 *   static $setters = array('name');
 	 *
 	 *   # INCORRECT way to do it
@@ -282,7 +282,7 @@ class Model
 	 * Define customer getter methods for the model.
 	 *
 	 * <code>
-	 * class User extends ActiveRecord\Base {
+	 * class User extends ActiveRecord\Model {
 	 *   static $getters = array('middle_initial','more','even_more');
 	 *
 	 *   # now to define the getter method. Note you must
@@ -304,7 +304,7 @@ class Model
 	 * custom getter for 'name':
 	 *
 	 * <code>
-	 * class User extends ActiveRecord\Base {
+	 * class User extends ActiveRecord\Model {
 	 *   static $getters = array('name');
 	 *
 	 *   # INCORRECT way to do it
