@@ -23,9 +23,9 @@ class Memcache
 		return $this->memcache->get($key);
 	}
 
-	public function write($key, $value)
+	public function write($key, $value, $expire)
 	{
-		$this->memcache->set($key,$value);
+		$this->memcache->set($key,$value,null,$expire);
 	}
 }
 ?>

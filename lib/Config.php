@@ -295,13 +295,15 @@ class Config extends Singleton
 	 *
 	 * <code>
 	 * $config->set_cache("memcached://localhost");
+	 * $config->set_cache("memcached://localhost",array("expire" => 60));
 	 * </code>
 	 *
 	 * @param string $url Url to your cache server.
+	 * @param array $options Array of options
 	 */
-	public function set_cache($url)
+	public function set_cache($url, $options=array())
 	{
-		Cache::initialize($url);
+		Cache::initialize($url,$options);
 	}
 };
 ?>

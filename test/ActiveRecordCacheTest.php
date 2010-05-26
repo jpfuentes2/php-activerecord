@@ -17,6 +17,17 @@ class ActiveRecordCacheTest extends DatabaseTest
 		Cache::initialize(null);
 	}
 
+	public function test_default_expire()
+	{
+		$this->assert_equals(30,Cache::$options['expire']);
+	}
+
+	public function test_explicit_default_expire()
+	{
+		ActiveRecord\Config::instance()->set_cache('memcache://localhost',array('expire' => 1));
+		$this->assert_equals(1,Cache::$options['expire']);
+	}
+
 	public function test_caches_column_meta_data()
 	{
 		Author::first();

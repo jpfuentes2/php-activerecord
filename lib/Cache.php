@@ -11,8 +11,15 @@ use Closure;
 class Cache
 {
 	static $adapter = null;
+	static $options = array();
 
-	public static function initialize($url)
+	/**
+	 * Initializes the cache.
+	 *
+	 * @param string $url URL to your cache server
+	 * @param array $options Specify additional options
+	 */
+	public static function initialize($url, $options=array())
 	{
 		if ($url)
 		{
@@ -24,6 +31,8 @@ class Cache
 		}
 		else
 			static::$adapter = null;
+
+		static::$options = array_merge(array('expire' => 30),$options);
 	}
 
 	public static function flush()
@@ -38,7 +47,7 @@ class Cache
 			return $closure();
 
 		if (!($value = static::$adapter->read($key)))
-			static::$adapter->write($key,($value = $closure()));
+			static::$adapter->write($key,($value = $closure()),static::$options['expire']);
 
 		return $value;
 	}
