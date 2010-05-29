@@ -311,7 +311,7 @@ class Validations
 			}
 
 			foreach ($numericalityOptions as $option => $check)
-       		{
+			{
 				$option_value = $options[$option];
 
 				if ('odd' != $option && 'even' != $option)
