@@ -1,5 +1,6 @@
 Version 1.0 - June 1, 2010
 
+- fixed validates_numericality_of to not ignore other options when only_integer is present and matches
 - fixed set methods on DateTime objects to properly flag attributes as dirty
 - fixed DateTime attributes to be serialized as strings
 - support for Oracle

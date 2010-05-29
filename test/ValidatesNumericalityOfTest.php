@@ -102,6 +102,14 @@ class ValidatesNumericalityOfTest extends DatabaseTest
 		$this->assert_invalid(array(1.5, '1.5'));
 	}
 
+	public function test_only_integer_matching_does_not_ignore_other_options()
+	{
+		BookNumericality::$validates_numericality_of[0]['only_integer'] = true;
+		BookNumericality::$validates_numericality_of[0]['greater_than'] = 0;
+
+		$this->assert_invalid(array(-1,'-1'));
+	}
+
 	public function test_greater_than()
 	{
 		BookNumericality::$validates_numericality_of[0]['greater_than'] = 5;

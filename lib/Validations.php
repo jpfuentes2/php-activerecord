@@ -288,16 +288,16 @@ class Validations
 
 			if (true === $options['only_integer'] && !is_integer($var))
 			{
-				if (preg_match('/\A[+-]?\d+\Z/', (string)($var)))
-					break;
+				if (!preg_match('/\A[+-]?\d+\Z/', (string)($var)))
+				{
+					if (isset($options['message']))
+						$message = $options['message'];
+					else
+						$message = Errors::$DEFAULT_ERROR_MESSAGES['not_a_number'];
 
-				if (isset($options['message']))
-					$message = $options['message'];
-				else
-					$message = Errors::$DEFAULT_ERROR_MESSAGES['not_a_number'];
-
-				$this->record->add($attribute, $message);
-				continue;
+					$this->record->add($attribute, $message);
+					continue;
+				}
 			}
 			else
 			{

@@ -9,7 +9,7 @@ class BookValidations extends ActiveRecord\Model
 	static $alias_attribute = array('name_alias' => 'name', 'x' => 'secondary_author_id');
 	static $validates_presence_of = array(array('name'));
 	static $validates_uniqueness_of = array();
-};
+}
 
 class ValidationsTest extends DatabaseTest
 {
