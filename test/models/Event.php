@@ -2,8 +2,8 @@
 class Event extends ActiveRecord\Model
 {
 	static $belongs_to = array(
-		array('host'),
-		array('venue')
+		'host',
+		'venue'
 	);
 
 	static $delegate = array(

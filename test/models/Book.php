@@ -1,7 +1,7 @@
 <?php
 class Book extends ActiveRecord\Model
 {
-	static $belongs_to = array(array('author'));
+	static $belongs_to = array('author');
 	static $has_one = array();
 	static $getters = array('upper_name');
 

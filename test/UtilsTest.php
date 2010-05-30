@@ -84,5 +84,14 @@ class UtilsTest extends SnakeCase_PHPUnit_Framework_TestCase
 
 		$this->assert_equals($class_names, $good_class_names);
 	}
+
+	public function test_wrap_strings_in_arrays()
+	{
+		$x = array('1',array('2'));
+		$this->assert_equals(array(array('1'),array('2')),ActiveRecord\wrap_strings_in_arrays($x));
+
+		$x = '1';
+		$this->assert_equals(array(array('1')),ActiveRecord\wrap_strings_in_arrays($x));
+	}
 };
 ?>

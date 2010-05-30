@@ -7,7 +7,7 @@ class BookValidations extends ActiveRecord\Model
 {
 	static $table_name = 'books';
 	static $alias_attribute = array('name_alias' => 'name', 'x' => 'secondary_author_id');
-	static $validates_presence_of = array(array('name'));
+	static $validates_presence_of = array();
 	static $validates_uniqueness_of = array();
 };
 
@@ -17,7 +17,8 @@ class ValidationsTest extends DatabaseTest
 	{
 		parent::set_up($connection_name);
 
-		BookValidations::$validates_uniqueness_of[0] = array('name');
+		BookValidations::$validates_presence_of[0] = 'name';
+		BookValidations::$validates_uniqueness_of[0] = 'name';
 	}
 
 	public function test_is_valid_invokes_validations()
@@ -113,6 +114,13 @@ class ValidationsTest extends DatabaseTest
 	{
 		$validators = BookValidations::first()->get_validation_rules();
 		$this->assert_true(in_array(array('validator' => 'validates_presence_of'),$validators['name']));
+	}
+
+	public function test_validations_takes_strings()
+	{
+		BookValidations::$validates_presence_of = array('numeric_test', array('special'), 'name');
+		$book = new BookValidations(array('numeric_test' => 1, 'special' => 1));
+		$this->assert_false($book->is_valid());
 	}
 };
 ?>

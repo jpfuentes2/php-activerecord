@@ -450,10 +450,10 @@ class Table
 
 		foreach ($this->class->getStaticProperties() as $name => $definitions)
 		{
-			if (!$definitions || !is_array($definitions))
+			if (!$definitions)# || !is_array($definitions))
 				continue;
 
-			foreach ($definitions as $definition)
+			foreach (wrap_strings_in_arrays($definitions) as $definition)
 			{
 				$relationship = null;
 
