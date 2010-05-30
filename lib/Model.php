@@ -428,6 +428,12 @@ class Model
 		throw new UndefinedPropertyException(get_called_class(),$name);
 	}
 
+	public function __wakeup()
+	{
+		// make sure the models Table instance gets initialized when waking up
+		static::table();
+	}
+
 	/**
 	 * Assign a value to an attribute.
 	 *
