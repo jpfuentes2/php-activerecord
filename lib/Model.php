@@ -1479,6 +1479,18 @@ class Model
 	}
 
 	/**
+	 * Helper method to run arbitrary queries against the model's database connection.
+	 *
+	 * @param string $sql SQL to execute
+	 * @param array $values Bind values, if any, for the query
+	 * @return object A PDOStatement object
+	 */
+	public static function query($sql, $values=null)
+	{
+		return static::connection()->query($sql, $values);
+	}
+
+	/**
 	 * Determines if the specified array is a valid ActiveRecord options array.
 	 *
 	 * @param array $array An options array
