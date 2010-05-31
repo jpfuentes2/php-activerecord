@@ -39,5 +39,11 @@ class ConnectionTest extends SnakeCase_PHPUnit_Framework_TestCase
 		$this->assert_equals('h az',$info->user);
 		$this->assert_equals('h@i',$info->pass);
 	}
+
+	public function test_encoding()
+	{
+		$info = ActiveRecord\Connection::parse_connection_url('mysql://test:test@127.0.0.1/test?charset=utf8');
+		$this->assert_equals('utf8', $info->charset);
+	}
 }
 ?>

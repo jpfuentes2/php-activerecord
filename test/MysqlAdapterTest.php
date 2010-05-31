@@ -18,5 +18,12 @@ class MysqlAdapterTest extends AdapterTest
 		$this->assert_equals(Column::STRING,$author_columns['some_enum']->type);
 		$this->assert_same(null,$author_columns['some_enum']->length);
 	}
+
+	public function test_set_charset()
+	{
+		$connection_string = ActiveRecord\Config::instance()->get_connection($this->connection_name);
+		$conn = ActiveRecord\Connection::instance($connection_string . '?charset=utf8');
+		$this->assert_equals('SET NAMES ?',$conn->last_query);
+	}
 }
 ?>

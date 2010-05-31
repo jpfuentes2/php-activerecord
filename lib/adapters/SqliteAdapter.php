@@ -77,5 +77,10 @@ class SqliteAdapter extends Connection
 
 		return $c;
 	}
+
+	public function set_encoding($charset)
+	{
+		throw new ActiveRecordException("SqliteAdapter::set_charset not supported.");
+	}
 };
 ?>

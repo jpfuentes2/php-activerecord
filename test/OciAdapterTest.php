@@ -36,5 +36,12 @@ class OciAdapterTest extends AdapterTest
 	public function test_insert_id_should_return_explicitly_inserted_id() {}
 	public function test_columns_time() {}
 	public function test_columns_sequence() {}
+
+	public function test_set_charset()
+	{
+		$connection_string = ActiveRecord\Config::instance()->get_connection($this->connection_name);
+		$conn = ActiveRecord\Connection::instance($connection_string . '?charset=utf8');
+		$this->assert_equals(';charset=utf8', $conn->dsn_params);
+	}
 }
 ?>

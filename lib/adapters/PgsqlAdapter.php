@@ -100,5 +100,10 @@ SQL;
 		}
 		return $c;
 	}
+
+	public function set_encoding($charset)
+	{
+		$this->query("SET NAMES '$charset'");
+	}
 };
 ?>

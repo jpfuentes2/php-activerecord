@@ -23,6 +23,7 @@ class DatabaseTest extends SnakeCase_PHPUnit_Framework_TestCase
 			new SQLite3($this->db);
 		}
 
+		$this->connection_name = $connection_name;
 		$this->conn = ActiveRecord\ConnectionManager::get_connection($connection_name);
 
 		$GLOBALS['ACTIVERECORD_LOG'] = false;

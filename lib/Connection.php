@@ -96,10 +96,13 @@ abstract class Connection
 		$fqclass = static::load_adapter_class($info->protocol);
 
 		try {
-			$connection = new $fqclass($info);
+			$connection           = new $fqclass($info);
 			$connection->protocol = $info->protocol;
-			$connection->logging = $config->get_logging();
-			$connection->logger = $connection->logging ? $config->get_logger() : null;
+			$connection->logging  = $config->get_logging();
+			$connection->logger   = $connection->logging ? $config->get_logger() : null;
+
+			if (isset($info->charset))
+				$connection->set_encoding($info->charset);
 		} catch (PDOException $e) {
 			throw new DatabaseException($e);
 		}
@@ -173,6 +176,17 @@ abstract class Connection
 
 			if ($info->pass)
 				$info->pass = urldecode($info->pass);
+		}
+
+		if (isset($url['query']))
+		{
+			foreach (explode('/&/',$url['query']) as $pair)
+			{
+				list($name,$value) = explode('=',$pair);
+
+				if ($name == 'charset')
+					$info->charset = $value;
+			}
 		}
 
 		return $info;
@@ -452,5 +466,10 @@ abstract class Connection
 	 * @return PDOStatement
 	 */
 	abstract function query_for_tables();
+
+	/**
+	 * Executes query to specify the character set for this connection.
+	 */
+	abstract function set_encoding($charset);
 };
 ?>

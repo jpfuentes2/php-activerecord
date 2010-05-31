@@ -29,5 +29,12 @@ class PgsqlAdapterTest extends AdapterTest
 		$this->conn->query('INSERT INTO authors(author_id,name) VALUES(99,\'name\')');
 		$this->assert_true($this->conn->insert_id('authors_author_id_seq') > 0);
 	}
+
+	public function test_set_charset()
+	{
+		$connection_string = ActiveRecord\Config::instance()->get_connection($this->connection_name);
+		$conn = ActiveRecord\Connection::instance($connection_string . '?charset=utf8');
+		$this->assert_equals("SET NAMES 'utf8'",$conn->last_query);
+	}
 }
 ?>
