@@ -678,7 +678,7 @@ class RelationshipTest extends DatabaseTest
 	/**
 	 * @expectedException ActiveRecord\RecordNotFound
 	 */
-	public function test_xxx()
+	public function test_dont_attempt_eager_load_when_record_does_not_exist()
 	{
 		Author::find(999999, array('include' => array('books')));
 	}
