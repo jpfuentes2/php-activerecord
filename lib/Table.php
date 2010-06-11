@@ -220,7 +220,7 @@ class Table
 			$list[] = $model;
 		}
 
-		if ($collect_attrs_for_includes)
+		if ($collect_attrs_for_includes && !empty($list))
 			$this->execute_eager_load($list, $attrs, $includes);
 
 		return $list;

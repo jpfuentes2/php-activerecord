@@ -674,5 +674,13 @@ class RelationshipTest extends DatabaseTest
 
 		$this->assert_equals($event->id, $event->venue->id);
 	}
+
+	/**
+	 * @expectedException ActiveRecord\RecordNotFound
+	 */
+	public function test_xxx()
+	{
+		Author::find(999999, array('include' => array('books')));
+	}
 };
 ?>
