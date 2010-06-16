@@ -114,5 +114,12 @@ class ValidationsTest extends DatabaseTest
 		$validators = BookValidations::first()->get_validation_rules();
 		$this->assert_true(in_array(array('validator' => 'validates_presence_of'),$validators['name']));
 	}
+
+	public function test_model_is_nulled_out_to_prevent_memory_leak()
+	{
+		$book = new BookValidations();
+		$book->is_valid();
+		$this->assert_true(strpos(serialize($book->errors),'model";N;') !== false);
+	}
 };
 ?>

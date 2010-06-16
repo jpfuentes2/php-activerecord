@@ -136,6 +136,7 @@ class Validations
 		foreach ($this->validators as $validate)
 			$this->$validate($reflection->getStaticPropertyValue($validate));
 
+		$this->record->clear_model();
 		return $this->record;
 	}
 
@@ -641,6 +642,15 @@ class Errors implements IteratorAggregate
 	public function __construct(Model $model)
 	{
 		$this->model = $model;
+	}
+
+	/**
+	 * Nulls $model so we don't get pesky circular references. $model is only needed during the
+	 * validation process and so can be safely cleared once that is done.
+	 */
+	public function clear_model()
+	{
+		$this->model = null;
 	}
 
 	/**
