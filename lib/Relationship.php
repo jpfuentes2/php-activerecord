@@ -236,11 +236,6 @@ abstract class AbstractRelationship implements InterfaceRelationship
 		return $options;
 	}
 
-	protected function keyify($class_name)
-	{
-		return strtolower(classify(denamespace($class_name))). '_id';
-	}
-
 	/**
 	 * Infers the $this->class_name based on $this->attribute_name.
 	 *
@@ -441,7 +436,7 @@ class HasMany extends AbstractRelationship
 	{
 		//infer from class_name
 		if (!$this->foreign_key || $override)
-			$this->foreign_key = array($this->keyify($model_class_name));
+			$this->foreign_key = array(Inflector::instance()->keyify($model_class_name));
 
 		if (!$this->primary_key || $override)
 			$this->primary_key = Table::load($model_class_name)->pk;
@@ -607,7 +602,7 @@ class BelongsTo extends AbstractRelationship
 
 		//infer from class_name
 		if (!$this->foreign_key)
-			$this->foreign_key = array($this->keyify($this->class_name));
+			$this->foreign_key = array(Inflector::instance()->keyify($this->class_name));
 
 		$this->primary_key = array(Table::load($this->class_name)->pk[0]);
 	}
