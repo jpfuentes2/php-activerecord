@@ -2,8 +2,8 @@ Version 1.0 - June 27, 2010
 
 - d2bed65 fixed an error with eager loading when no records exist
 - c225942 fixed set methods on DateTime objects to properly flag attributes as dirty
-- 3e26749 fixed a memory leak when using validations
-- 46a1219 fixed problem with some model functionality not working correctly after being deserialized 
+- 46a1219 fixed a memory leak when using validations
+- c225942 fixed problem with some model functionality not working correctly after being deserialized 
 - 3e26749 fixed validates_numericality_of to not ignore other options when only_integer is present and matches
 - 53ad5ec fixed ambiguous id error when finding by pk with a join option
 - 26e40f4 fixed conditions to accept DateTime values
