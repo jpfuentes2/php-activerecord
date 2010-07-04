@@ -84,5 +84,11 @@ class UtilsTest extends SnakeCase_PHPUnit_Framework_TestCase
 
 		$this->assert_equals($class_names, $good_class_names);
 	}
+
+	public function test_classify_singularize_status()
+	{
+		$this->assert_equals('order_status',AR\Utils::singularize('order_status'));
+		$this->assert_equals('order_status',AR\Utils::singularize('order_statuses'));
+	}
 };
 ?>
