@@ -246,7 +246,8 @@ abstract class AbstractRelationship implements InterfaceRelationship
 	 */
 	protected function set_inferred_class_name()
 	{
-		$this->set_class_name(classify($this->attribute_name, true));
+		$singularize = ($this instanceOf HasMany ? true : false);
+		$this->set_class_name(classify($this->attribute_name, $singularize));
 	}
 
 	protected function set_class_name($class_name)

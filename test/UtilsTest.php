@@ -91,6 +91,9 @@ class UtilsTest extends SnakeCase_PHPUnit_Framework_TestCase
 		$this->assert_equals('order_status',AR\Utils::singularize('order_statuses'));
 		$this->assert_equals('os_type', AR\Utils::singularize('os_type'));
 		$this->assert_equals('os_type', AR\Utils::singularize('os_types'));
+		$this->assert_equals('photo', AR\Utils::singularize('photos'));
+		$this->assert_equals('pass', AR\Utils::singularize('pass'));
+		$this->assert_equals('pass', AR\Utils::singularize('passes'));
 	}
 };
 ?>

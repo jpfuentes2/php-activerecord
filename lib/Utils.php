@@ -39,17 +39,9 @@ use \Closure;
 function classify($class_name, $singularize=false)
 {
 	if ($singularize)
-	{
-		$parts = explode('_',  Inflector::instance()->uncamelize($class_name));
-		$class_name = '';
-		foreach ($parts as $name)
-			$class_name .= '_' . Utils::singularize($name);
-
-		$class_name = ltrim($class_name, '_');
-	}
+    $class_name = Utils::singularize($class_name);
 
 	$class_name = Inflector::instance()->camelize($class_name);
-
 	return ucfirst($class_name);
 }
 
@@ -259,7 +251,7 @@ class Utils
         '/(h|bl)ouses$/i'           => "$1ouse",
         '/(corpse)s$/i'             => "$1",
         '/(us)es$/i'                => "$1",
-        '/(us|os)$/i'               => "$1",
+        '/(us|ss)$/i'               => "$1",
         '/s$/i'                     => ""
     );
 
