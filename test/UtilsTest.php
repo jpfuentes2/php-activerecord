@@ -22,43 +22,43 @@ class UtilsTest extends SnakeCase_PHPUnit_Framework_TestCase
 
 	public function test_collect_with_array_of_objects_using_closure()
 	{
-		$this->assert_equals(array("0a","1a"),ActiveRecord\collect($this->object_array,function($obj) { return $obj->a; }));
+		$this->assert_equals(array("0a","1a"),AR\collect($this->object_array,function($obj) { return $obj->a; }));
 	}
 
 	public function test_collect_with_array_of_objects_using_string()
 	{
-		$this->assert_equals(array("0a","1a"),ActiveRecord\collect($this->object_array,"a"));
+		$this->assert_equals(array("0a","1a"),AR\collect($this->object_array,"a"));
 	}
 
 	public function test_collect_with_array_hash_using_closure()
 	{
-		$this->assert_equals(array("0a","1a"),ActiveRecord\collect($this->array_hash,function($item) { return $item["a"]; }));
+		$this->assert_equals(array("0a","1a"),AR\collect($this->array_hash,function($item) { return $item["a"]; }));
 	}
 
 	public function test_collect_with_array_hash_using_string()
 	{
-		$this->assert_equals(array("0a","1a"),ActiveRecord\collect($this->array_hash,"a"));
+		$this->assert_equals(array("0a","1a"),AR\collect($this->array_hash,"a"));
 	}
 
     public function test_array_flatten()
     {
-		$this->assert_equals(array(), ActiveRecord\array_flatten(array()));
-		$this->assert_equals(array(1), ActiveRecord\array_flatten(array(1)));
-		$this->assert_equals(array(1), ActiveRecord\array_flatten(array(array(1))));
-		$this->assert_equals(array(1, 2), ActiveRecord\array_flatten(array(array(1, 2))));
-		$this->assert_equals(array(1, 2), ActiveRecord\array_flatten(array(array(1), 2)));
-		$this->assert_equals(array(1, 2), ActiveRecord\array_flatten(array(1, array(2))));
-		$this->assert_equals(array(1, 2, 3), ActiveRecord\array_flatten(array(1, array(2), 3)));
-		$this->assert_equals(array(1, 2, 3, 4), ActiveRecord\array_flatten(array(1, array(2, 3), 4)));
-		$this->assert_equals(array(1, 2, 3, 4, 5, 6), ActiveRecord\array_flatten(array(1, array(2, 3), 4, array(5, 6))));
+		$this->assert_equals(array(), AR\array_flatten(array()));
+		$this->assert_equals(array(1), AR\array_flatten(array(1)));
+		$this->assert_equals(array(1), AR\array_flatten(array(array(1))));
+		$this->assert_equals(array(1, 2), AR\array_flatten(array(array(1, 2))));
+		$this->assert_equals(array(1, 2), AR\array_flatten(array(array(1), 2)));
+		$this->assert_equals(array(1, 2), AR\array_flatten(array(1, array(2))));
+		$this->assert_equals(array(1, 2, 3), AR\array_flatten(array(1, array(2), 3)));
+		$this->assert_equals(array(1, 2, 3, 4), AR\array_flatten(array(1, array(2, 3), 4)));
+		$this->assert_equals(array(1, 2, 3, 4, 5, 6), AR\array_flatten(array(1, array(2, 3), 4, array(5, 6))));
 	}
 
 	public function test_all()
 	{
-		$this->assert_true(ActiveRecord\all(null,array(null,null)));
-		$this->assert_true(ActiveRecord\all(1,array(1,1)));
-		$this->assert_false(ActiveRecord\all(1,array(1,'1')));
-		$this->assert_false(ActiveRecord\all(null,array('',null)));
+		$this->assert_true(AR\all(null,array(null,null)));
+		$this->assert_true(AR\all(1,array(1,1)));
+		$this->assert_false(AR\all(1,array(1,'1')));
+		$this->assert_false(AR\all(null,array('',null)));
 	}
 
 	public function test_classify()
