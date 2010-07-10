@@ -714,6 +714,16 @@ class Model
 	}
 
 	/**
+	 * Re-establishes the database connection with a new connection.
+	 *
+	 * @return Connection
+	 */
+	public static function reestablish_connection()
+	{
+		return static::table()->reestablish_connection();
+	}
+
+	/**
 	 * Returns the {@link Table} object for this model.
 	 *
 	 * Be sure to call in static scoping: static::table()

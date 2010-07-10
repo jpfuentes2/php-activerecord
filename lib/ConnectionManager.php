@@ -34,5 +34,17 @@ class ConnectionManager extends Singleton
 		}
 		return self::$connections[$name];
 	}
+
+  /**
+   * Drops the connection from the connection manager. Does not actually close it since there
+   * is no close method in PDO.
+   *
+   * @param string $name Name of the connection to forget about
+   */
+	public static function drop_connection($name=null)
+	{
+		if (isset(self::$connections[$name]))
+			unset(self::$connections[$name]);
+	}
 };
 ?>

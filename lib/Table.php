@@ -77,10 +77,7 @@ class Table
 	{
 		$this->class = Reflections::instance()->add($class_name)->get($class_name);
 
-		// if connection name property is null the connection manager will use the default connection
-		$connection = $this->class->getStaticPropertyValue('connection',null);
-
-		$this->conn = ConnectionManager::get_connection($connection);
+		$this->reestablish_connection(false);
 		$this->set_table_name();
 		$this->get_meta_data();
 		$this->set_primary_key();
@@ -91,6 +88,17 @@ class Table
 		$this->callback = new CallBack($class_name);
 		$this->callback->register('before_save', function(Model $model) { $model->set_timestamps(); }, array('prepend' => true));
 		$this->callback->register('after_save', function(Model $model) { $model->reset_dirty(); }, array('prepend' => true));
+	}
+
+	public function reestablish_connection($close=true)
+	{
+		// if connection name property is null the connection manager will use the default connection
+		$connection = $this->class->getStaticPropertyValue('connection',null);
+
+		if ($close)
+			ConnectionManager::drop_connection($connection);
+
+		return ($this->conn = ConnectionManager::get_connection($connection));
 	}
 
 	public function create_joins($joins)
