@@ -96,8 +96,10 @@ class Table
 		$connection = $this->class->getStaticPropertyValue('connection',null);
 
 		if ($close)
+		{
 			ConnectionManager::drop_connection($connection);
-
+			static::clear_cache();
+		}
 		return ($this->conn = ConnectionManager::get_connection($connection));
 	}
 
