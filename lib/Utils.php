@@ -49,18 +49,15 @@ function classify($class_name, $singularize=false)
 function array_flatten(array $array)
 {
 	$i = 0;
-	$n = count($array);
 
-	while ($i < $n)
+	while ($i < count($array))
 	{
 		if (is_array($array[$i]))
 			array_splice($array,$i,1,$array[$i]);
-        else
+		else
 			++$i;
-
-		$n = count($array);
-    }
-    return $array;
+	}
+	return $array;
 }
 
 /**
