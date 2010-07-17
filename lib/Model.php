@@ -419,6 +419,9 @@ class Model
 		if (array_key_exists($name,$this->attributes))
 			return $this->assign_attribute($name,$value);
 
+		if ($name == 'id')
+			return $this->assign_attribute($this->get_primary_key(true),$value);
+
 		foreach (static::$delegate as &$item)
 		{
 			if (($delegated_name = $this->is_delegated($name,$item)))
@@ -496,11 +499,9 @@ class Model
 
 		if ($name == 'id')
 		{
-			if (count($this->get_primary_key()) > 1)
-				throw new Exception("TODO composite key support");
-
-			if (isset($this->attributes[$table->pk[0]]))
-				return $this->attributes[$table->pk[0]];
+			$pk = $this->get_primary_key(true);
+			if (isset($this->attributes[$pk]))
+				return $this->attributes[$pk];
 		}
 
 		//do not remove - have to return null by reference in strict mode
@@ -564,11 +565,13 @@ class Model
 	/**
 	 * Retrieve the primary key name.
 	 *
+	 * @param boolean Set to true to return the first value in the pk array only
 	 * @return string The primary key for the model
 	 */
-	public function get_primary_key()
+	public function get_primary_key($first=false)
 	{
-		return Table::load(get_class($this))->pk;
+		$pk = static::table()->pk;
+		return $first ? $pk[0] : $pk;
 	}
 
 	/**
@@ -787,25 +790,25 @@ class Model
 		if (!($attributes = $this->dirty_attributes()))
 			$attributes = $this->attributes;
 
-		$pk = $this->get_primary_key();
+		$pk = $this->get_primary_key(true);
 		$use_sequence = false;
 
-		if ($table->sequence && !isset($attributes[$pk[0]]))
+		if ($table->sequence && !isset($attributes[$pk]))
 		{
 			if (($conn = static::connection()) instanceof OciAdapter)
 			{
 				// terrible oracle makes us select the nextval first
-				$attributes[$pk[0]] = $conn->get_next_sequence_value($table->sequence);
+				$attributes[$pk] = $conn->get_next_sequence_value($table->sequence);
 				$table->insert($attributes);
-				$this->attributes[$pk[0]] = $attributes[$pk[0]];
+				$this->attributes[$pk] = $attributes[$pk];
 			}
 			else
 			{
 				// unset pk that was set to null
-				if (array_key_exists($pk[0],$attributes))
-					unset($attributes[$pk[0]]);
+				if (array_key_exists($pk,$attributes))
+					unset($attributes[$pk]);
 
-				$table->insert($attributes,$pk[0],$table->sequence);
+				$table->insert($attributes,$pk,$table->sequence);
 				$use_sequence = true;
 			}
 		}
@@ -813,12 +816,13 @@ class Model
 			$table->insert($attributes);
 
 		// if we've got an autoincrementing/sequenced pk set it
-		if (count($pk) == 1)
+		// don't need this check until the day comes that we decide to support composite pks
+		// if (count($pk) == 1)
 		{
-			$column = $table->get_column_by_inflected_name($pk[0]);
+			$column = $table->get_column_by_inflected_name($pk);
 
 			if ($column->auto_increment || $use_sequence)
-				$this->attributes[$pk[0]] = $table->conn->insert_id($table->sequence);
+				$this->attributes[$pk] = $table->conn->insert_id($table->sequence);
 		}
 
 		$this->invoke_callback('after_create',false);
@@ -1488,6 +1492,18 @@ class Model
 	public static function find_by_sql($sql, $values=null)
 	{
 		return static::table()->find_by_sql($sql, $values, true);
+	}
+
+	/**
+	 * Helper method to run arbitrary queries against the model's database connection.
+	 *
+	 * @param string $sql SQL to execute
+	 * @param array $values Bind values, if any, for the query
+	 * @return object A PDOStatement object
+	 */
+	public static function query($sql, $values=null)
+	{
+		return static::connection()->query($sql, $values);
 	}
 
 	/**

@@ -69,5 +69,11 @@ class MysqlAdapter extends Connection
 
 		return $c;
 	}
+
+	public function set_encoding($charset)
+	{
+		$params = array($charset);
+		$this->query('SET NAMES ?',$params);
+	}
 }
 ?>

@@ -284,5 +284,26 @@ class Config extends Singleton
 	{
 		$this->date_format = $format;
 	}
+
+	/**
+	 * Sets the url for the cache server to enable query caching.
+	 *
+	 * Only table schema queries are cached at the moment. A general query cache
+	 * will follow.
+	 *
+	 * Example:
+	 *
+	 * <code>
+	 * $config->set_cache("memcached://localhost");
+	 * $config->set_cache("memcached://localhost",array("expire" => 60));
+	 * </code>
+	 *
+	 * @param string $url Url to your cache server.
+	 * @param array $options Array of options
+	 */
+	public function set_cache($url, $options=array())
+	{
+		Cache::initialize($url,$options);
+	}
 };
 ?>

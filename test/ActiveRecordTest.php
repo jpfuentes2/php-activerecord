@@ -463,5 +463,20 @@ class ActiveRecordTest extends DatabaseTest
 		$this->assert_equals('name', $venue->get_real_attribute_name('marquee'));
 		$this->assert_equals(null, $venue->get_real_attribute_name('invalid_field'));
 	}
+
+	public function test_id_setter_works_with_table_without_pk_named_attribute()
+	{
+		$author = new Author(array('id' => 123));
+		$this->assert_equals(123,$author->author_id);
+	}
+
+	public function test_query()
+	{
+		$row = Author::query('SELECT COUNT(*) AS n FROM authors',null)->fetch();
+		$this->assert_true($row['n'] > 1);
+
+		$row = Author::query('SELECT COUNT(*) AS n FROM authors WHERE name=?',array('Tito'))->fetch();
+		$this->assert_equals(array('n' => 1), $row);
+	}
 };
 ?>

@@ -2,7 +2,7 @@
 class Host extends ActiveRecord\Model
 {
 	static $has_many = array(
-		array('events'),
+		'events',
 		array('venues', 'through' => 'events')
 	);
 }

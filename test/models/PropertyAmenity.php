@@ -5,8 +5,8 @@ class PropertyAmenity extends ActiveRecord\Model
 	static $primary_key = 'id';
 
 	static $belongs_to = array(
-		array('amenity'),
-		array('property')
+		'amenity',
+		'property'
 	);
 };
 ?>

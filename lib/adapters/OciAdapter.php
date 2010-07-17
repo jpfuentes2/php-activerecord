@@ -16,10 +16,13 @@ class OciAdapter extends Connection
 	static $QUOTE_CHARACTER = '';
 	static $DEFAULT_PORT = 1521;
 
+	public $dsn_params;
+
 	protected function __construct($info)
 	{
 		try {
-			$this->connection = new PDO("oci:dbname=//$info->host/$info->db",$info->user,$info->pass,static::$PDO_OPTIONS);
+			$this->dsn_params = isset($info->charset) ? ";charset=$info->charset" : "";
+			$this->connection = new PDO("oci:dbname=//$info->host/$info->db$this->dsn_params",$info->user,$info->pass,static::$PDO_OPTIONS);
 		} catch (PDOException $e) {
 			throw new DatabaseException($e);
 		}
@@ -116,6 +119,11 @@ class OciAdapter extends Connection
 		$c->default	= $c->cast($column['data_default'],$this);
 
 		return $c;
+	}
+
+	public function set_encoding($charset)
+	{
+		// is handled in the constructor
 	}
 };
 ?>

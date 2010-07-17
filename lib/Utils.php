@@ -137,6 +137,24 @@ function collect(&$enumerable, $name_or_closure)
 }
 
 /**
+ * Wrap string definitions (if any) into arrays.
+ */
+function wrap_strings_in_arrays(&$strings)
+{
+	if (!is_array($strings))
+		$strings = array(array($strings));
+	else 
+	{
+		foreach ($strings as &$str)
+		{
+			if (!is_array($str))
+				$str = array($str);
+		}
+	}
+	return $strings;
+}
+
+/**
  * Some internal utility functions.
  *
  * @package ActiveRecord
