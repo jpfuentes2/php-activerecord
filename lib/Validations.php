@@ -287,16 +287,13 @@ class Validations
 			if ($this->is_null_with_option($var, $options))
 				continue;
 
+			$not_a_number_message = (isset($options['message']) ? $options['message'] : Errors::$DEFAULT_ERROR_MESSAGES['not_a_number']);
+
 			if (true === $options['only_integer'] && !is_integer($var))
 			{
 				if (!preg_match('/\A[+-]?\d+\Z/', (string)($var)))
 				{
-					if (isset($options['message']))
-						$message = $options['message'];
-					else
-						$message = Errors::$DEFAULT_ERROR_MESSAGES['not_a_number'];
-
-					$this->record->add($attribute, $message);
+					$this->record->add($attribute, $not_a_number_message);
 					continue;
 				}
 			}
@@ -304,7 +301,7 @@ class Validations
 			{
 				if (!is_numeric($var))
 				{
-					$this->record->add($attribute, Errors::$DEFAULT_ERROR_MESSAGES['not_a_number']);
+					$this->record->add($attribute, $not_a_number_message);
 					continue;
 				}
 
@@ -314,18 +311,14 @@ class Validations
 			foreach ($numericalityOptions as $option => $check)
 			{
 				$option_value = $options[$option];
+				$message = (isset($options['message']) ? $options['message'] : Errors::$DEFAULT_ERROR_MESSAGES[$option]);
 
 				if ('odd' != $option && 'even' != $option)
 				{
 					$option_value = (float)$options[$option];
 
 					if (!is_numeric($option_value))
-						throw new  ValidationsArgumentError("$option must be a number");
-
-					if (isset($options['message']))
-						$message = $options['message'];
-					else
-						$message = Errors::$DEFAULT_ERROR_MESSAGES[$option];
+						throw new ValidationsArgumentError("$option must be a number");
 
 					$message = str_replace('%d', $option_value, $message);
 
@@ -346,12 +339,7 @@ class Validations
 				}
 				else
 				{
-					if (isset($options['message']))
-						$message = $options['message'];
-					else
-						$message = Errors::$DEFAULT_ERROR_MESSAGES[$option];
-
-					if ( ('odd' == $option && !( Utils::is_odd($var))) || ('even' == $option && ( Utils::is_odd($var))))
+					if (('odd' == $option && !Utils::is_odd($var)) || ('even' == $option && Utils::is_odd($var)))
 						$this->record->add($attribute, $message);
 				}
 			}

@@ -13,12 +13,12 @@ class BookNumericality extends ActiveRecord\Model
 class ValidatesNumericalityOfTest extends DatabaseTest
 {
 	static $NULL = array(null);
-  	static $BLANK = array("", " ", " \t \r \n");
+	static $BLANK = array("", " ", " \t \r \n");
 	static $FLOAT_STRINGS = array('0.0','+0.0','-0.0','10.0','10.5','-10.5','-0.0001','-090.1');
-  	static $INTEGER_STRINGS = array('0', '+0', '-0', '10', '+10', '-10', '0090', '-090');
+	static $INTEGER_STRINGS = array('0', '+0', '-0', '10', '+10', '-10', '0090', '-090');
 	static $FLOATS = array(0.0, 10.0, 10.5, -10.5, -0.0001);
-  	static $INTEGERS = array(0, 10, -10);
-  	static $JUNK = array("not a number", "42 not a number", "00-1", "--3", "+-3", "+3-1", "-+019.0", "12.12.13.12", "123\nnot a number");
+	static $INTEGERS = array(0, 10, -10);
+	static $JUNK = array("not a number", "42 not a number", "00-1", "--3", "+-3", "+3-1", "-+019.0", "12.12.13.12", "123\nnot a number");
 
 	public function set_up($connection_name=null)
 	{
@@ -148,6 +148,16 @@ class ValidatesNumericalityOfTest extends DatabaseTest
 
 		$this->assert_valid(array(2));
 		$this->assert_invalid(array(1,3,4));
+	}
+
+	public function test_custom_message()
+	{
+		BookNumericality::$validates_numericality_of = array(
+			array('numeric_test', 'message' => 'Hello')
+		);
+		$book = new BookNumericality(array('numeric_test' => 'NaN'));
+		$book->is_valid();
+		$this->assert_equals(array('Numeric test Hello'),$book->errors->full_messages());
 	}
 };
 
