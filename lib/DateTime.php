@@ -1,6 +1,15 @@
 <?php
+/**
+ * @package ActiveRecord
+ */
 namespace ActiveRecord;
 
+/**
+ * Main purpose of this class is to provide a way to notify the parent model when any of
+ * the set methods are called so that they can be flagged dirty.
+ *
+ * @package ActiveRecord
+ */
 class DateTime extends \DateTime
 {
 	private $model;
