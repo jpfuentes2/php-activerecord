@@ -277,7 +277,7 @@ class Config extends Singleton
 	 *
 	 * Accepts date formats accepted by PHP's date() function.
 	 *
-	 * @link http://us.php.net/manual/en/function.date.php
+	 * @link http://php.net/manual/en/function.date.php
 	 * @param string $format
 	 */
 	public function set_date_format($format)

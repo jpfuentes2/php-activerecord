@@ -9,6 +9,7 @@ namespace ActiveRecord;
  * the set methods are called so that they can be flagged dirty.
  *
  * @package ActiveRecord
+ * @see http://php.net/manual/en/class.datetime.php
  */
 class DateTime extends \DateTime
 {
