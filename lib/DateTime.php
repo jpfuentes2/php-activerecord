@@ -5,8 +5,30 @@
 namespace ActiveRecord;
 
 /**
- * Main purpose of this class is to provide a way to notify the parent model when any of
- * the set methods are called so that they can be flagged dirty.
+ * An extension of PHP's DateTime class to provide dirty flagging and easier formatting options.
+ *
+ * All date and datetime fields from your database will be created as instances of this class.
+ *
+ * Example of formatting and changing the default format:
+ *
+ * <code>
+ * $now = new ActiveRecord\DateTime('2010-01-02 03:04:05');
+ * ActiveRecord\DateTime::$DEFAULT_FORMAT = 'short';
+ *
+ * echo $now->format();         # 02 Jan 03:04
+ * echo $now->format('atom');   # 2010-01-02T03:04:05-05:00
+ * echo $now->format('Y-m-d');  # 2010-01-02
+ *
+ * # __toString() uses the default formatter
+ * echo (string)$now;           # 02 Jan 03:04
+ * </code>
+ *
+ * You can also add your own pre-defined friendly formatters:
+ *
+ * <code>
+ * ActiveRecord\DateTime::$FORMATS['awesome_format'] = 'H:i:s m/d/Y';
+ * echo $now->format('awesome_format')  # 03:04:05 01/02/2010
+ * </code>
  *
  * @package ActiveRecord
  * @see http://php.net/manual/en/class.datetime.php
