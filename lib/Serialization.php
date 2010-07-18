@@ -46,6 +46,13 @@ abstract class Serialization
 	protected $attributes;
 
 	/**
+	 * The default format to serialize DateTime objects to.
+	 *
+	 * @see DateTime
+	 */
+	public static $DATETIME_FORMAT = 'iso8601';
+
+	/**
 	 * Set this to true if the serializer needs to create a nested array keyed
 	 * on the name of the included classes such as for xml serialization.
 	 *
@@ -195,12 +202,10 @@ abstract class Serialization
 	 */
 	final public function to_a()
 	{
-		$date_format = Config::instance()->get_date_format();
-
 		foreach ($this->attributes as &$value)
 		{
 			if ($value instanceof \DateTime)
-				$value = $value->format($date_format);
+				$value = $value->format(self::$DATETIME_FORMAT);
 		}
 		return $this->attributes;
 	}

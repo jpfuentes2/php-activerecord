@@ -93,7 +93,7 @@ class SerializationTest extends DatabaseTest
 	{
 		$now = new DateTime();
 		$a = $this->_a(array('only' => 'created_at'),new Author(array('created_at' => $now)));
-		$this->assert_equals($now->format(ActiveRecord\Config::instance()->get_date_format()),$a['created_at']);
+		$this->assert_equals($now->format(ActiveRecord\Serialization::$DATETIME_FORMAT),$a['created_at']);
 	}
 
 	public function test_to_json()

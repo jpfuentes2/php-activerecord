@@ -263,26 +263,21 @@ class Config extends Singleton
 	}
 
 	/**
-	 * Returns the date format.
-	 *
-	 * @return string
+	 * DEPRECATED
 	 */
 	public function get_date_format()
 	{
-		return $this->date_format;
+		error_log('DEPRECATION WARNING: Config::get_date_format() has been deprecated and will be removed in a future version. Please ActiveRecord\Serialization::$DATETIME_FORMAT instead.');
+		return Serialization::$DATETIME_FORMAT;
 	}
 
 	/**
-	 * Sets the date format.
-	 *
-	 * Accepts date formats accepted by PHP's date() function.
-	 *
-	 * @link http://php.net/manual/en/function.date.php
-	 * @param string $format
+	 * DEPRECATED
 	 */
 	public function set_date_format($format)
 	{
-		$this->date_format = $format;
+		error_log('DEPRECATION WARNING: Config::set_date_format() has been deprecated and will be removed in a future version. Please use ActiveRecord\Serialization::$DATETIME_FORMAT instead.');
+		Serialization::$DATETIME_FORMAT = $format;
 	}
 
 	/**
