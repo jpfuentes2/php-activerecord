@@ -159,6 +159,8 @@ class Validations
 	 *
 	 * <ul>
 	 * <li><b>message:</b> custom error message</li>
+	 * <li><b>allow_blank:</b> allow blank strings</li>
+	 * <li><b>allow_null:</b> allow null strings</li>
 	 * </ul>
 	 *
 	 * @param array $attrs Validation definition
@@ -190,6 +192,8 @@ class Validations
 	 * <ul>
 	 * <li><b>in/within:</b> attribute should/shouldn't be a value within an array</li>
 	 * <li><b>message:</b> custome error message</li>
+	 * <li><b>allow_blank:</b> allow blank strings</li>
+	 * <li><b>allow_null:</b> allow null strings</li>
 	 * </ul>
 	 *
 	 * @param array $attrs Validation definition
@@ -202,6 +206,15 @@ class Validations
 	/**
 	 * This is the opposite of {@link validates_include_of}.
 	 *
+	 * Available options:
+	 *
+	 * <ul>
+	 * <li><b>in/within:</b> attribute should/shouldn't be a value within an array</li>
+	 * <li><b>message:</b> custome error message</li>
+	 * <li><b>allow_blank:</b> allow blank strings</li>
+	 * <li><b>allow_null:</b> allow null strings</li>
+	 * </ul>
+	 *
 	 * @param array $attrs Validation definition
 	 * @see validates_inclusion_of
 	 */
@@ -212,6 +225,15 @@ class Validations
 
 	/**
 	 * Validates that a value is in or out of a specified list of values.
+	 *
+	 * Available options:
+	 *
+	 * <ul>
+	 * <li><b>in/within:</b> attribute should/shouldn't be a value within an array</li>
+	 * <li><b>message:</b> custome error message</li>
+	 * <li><b>allow_blank:</b> allow blank strings</li>
+	 * <li><b>allow_null:</b> allow null strings</li>
+	 * </ul>
 	 *
 	 * @see validates_inclusion_of
 	 * @see validates_exclusion_of
@@ -268,6 +290,8 @@ class Validations
 	 * <li><b>equal_to:</b> ...</li>
 	 * <li><b>less_than:</b> ...</li>
 	 * <li><b>less_than_or_equal_to:</b> ...</li>
+	 * <li><b>allow_blank:</b> allow blank strings</li>
+	 * <li><b>allow_null:</b> allow null strings</li>
 	 * </ul>
 	 *
 	 * @param array $attrs Validation definition
@@ -375,6 +399,8 @@ class Validations
 	 * <ul>
 	 * <li><b>with:</b> a regular expression</li>
 	 * <li><b>message:</b> custom error message</li>
+	 * <li><b>allow_blank:</b> allow blank strings</li>
+	 * <li><b>allow_null:</b> allow null strings</li>
 	 * </ul>
 	 *
 	 * @param array $attrs Validation definition
@@ -419,6 +445,9 @@ class Validations
 	 * <li><b>is:</b> attribute should be exactly n characters long</li>
 	 * <li><b>in/within:</b> attribute should be within an range array(min,max)</li>
 	 * <li><b>maximum/minimum:</b> attribute should not be above/below respectively</li>
+	 * <li><b>message:</b> custome error message</li>
+	 * <li><b>allow_blank:</b> allow blank strings</li>
+	 * <li><b>allow_null:</b> allow null strings</li>
 	 * </ul>
 	 *
 	 * @param array $attrs Validation definition
@@ -529,6 +558,15 @@ class Validations
 	 *   );
 	 * }
 	 * </code>
+	 *
+	 * Available options:
+	 *
+	 * <ul>
+	 * <li><b>with:</b> a regular expression</li>
+	 * <li><b>message:</b> custom error message</li>
+	 * <li><b>allow_blank:</b> allow blank strings</li>
+	 * <li><b>allow_null:</b> allow null strings</li>
+	 * </ul>
 	 *
 	 * @param array $attrs Validation definition
 	 */
