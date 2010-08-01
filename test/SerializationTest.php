@@ -135,5 +135,10 @@ class SerializationTest extends DatabaseTest
 		$this->assert_same(false,strpos(Book::find(1)->to_xml(array('skip_instruct' => true)),'<?xml version'));
 		$this->assert_same(0,    strpos(Book::find(1)->to_xml(array('skip_instruct' => false)),'<?xml version'));
 	}
+
+	public function test_only_method()
+	{
+		$this->assert_contains('<sharks>lasers</sharks>', Author::first()->to_xml(array('only_method' => 'return_something')));
+	}
 };
 ?>
