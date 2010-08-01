@@ -1245,13 +1245,15 @@ class Model
 				$args = $args[0];
 
 			$association_name = str_replace(array('build_', 'create_'), '', $method);
+			$method = str_replace($association_name, 'association', $method);
+			$table = static::table();
 
-			if (($association = static::table()->get_relationship($association_name)))
+			if (($association = $table->get_relationship($association_name)) || 
+				  ($association = $table->get_relationship(($association_name = Utils::pluralize($association_name)))))
 			{
-				//access association to ensure that the relationship has been loaded
-				//so that we do not double-up on records if we append a newly created
+				// access association to ensure that the relationship has been loaded
+				// so that we do not double-up on records if we append a newly created
 				$this->$association_name;
-				$method = str_replace($association_name,'association', $method);
 				return $association->$method($this, $args);
 			}
 		}

@@ -191,6 +191,13 @@ class RelationshipTest extends DatabaseTest
 		$this->assert_equals($values, array_intersect_key($values, $venue->attributes()));
 	}
 
+	public function test_has_many_build_association()
+	{
+		$author = Author::first();
+		$this->assert_equals($author->id, $author->build_books()->author_id);
+		$this->assert_equals($author->id, $author->build_book()->author_id);
+	}
+
 	public function test_belongs_to_create_association()
 	{
 		$event = $this->get_relationship();
