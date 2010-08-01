@@ -393,11 +393,11 @@ class HasMany extends AbstractRelationship
 	 *
 	 * <ul>
 	 * <li><b>limit/offset:</b> limit the number of records</li>
-     * <li><b>primary_key:</b> name of the primary_key of the association (defaults to "id")</li>
-     * <li><b>group:</b> GROUP BY clause</li>
-     * <li><b>order:</b> ORDER BY clause</li>
-     * <li><b>through:</b> name of a model</li>
-     * </ul>
+	 * <li><b>primary_key:</b> name of the primary_key of the association (defaults to "id")</li>
+	 * <li><b>group:</b> GROUP BY clause</li>
+	 * <li><b>order:</b> ORDER BY clause</li>
+	 * <li><b>through:</b> name of a model</li>
+	 * </ul>
 	 *
 	 * @var array
 	 */
