@@ -9,6 +9,14 @@ class BookValidations extends ActiveRecord\Model
 	static $alias_attribute = array('name_alias' => 'name', 'x' => 'secondary_author_id');
 	static $validates_presence_of = array();
 	static $validates_uniqueness_of = array();
+	static $custom_validator_error_msg = 'failed custom validation';
+
+	// fired for every validation - but only used for custom validation test
+	public function validate()
+	{
+		if ($this->name == 'test_custom_validation')
+			$this->errors->add('name', self::$custom_validator_error_msg);
+	}
 }
 
 class ValidationsTest extends DatabaseTest
@@ -82,7 +90,7 @@ class ValidationsTest extends DatabaseTest
 	public function test_validates_uniqueness_of_excludes_self()
 	{
 		$book = BookValidations::first();
-		$this->assert_equals(true,$book->is_valid()); 
+		$this->assert_equals(true,$book->is_valid());
 	}
 
 	public function test_validates_uniqueness_of_with_multiple_fields()
@@ -128,6 +136,14 @@ class ValidationsTest extends DatabaseTest
 		BookValidations::$validates_presence_of = array('numeric_test', array('special'), 'name');
 		$book = new BookValidations(array('numeric_test' => 1, 'special' => 1));
 		$this->assert_false($book->is_valid());
+	}
+
+	public function test_gh131_custom_validation()
+	{
+		$book = new BookValidations(array('name' => 'test_custom_validation'));
+		$book->save();
+		$this->assert_true($book->errors->is_invalid('name'));
+		$this->assert_equals(BookValidations::$custom_validator_error_msg, $book->errors->on('name'));
 	}
 };
 ?>

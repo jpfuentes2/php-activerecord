@@ -929,7 +929,9 @@ class Model
 				return false;
 		}
 
-		$this->errors = $validator->validate();
+		// need to store reference b4 validating so that custom validators have access to add errors
+		$this->errors = $validator->get_record();
+		$validator->validate();
 
 		foreach (array('after_validation', "after_$validation_on") as $callback)
 			$this->invoke_callback($callback,false);
