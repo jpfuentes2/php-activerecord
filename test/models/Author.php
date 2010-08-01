@@ -21,5 +21,10 @@ class Author extends ActiveRecord\Model
 		$value = strtoupper($value);
 		$this->assign_attribute('name',$value);
 	}
+
+	public function return_something()
+	{
+		return array("sharks" => "lasers");
+	}
 };
 ?>
