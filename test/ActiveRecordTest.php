@@ -383,7 +383,6 @@ class ActiveRecordTest extends DatabaseTest
 
 	public function test_setter_with_same_name_as_an_attribute()
 	{
-		Author::$setters[] = 'name';
 		$author = new Author();
 		$author->name = 'bob';
 		$this->assert_equals('BOB',$author->name);
@@ -397,11 +396,11 @@ class ActiveRecordTest extends DatabaseTest
 
 	public function test_getter_with_same_name_as_an_attribute()
 	{
-		Book::$getters[] = 'name';
+		Book::$use_custom_get_name_getter = true;
 		$book = new Book;
 		$book->name = 'bob';
 		$this->assert_equals('BOB', $book->name);
-		Book::$getters = array();
+		Book::$use_custom_get_name_getter = false;
 	}
 
 	public function test_setting_invalid_date_should_set_date_to_null()

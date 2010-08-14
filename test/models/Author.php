@@ -9,7 +9,6 @@ class Author extends ActiveRecord\Model
 		array('awesome_person', 'foreign_key' => 'author_id', 'primary_key' => 'author_id'),
 		array('parent_author', 'class_name' => 'Author', 'foreign_key' => 'parent_author_id'));
 	static $belongs_to = array();
-	static $setters = array('password');
 
 	public function set_password($plaintext)
 	{
