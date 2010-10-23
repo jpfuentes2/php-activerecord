@@ -155,6 +155,16 @@ class ActiveRecordTest extends DatabaseTest
 		$venue->reload();
 		$this->assert_equals('NY', $venue->state);
 	}
+	
+	public function test_reload_protected_attribute()
+	{
+		$book = BookAttrAccessible::find(1);
+		
+		$book->book_id = 10;
+		$book->reload();
+		$book->assert_equals(1, $book->book_id);
+		$book->delete();
+	}
 
 	public function test_active_record_model_home_not_set()
 	{
