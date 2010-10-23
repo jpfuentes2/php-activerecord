@@ -163,7 +163,6 @@ class ActiveRecordTest extends DatabaseTest
 		$book->name = "Should not stay";
 		$book->reload();
 		$this->assert_not_equals("Should not stay", $book->name);
-		$book->delete();
 	}
 
 	public function test_active_record_model_home_not_set()
