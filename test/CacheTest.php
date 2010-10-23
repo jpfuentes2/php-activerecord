@@ -7,6 +7,12 @@ class CacheTest extends SnakeCase_PHPUnit_Framework_TestCase
 {
 	public function set_up()
 	{
+		if (!extension_loaded('memcache'))
+		{
+			$this->markTestSkipped('The memcache extension is not available');
+			return;
+		}
+		
 		Cache::initialize('memcache://localhost');
 	}
 
