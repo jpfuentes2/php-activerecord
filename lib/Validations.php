@@ -814,6 +814,22 @@ class Errors implements IteratorAggregate
 		}
 		return $full_messages;
 	}
+	
+	/**
+	 * Convert all error messages to a String.
+	 * This function is called implicitely if the object is casted to a string:
+	 * 
+	 * <code>
+	 * echo $error;
+	 * 
+	 * # "Name can't be blank\nState is the wrong length (should be 2 chars)"
+	 * </code>
+	 * @return string
+	 */
+	public function __toString()
+	{
+		return implode("\n", $this->full_messages());
+	}
 
 	/**
 	 * Returns true if there are no error messages.
