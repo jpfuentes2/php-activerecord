@@ -159,10 +159,10 @@ class ActiveRecordTest extends DatabaseTest
 	public function test_reload_protected_attribute()
 	{
 		$book = BookAttrAccessible::find(1);
-		
-		$book->book_id = 10;
+	
+		$book->name = "Should not stay";
 		$book->reload();
-		$book->assert_equals(1, $book->book_id);
+		$this->assert_not_equals("Should not stay", $book->name);
 		$book->delete();
 	}
 
