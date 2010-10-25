@@ -159,13 +159,13 @@ class Model
 	 * <code>
 	 * class Person extends ActiveRecord\Model {
 	 *   static $alias_attribute = array(
-	 *     'the_first_name' => 'first_name',
-	 *     'the_last_name' => 'last_name');
+	 *     'alias_first_name' => 'first_name',
+	 *     'alias_last_name' => 'last_name');
 	 * }
 	 *
 	 * $person = Person::first();
-	 * $person->the_first_name = 'Tito';
-	 * echo $person->the_first_name;
+	 * $person->alias_first_name = 'Tito';
+	 * echo $person->alias_first_name;
 	 * </code>
 	 *
 	 * @var array
@@ -199,6 +199,8 @@ class Model
 	 *
 	 * This is the opposite of {@link attr_accessible $attr_accessible} and the format
 	 * for defining these are exactly the same.
+	 * 
+	 * If the attribute is both accessible and protected, it is treated as protected.
 	 *
 	 * @var array
 	 */
@@ -240,7 +242,7 @@ class Model
 	 * </code>
 	 *
 	 * @param array $attributes Hash containing names and values to mass assign to the model
-	 * @param boolean $guard_attributes Set to true to guard attributes
+	 * @param boolean $guard_attributes Set to true to guard protected/non-accessible attributes
 	 * @param boolean $instantiating_via_find Set to true if this model is being created from a find call
 	 * @param boolean $new_record Set to true if this should be considered a new record
 	 * @return Model
@@ -1019,7 +1021,7 @@ class Model
 	 *
 	 * @throws ActiveRecord\UndefinedPropertyException
 	 * @param array $attributes An array in the form array(name => value, ...)
-	 * @param boolean $guard_attributes Flag of whether or not attributes should be guarded
+	 * @param boolean $guard_attributes Flag of whether or not protected/non-accessible attributes should be guarded
 	 */
 	private function set_attributes_via_mass_assignment(array &$attributes, $guard_attributes)
 	{
