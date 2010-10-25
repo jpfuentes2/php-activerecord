@@ -1,5 +1,15 @@
 <?php
-require_once 'Log.php';
+/**
+ * In order to run these unit tests, you need to install:
+ *  - PHPUnit
+ *  - PEAR Log (otherwise logging SQL queries will be disabled)
+ *  - Memcache (otherwise Caching tests will not be executed)
+ *  
+ * To run all tests : phpunit AllTests.php --slow-tests
+ * To run a specific test : phpunit ????Test.php 
+ */
+
+@include_once 'Log.php';
 require_once 'PHPUnit/Framework/TestCase.php';
 require_once 'SnakeCase_PHPUnit_Framework_TestCase.php';
 require_once 'DatabaseTest.php';
@@ -8,6 +18,10 @@ require_once dirname(__FILE__) . '/../../ActiveRecord.php';
 
 // whether or not to run the slow non-crucial tests
 $GLOBALS['slow_tests'] = false;
+
+// whether or not to show warnings when Log or Memcache is missing
+$GLOBALS['show_warnings'] = true;
+
 
 if (getenv('LOG') !== 'false')
 	DatabaseTest::$log = true;
@@ -31,10 +45,28 @@ ActiveRecord\Config::initialize(function($cfg)
 			$GLOBALS['slow_tests'] = true;
 	}
 
-	$logger = Log::singleton('file', dirname(__FILE__) . '/../log/query.log','ident',array('mode' => 0664, 'timeFormat' =>  '%Y-%m-%d %H:%M:%S'));
+	if (is_callable('Log::singleton')) // PEAR Log installed
+	{
+		$logger = Log::singleton('file', dirname(__FILE__) . '/../log/query.log','ident',array('mode' => 0664, 'timeFormat' =>  '%Y-%m-%d %H:%M:%S'));
+	
+		$cfg->set_logging(true);
+		$cfg->set_logger($logger);
+	}
+	else
+	{
+		if ($GLOBALS['show_warnings'] && !isset($GLOBALS['show_warnings_done']))
+			echo "(Logging SQL queries disabled, PEAR::Log not found.)\n";
 
-	$cfg->set_logging(true);
-	$cfg->set_logger($logger);
+		DatabaseTest::$log = false;
+	}
+	
+	if ($GLOBALS['show_warnings']  && !isset($GLOBALS['show_warnings_done']))
+	{ 
+		if (!extension_loaded('memcache'))
+			echo "(Cache Tests will be skipped, Memcache not found.)\n";
+	}
+	
+	$GLOBALS['show_warnings_done'] = true;
 });
 
 error_reporting(E_ALL | E_STRICT);
