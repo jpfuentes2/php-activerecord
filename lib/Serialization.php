@@ -12,7 +12,7 @@ use XmlWriter;
  *
  * <ul>
  * <li><b>only:</b> a string or array of attributes to be included.</li>
- * <li><b>exclude:</b> a string or array of attributes to be excluded.</li>
+ * <li><b>except:</b> a string or array of attributes to be excluded.</li>
  * <li><b>methods:</b> a string or array of methods to invoke. The method's name will be used as a key for the final attributes array
  * along with the method's returned value</li>
  * <li><b>include:</b> a string or array of associated models to include in the final serialized product.</li>
@@ -33,8 +33,8 @@ use XmlWriter;
  *   'include' => array('comments', 'posts' => array('only' => 'id'))
  * ));
  *
- * # exclude the password field from being included
- * $model->to_xml(array('exclude' => 'password')));
+ * # except the password field from being included
+ * $model->to_xml(array('except' => 'password')));
  * </code>
  *
  * @package ActiveRecord
