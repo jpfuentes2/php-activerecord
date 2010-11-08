@@ -1277,8 +1277,15 @@ class Model
 	{
 		$args = func_get_args();
 		$options = static::extract_and_validate_options($args);
-		$options['select'] = 'COUNT(*)';
-
+                if (isset($options['group']))
+                {
+                    $options['select'] = 'COUNT(DISTINCT ' . $options['group'] . ')';
+                    unset($options['group']);
+                }
+                else
+                {
+                    $options['select'] = 'COUNT(*)';
+                }
 		if (!empty($args))
 		{
 			if (is_hash($args[0]))
