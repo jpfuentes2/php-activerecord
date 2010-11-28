@@ -799,19 +799,10 @@ class Errors implements IteratorAggregate
 	{
 		$full_messages = array();
 
-		if ($this->errors)
-		{
-			foreach ($this->errors as $attribute => $messages)
-			{
-				foreach ($messages as $msg)
-				{
-					if (is_null($msg))
-						continue;
+		$this->to_array(function($attribute, $message) use (&$full_messages) {
+			$full_messages[] = $message;
+		});
 
-					$full_messages[] = Utils::human_attribute($attribute) . ' ' . $msg;
-				}
-			}
-		}
 		return $full_messages;
 	}
 
@@ -830,7 +821,7 @@ class Errors implements IteratorAggregate
 	 * @param array $options Options for messages
 	 * @return array
 	 */
-	public function errors()
+	public function to_array($closure=null)
 	{
 		$errors = array();
 
@@ -843,7 +834,10 @@ class Errors implements IteratorAggregate
 					if (is_null($msg))
 						continue;
 
-					$errors[$attribute][] = Utils::human_attribute($attribute) . ' ' . $msg;
+					$errors[$attribute][] = ($message = Utils::human_attribute($attribute) . ' ' . $msg);
+
+					if ($closure)
+						$closure($attribute,$message);
 				}
 			}
 		}

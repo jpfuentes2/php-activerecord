@@ -78,12 +78,12 @@ class ValidationsTest extends DatabaseTest
 		$this->assert_equals(array("Name can't be blank"),array_values($book->errors->full_messages(array('hash' => true))));
 	}
 
-	public function test_errors()
+	public function test_to_array()
 	{
 		$book = new BookValidations();
 		$book->is_valid();
 
-		$this->assert_equals(array("name" => array("Name can't be blank")), $book->errors->errors());
+		$this->assert_equals(array("name" => array("Name can't be blank")), $book->errors->to_array());
 	}
 	
 	public function test_toString()
