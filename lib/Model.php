@@ -1623,6 +1623,18 @@ class Model
   }
 
 	/**
+	 * Returns an Array representation of this model.
+	 *
+	 * @see Serialization
+	 * @param array $options An array containing options for json serialization (see {@link Serialization} for valid options)
+	 * @return array Array representation of the model
+	 */
+	public function to_array(array $options=array())
+	{
+		return $this->serialize('Array', $options);
+	}
+
+	/**
 	 * Creates a serializer based on pre-defined to_serializer()
 	 *
 	 * An options array can take the following parameters:
@@ -1635,7 +1647,7 @@ class Model
 	 * <li><b>include:</b> a string or array of associated models to include in the final serialized product.</li>
 	 * </ul>
 	 *
-	 * @param string $type Either Xml or Json
+	 * @param string $type Either Xml, Json or Array
 	 * @param array $options Options array for the serializer
 	 * @return string Serialized representation of the model
 	 */

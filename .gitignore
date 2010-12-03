@@ -3,3 +3,4 @@
 .settings
 *.log
 test/*.db
+*.swp

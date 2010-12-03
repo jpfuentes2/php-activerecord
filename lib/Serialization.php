@@ -240,17 +240,33 @@ abstract class Serialization
 };
 
 /**
- * JSON serializer.
+ * Array serializer.
  *
  * @package ActiveRecord
  */
-class JsonSerializer extends Serialization
+class ArraySerializer extends Serialization
 {
 	public static $include_root = false;
 
 	public function to_s()
 	{
-		return json_encode(self::$include_root ? array(strtolower(get_class($this->model)) => $this->to_a()) : $this->to_a());
+		return self::$include_root ? array(strtolower(get_class($this->model)) => $this->to_a()) : $this->to_a();
+	}
+}
+
+/**
+ * JSON serializer.
+ *
+ * @package ActiveRecord
+ */
+class JsonSerializer extends ArraySerializer
+{
+	public static $include_root = false;
+
+	public function to_s()
+	{
+		parent::$include_root = self::$include_root;
+		return json_encode(parent::to_s());
 	}
 }
 

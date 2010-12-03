@@ -9,6 +9,7 @@ class SerializationTest extends DatabaseTest
 	public function tear_down()
 	{
 		parent::tear_down();
+		ActiveRecord\ArraySerializer::$include_root = false;
 		ActiveRecord\JsonSerializer::$include_root = false;
 	}
 
@@ -122,6 +123,31 @@ class SerializationTest extends DatabaseTest
 		$book = Book::find(1);
 		$this->assert_equals($book->attributes(),get_object_vars(new SimpleXMLElement($book->to_xml())));
 	}
+
+  public function test_to_array()
+  {
+ 		$book = Book::find(1);
+		$array = $book->to_array();
+		$this->assert_equals($book->attributes(), $array);
+  }
+
+  public function test_to_array_include_root()
+  {
+		ActiveRecord\ArraySerializer::$include_root = true;
+ 		$book = Book::find(1);
+		$array = $book->to_array();
+    $book_attributes = array('book' => $book->attributes());
+		$this->assert_equals($book_attributes, $array);
+  }
+
+  public function test_to_array_except()
+  {
+ 		$book = Book::find(1);
+		$array = $book->to_array(array('except' => array('special')));
+		$book_attributes = $book->attributes();
+		unset($book_attributes['special']);
+		$this->assert_equals($book_attributes, $array);
+  }
 
 	public function test_works_with_datetime()
 	{
