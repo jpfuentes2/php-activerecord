@@ -1647,7 +1647,7 @@ class Model
 	 * <li><b>include:</b> a string or array of associated models to include in the final serialized product.</li>
 	 * </ul>
 	 *
-	 * @param string $type Either Xml, Json or Array
+	 * @param string $type Either Xml, Json, Csv or Array
 	 * @param array $options Options array for the serializer
 	 * @return string Serialized representation of the model
 	 */
