@@ -129,7 +129,7 @@ abstract class AbstractRelationship implements InterfaceRelationship
 	protected function query_and_attach_related_models_eagerly(Table $table, $models, $attributes, $includes=array(), $query_keys=array(), $model_values_keys=array())
 	{
 		$values = array();
-		$options = array();
+		$options = $this->options;
 		$inflector = Inflector::instance();
 		$query_key = $query_keys[0];
 		$model_values_key = $model_values_keys[0];
@@ -138,7 +138,12 @@ abstract class AbstractRelationship implements InterfaceRelationship
 			$values[] = $value[$inflector->variablize($model_values_key)];
 
 		$values = array($values);
-		$options['conditions'] = SQLBuilder::create_conditions_from_underscored_string($table->conn,$query_key,$values);
+		$conditions = SQLBuilder::create_conditions_from_underscored_string($table->conn,$query_key,$values);
+
+        if (isset($options['conditions']) && strlen($options['conditions'][0]) > 1)
+            Utils::add_condition($options['conditions'], $conditions);
+        else
+            $options['conditions'] = $conditions;
 
 		if (!empty($includes))
 			$options['include'] = $includes;

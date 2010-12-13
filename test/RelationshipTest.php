@@ -501,7 +501,16 @@ class RelationshipTest extends DatabaseTest
 		AuthorWithNonModelRelationship::first()->books;
 	}
 
-	public function test_eager_loading_has_many()
+	public function test_gh93_eager_loading_respects_association_options()
+	{
+		Venue::$has_many = array(array('events', 'order' => 'id asc', 'conditions' => array('length(title) = ?', 14)));
+		$venues = Venue::find(array(2, 6), array('include' => 'events'));
+
+		$this->assert_sql_has("WHERE length(title) = ? AND venue_id IN(?,?) ORDER BY id asc",ActiveRecord\Table::load('Event')->last_sql);
+		$this->assert_equals(1, count($venues[0]->events));
+    }
+
+	public function test_eager_loading_has_many_x()
 	{
 		$venues = Venue::find(array(2, 6), array('include' => 'events'));
 		$this->assert_sql_has("WHERE venue_id IN(?,?)",ActiveRecord\Table::load('Event')->last_sql);

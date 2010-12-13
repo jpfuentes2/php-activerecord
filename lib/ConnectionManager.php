@@ -26,12 +26,12 @@ class ConnectionManager extends Singleton
 	 */
 	public static function get_connection($name=null)
 	{
+        $config = Config::instance();
+        $name = $name ? $name : $config->get_default_connection();
+
 		if (!isset(self::$connections[$name]) || !self::$connections[$name]->connection)
-		{
-			$config = Config::instance();
-			$connection_string = $name ? $config->get_connection($name) : $config->get_default_connection();
-			self::$connections[$name] = Connection::instance($connection_string);
-		}
+            self::$connections[$name] = Connection::instance($config->get_connection($name));
+
 		return self::$connections[$name];
 	}
 
