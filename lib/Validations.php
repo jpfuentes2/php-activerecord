@@ -813,8 +813,8 @@ class Errors implements IteratorAggregate
 	 * $model->errors->errors();
 	 *
 	 * # array(
-	 * #  "name" => "Name can't be blank",
-	 * #  "state" => "State is the wrong length (should be 2 chars)"
+	 * #  "name" => array("Name can't be blank"),
+	 * #  "state" => array("State is the wrong length (should be 2 chars)")
 	 * # )
 	 * </code>
 	 *
