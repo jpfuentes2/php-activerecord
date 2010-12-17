@@ -769,15 +769,9 @@ class Errors implements IteratorAggregate
 	 */
 	public function on($attribute)
 	{
-		if (!isset($this->errors[$attribute]))
-			return null;
+		$errors = $this->$attribute;
 
-		$errors = $this->errors[$attribute];
-
-		if (null === $errors)
-			return null;
-		else
-			return count($errors) == 1 ? $errors[0] : $errors;
+		return $errors && count($errors) == 1 ? $errors[0] : $errors;
 	}
 
 	/**
