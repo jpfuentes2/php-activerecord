@@ -493,6 +493,16 @@ class RelationshipTest extends DatabaseTest
 		$this->assert_true(count($venue->hosts) > 0);
 	}
 
+	public function test_has_many_count()
+	{
+		Venue::$has_many = array(
+			array('events'),
+			array('hosts', 'through' => 'events')
+		);
+		$venue = Venue::first();
+		$this->assert_equals(count($venue->hosts), $venue->hosts_count);
+	}
+
 	/**
 	 * @expectedException ActiveRecord\RelationshipException
 	 */
@@ -508,7 +518,7 @@ class RelationshipTest extends DatabaseTest
 
 		$this->assert_sql_has("WHERE length(title) = ? AND venue_id IN(?,?) ORDER BY id asc",ActiveRecord\Table::load('Event')->last_sql);
 		$this->assert_equals(1, count($venues[0]->events));
-    }
+	}
 
 	public function test_eager_loading_has_many_x()
 	{
