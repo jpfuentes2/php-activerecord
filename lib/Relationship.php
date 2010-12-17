@@ -140,10 +140,10 @@ abstract class AbstractRelationship implements InterfaceRelationship
 		$values = array($values);
 		$conditions = SQLBuilder::create_conditions_from_underscored_string($table->conn,$query_key,$values);
 
-        if (isset($options['conditions']) && strlen($options['conditions'][0]) > 1)
-            Utils::add_condition($options['conditions'], $conditions);
-        else
-            $options['conditions'] = $conditions;
+		if (isset($options['conditions']) && strlen($options['conditions'][0]) > 1)
+			Utils::add_condition($options['conditions'], $conditions);
+		else
+			$options['conditions'] = $conditions;
 
 		if (!empty($includes))
 			$options['include'] = $includes;
@@ -450,15 +450,21 @@ class HasMany extends AbstractRelationship
 
 	public function load(Model $model)
 	{
-		extract($this->initialize($model));
-		return $class_name::find($this->poly_relationship ? 'all' : 'first',$options);
+		if($init = $this->initialize($model))
+		{
+			extract($init);
+			return $class_name::find($this->poly_relationship ? 'all' : 'first', $options);
+		}
 	}
 
 
 	public function load_count(Model $model)
 	{
-		extract($this->initialize($model));
-		return $class_name::count($options);
+		if($init = $this->initialize($model))
+		{
+			extract($init);
+			return $class_name::count($options);
+		}
 	}
 
 	private function initialize(Model $model) {
