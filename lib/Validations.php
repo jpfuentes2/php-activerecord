@@ -803,7 +803,6 @@ class Errors implements IteratorAggregate
 	 * # )
 	 * </code>
 	 *
-	 * @param array $options Options for messages
 	 * @return array
 	 */
 	public function full_messages()
@@ -829,7 +828,9 @@ class Errors implements IteratorAggregate
 	 * # )
 	 * </code>
 	 *
-	 * @param array $options Options for messages
+	 * @param array $closure Closure to fetch the errors in some other format (optional)
+	 *                       This closure has the signature function($attribute, $message)
+	 *                       and is called for each available error message.
 	 * @return array
 	 */
 	public function to_array($closure=null)
