@@ -775,6 +775,23 @@ class Errors implements IteratorAggregate
 	}
 
 	/**
+	 * Returns the internal errors object.
+	 *
+	 * <code>
+	 * $model->errors->get_raw_errors();
+	 *
+	 * # array(
+	 * #  "name" => array("can't be blank"),
+	 * #  "state" => array("is the wrong length (should be 2 chars)",
+	 * # )
+	 * </code>
+	 */
+	public function get_raw_errors()
+	{
+		return $this->errors;
+	}
+
+	/**
 	 * Returns all the error messages as an array.
 	 *
 	 * <code>
