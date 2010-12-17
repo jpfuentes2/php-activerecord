@@ -722,10 +722,10 @@ class Errors implements IteratorAggregate
 	}
 
 	/**
-	 * Retrieve error message for an attribute.
+	 * Retrieve error messages for an attribute.
 	 *
 	 * @param string $attribute Name of an attribute on the model
-	 * @return string
+	 * @return array or null if there is no error.
 	 */
 	public function __get($attribute)
 	{
@@ -762,10 +762,10 @@ class Errors implements IteratorAggregate
 	}
 
 	/**
-	 * Returns the error message for the specified attribute or null if none.
+	 * Returns the error message(s) for the specified attribute or null if none.
 	 *
 	 * @param string $attribute Name of an attribute on the model
-	 * @return string
+	 * @return string/array	Array of strings if several error occured on this attribute.
 	 */
 	public function on($attribute)
 	{
