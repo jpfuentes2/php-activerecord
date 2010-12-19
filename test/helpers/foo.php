@@ -4,22 +4,22 @@ namespace foo\bar\biz;
 
 class User extends \ActiveRecord\Model {
 	static $has_many = array(
-		array('usernewsletters', 'class_name' => '\foo\bar\biz\Usernewsletter'),
+		array('user_newsletters', 'class_name' => '\foo\bar\biz\UserNewsletter'),
 		array('newsletters', 'class_name' => '\foo\bar\biz\Newsletter',
-		      'through' => 'usernewsletters')
+		      'through' => 'user_newsletters')
 	);
 
 }
 
 class Newsletter extends \ActiveRecord\Model {
 	static $has_many = array(
-		array('usernewsletters', 'class_name' => '\foo\bar\biz\Usernewsletter'),
+		array('user_newsletters', 'class_name' => '\foo\bar\biz\UserNewsletter'),
 		array('users', 'class_name' => '\foo\bar\biz\User',
-		      'through' => 'usernewsletters')
+		      'through' => 'user_newsletters')
 	);
 }
 
-class Usernewsletter extends \ActiveRecord\Model {
+class UserNewsletter extends \ActiveRecord\Model {
 	static $belong_to = array(
 		array('user', 'class_name' => '\foo\bar\biz\User'),
 		array('newsletter', 'class_name' => '\foo\bar\biz\Newsletter'),
