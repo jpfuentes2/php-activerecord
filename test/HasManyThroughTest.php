@@ -30,7 +30,7 @@ class HasManyThroughTest extends DatabaseTest {
 		));
 
 		$this->assert_equals(1, $user->id);
-        $this->assert_equals(1, $user->user_newsletters[0]->id);
+		$this->assert_equals(1, $user->user_newsletters[0]->id);
 	}
 
 	public function test_gh101_has_many_through_sub_include() {
@@ -41,8 +41,8 @@ class HasManyThroughTest extends DatabaseTest {
 		));
 
 		$this->assert_equals(1, $user->id);
-        $this->assert_equals(1, $user->user_newsletters[0]->id);
-        $this->assert_equals(1, $user->user_newsletters[0]->newsletter->id);
+		$this->assert_equals(1, $user->user_newsletters[0]->id);
+		$this->assert_equals(1, $user->user_newsletters[0]->newsletter->id);
 	}
 
 }
