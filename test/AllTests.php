@@ -1,8 +1,6 @@
 <?php
 require_once 'PHPUnit/Framework.php';
 
-date_default_timezone_set('Europe/Zurich');
-
 foreach (glob('*Test.php') as $file)
 {
 	if ($file != 'AllValidationsTest.php')
