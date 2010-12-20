@@ -45,6 +45,16 @@ class HasManyThroughTest extends DatabaseTest {
 		$this->assert_equals(1, $user->user_newsletters[0]->newsletter->id);
 	}
 
+	public function test_gh101_has_many_through_through_include() {
+		$user = User::find(1, array(
+			'include' => array(
+				'newsletters'
+			)
+		));
+
+		$this->assert_equals(1, $user->id);
+		$this->assert_equals(1, $user->newsletters[0]->id);
+	}
 }
 
 # vim: ts=4 noet nobinary
