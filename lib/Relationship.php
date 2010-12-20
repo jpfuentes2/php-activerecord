@@ -147,6 +147,8 @@ abstract class AbstractRelationship implements InterfaceRelationship
 
 		if (!empty($includes))
 			$options['include'] = $includes;
+			
+		$options = $this->unset_non_finder_options($options);
 
 		$class = $this->class_name;
 
