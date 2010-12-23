@@ -140,10 +140,10 @@ abstract class AbstractRelationship implements InterfaceRelationship
 		$values = array($values);
 		$conditions = SQLBuilder::create_conditions_from_underscored_string($table->conn,$query_key,$values);
 
-        if (isset($options['conditions']) && strlen($options['conditions'][0]) > 1)
-            Utils::add_condition($options['conditions'], $conditions);
-        else
-            $options['conditions'] = $conditions;
+		if (isset($options['conditions']) && strlen($options['conditions'][0]) > 1)
+			Utils::add_condition($options['conditions'], $conditions);
+		else
+			$options['conditions'] = $conditions;
 
 		if (!empty($includes))
 			$options['include'] = $includes;
@@ -474,8 +474,10 @@ class HasMany extends AbstractRelationship
 				$fk = $this->foreign_key;
 
 				$this->set_keys($this->get_table()->class->getName(), true);
-
-				$through_table = Table::load(classify($this->through, true));
+				
+				$class = $this->class_name;
+				$relation = $class::table()->get_relationship($this->through);
+				$through_table = $relation->get_table();
 				$this->options['joins'] = $this->construct_inner_join_sql($through_table, true);
 
 				// reset keys
