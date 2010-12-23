@@ -155,10 +155,14 @@ abstract class AbstractRelationship implements InterfaceRelationship
 
 			$this->set_keys($this->get_table()->class->getName(), true);
 
-			$class = isset($options['class_name']) ?
-				$options['class_name'] :
-				classify($options['through'], true);
-			$through_table = $class::table();
+			if (!isset($options['class_name'])) {
+				$class = classify($options['through'], true);
+				$through_table = $class::table();
+			} else {
+				$class = $options['class_name'];
+				$relation = $class::table()->get_relationship($options['through']);
+				$through_table = $relation->get_table();
+			}
 			$options['joins'] = $this->construct_inner_join_sql($through_table, true);
 
 			$query_key = $this->primary_key[0];

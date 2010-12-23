@@ -6,6 +6,7 @@ use foo\bar\biz\User;
 use foo\bar\biz\Newsletter;
 
 class HasManyThroughTest extends DatabaseTest {
+
 	public function test_gh101_has_many_through() {
 		$user = User::find(1);
 		$newsletter = Newsletter::find(1);
