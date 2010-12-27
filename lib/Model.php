@@ -1290,6 +1290,7 @@ class Model
 		$table = static::table();
 		$sql = $table->options_to_sql($options);
 		$values = $sql->get_where_values();
+		$table->last_sql = $sql->to_s();
 		return $table->conn->query_and_fetch_one($sql->to_s(),$values);
 	}
 
