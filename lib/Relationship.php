@@ -333,7 +333,7 @@ abstract class AbstractRelationship implements InterfaceRelationship
 			$join_table = $from_table;
 			$join_table_name = $from_table->get_fully_qualified_table_name();
 			$from_table_name = Table::load($this->class_name)->get_fully_qualified_table_name();
- 		}
+		}
 		else
 		{
 			$join_table = Table::load($this->class_name);
@@ -734,68 +734,69 @@ class BelongsTo extends AbstractRelationship
 }
 
 class RelatedObjects implements \ArrayAccess, \Countable, \IteratorAggregate {
-    protected $_class_name;
-    protected $_options;
-    protected $_data;
-    protected $_count;
+	protected $_class_name;
+	protected $_options;
+	protected $_data;
+	protected $_count;
 
 
-    public function __construct($options=array()) {
-        $this->_class_name = $options['class_name'];
-        $this->_options = $options['options'];
-    }
+	public function __construct($options=array()) {
+		$this->_class_name = $options['class_name'];
+		$this->_options = $options['options'];
+	}
 
-    public function count() {
-        if (!isset($this->_count)) {
-            if (!isset($this->_data)) {
-                $class_name = $this->_class_name;
-                $this->_count = $class_name::count($this->_options);
-            } else {
-                $this->_count = count($this->_data);
-            }
-        }
-        return $this->_count;
-    }
+	public function count() {
+		if (!isset($this->_count)) {
+			if (!isset($this->_data)) {
+				$class_name = $this->_class_name;
+				$this->_count = $class_name::count($this->_options);
+			} else {
+				$this->_count = count($this->_data);
+			}
+		}
+		return $this->_count;
+	}
 
-    protected function &fetch() {
-        if (!isset($this->_data)) {
-            $class_name = $this->_class_name;
-            $this->_data = $class_name::find('all', $this->_options);
-            $this->_count = count($this->_data);
-        }
-        return $this->_data;
-    }
+	protected function &fetch() {
+		if (!isset($this->_data)) {
+			$class_name = $this->_class_name;
+			$this->_data = $class_name::find('all', $this->_options);
+			$this->_count = count($this->_data);
+		}
+		return $this->_data;
+	}
 
-    public function getIterator() {
-        return new \ArrayIterator($this->fetch());
-    }
+	public function getIterator() {
+		$this->fetch();
+		return new \ArrayIterator($this->_data);
+	}
 
-    public function offsetExists($offset) {
-        $this->fetch();
+	public function offsetExists($offset) {
+		$this->fetch();
 		return isset($this->_data[$offset]);
-    }
+	}
 
-    // Shouldn't it be read-only?
-    public function offsetSet($offset, $value) {
-        $this->fetch();
-        if (is_null($offset)) {
-            $this->_data[] = $value;
-        } else {
-            $this->_data[$offset] = $value;
-        }
-    }
+	// Shouldn't it be read-only?
+	public function offsetSet($offset, $value) {
+		$this->fetch();
+		if (is_null($offset)) {
+			$this->_data[] = $value;
+		} else {
+			$this->_data[$offset] = $value;
+		}
+	}
 
-    public function offsetGet($offset) {
-        $this->fetch();
-        return isset($this->_data[$offset]) ?
-            $this->_data[$offset] :
-            null;
-    }
-    
-    // Shouldn't it be read-only?
-    public function offsetUnset($offset) {
-        $this->fetch();
-        unset($this->_data[$offset]);
-    }
+	public function offsetGet($offset) {
+		$this->fetch();
+		return isset($this->_data[$offset]) ?
+			$this->_data[$offset] :
+			null;
+	}
+	
+	// Shouldn't it be read-only?
+	public function offsetUnset($offset) {
+		$this->fetch();
+		unset($this->_data[$offset]);
+	}
 }
 
