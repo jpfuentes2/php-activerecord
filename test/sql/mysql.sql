@@ -86,8 +86,6 @@ CREATE TABLE property_amenities(
   `property_id` int(11) NOT NULL DEFAULT '0'
 );
 
--- 
-
 CREATE TABLE users (
     id INT NOT NULL AUTO_INCREMENT PRIMARY KEY
 ) ENGINE=InnoDB;
