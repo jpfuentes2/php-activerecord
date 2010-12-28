@@ -771,31 +771,31 @@ class RelatedObjects implements \ArrayAccess, \Countable, \IteratorAggregate {
     }
 
     public function offsetExists($offset) {
-        $data = $this->fetch();
-        return isset($data[$offset]);
+        $this->fetch();
+		return isset($this->_data[$offset]);
     }
 
     // Shouldn't it be read-only?
     public function offsetSet($offset, $value) {
-        $data = $this->fetch();
+        $this->fetch();
         if (is_null($offset)) {
-            $data[] = $value;
+            $this->_data[] = $value;
         } else {
-            $data[$offset] = $value;
+            $this->_data[$offset] = $value;
         }
     }
 
     public function offsetGet($offset) {
-        $data = $this->fetch();
-        return isset($data[$offset]) ?
-            $data[$offset] :
+        $this->fetch();
+        return isset($this->_data[$offset]) ?
+            $this->_data[$offset] :
             null;
     }
     
     // Shouldn't it be read-only?
     public function offsetUnset($offset) {
-        $data = $this->fetch();
-        unset($data[$offset]);
+        $this->fetch();
+        unset($this->_data[$offset]);
     }
 }
 
