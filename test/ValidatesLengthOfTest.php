@@ -266,6 +266,14 @@ class ValidatesLengthOfTest extends DatabaseTest
 		$book->is_valid();
 		$this->assert_equals(array("Name is too short (minimum is 2 characters)"),$book->errors->full_messages());
 	}
+	
+	public function test_validates_length_of_maximum_custom_message()
+	{
+		BookLength::$validates_length_of[0] = array('name', 'maximum' => 10, 'message' => 'is far too long');
+		$book = new BookLength(array('name' => '12345678901'));
+		$book->is_valid();
+		$this->assert_equals(array("Name is far too long"),$book->errors->full_messages());
+	}
 
 	public function test_validates_length_of_is()
 	{
