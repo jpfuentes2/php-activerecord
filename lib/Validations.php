@@ -531,10 +531,13 @@ class Validations
 				{
 					$messageOptions = array('is' => 'wrong_length', 'minimum' => 'too_short', 'maximum' => 'too_long');
 
-					if (isset($options[$messageOptions[$range_option]]))
-						$message = $options[$messageOptions[$range_option]];
-					else
+					if (isset($attr[$messageOptions[$range_option]]))
+						$message = $attr[$messageOptions[$range_option]];
+					elseif (isset($options['message']))
 						$message = $options['message'];
+					else
+						$message = $options[$messageOptions[$range_option]];
+					
 
 					$message = str_replace('%d', $option, $message);
 					$attribute_value = $this->model->$attribute;
