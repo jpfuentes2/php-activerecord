@@ -531,10 +531,13 @@ class Validations
 				{
 					$messageOptions = array('is' => 'wrong_length', 'minimum' => 'too_short', 'maximum' => 'too_long');
 
-					if (isset($options[$messageOptions[$range_option]]))
-						$message = $options[$messageOptions[$range_option]];
-					else
+					if (isset($attr[$messageOptions[$range_option]]))
+						$message = $attr[$messageOptions[$range_option]];
+					elseif (isset($options['message']))
 						$message = $options['message'];
+					else
+						$message = $options[$messageOptions[$range_option]];
+					
 
 					$message = str_replace('%d', $option, $message);
 					$attribute_value = $this->model->$attribute;
@@ -722,10 +725,10 @@ class Errors implements IteratorAggregate
 	}
 
 	/**
-	 * Retrieve error message for an attribute.
+	 * Retrieve error messages for an attribute.
 	 *
 	 * @param string $attribute Name of an attribute on the model
-	 * @return string
+	 * @return array or null if there is no error.
 	 */
 	public function __get($attribute)
 	{
@@ -762,22 +765,33 @@ class Errors implements IteratorAggregate
 	}
 
 	/**
-	 * Returns the error message for the specified attribute or null if none.
+	 * Returns the error message(s) for the specified attribute or null if none.
 	 *
 	 * @param string $attribute Name of an attribute on the model
-	 * @return string
+	 * @return string/array	Array of strings if several error occured on this attribute.
 	 */
 	public function on($attribute)
 	{
-		if (!isset($this->errors[$attribute]))
-			return null;
+		$errors = $this->$attribute;
 
-		$errors = $this->errors[$attribute];
+		return $errors && count($errors) == 1 ? $errors[0] : $errors;
+	}
 
-		if (null === $errors)
-			return null;
-		else
-			return count($errors) == 1 ? $errors[0] : $errors;
+	/**
+	 * Returns the internal errors object.
+	 *
+	 * <code>
+	 * $model->errors->get_raw_errors();
+	 *
+	 * # array(
+	 * #  "name" => array("can't be blank"),
+	 * #  "state" => array("is the wrong length (should be 2 chars)",
+	 * # )
+	 * </code>
+	 */
+	public function get_raw_errors()
+	{
+		return $this->errors;
 	}
 
 	/**
@@ -792,7 +806,6 @@ class Errors implements IteratorAggregate
 	 * # )
 	 * </code>
 	 *
-	 * @param array $options Options for messages
 	 * @return array
 	 */
 	public function full_messages()
@@ -813,12 +826,14 @@ class Errors implements IteratorAggregate
 	 * $model->errors->errors();
 	 *
 	 * # array(
-	 * #  "name" => "Name can't be blank",
-	 * #  "state" => "State is the wrong length (should be 2 chars)"
+	 * #  "name" => array("Name can't be blank"),
+	 * #  "state" => array("State is the wrong length (should be 2 chars)")
 	 * # )
 	 * </code>
 	 *
-	 * @param array $options Options for messages
+	 * @param array $closure Closure to fetch the errors in some other format (optional)
+	 *                       This closure has the signature function($attribute, $message)
+	 *                       and is called for each available error message.
 	 * @return array
 	 */
 	public function to_array($closure=null)
