@@ -454,7 +454,7 @@ class Validations
 	 * <li><b>maximum/minimum:</b> attribute should not be above/below respectively</li>
 	 * <li><b>message:</b> custome error message</li>
 	 * <li><b>allow_blank:</b> allow blank strings</li>
-	 * <li><b>allow_null:</b> allow null strings</li>
+	 * <li><b>allow_null:</b> allow null strings. (Even if this is set to false, a null string is always shorter than a maximum value.)</li>
 	 * </ul>
 	 *
 	 * @param array $attrs Validation definition
