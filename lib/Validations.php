@@ -531,9 +531,7 @@ class Validations
 				{
 					$messageOptions = array('is' => 'wrong_length', 'minimum' => 'too_short', 'maximum' => 'too_long');
 
-					if (isset($attr[$messageOptions[$range_option]]))
-						$message = $attr[$messageOptions[$range_option]];
-					elseif (isset($options['message']))
+					if (isset($options['message']))
 						$message = $options['message'];
 					else
 						$message = $options[$messageOptions[$range_option]];
@@ -862,10 +860,10 @@ class Errors implements IteratorAggregate
 	/**
 	 * Convert all error messages to a String.
 	 * This function is called implicitely if the object is casted to a string:
-	 * 
+	 *
 	 * <code>
 	 * echo $error;
-	 * 
+	 *
 	 * # "Name can't be blank\nState is the wrong length (should be 2 chars)"
 	 * </code>
 	 * @return string
