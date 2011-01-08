@@ -199,7 +199,7 @@ class Model
 	 *
 	 * This is the opposite of {@link attr_accessible $attr_accessible} and the format
 	 * for defining these are exactly the same.
-	 * 
+	 *
 	 * If the attribute is both accessible and protected, it is treated as protected.
 	 *
 	 * @var array
@@ -503,7 +503,7 @@ class Model
 				$to = $item['to'];
 				if ($this->$to)
 				{
-					$val =& $this->$to->$delegated_name;
+					$val =& $this->$to->__get($delegated_name);
 					return $val;
 				}
 				else
