@@ -153,8 +153,9 @@ abstract class Connection
 	public static function parse_connection_url($connection_url)
 	{
 		$url = @parse_url($connection_url);
-		if (!$url['host'])
-			throw new DatabaseException('Database host must be specified in the connection string. If you want to specify absolute filenames, use e.g. sqlite://unix(/path/to/file)');
+		
+		if (!isset($url['host']))
+			throw new DatabaseException('Database host must be specified in the connection string. If you want to specify an absolute filename, use e.g. sqlite://unix(/path/to/file)');
 		
 		$info = new \stdClass();
 		$info->protocol = $url['scheme'];
