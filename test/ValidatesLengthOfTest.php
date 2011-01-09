@@ -46,6 +46,7 @@ class ValidatesLengthOfTest extends DatabaseTest
 	public function test_within_custom_error_message()
 	{
 		BookLength::$validates_length_of[0]['within'] = array(2,5);
+		BookLength::$validates_length_of[0]['too_short'] = 'is too short';
 		BookLength::$validates_length_of[0]['message'] = 'is not between 2 and 5 characters';
 		$book = new BookLength();
 		$book->name = '1';
@@ -125,7 +126,7 @@ class ValidatesLengthOfTest extends DatabaseTest
 		$this->assert_equals('is too short (minimum is 1 characters)', $book->errors->on('name'));
 	}
 
-	public function test_invalid_null()
+	public function test_invalid_null_within()
 	{
 		BookLength::$validates_length_of[0]['within'] = array(1, 3);
 
@@ -134,6 +135,28 @@ class ValidatesLengthOfTest extends DatabaseTest
 		$book->save();
 		$this->assert_true($book->errors->is_invalid('name'));
 		$this->assert_equals('is too short (minimum is 1 characters)', $book->errors->on('name'));
+	}
+	
+	public function test_invalid_null_minimum()
+	{
+		BookLength::$validates_length_of[0]['minimum'] = 1;
+
+		$book = new BookLength;
+		$book->name = null;
+		$book->save();
+		$this->assert_true($book->errors->is_invalid('name'));
+		$this->assert_equals('is too short (minimum is 1 characters)', $book->errors->on('name'));
+		
+	}
+	
+	public function test_valid_null_maximum()
+	{
+		BookLength::$validates_length_of[0]['maximum'] = 1;
+
+		$book = new BookLength;
+		$book->name = null;
+		$book->save();
+		$this->assert_false($book->errors->is_invalid('name'));
 	}
 
 	public function test_float_as_impossible_range_option()
@@ -144,7 +167,7 @@ class ValidatesLengthOfTest extends DatabaseTest
 		try {
 			$book->save();
 		} catch (ActiveRecord\ValidationsArgumentError $e) {
-			$this->assert_equals('Range values cannot use floats for length.', $e->getMessage());
+			$this->assert_equals('maximum value cannot use a float for length.', $e->getMessage());
 		}
 
 		$this->set_up();
@@ -170,7 +193,7 @@ class ValidatesLengthOfTest extends DatabaseTest
 		try {
 			$book->save();
 		} catch (ActiveRecord\ValidationsArgumentError $e) {
-			$this->assert_equals('Range values cannot use signed integers.', $e->getMessage());
+			$this->assert_equals('minimum value cannot use a signed integer.', $e->getMessage());
 			return;
 		}
 
@@ -299,7 +322,7 @@ class ValidatesLengthOfTest extends DatabaseTest
 		BookLength::$validates_length_of[0] = array('name', 'minimum' => 10, 'too_short' => 'is too short', 'message' => 'is custom message');
 		$book = new BookLength(array('name' => '123456789'));
 		$book->is_valid();
-		$this->assert_equals(array("Name is too short"),$book->errors->full_messages());
+		$this->assert_equals(array("Name is custom message"),$book->errors->full_messages());
 	}
 
 	public function test_validates_length_of_is()
