@@ -52,7 +52,7 @@ class ConnectionTest extends SnakeCase_PHPUnit_Framework_TestCase
     	$this->assert_equals('/some/path/to/file.db', $info->host);
 
     	$info = ActiveRecord\Connection::parse_connection_url('sqlite://windows(c:/some/path/to/file.db)');
-    	$this->assert_equals('c:/some/path/to/file.db', $info->host);
+    	$this->assert_equals('c:/some/path/to/file.db', $info->host); # TODO: currently not implemented
     }
 	
 
