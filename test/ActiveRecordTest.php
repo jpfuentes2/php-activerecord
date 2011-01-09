@@ -365,11 +365,33 @@ class ActiveRecordTest extends DatabaseTest
 		$this->assert_null($event->state);
 	}
 
-	public function test_delegate_setter()
+	public function test_delegate_set_attribute()
 	{
 		$event = Event::first();
 		$event->state = 'MEXICO';
 		$this->assert_equals('MEXICO',$event->venue->state);
+	}
+
+	public function test_delegate_getter_gh_98()
+	{
+		Venue::$use_custom_get_state_getter = true;
+
+		$event = Event::first();
+		$this->assert_equals('ny', $event->venue->state);
+		$this->assert_equals('ny', $event->state);
+
+		Venue::$use_custom_get_state_getter = false;
+	}
+
+	public function test_delegate_setter_gh_98()
+	{
+		Venue::$use_custom_set_state_setter = true;
+
+		$event = Event::first();
+		$event->state = 'MEXICO';
+		$this->assert_equals('MEXICO#',$event->venue->state);
+
+		Venue::$use_custom_set_state_setter = false;
 	}
 
 	public function test_table_name_with_underscores()
