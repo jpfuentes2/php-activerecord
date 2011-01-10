@@ -207,11 +207,19 @@ class CallBack
 		if (!in_array($name,self::$VALID_CALLBACKS))
 			throw new ActiveRecordException("Invalid callback: $name");
 
-		if (!($closure_or_method_name instanceof Closure) && !$this->klass->hasMethod($closure_or_method_name))
+		if (!($closure_or_method_name instanceof Closure)
 		{
-			// i'm a dirty ruby programmer
-			throw new ActiveRecordException("Unknown method for callback: $name" .
-				(is_string($closure_or_method_name) ? ": #$closure_or_method_name" : ""));
+			if (!$this->klass->hasMethod($closure_or_method_name))
+			{
+				// i'm a dirty ruby programmer
+				throw new ActiveRecordException("Unknown method for callback: $name" .
+					(is_string($closure_or_method_name) ? ": #$closure_or_method_name" : ""));
+			}
+			else
+			{
+				if (!in_array($closure_or_method_name, get_class_methods($this->klass->getName())))
+					throw new ActiveRecordException("Callback methods need to be public (or anonymous closures). Please change the visibility of " . $this->klass->getName() . "->" . $closure_or_method_name . "()");
+			}
 		}
 
 		if (!isset($this->registry[$name]))
