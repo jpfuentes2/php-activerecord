@@ -542,6 +542,16 @@ class Model
 	}
 
 	/**
+	 * Check if a particular attribute has been modified since loading the model.
+	 * @param string $attribute	Name of the attribute
+	 * @return boolean TRUE if it has been modified.
+	 */
+	public function attribute_is_dirty($attribute)
+	{
+		return $this->__dirty && isset($this->__dirty[$attribute]);
+	}
+
+	/**
 	 * Returns a copy of the model's attributes hash.
 	 *
 	 * @return array A copy of the model's attribute data
