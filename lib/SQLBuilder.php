@@ -331,6 +331,15 @@ class SQLBuilder
 		if ($this->where)
 			$sql .= " WHERE $this->where";
 
+		if ($this->connection->accepts_limit_and_order_for_update_and_delete())
+		{
+			if ($this->order)
+				$sql .= " ORDER BY $this->order";
+
+			if ($this->limit)
+				$sql = $this->connection->limit($sql,null,$this->limit);
+		}
+
 		return $sql;
 	}
 
@@ -388,6 +397,15 @@ class SQLBuilder
 
 		if ($this->where)
 			$sql .= " WHERE $this->where";
+
+		if ($this->connection->accepts_limit_and_order_for_update_and_delete())
+		{
+			if ($this->order)
+				$sql .= " ORDER BY $this->order";
+
+			if ($this->limit)
+				$sql = $this->connection->limit($sql,null,$this->limit);
+		}
 
 		return $sql;
 	}

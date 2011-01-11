@@ -75,5 +75,7 @@ class MysqlAdapter extends Connection
 		$params = array($charset);
 		$this->query('SET NAMES ?',$params);
 	}
+
+	public function accepts_limit_and_order_for_update_and_delete() { return true; }
 }
 ?>

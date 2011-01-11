@@ -346,7 +346,7 @@ class ActiveRecordFindTest extends DatabaseTest
 	{
 		$venues = Venue::all(array('select' => 'state', 'group' => 'state', 'having' => 'length(state) = 2', 'order' => 'state', 'limit' => 2));
 		$this->assert_true(count($venues) > 0);
-		$this->assert_sql_has($this->conn->limit('SELECT state FROM venues GROUP BY state HAVING length(state) = 2 ORDER BY state',0,2),Venue::table()->last_sql);
+		$this->assert_sql_has($this->conn->limit('SELECT state FROM venues GROUP BY state HAVING length(state) = 2 ORDER BY state',null,2),Venue::table()->last_sql);
 	}
 
 	public function test_escape_quotes()
