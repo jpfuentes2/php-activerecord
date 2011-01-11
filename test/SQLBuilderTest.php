@@ -134,14 +134,6 @@ class SQLBuilderTest extends DatabaseTest
 		$this->sql->insert(array(1));
 	}
 
-	/**
-	 * @expectedException ActiveRecord\ActiveRecordException
-	 */
-	public function test_update_requires_hash()
-	{
-		$this->sql->update(array(1));
-	}
-
 	public function test_insert()
 	{
 		$this->sql->insert(array('id' => 1, 'name' => 'Tito'));
@@ -154,11 +146,17 @@ class SQLBuilderTest extends DatabaseTest
 		$this->assert_sql_has("INSERT INTO authors(id,name) VALUES(?,?)",$this->sql->to_s());
 	}
 
-	public function test_update()
+	public function test_update_with_hash()
 	{
 		$this->sql->update(array('id' => 1, 'name' => 'Tito'))->where('id=1 AND name IN(?)',array('Tito','Mexican'));
  		$this->assert_sql_has("UPDATE authors SET id=?, name=? WHERE id=1 AND name IN(?,?)",(string)$this->sql);
  		$this->assert_equals(array(1,'Tito','Tito','Mexican'),$this->sql->bind_values());
+	}
+
+	public function test_update_with_string()
+	{
+		$this->sql->update("name='Bob'");
+		$this->assert_sql_has("UPDATE authors SET name='Bob'", $this->sql->to_s());
 	}
 
 	public function test_update_with_null()
