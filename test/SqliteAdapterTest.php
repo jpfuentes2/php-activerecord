@@ -30,6 +30,15 @@ class SqliteAdapterTest extends AdapterTest
 		}
 	}
 
+	public function test_limit_with_null_offset_does_not_contain_offset()
+	{
+		$ret = array();
+		$sql = 'SELECT * FROM authors ORDER BY name ASC';
+		$this->conn->query_and_fetch($this->conn->limit($sql,null,1),function($row) use (&$ret) { $ret[] = $row; });
+
+		$this->assert_true(strpos($this->conn->last_query, 'LIMIT 1') !== false);
+	}
+
 	// not supported
 	public function testCompositeKey() {}
 	public function testConnectWithPort() {}
