@@ -454,7 +454,7 @@ class Validations
 	 * <li><b>maximum/minimum:</b> attribute should not be above/below respectively</li>
 	 * <li><b>message:</b> custome error message</li>
 	 * <li><b>allow_blank:</b> allow blank strings</li>
-	 * <li><b>allow_null:</b> allow null strings</li>
+	 * <li><b>allow_null:</b> allow null strings. (Even if this is set to false, a null string is always shorter than a maximum value.)</li>
 	 * </ul>
 	 *
 	 * @param array $attrs Validation definition
@@ -487,39 +487,21 @@ class Validations
 
 			$attribute = $options[0];
 			$var = $this->model->$attribute;
-			$range_option = $range_options[0];
-
 			if ($this->is_null_with_option($var, $options) || $this->is_blank_with_option($var, $options))
 				continue;
-
-			if ('within' == $range_option || 'in' == $range_option)
+			if ($range_options[0] == 'within' || $range_options[0] == 'in')
 			{
 				$range = $options[$range_options[0]];
 
 				if (!(Utils::is_a('range', $range)))
 					throw new  ValidationsArgumentError("$range_option must be an array composing a range of numbers with key [0] being less than key [1]");
-
-				if (is_float($range[0]) || is_float($range[1]))
-					throw new  ValidationsArgumentError("Range values cannot use floats for length.");
-
-				if ((int)$range[0] <= 0 || (int)$range[1] <= 0)
-					throw new  ValidationsArgumentError("Range values cannot use signed integers.");
-
-				$too_short = isset($options['message']) ? $options['message'] : $options['too_short'];
-				$too_long =  isset($options['message']) ? $options['message'] : $options['too_long'];
-
-				$too_short = str_replace('%d', $range[0], $too_short);
-				$too_long = str_replace('%d', $range[1], $too_long);
-
-				if (strlen($this->model->$attribute) < (int)$range[0])
-					$this->record->add($attribute, $too_short);
-				elseif (strlen($this->model->$attribute) > (int)$range[1])
-					$this->record->add($attribute, $too_long);
+				$range_options = array('minimum', 'maximum');
+				$attr['minimum'] = $range[0];
+				$attr['maximum'] = $range[1];
 			}
-
-			elseif ('is' == $range_option || 'minimum' == $range_option || 'maximum' == $range_option)
+			foreach ($range_options as $range_option)
 			{
-				$option = $options[$range_option];
+				$option = $attr[$range_option];
 
 				if ((int)$option <= 0)
 					throw new  ValidationsArgumentError("$range_option value cannot use a signed integer.");
@@ -527,14 +509,15 @@ class Validations
 				if (is_float($option))
 					throw new  ValidationsArgumentError("$range_option value cannot use a float for length.");
 
-				if (!is_null($this->model->$attribute))
+				if (!($range_option == 'maximum' && is_null($this->model->$attribute)))
 				{
 					$messageOptions = array('is' => 'wrong_length', 'minimum' => 'too_short', 'maximum' => 'too_long');
 
-					if (isset($options[$messageOptions[$range_option]]))
-						$message = $options[$messageOptions[$range_option]];
-					else
+					if (isset($options['message']))
 						$message = $options['message'];
+					else
+						$message = $options[$messageOptions[$range_option]];
+					
 
 					$message = str_replace('%d', $option, $message);
 					$attribute_value = $this->model->$attribute;
@@ -722,10 +705,10 @@ class Errors implements IteratorAggregate
 	}
 
 	/**
-	 * Retrieve error message for an attribute.
+	 * Retrieve error messages for an attribute.
 	 *
 	 * @param string $attribute Name of an attribute on the model
-	 * @return string
+	 * @return array or null if there is no error.
 	 */
 	public function __get($attribute)
 	{
@@ -762,22 +745,33 @@ class Errors implements IteratorAggregate
 	}
 
 	/**
-	 * Returns the error message for the specified attribute or null if none.
+	 * Returns the error message(s) for the specified attribute or null if none.
 	 *
 	 * @param string $attribute Name of an attribute on the model
-	 * @return string
+	 * @return string/array	Array of strings if several error occured on this attribute.
 	 */
 	public function on($attribute)
 	{
-		if (!isset($this->errors[$attribute]))
-			return null;
+		$errors = $this->$attribute;
 
-		$errors = $this->errors[$attribute];
+		return $errors && count($errors) == 1 ? $errors[0] : $errors;
+	}
 
-		if (null === $errors)
-			return null;
-		else
-			return count($errors) == 1 ? $errors[0] : $errors;
+	/**
+	 * Returns the internal errors object.
+	 *
+	 * <code>
+	 * $model->errors->get_raw_errors();
+	 *
+	 * # array(
+	 * #  "name" => array("can't be blank"),
+	 * #  "state" => array("is the wrong length (should be 2 chars)",
+	 * # )
+	 * </code>
+	 */
+	public function get_raw_errors()
+	{
+		return $this->errors;
 	}
 
 	/**
@@ -792,7 +786,6 @@ class Errors implements IteratorAggregate
 	 * # )
 	 * </code>
 	 *
-	 * @param array $options Options for messages
 	 * @return array
 	 */
 	public function full_messages()
@@ -813,12 +806,14 @@ class Errors implements IteratorAggregate
 	 * $model->errors->errors();
 	 *
 	 * # array(
-	 * #  "name" => "Name can't be blank",
-	 * #  "state" => "State is the wrong length (should be 2 chars)"
+	 * #  "name" => array("Name can't be blank"),
+	 * #  "state" => array("State is the wrong length (should be 2 chars)")
 	 * # )
 	 * </code>
 	 *
-	 * @param array $options Options for messages
+	 * @param array $closure Closure to fetch the errors in some other format (optional)
+	 *                       This closure has the signature function($attribute, $message)
+	 *                       and is called for each available error message.
 	 * @return array
 	 */
 	public function to_array($closure=null)
@@ -847,10 +842,10 @@ class Errors implements IteratorAggregate
 	/**
 	 * Convert all error messages to a String.
 	 * This function is called implicitely if the object is casted to a string:
-	 * 
+	 *
 	 * <code>
 	 * echo $error;
-	 * 
+	 *
 	 * # "Name can't be blank\nState is the wrong length (should be 2 chars)"
 	 * </code>
 	 * @return string

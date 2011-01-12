@@ -347,4 +347,82 @@ class ActiveRecordWriteTest extends DatabaseTest
 		$author->some_date->setDate(2010,1,1);
 		$this->assert_has_keys('some_date', $author->dirty_attributes());
 	}
+
+	public function test_delete_all_with_conditions_as_string()
+	{
+		$num_affected = Author::delete_all(array('conditions' => 'parent_author_id = 2'));
+		$this->assert_equals(2, $num_affected);
+	}
+
+	public function test_delete_all_with_conditions_as_hash()
+	{
+		$num_affected = Author::delete_all(array('conditions' => array('parent_author_id' => 2)));
+		$this->assert_equals(2, $num_affected);
+	}
+
+	public function test_delete_all_with_conditions_as_array()
+	{
+		$num_affected = Author::delete_all(array('conditions' => array('parent_author_id = ?', 2)));
+		$this->assert_equals(2, $num_affected);
+	}
+
+	public function test_delete_all_with_limit_and_order()
+	{
+		if (!$this->conn->accepts_limit_and_order_for_update_and_delete())
+			$this->mark_test_skipped('Only MySQL & Sqlite accept limit/order with UPDATE clause');
+
+		$num_affected = Author::delete_all(array('conditions' => array('parent_author_id = ?', 2), 'limit' => 1, 'order' => 'name asc'));
+		$this->assert_equals(1, $num_affected);
+		$this->assert_true(strpos(Author::table()->last_sql, 'ORDER BY name asc LIMIT 1') !== false);
+	}
+
+	public function test_update_all_with_set_as_string()
+	{
+		$num_affected = Author::update_all(array('set' => 'parent_author_id = 2'));
+		$this->assert_equals(2, $num_affected);
+		$this->assert_equals(4, Author::count_by_parent_author_id(2));
+	}
+
+	public function test_update_all_with_set_as_hash()
+	{
+		$num_affected = Author::update_all(array('set' => array('parent_author_id' => 2)));
+		$this->assert_equals(2, $num_affected);
+	}
+
+	/**
+	 * TODO: not implemented
+	public function test_update_all_with_set_as_array()
+	{
+		$num_affected = Author::update_all(array('set' => array('parent_author_id = ?', 2)));
+		$this->assert_equals(2, $num_affected);
+	}
+	 */
+
+	public function test_update_all_with_conditions_as_string()
+	{
+		$num_affected = Author::update_all(array('set' => 'parent_author_id = 2', 'conditions' => 'name = "Tito"'));
+		$this->assert_equals(1, $num_affected);
+	}
+
+	public function test_update_all_with_conditions_as_hash()
+	{
+		$num_affected = Author::update_all(array('set' => 'parent_author_id = 2', 'conditions' => array('name' => "Tito")));
+		$this->assert_equals(1, $num_affected);
+	}
+
+	public function test_update_all_with_conditions_as_array()
+	{
+		$num_affected = Author::update_all(array('set' => 'parent_author_id = 2', 'conditions' => array('name = ?', "Tito")));
+		$this->assert_equals(1, $num_affected);
+	}
+
+	public function test_update_all_with_limit_and_order()
+	{
+		if (!$this->conn->accepts_limit_and_order_for_update_and_delete())
+			$this->mark_test_skipped('Only MySQL & Sqlite accept limit/order with UPDATE clause');
+
+		$num_affected = Author::update_all(array('set' => 'parent_author_id = 2', 'limit' => 1, 'order' => 'name asc'));
+		$this->assert_equals(1, $num_affected);
+		$this->assert_true(strpos(Author::table()->last_sql, 'ORDER BY name asc LIMIT 1') !== false);
+	}
 };

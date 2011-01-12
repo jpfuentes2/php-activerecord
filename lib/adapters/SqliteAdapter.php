@@ -23,9 +23,9 @@ class SqliteAdapter extends Connection
 
 	public function limit($sql, $offset, $limit)
 	{
-		$offset = intval($offset);
+		$offset = is_null($offset) ? '' : intval($offset) . ',';
 		$limit = intval($limit);
-		return "$sql LIMIT $offset,$limit";
+		return "$sql LIMIT {$offset}$limit";
 	}
 
 	public function query_column_info($table)
@@ -82,5 +82,7 @@ class SqliteAdapter extends Connection
 	{
 		throw new ActiveRecordException("SqliteAdapter::set_charset not supported.");
 	}
+
+	public function accepts_limit_and_order_for_update_and_delete() { return true; }
 };
 ?>

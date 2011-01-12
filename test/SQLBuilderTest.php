@@ -134,14 +134,6 @@ class SQLBuilderTest extends DatabaseTest
 		$this->sql->insert(array(1));
 	}
 
-	/**
-	 * @expectedException ActiveRecord\ActiveRecordException
-	 */
-	public function test_update_requires_hash()
-	{
-		$this->sql->update(array(1));
-	}
-
 	public function test_insert()
 	{
 		$this->sql->insert(array('id' => 1, 'name' => 'Tito'));
@@ -154,11 +146,26 @@ class SQLBuilderTest extends DatabaseTest
 		$this->assert_sql_has("INSERT INTO authors(id,name) VALUES(?,?)",$this->sql->to_s());
 	}
 
-	public function test_update()
+	public function test_update_with_hash()
 	{
 		$this->sql->update(array('id' => 1, 'name' => 'Tito'))->where('id=1 AND name IN(?)',array('Tito','Mexican'));
  		$this->assert_sql_has("UPDATE authors SET id=?, name=? WHERE id=1 AND name IN(?,?)",(string)$this->sql);
- 		$this->assert_equals(array(1,'Tito','Tito','Mexican'),$this->sql->bind_values());
+		$this->assert_equals(array(1,'Tito','Tito','Mexican'),$this->sql->bind_values());
+	}
+
+	public function test_update_with_limit_and_order()
+	{
+		if (!$this->conn->accepts_limit_and_order_for_update_and_delete())
+			$this->mark_test_skipped('Only MySQL & Sqlite accept limit/order with UPDATE operation');
+
+		$this->sql->update(array('id' => 1))->order('name asc')->limit(1);
+		$this->assert_sql_has("UPDATE authors SET id=? ORDER BY name asc LIMIT 1", $this->sql->to_s());
+	}
+
+	public function test_update_with_string()
+	{
+		$this->sql->update("name='Bob'");
+		$this->assert_sql_has("UPDATE authors SET name='Bob'", $this->sql->to_s());
 	}
 
 	public function test_update_with_null()
@@ -185,6 +192,15 @@ class SQLBuilderTest extends DatabaseTest
 		$this->sql->delete(array('id' => 1, 'name' => array('Tito','Mexican')));
 		$this->assert_sql_has("DELETE FROM authors WHERE id=? AND name IN(?,?)",$this->sql->to_s());
 		$this->assert_equals(array(1,'Tito','Mexican'),$this->sql->get_where_values());
+	}
+
+	public function test_delete_with_limit_and_order()
+	{
+		if (!$this->conn->accepts_limit_and_order_for_update_and_delete())
+			$this->mark_test_skipped('Only MySQL & Sqlite accept limit/order with DELETE operation');
+
+		$this->sql->delete(array('id' => 1))->order('name asc')->limit(1);
+		$this->assert_sql_has("DELETE FROM authors WHERE id=? ORDER BY name asc LIMIT 1",$this->sql->to_s());
 	}
 
 	public function test_reverse_order()
