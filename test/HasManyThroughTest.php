@@ -34,18 +34,6 @@ class HasManyThroughTest extends DatabaseTest {
 		$this->assert_equals(1, $user->user_newsletters[0]->id);
 	}
 
-	public function test_gh101_has_many_through_sub_include() {
-		$user = User::find(1, array(
-			'include' => array(
-				'user_newsletters' => array('newsletter')
-			)
-		));
-
-		$this->assert_equals(1, $user->id);
-		$this->assert_equals(1, $user->user_newsletters[0]->id);
-		$this->assert_equals(1, $user->user_newsletters[0]->newsletter->id);
-	}
-
 	public function test_gh107_has_many_through_include_eager() {
 		$venue = Venue::find(1, array('include' => array('events')));
 		$this->assert_equals(1, $venue->events[0]->id);
