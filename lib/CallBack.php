@@ -7,10 +7,10 @@ use Closure;
 
 /**
  * Callbacks allow the programmer to hook into the life cycle of a {@link Model}.
- * 
+ *
  * You can control the state of your object by declaring certain methods to be
  * called before or after methods are invoked on your object inside of ActiveRecord.
- * 
+ *
  * Valid callbacks are:
  * <ul>
  * <li><b>after_construct:</b> called after a model has been constructed</li>
@@ -29,18 +29,18 @@ use Closure;
  * <li><b>before_destroy:</b> called after a model has been deleted</li>
  * <li><b>after_destroy:</b> called after a model has been deleted</li>
  * </ul>
- * 
+ *
  * This class isn't meant to be used directly. Callbacks are defined on your model like the example below:
- * 
+ *
  * <code>
  * class Person extends ActiveRecord\Model {
  *   static $before_save = array('make_name_uppercase');
  *   static $after_save = array('do_happy_dance');
- *   
+ *
  *   public function make_name_uppercase() {
  *     $this->name = strtoupper($this->name);
  *   }
- * 
+ *
  *   public function do_happy_dance() {
  *     happy_dance();
  *   }
@@ -83,10 +83,16 @@ class CallBack
 
 	/**
 	 * Container for reflection class of given model
-	 * 
+	 *
 	 * @var object
 	 */
 	private $klass;
+
+	/**
+	 * List of public methods of the given model
+	 * @var array
+	 */
+	private $publicMethods;
 
 	/**
 	 * Holds data for registered callbacks.
@@ -191,6 +197,11 @@ class CallBack
 	/**
 	 * Register a new callback.
 	 *
+	 * The option array can contain the following parameters:
+	 * <ul>
+	 * <li><b>prepend:</b> Add this callback at the beginning of the existing callbacks (true) or at the end (false, default)</li>
+	 * </ul>
+	 *
 	 * @param string $name Name of callback type (see {@link VALID_CALLBACKS $VALID_CALLBACKS})
 	 * @param mixed $closure_or_method_name Either a closure or the name of a method on the {@link Model}
 	 * @param array $options Options array
@@ -207,11 +218,26 @@ class CallBack
 		if (!in_array($name,self::$VALID_CALLBACKS))
 			throw new ActiveRecordException("Invalid callback: $name");
 
-		if (!($closure_or_method_name instanceof Closure) && !$this->klass->hasMethod($closure_or_method_name))
+		if (!($closure_or_method_name instanceof Closure))
 		{
-			// i'm a dirty ruby programmer
-			throw new ActiveRecordException("Unknown method for callback: $name" .
-				(is_string($closure_or_method_name) ? ": #$closure_or_method_name" : ""));
+			if (!isset($this->publicMethods))
+				$this->publicMethods = get_class_methods($this->klass->getName());
+
+			if (!in_array($closure_or_method_name, $this->publicMethods))
+			{
+				if ($this->klass->hasMethod($closure_or_method_name))
+				{
+					// Method is private or protected
+					throw new ActiveRecordException("Callback methods need to be public (or anonymous closures). " .
+						"Please change the visibility of " . $this->klass->getName() . "->" . $closure_or_method_name . "()");
+				}
+				else
+				{
+					// i'm a dirty ruby programmer
+					throw new ActiveRecordException("Unknown method for callback: $name" .
+						(is_string($closure_or_method_name) ? ": #$closure_or_method_name" : ""));
+				}
+			}
 		}
 
 		if (!isset($this->registry[$name]))
