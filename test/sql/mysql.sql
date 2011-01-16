@@ -94,7 +94,7 @@ CREATE TABLE newsletters (
     id INT NOT NULL AUTO_INCREMENT PRIMARY KEY
 ) ENGINE=InnoDB;
 
-CREATE TABLE usernewsletters (
+CREATE TABLE user_newsletters (
     id INT NOT NULL AUTO_INCREMENT PRIMARY KEY,
     user_id INT NOT NULL,
     newsletter_id INT NOT NULL

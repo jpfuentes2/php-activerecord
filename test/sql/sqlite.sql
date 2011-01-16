@@ -93,7 +93,7 @@ CREATE TABLE newsletters (
     id INTEGER NOT NULL PRIMARY KEY
 );
 
-CREATE TABLE usernewsletters (
+CREATE TABLE user_newsletters (
     id INTEGER NOT NULL PRIMARY KEY,
     user_id INTEGER NOT NULL,
     newsletter_id INTEGER NOT NULL
