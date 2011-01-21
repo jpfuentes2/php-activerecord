@@ -781,8 +781,10 @@ class RelatedObjects implements \ArrayAccess, \Countable, \IteratorAggregate {
 		$this->fetch();
 		if (is_null($offset)) {
 			$this->_data[] = $value;
+			$this->_count++;
 		} else {
 			$this->_data[$offset] = $value;
+			$this->_count = count($this->_data);
 		}
 	}
 
@@ -797,6 +799,7 @@ class RelatedObjects implements \ArrayAccess, \Countable, \IteratorAggregate {
 	public function offsetUnset($offset) {
 		$this->fetch();
 		unset($this->_data[$offset]);
+		$this->_count = count($this->_data);
 	}
 }
 
