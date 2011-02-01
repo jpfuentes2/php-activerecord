@@ -194,13 +194,9 @@ class Config extends Singleton
 	 *
 	 * @param string $dir Directory path containing your models
 	 * @return void
-	 * @throws ConfigException if specified directory was not found
 	 */
 	public function set_model_directory($dir)
 	{
-		if (!file_exists($dir))
-			throw new ConfigException("Invalid or non-existent directory: $dir");
-
 		$this->model_directory = $dir;
 	}
 
@@ -208,9 +204,13 @@ class Config extends Singleton
 	 * Returns the model directory.
 	 *
 	 * @return string
+	 * @throws ConfigException if specified directory was not found
 	 */
 	public function get_model_directory()
 	{
+		if (!file_exists($this->model_directory))
+			throw new ConfigException('Invalid or non-existent directory: '.$this->model_directory);
+
 		return $this->model_directory;
 	}
 
