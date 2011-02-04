@@ -538,7 +538,7 @@ class Table
 	}
 
 	/**
-	 * DEPRECATED: Model.php now checks for get|set_ methods via method_exists so there is no need for declaring static g|setters.
+	 * @deprecated Model.php now checks for get|set_ methods via method_exists so there is no need for declaring static g|setters.
 	 */
 	private function set_setters_and_getters()
 	{
@@ -546,8 +546,8 @@ class Table
 		$setters = $this->class->getStaticPropertyValue('setters', array());
 
 		if (!empty($getters) || !empty($setters))
-			error_log('DEPRECATION WARNING: static::$getters and static::$setters is deprecated and will be removed in a future version. Please define your setters and getters by declaring methods in your model prefixed with get_ or set_. See
-			http://www.phpactiverecord.org/projects/main/wiki/Utilities#attribute-setters and http://www.phpactiverecord.org/projects/main/wiki/Utilities#attribute-getters on how to make use of this option.');
+			trigger_error('static::$getters and static::$setters are deprecated. Please define your setters and getters by declaring methods in your model prefixed with get_ or set_. See
+			http://www.phpactiverecord.org/projects/main/wiki/Utilities#attribute-setters and http://www.phpactiverecord.org/projects/main/wiki/Utilities#attribute-getters on how to make use of this option.', E_USER_DEPRECATED);
 	}
 };
 ?>
