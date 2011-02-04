@@ -176,7 +176,7 @@ class CallBackTest extends DatabaseTest
 	 */
 	public function test_invoke_unregistered_callback()
 	{
-		$mock = $this->get_mock('VenueCB',array());
+		$mock = $this->get_mock('VenueCB', array('columns'));
 		$this->callback->invoke($mock,'before_validation_on_create');
 	}
 
