@@ -1,5 +1,4 @@
 <?php
-require_once 'PHPUnit/Framework.php';
 require_once 'helpers/config.php';
 
 foreach (glob('Validates*Test.php') as $file)
