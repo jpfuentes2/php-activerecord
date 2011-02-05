@@ -51,9 +51,12 @@ class ConnectionTest extends SnakeCase_PHPUnit_Framework_TestCase
     	
 		$info = ActiveRecord\Connection::parse_connection_url('sqlite://unix(/some/path/to/file.db)/dummy');
 		$this->assert_equals('/some/path/to/file.db', $info->host);
+	}
 
-		$info = ActiveRecord\Connection::parse_connection_url('sqlite://windows(c:/some/path/to/file.db)');
-		$this->assert_equals('c:/some/path/to/file.db', $info->host); # TODO: currently not implemented
+	public function test_gh_103_sqlite_connection_string_windows()
+	{
+		$info = ActiveRecord\Connection::parse_connection_url('sqlite://windows(c%3A/some/path/to/file.db)');
+		$this->assert_equals('c:/some/path/to/file.db', $info->host);
 	}
 
 	public function test_parse_connection_url_with_unix_sockets()
