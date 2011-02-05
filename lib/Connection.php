@@ -144,7 +144,7 @@ abstract class Connection
 	 * sqlite://file.db
 	 * sqlite://../relative/path/to/file.db
 	 * sqlite://unix(/absolute/path/to/file.db)
-	 * sqlite://windows(c:/absolute/path/to/file.db) // TODO currently not implemented
+	 * sqlite://windows(c%2A/absolute/path/to/file.db)
 	 * </code>
 	 *
 	 * @param string $connection_url A connection URL
@@ -158,13 +158,14 @@ abstract class Connection
 			throw new DatabaseException('Database host must be specified in the connection string. If you want to specify an absolute filename, use e.g. sqlite://unix(/path/to/file)');
 
 		$info = new \stdClass();
-		$info->protocol = $url['scheme'];
-		$info->host		= $url['host'];
-		$info->db		= isset($url['path']) ? substr($url['path'],1) : null;
-		$info->user		= isset($url['user']) ? $url['user'] : null;
-		$info->pass		= isset($url['pass']) ? $url['pass'] : null;
+		$info->protocol	= $url['scheme'];
+		$info->host			= $url['host'];
+		$info->db				= isset($url['path']) ? substr($url['path'],1) : null;
+		$info->user			= isset($url['user']) ? $url['user'] : null;
+		$info->pass			= isset($url['pass']) ? $url['pass'] : null;
 
 		$allow_blank_db = ($info->protocol == 'sqlite');
+
 		if ($info->host == 'unix(')
 		{
 			$socket_database = $info->host . '/' . $info->db;
@@ -173,12 +174,19 @@ abstract class Connection
 				$unix_regex = '/^unix\((.+)\)\/?().*$/';
 			else
 				$unix_regex = '/^unix\((.+)\)\/(.+)$/';
+
 			if (preg_match_all($unix_regex, $socket_database, $matches) > 0)
 			{
 				$info->host = $matches[1][0];
 				$info->db = $matches[2][0];
 			}
 		}
+		elseif (substr($info->host,0,8) == 'windows(')
+		{
+			$info->host = urldecode(substr($info->host,8) . '/' . substr($info->db,0,-1));
+			$info->db = null;
+		}
+
 		if ($allow_blank_db && $info->db)
 			$info->host .= '/' . $info->db;
 		
