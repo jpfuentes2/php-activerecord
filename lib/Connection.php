@@ -1,7 +1,9 @@
 <?php
+
 /**
  * @package ActiveRecord
  */
+
 namespace ActiveRecord;
 
 require 'Column.php';
@@ -17,48 +19,48 @@ use Closure;
  */
 abstract class Connection
 {
+
 	/**
 	 * The PDO connection object.
 	 * @var mixed
 	 */
 	public $connection;
-
 	/**
 	 * The last query run.
 	 * @var string
 	 */
 	public $last_query;
-
 	/**
 	 * Switch for logging.
 	 *
 	 * @var bool
 	 */
-	 private $logging = false;
-
+	private $logging = false;
 	/**
 	 * Contains a Logger object that must impelement a log() method.
 	 *
 	 * @var object
 	 */
 	private $logger;
-
+	/**
+	 * The name of the protocol that is used.
+	 * @var string
+	 */
+	public $protocol;
 	/**
 	 * Default PDO options to set for each connection.
 	 * @var array
 	 */
 	static $PDO_OPTIONS = array(
-		PDO::ATTR_CASE				=> PDO::CASE_LOWER,
-		PDO::ATTR_ERRMODE			=> PDO::ERRMODE_EXCEPTION,
-		PDO::ATTR_ORACLE_NULLS		=> PDO::NULL_NATURAL,
-		PDO::ATTR_STRINGIFY_FETCHES	=> false);
-
+		PDO::ATTR_CASE => PDO::CASE_LOWER,
+		PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION,
+		PDO::ATTR_ORACLE_NULLS => PDO::NULL_NATURAL,
+		PDO::ATTR_STRINGIFY_FETCHES => false);
 	/**
 	 * The quote character for stuff like column and field names.
 	 * @var string
 	 */
 	static $QUOTE_CHARACTER = '`';
-
 	/**
 	 * Default port.
 	 * @var int
@@ -80,7 +82,7 @@ abstract class Connection
 	{
 		$config = Config::instance();
 
-		if (strpos($connection_string_or_connection_name,'://') === false)
+		if (strpos($connection_string_or_connection_name, '://') === false)
 		{
 			$connection_string = $connection_string_or_connection_name ?
 				$config->get_connection($connection_string_or_connection_name) :
@@ -96,10 +98,10 @@ abstract class Connection
 		$fqclass = static::load_adapter_class($info->protocol);
 
 		try {
-			$connection           = new $fqclass($info);
+			$connection = new $fqclass($info);
 			$connection->protocol = $info->protocol;
-			$connection->logging  = $config->get_logging();
-			$connection->logger   = $connection->logging ? $config->get_logger() : null;
+			$connection->logging = $config->get_logging();
+			$connection->logger = $connection->logging ? $config->get_logger() : null;
 
 			if (isset($info->charset))
 				$connection->set_encoding($info->charset);
@@ -158,11 +160,11 @@ abstract class Connection
 			throw new DatabaseException('Database host must be specified in the connection string. If you want to specify an absolute filename, use e.g. sqlite://unix(/path/to/file)');
 
 		$info = new \stdClass();
-		$info->protocol	= $url['scheme'];
-		$info->host			= $url['host'];
-		$info->db				= isset($url['path']) ? substr($url['path'],1) : null;
-		$info->user			= isset($url['user']) ? $url['user'] : null;
-		$info->pass			= isset($url['pass']) ? $url['pass'] : null;
+		$info->protocol = $url['scheme'];
+		$info->host = $url['host'];
+		$info->db = isset($url['path']) ? substr($url['path'], 1) : null;
+		$info->user = isset($url['user']) ? $url['user'] : null;
+		$info->pass = isset($url['pass']) ? $url['pass'] : null;
 
 		$allow_blank_db = ($info->protocol == 'sqlite');
 
@@ -180,20 +182,19 @@ abstract class Connection
 				$info->host = $matches[1][0];
 				$info->db = $matches[2][0];
 			}
-		}
-		elseif (substr($info->host,0,8) == 'windows(')
+		} elseif (substr($info->host, 0, 8) == 'windows(')
 		{
-			$info->host = urldecode(substr($info->host,8) . '/' . substr($info->db,0,-1));
+			$info->host = urldecode(substr($info->host, 8) . '/' . substr($info->db, 0, -1));
 			$info->db = null;
 		}
 
 		if ($allow_blank_db && $info->db)
 			$info->host .= '/' . $info->db;
-		
+
 		if (isset($url['port']))
 			$info->port = $url['port'];
 
-		if (strpos($connection_url,'decode=true') !== false)
+		if (strpos($connection_url, 'decode=true') !== false)
 		{
 			if ($info->user)
 				$info->user = urldecode($info->user);
@@ -204,9 +205,8 @@ abstract class Connection
 
 		if (isset($url['query']))
 		{
-			foreach (explode('/&/',$url['query']) as $pair)
-			{
-				list($name,$value) = explode('=',$pair);
+			foreach (explode('/&/', $url['query']) as $pair) {
+				list($name, $value) = explode('=', $pair);
 
 				if ($name == 'charset')
 					$info->charset = $value;
@@ -224,8 +224,7 @@ abstract class Connection
 	 */
 	protected function __construct($info)
 	{
-		try
-		{
+		try {
 			// unix sockets start with a /
 			if ($info->host[0] != '/')
 			{
@@ -237,7 +236,7 @@ abstract class Connection
 			else
 				$host = "unix_socket=$info->host";
 
-			$this->connection = new PDO("$info->protocol:$host;dbname=$info->db",$info->user,$info->pass,static::$PDO_OPTIONS);
+			$this->connection = new PDO("$info->protocol:$host;dbname=$info->db", $info->user, $info->pass, static::$PDO_OPTIONS);
 		} catch (PDOException $e) {
 			throw new DatabaseException($e);
 		}
@@ -254,8 +253,7 @@ abstract class Connection
 		$columns = array();
 		$sth = $this->query_column_info($table);
 
-		while (($row = $sth->fetch()))
-		{
+		while (($row = $sth->fetch())) {
 			$c = $this->create_column($row);
 			$columns[$c->name] = $c;
 		}
@@ -325,7 +323,7 @@ abstract class Connection
 	 */
 	public function query_and_fetch_one($sql, &$values=array())
 	{
-		$sth = $this->query($sql,$values);
+		$sth = $this->query($sql, $values);
 		$row = $sth->fetch(PDO::FETCH_NUM);
 		return $row[0];
 	}
@@ -392,7 +390,10 @@ abstract class Connection
 	 *
 	 * @return boolean
 	 */
-	function supports_sequences() { return false; }
+	function supports_sequences()
+	{
+		return false;
+	}
 
 	/**
 	 * Return a default sequence name for the specified table.
@@ -412,7 +413,10 @@ abstract class Connection
 	 * @param string $sequence_name Name of the sequence
 	 * @return string
 	 */
-	public function next_sequence_value($sequence_name) { return null; }
+	public function next_sequence_value($sequence_name)
+	{
+		return null;
+	}
 
 	/**
 	 * Quote a name like table names and field names.
@@ -422,7 +426,7 @@ abstract class Connection
 	 */
 	public function quote_name($string)
 	{
-		return $string[0] === static::$QUOTE_CHARACTER || $string[strlen($string)-1] === static::$QUOTE_CHARACTER ?
+		return $string[0] === static::$QUOTE_CHARACTER || $string[strlen($string) - 1] === static::$QUOTE_CHARACTER ?
 			$string : static::$QUOTE_CHARACTER . $string . static::$QUOTE_CHARACTER;
 	}
 
@@ -496,12 +500,24 @@ abstract class Connection
 	 */
 	abstract function set_encoding($charset);
 
+	/*
+	 * Returns an array mapping of native database types
+	 */
+
+	abstract public function native_database_types();
+
 	/**
 	 * Specifies whether or not adapter can use LIMIT/ORDER clauses with DELETE & UPDATE operations
 	 *
 	 * @internal
 	 * @returns boolean (FALSE by default)
 	 */
-	public function accepts_limit_and_order_for_update_and_delete() { return false; }
-};
+	public function accepts_limit_and_order_for_update_and_delete()
+	{
+		return false;
+	}
+
+}
+
+;
 ?>

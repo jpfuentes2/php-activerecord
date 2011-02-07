@@ -84,5 +84,42 @@ class SqliteAdapter extends Connection
 	}
 
 	public function accepts_limit_and_order_for_update_and_delete() { return true; }
-};
+
+	public function supports_sequences()
+	{
+		$sqliteVersion = \SQLite3::version();
+
+		/* sqlite 3.1.0 has support for sequences */
+		if (\version_compare($sqliteVersion['versionString'], '3.1.0') >= 0)
+			return true;
+		return false;
+	}
+
+	private function default_primary_key_type()
+	{
+		if ($this->supports_sequences())
+			return 'INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL';
+		else
+			return 'INTEGER PRIMARY KEY NOT NULL';
+	}
+
+	public function native_database_types()
+	{
+		return array(
+			'primary_key' => $this->default_primary_key_type(),
+			'string' => array('name' => 'varchar', 'length' => 255),
+			'text' => array('name' => 'text'),
+			'integer' => array('name' => 'integer'),
+			'float' => array('name' => 'float'),
+			'decimal' => array('name' => 'decimal'),
+			'datetime' => array('name' => 'datetime'),
+			'timestamp' => array('name' => 'datetime'),
+			'time' => array('name' => 'time'),
+			'date' => array('name' => 'date'),
+			'binary' => array('name' => 'blob'),
+			'boolean' => array('name' => 'boolean')
+		);
+	}
+
+}
 ?>

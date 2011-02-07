@@ -125,5 +125,22 @@ class OciAdapter extends Connection
 	{
 		// is handled in the constructor
 	}
-};
+
+	public function native_database_types()
+	{
+		return array(
+			'primary_key' => "NUMBER(38) NOT NULL PRIMARY KEY",
+			'string' => array('name' => 'VARCHAR2', 'length' => 255),
+			'text' => array('name' => 'CLOB'),
+			'integer' => array('name' => 'NUMBER', 'length' => 38),
+			'float' => array('name' => 'NUMBER'),
+			'datetime' => array('name' => 'DATE'),
+			'timestamp' => array('name' => 'DATE'),
+			'time' => array('name' => 'DATE'),
+			'date' => array('name' => 'DATE'),
+			'binary' => array('name' => 'BLOB'),
+			'boolean' => array('name' => 'NUMBER', 'length' => 1)
+		);
+	}
+}
 ?>
