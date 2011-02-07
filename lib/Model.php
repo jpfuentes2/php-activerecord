@@ -821,7 +821,7 @@ class Model
 			$column = $table->get_column_by_inflected_name($pk);
 
 			if ($column->auto_increment || $use_sequence)
-				$this->attributes[$pk] = $table->conn->insert_id($table->sequence);
+				$this->attributes[$pk] = static::connection()->insert_id($table->sequence);
 		}
 
 		$this->invoke_callback('after_create',false);
@@ -1324,7 +1324,7 @@ class Model
 		if (substr($method,0,7) === 'find_by')
 		{
 			$attributes = substr($method,8);
-			$options['conditions'] = SQLBuilder::create_conditions_from_underscored_string(static::table()->conn,$attributes,$args,static::$alias_attribute);
+			$options['conditions'] = SQLBuilder::create_conditions_from_underscored_string(static::connection(),$attributes,$args,static::$alias_attribute);
 
 			if (!($ret = static::find('first',$options)) && $create)
 				return static::create(SQLBuilder::create_hash_from_underscored_string($attributes,$args,static::$alias_attribute));
@@ -1333,12 +1333,12 @@ class Model
 		}
 		elseif (substr($method,0,11) === 'find_all_by')
 		{
-			$options['conditions'] = SQLBuilder::create_conditions_from_underscored_string(static::table()->conn,substr($method,12),$args,static::$alias_attribute);
+			$options['conditions'] = SQLBuilder::create_conditions_from_underscored_string(static::connection(),substr($method,12),$args,static::$alias_attribute);
 			return static::find('all',$options);
 		}
 		elseif (substr($method,0,8) === 'count_by')
 		{
-			$options['conditions'] = SQLBuilder::create_conditions_from_underscored_string(static::table()->conn,substr($method,9),$args,static::$alias_attribute);
+			$options['conditions'] = SQLBuilder::create_conditions_from_underscored_string(static::connection(),substr($method,9),$args,static::$alias_attribute);
 			return static::count($options);
 		}
 
@@ -1415,7 +1415,7 @@ class Model
 		$table = static::table();
 		$sql = $table->options_to_sql($options);
 		$values = $sql->get_where_values();
-		return $table->conn->query_and_fetch_one($sql->to_s(),$values);
+		return static::connection()->query_and_fetch_one($sql->to_s(),$values);
 	}
 
 	/**
