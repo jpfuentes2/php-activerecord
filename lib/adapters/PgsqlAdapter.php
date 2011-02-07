@@ -11,10 +11,13 @@ namespace ActiveRecord;
  */
 class PgsqlAdapter extends Connection
 {
-	static $QUOTE_CHARACTER	= '"';
-	static $DEFAULT_PORT	= 5432;
+	static $QUOTE_CHARACTER = '"';
+	static $DEFAULT_PORT = 5432;
 
-	public function supports_sequences() { return true; }
+	public function supports_sequences()
+	{
+		return true;
+	}
 
 	public function get_sequence_name($table, $column_name)
 	{
@@ -105,5 +108,23 @@ SQL;
 	{
 		$this->query("SET NAMES '$charset'");
 	}
-};
+
+	public function native_database_types()
+	{
+		return array(
+			'primary_key' => 'serial primary key',
+			'string' => array('name' => 'character varying', 'length' => 255),
+			'text' => array('name' => 'text'),
+			'integer' => array('name' => 'integer'),
+			'float' => array('name' => 'float'),
+			'datetime' => array('name' => 'datetime'),
+			'timestamp' => array('name' => 'timestamp'),
+			'time' => array('name' => 'time'),
+			'date' => array('name' => 'date'),
+			'binary' => array('name' => 'binary'),
+			'boolean' => array('name' => 'boolean')
+		);
+	}
+
+}
 ?>
