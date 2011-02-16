@@ -54,7 +54,8 @@ class Validations
 		'validates_exclusion_of',
 		'validates_format_of',
 		'validates_numericality_of',
-		'validates_uniqueness_of'
+		'validates_uniqueness_of',
+    'validates_confirmation_of',
 	);
 
 	private static $DEFAULT_VALIDATION_OPTIONS = array(
@@ -182,6 +183,26 @@ class Validations
 			$this->record->add_on_blank($options[0], $options['message']);
 		}
 	}
+
+  public function validates_confirmation_of($attrs)
+  {
+    $configuration = array_merge(self::$DEFAULT_VALIDATION_OPTIONS, array('message' => Errors::$DEFAULT_ERROR_MESSAGES['confirmation'], 'on' => 'save'));
+
+    foreach($attrs as $attr)
+    {
+      $options = array_merge($configuration, $attr);
+      $attribute = $options[0];
+      $attribute_confirmation = "{$attribute}_confirmation";
+
+      if(isset($this->model->$attribute))
+      {
+        if($this->model->$attribute !== $this->model->$attribute_confirmation)
+        {
+          $this->record->add($attribute, $options['message']);
+        }
+      }
+    }
+  }
 
 	/**
 	 * Validates that a value is included the specified array.
@@ -517,7 +538,7 @@ class Validations
 						$message = $options['message'];
 					else
 						$message = $options[$messageOptions[$range_option]];
-					
+
 
 					$message = str_replace('%d', $option, $message);
 					$attribute_value = $this->model->$attribute;
