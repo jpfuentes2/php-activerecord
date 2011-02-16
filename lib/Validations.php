@@ -184,6 +184,26 @@ class Validations
 		}
 	}
 
+	/**
+   * Validates that a field, if set, has a confirmation
+   * field with the same contents.
+	 *
+	 * <code>
+	 * class Person extends ActiveRecord\Model {
+   *   static $validates_confirmation_of = array(
+   *     array('email_address')
+   *   );
+	 * }
+	 * </code>
+	 *
+	 * Available options:
+	 *
+	 * <ul>
+	 * <li><b>message:</b> custom error message</li>
+	 * </ul>
+	 *
+	 * @param array $attrs Validation definition
+	 */
   public function validates_confirmation_of($attrs)
   {
     $configuration = array_merge(self::$DEFAULT_VALIDATION_OPTIONS, array('message' => Errors::$DEFAULT_ERROR_MESSAGES['confirmation'], 'on' => 'save'));
