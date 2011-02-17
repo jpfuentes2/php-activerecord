@@ -1,5 +1,5 @@
 <?php
-require_once dirname(__FILE__) . '/../../ActiveRecord.php';
+require_once __DIR__ . '/../../ActiveRecord.php';
 
 // assumes a table named "books" with a pk named "id"
 // see simple.sql

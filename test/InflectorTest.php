@@ -1,6 +1,6 @@
 <?php
 include 'helpers/config.php';
-require_once dirname(__FILE__) . '/../lib/Inflector.php';
+require_once __DIR__ . '/../lib/Inflector.php';
 
 class InflectorTest extends SnakeCase_PHPUnit_Framework_TestCase
 {

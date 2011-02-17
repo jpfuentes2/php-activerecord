@@ -1,6 +1,6 @@
 <?php
 include 'helpers/config.php';
-require_once dirname(__FILE__) . '/../lib/adapters/SqliteAdapter.php';
+require_once __DIR__ . '/../lib/adapters/SqliteAdapter.php';
 
 class SqliteAdapterTest extends AdapterTest
 {
@@ -26,7 +26,7 @@ class SqliteAdapterTest extends AdapterTest
 		}
 		catch (ActiveRecord\DatabaseException $e)
 		{
-			$this->assertFalse(file_exists(dirname(__FILE__) . "/" . self::InvalidDb));
+			$this->assertFalse(file_exists(__DIR__ . "/" . self::InvalidDb));
 		}
 	}
 

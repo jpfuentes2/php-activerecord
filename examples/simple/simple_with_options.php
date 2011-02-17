@@ -1,5 +1,5 @@
 <?php
-require_once dirname(__FILE__) . '/../../ActiveRecord.php';
+require_once __DIR__ . '/../../ActiveRecord.php';
 
 class Book extends ActiveRecord\Model
 {
