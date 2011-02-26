@@ -9,7 +9,7 @@ class Memcache
 	{
 		$this->memcache = new \Memcache();
 
-		if (!$this->memcache->connect($options['host']))
+		if (!$this->memcache->connect($options['host'],$options['port']))
 			throw new CacheException("Could not connect to $options[host]:$options[port]");
 	}
 
