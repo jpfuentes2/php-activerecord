@@ -78,7 +78,7 @@ class CacheTest extends SnakeCase_PHPUnit_Framework_TestCase
 	{
 	  Cache::$options['namespace'] = 'myapp';
 	  $this->cache_get();
-	  $this->assert_same("abcd", Cache::$adapter->read("1337myapp"));
+	  $this->assert_same("abcd", Cache::$adapter->read("myapp::1337"));
 	}
 }
 ?>

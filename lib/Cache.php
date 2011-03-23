@@ -61,7 +61,7 @@ class Cache
 
 	public static function get($key, $closure)
 	{
-		$key = $key.static::$options['namespace'];
+		$key = static::get_namespace() . $key;
 		
 		if (!static::$adapter)
 			return $closure();
@@ -70,6 +70,11 @@ class Cache
 			static::$adapter->write($key,($value = $closure()),static::$options['expire']);
 
 		return $value;
+	}
+
+	private static function get_namespace()
+	{
+		return !isset(static::$options['namespace']) ? "" : static::$options['namespace'] . "::";
 	}
 }
 ?>
