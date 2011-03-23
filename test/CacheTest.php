@@ -69,7 +69,7 @@ class CacheTest extends SnakeCase_PHPUnit_Framework_TestCase
 	{
 		Cache::$options['expire'] = 1;
 		$this->cache_get();
-		sleep(1);
+		sleep(2);
 
 		$this->assert_same(false, Cache::$adapter->read("1337"));
 	}

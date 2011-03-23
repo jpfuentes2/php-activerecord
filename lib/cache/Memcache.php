@@ -3,7 +3,7 @@ namespace ActiveRecord;
 
 class Memcache
 {
-	const DEFAULT_PORT = 11212;
+	const DEFAULT_PORT = 11211;
 
 	private $memcache;
 
