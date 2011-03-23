@@ -4,8 +4,8 @@ use Closure;
 
 /**
  * Cache::get('the-cache-key', function() {
- *   # this gets executed when cache is stale
- *   return "your cacheable datas";
+ *	 # this gets executed when cache is stale
+ *	 return "your cacheable datas";
  * });
  */
 class Cache
@@ -15,6 +15,24 @@ class Cache
 
 	/**
 	 * Initializes the cache.
+	 *
+	 * With the $options array it's possible to define:
+	 * - expiration of the key, (time in seconds)
+	 * - a namespace for the key
+	 *
+	 * this last one is useful in the case two applications use
+	 * a shared key/store (for instance a shared Memcached db)
+	 *
+	 * Ex:
+	 * $cfg_ar = ActiveRecord\Config::instance();
+	 * $cfg_ar->set_cache('memcache://localhost:11211',array('namespace' => 'my_cool_app',
+	 *																											 'expire'		 => 120
+	 *																											 ));
+	 *
+	 * In the example above all the keys expire after 120 seconds, and the
+	 * all get a postfix 'my_cool_app'.
+	 *
+	 * (Note: expiring needs to be implemented in your cache store.)
 	 *
 	 * @param string $url URL to your cache server
 	 * @param array $options Specify additional options
@@ -32,7 +50,7 @@ class Cache
 		else
 			static::$adapter = null;
 
-		static::$options = array_merge(array('expire' => 30),$options);
+		static::$options = array_merge(array('expire' => 30, 'namespace' => ''),$options);
 	}
 
 	public static function flush()
@@ -43,6 +61,8 @@ class Cache
 
 	public static function get($key, $closure)
 	{
+		$key = $key.static::$options['namespace'];
+		
 		if (!static::$adapter)
 			return $closure();
 
