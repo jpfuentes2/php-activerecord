@@ -10,6 +10,8 @@
  */
 
 @include_once 'Log.php';
+@include_once 'Log/file.php';
+require_once 'PHPUnit/Framework/TestCase.php';
 require_once 'SnakeCase_PHPUnit_Framework_TestCase.php';
 require_once 'DatabaseTest.php';
 require_once 'AdapterTest.php';
@@ -44,9 +46,9 @@ ActiveRecord\Config::initialize(function($cfg)
 			$GLOBALS['slow_tests'] = true;
 	}
 
-	if (is_callable('Log::singleton')) // PEAR Log installed
+	if (class_exists('Log_file')) // PEAR Log installed
 	{
-		$logger = Log::singleton('file', __DIR__ . '/../log/query.log','ident',array('mode' => 0664, 'timeFormat' =>  '%Y-%m-%d %H:%M:%S'));
+		$logger = new Log_file(dirname(__FILE__) . '/../log/query.log','ident',array('mode' => 0664, 'timeFormat' =>  '%Y-%m-%d %H:%M:%S'));
 	
 		$cfg->set_logging(true);
 		$cfg->set_logger($logger);

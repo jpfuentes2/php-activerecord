@@ -630,34 +630,34 @@ class Errors implements IteratorAggregate
 	private $errors;
 
 	public static $DEFAULT_ERROR_MESSAGES = array(
-   		'inclusion'		=> "is not included in the list",
-     	'exclusion'		=> "is reserved",
-      	'invalid'		=> "is invalid",
-      	'confirmation'	=> "doesn't match confirmation",
-      	'accepted'		=> "must be accepted",
-      	'empty'			=> "can't be empty",
-      	'blank'			=> "can't be blank",
-      	'too_long'		=> "is too long (maximum is %d characters)",
-      	'too_short'		=> "is too short (minimum is %d characters)",
-      	'wrong_length'	=> "is the wrong length (should be %d characters)",
-      	'taken'			=> "has already been taken",
-      	'not_a_number'	=> "is not a number",
-      	'greater_than'	=> "must be greater than %d",
-      	'equal_to'		=> "must be equal to %d",
-      	'less_than'		=> "must be less than %d",
-      	'odd'			=> "must be odd",
-      	'even'			=> "must be even",
-		'unique'		=> "must be unique",
-      	'less_than_or_equal_to' => "must be less than or equal to %d",
-      	'greater_than_or_equal_to' => "must be greater than or equal to %d"
-   	);
+		'inclusion'    => "is not included in the list",
+		'exclusion'    => "is reserved",
+		'invalid'      => "is invalid",
+		'confirmation' => "doesn't match confirmation",
+		'accepted'     => "must be accepted",
+		'empty'        => "can't be empty",
+		'blank'        => "can't be blank",
+		'too_long'     => "is too long (maximum is %d characters)",
+		'too_short'    => "is too short (minimum is %d characters)",
+		'wrong_length' => "is the wrong length (should be %d characters)",
+		'taken'        => "has already been taken",
+		'not_a_number' => "is not a number",
+		'greater_than' => "must be greater than %d",
+		'equal_to'     => "must be equal to %d",
+		'less_than'    => "must be less than %d",
+		'odd'          => "must be odd",
+		'even'         => "must be even",
+		'unique'       => "must be unique",
+		'less_than_or_equal_to' => "must be less than or equal to %d",
+		'greater_than_or_equal_to' => "must be greater than or equal to %d"
+	);
 
-   	/**
+	/**
 	 * Constructs an {@link Errors} object.
 	 *
 	 * @param Model $model The model the error is for
 	 * @return Errors
-   	 */
+	 */
 	public function __construct(Model $model)
 	{
 		$this->model = $model;

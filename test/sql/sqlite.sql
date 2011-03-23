@@ -84,3 +84,17 @@ CREATE TABLE property_amenities(
   `amenity_id` INT NOT NULL,
   `property_id` INT NOT NULL
 );
+
+CREATE TABLE users (
+    id INTEGER NOT NULL PRIMARY KEY
+);
+
+CREATE TABLE newsletters (
+    id INTEGER NOT NULL PRIMARY KEY
+);
+
+CREATE TABLE user_newsletters (
+    id INTEGER NOT NULL PRIMARY KEY,
+    user_id INTEGER NOT NULL,
+    newsletter_id INTEGER NOT NULL
+);

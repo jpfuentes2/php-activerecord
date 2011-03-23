@@ -85,3 +85,17 @@ CREATE TABLE property_amenities(
   `amenity_id` int(11) NOT NULL DEFAULT '0',
   `property_id` int(11) NOT NULL DEFAULT '0'
 );
+
+CREATE TABLE users (
+    id INT NOT NULL AUTO_INCREMENT PRIMARY KEY
+) ENGINE=InnoDB;
+
+CREATE TABLE newsletters (
+    id INT NOT NULL AUTO_INCREMENT PRIMARY KEY
+) ENGINE=InnoDB;
+
+CREATE TABLE user_newsletters (
+    id INT NOT NULL AUTO_INCREMENT PRIMARY KEY,
+    user_id INT NOT NULL,
+    newsletter_id INT NOT NULL
+) ENGINE=InnoDB;
