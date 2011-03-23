@@ -67,6 +67,13 @@ class SQLBuilderTest extends DatabaseTest
 		$this->assert_equals(array(1,'Tito','Mexican'),$this->sql->get_where_values());
 	}
 
+	public function test_gh134_where_with_hash_and_null()
+	{
+		$this->sql->where(array('id' => 1, 'name' => null));
+		$this->assert_sql_has("SELECT * FROM authors WHERE id=? AND name IS ?",(string)$this->sql);
+		$this->assert_equals(array(1, null),$this->sql->get_where_values());
+	}
+
 	public function test_where_with_null()
 	{
 		$this->sql->where(null);
