@@ -5,9 +5,10 @@ include 'helpers/foo.php';
 use foo\bar\biz\User;
 use foo\bar\biz\Newsletter;
 
-class HasManyThroughTest extends DatabaseTest {
-
-	public function test_gh101_has_many_through() {
+class HasManyThroughTest extends DatabaseTest
+{
+	public function test_gh101_has_many_through()
+	{
 		$user = User::find(1);
 		$newsletter = Newsletter::find(1);
 
@@ -23,7 +24,8 @@ class HasManyThroughTest extends DatabaseTest {
 		);
 	}
 
-	public function test_gh101_has_many_through_include() {
+	public function test_gh101_has_many_through_include()
+	{
 		$user = User::find(1, array(
 			'include' => array(
 				'user_newsletters'
@@ -34,7 +36,8 @@ class HasManyThroughTest extends DatabaseTest {
 		$this->assert_equals(1, $user->user_newsletters[0]->id);
 	}
 
-	public function test_gh107_has_many_through_include_eager() {
+	public function test_gh107_has_many_through_include_eager()
+	{
 		$venue = Venue::find(1, array('include' => array('events')));
 		$this->assert_equals(1, $venue->events[0]->id);
 
@@ -42,7 +45,8 @@ class HasManyThroughTest extends DatabaseTest {
 		$this->assert_equals(1, $venue->hosts[0]->id);
 	}
 
-	public function test_gh107_has_many_though_include_eager_with_namespace() {
+	public function test_gh107_has_many_though_include_eager_with_namespace()
+	{
 		$user = User::find(1, array(
 			'include' => array(
 				'newsletters'
