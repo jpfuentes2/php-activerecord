@@ -446,6 +446,30 @@ class Model
 				return $this->$item['to']->$delegated_name = $value;
 		}
 
+		$table = static::table();
+		if ($relationship = $table->get_relationship($name)
+		)
+		{
+			if (is_null($value))
+			{
+				$this->__relationships[$name] = $value;
+				return $this->assign_attribute($relationship->foreign_key[0], $value);
+			}
+			elseif (($value instanceof \ActiveRecord\Model) &&
+					$value instanceof $relationship->class_name)
+			{
+				$this->__relationships[$name] = $value;
+				$pk = $value->get_primary_key(0);
+				return $this->assign_attribute(
+					$relationship->foreign_key[0],
+					$value->is_new_record() ? null : $value->{$pk[0]}
+				);
+			}
+			else
+			{
+				throw new RelationshipException();
+			}
+		}
 		throw new UndefinedPropertyException(get_called_class(),$name);
 	}
 
@@ -837,7 +861,7 @@ class Model
 	 * @param boolean $guard_attributes Set to true to guard protected/non-accessible attributes
 	 * @return Model
 	 */
-	public static function create($attributes, $validate=true, $guard_attributes=true)
+	public static function create(array $attributes=array(), $validate=true, $guard_attributes=true)
 	{
 		$class_name = get_called_class();
 		$model = new $class_name($attributes, $guard_attributes);
