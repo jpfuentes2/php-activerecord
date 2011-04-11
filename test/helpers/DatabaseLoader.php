@@ -30,10 +30,9 @@ class DatabaseLoader
 			$this->load_fixture_data($table);
 		}
 
-		try {
-			$this->exec_sql_script("{$this->db->protocol}-after-fixtures");
-		} catch (Exception $e) {
-			// ignore
+		$after_fixtures = $this->db->protocol.'-after-fixtures';
+		if (file_exists($after_fixtures)) {
+			$this->exec_sql_script($after_fixtures);
 		}
 	}
 
