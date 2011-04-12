@@ -421,14 +421,13 @@ class Model
 		if (is_object($value) &&
 		    $relationship = $table->get_relationship($name)
 		) {
-			$class_name = get_class($value);
-			if ($relationship->class_name === $class_name) {
+			if ($value instanceof $relationship->class_name) {
 				$this->__relationships[$name] = $value;
 				if (!$value->is_new_record()) {
 					$pk = $value->get_primary_key(0);
 					return $this->assign_attribute(
 						$relationship->foreign_key[0],
-						$value->{$pk[0]}
+						$value->$pk[0]
 					);
 				}
 				return; // do nothing

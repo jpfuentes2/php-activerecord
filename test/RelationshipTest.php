@@ -730,5 +730,14 @@ class RelationshipTest extends DatabaseTest
 		));
 	}
 
+	public function test_gh_125_auto_setter_for_relation_using_subclass()
+	{
+		$event = new Event(array(
+			'venue' => new SubVenue()
+		));
+
+		$this->assert_not_null($event->venue);
+		$this->assert_null($event->venue_id);
+	}
 };
 ?>
