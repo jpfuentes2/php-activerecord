@@ -710,6 +710,38 @@ class RelationshipTest extends DatabaseTest
 		}
 		$this->assert_equals(1, $host->events[0]->id);
 	}
+
+	public function test_gh_49_arrayobject_relation_with_options()
+	{
+		// clear up the SQL cache
+		Event::table()->last_sql = null;
+
+		$host = Host::find(1);
+		$events = $host->events;
+
+		$events = $events(array(
+			'conditions' => array('LENGTH(title) > 10'),
+			'order' => 'title ASC',
+			'limit' => 2
+		));
+
+		$this->assert_null(Event::table()->last_sql);
+		$this->assert_true($events instanceof Countable);
+		$this->assert_true($events instanceof IteratorAggregate);
+
+		$this->assert_equals(2, count($events));
+		$sql = Event::table()->last_sql;
+		$this->assert_sql_has('SELECT COUNT(*) FROM' , $sql);
+		$this->assert_sql_has('LENGTH(title) > 10' , $sql);
+		$this->assert_sql_has('ORDER BY title ASC' , $sql);
+
+		$this->assert_equals(2, count($events->getArrayCopy()));
+		$sql = Event::table()->last_sql;
+		$this->assert_sql_has('SELECT * FROM' , $sql);
+		$this->assert_sql_has('LENGTH(title) > 10' , $sql);
+		$this->assert_sql_has('ORDER BY title ASC' , $sql);
+		$this->assert_sql_has('LIMIT 0,2' , $sql);
+	}
 };
 
 ?>
