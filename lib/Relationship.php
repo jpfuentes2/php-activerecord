@@ -526,11 +526,8 @@ class HasMany extends AbstractRelationship
 		$options['conditions'] = $conditions;
 
         return ($this->poly_relationship) ? 
-            new RelatedObjects(array(
-                'class_name' => $class_name,
-                'options' => $options
-            )) :
-            $class_name::find('first', $options);
+            new RelatedObjects($class_name, $options) :
+			$class_name::find('first', $options);
 	}
 
 	/**
@@ -734,17 +731,56 @@ class BelongsTo extends AbstractRelationship
 }
 
 class RelatedObjects implements \ArrayAccess, \Countable, \IteratorAggregate {
+	/**
+	 * Model of the relation
+	 *
+	 * @var string
+	 */
 	protected $_class_name;
+	/**
+	 * Selection options
+	 *
+	 * @var array
+	 */
 	protected $_options;
+	/**
+	 * Encapsuled Array containing the related objects
+	 *
+	 * @var array
+	 */
 	protected $_data;
+	/**
+	 * Result from the `Model::count` request
+	 *
+	 * @var integer
+	 */
 	protected $_count;
 
-
-	public function __construct($options=array()) {
-		$this->_class_name = $options['class_name'];
-		$this->_options = $options['options'];
+	/**
+	 * Construct the related objects
+	 *
+	 * @param array $options Options to build it (class_name and options)
+	 */
+	public function __construct($class_name, array $options=array()) {
+		$this->_class_name = $class_name;
+		$this->_options = $options;
 	}
 
+	/**
+	 * Returns a copy of itself with some extra conditions
+	 *
+	 * @param array $options Options for the association
+	 * @return object a new RelatedObjects
+	 */
+	public function __invoke(array $options=array()) {
+		return new self($this->_class_name, $options + $this->_options);
+	}
+
+	/**
+	 * Returns how many items are found for this relation
+	 *
+	 * @return integer how many objects were found (using `count`);
+	 */
 	public function count() {
 		if (!isset($this->_count)) {
 			if (!isset($this->_data)) {
@@ -753,10 +789,20 @@ class RelatedObjects implements \ArrayAccess, \Countable, \IteratorAggregate {
 			} else {
 				$this->_count = count($this->_data);
 			}
+			// respect the limit set and don't return more of them, so this
+			// can be calculated with a fetch too and is coherent.
+			if (isset($this->_options['limit'])) {
+				$this->_count = min($this->_count, (int)$this->_options['limit']);
+			}
 		}
 		return $this->_count;
 	}
 
+	/**
+	 * Performs the actual fetching, aka SQL querying.
+	 *
+	 * @return array the data.
+	 */
 	protected function &fetch() {
 		if (!isset($this->_data)) {
 			$class_name = $this->_class_name;
@@ -764,6 +810,15 @@ class RelatedObjects implements \ArrayAccess, \Countable, \IteratorAggregate {
 			$this->_count = count($this->_data);
 		}
 		return $this->_data;
+	}
+
+	/**
+	 * Creates a copy of itself as en Array
+	 *
+	 * @return array copy of this as an Array.
+	 */
+	public function getArrayCopy() {
+		return $this->fetch();
 	}
 
 	public function getIterator() {
