@@ -519,15 +519,17 @@ class HasMany extends AbstractRelationship
 			$this->initialized = true;
 		}
 
-		if (!($conditions = $this->create_conditions_from_keys($model, $this->foreign_key, $this->primary_key)))
-			return null;
-
-		$options = $this->unset_non_finder_options($this->options);
-		$options['conditions'] = $conditions;
+		if (!($conditions = $this->create_conditions_from_keys($model, $this->foreign_key, $this->primary_key))) {
+			$options = $this->unset_non_finder_options($this->options);
+			$options = null;
+		} else {
+			$options = $this->unset_non_finder_options($this->options);
+			$options['conditions'] = $conditions;
+		}
 
         return ($this->poly_relationship) ? 
             new RelatedObjects($class_name, $options) :
-			$class_name::find('first', $options);
+			($options ? $class_name::find('first', $options) : null);
 	}
 
 	/**
@@ -761,7 +763,7 @@ class RelatedObjects implements \ArrayAccess, \Countable, \IteratorAggregate {
 	 *
 	 * @param array $options Options to build it (class_name and options)
 	 */
-	public function __construct($class_name, array $options=array()) {
+	public function __construct($class_name, $options=null) {
 		$this->_class_name = $class_name;
 		$this->_options = $options;
 	}
@@ -772,8 +774,11 @@ class RelatedObjects implements \ArrayAccess, \Countable, \IteratorAggregate {
 	 * @param array $options Options for the association
 	 * @return object a new RelatedObjects
 	 */
-	public function __invoke(array $options=array()) {
-		return new self($this->_class_name, $options + $this->_options);
+	public function __invoke($options=null) {
+		if (is_array($options)) {
+			$options = $options + (array)$this->_options;
+		}
+		return new self($this->_class_name, $options);
 	}
 
 	/**
@@ -805,9 +810,14 @@ class RelatedObjects implements \ArrayAccess, \Countable, \IteratorAggregate {
 	 */
 	protected function &fetch() {
 		if (!isset($this->_data)) {
-			$class_name = $this->_class_name;
-			$this->_data = $class_name::find('all', $this->_options);
-			$this->_count = count($this->_data);
+			if (!is_null($this->_options)) {
+				$class_name = $this->_class_name;
+				$this->_data = $class_name::find('all', $this->_options);
+				$this->_count = count($this->_data);
+			} else {
+				$this->_data = array();
+				$this->_count = 0;
+			}
 		}
 		return $this->_data;
 	}

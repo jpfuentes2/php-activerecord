@@ -731,12 +731,21 @@ class RelationshipTest extends DatabaseTest
 	{
 		$host = Host::find(1);
 		$this->assert_true($host->events instanceof Countable);
-		$this->assert_equals(1, count($host->events));
 		$this->assert_true($host->events instanceof IteratorAggregate);
+		$this->assert_equals(1, count($host->events));
 		foreach($host->events as $event) {
 			$this->assert_equals(1, $event->host_id);
 		}
 		$this->assert_equals(1, $host->events[0]->id);
+	}
+
+	public function test_gh_49_arrayobject_relation_new_record()
+	{
+		$host = new Host();
+		$this->assert_true($host->events instanceof Countable);
+		$this->assert_true($host->events instanceof IteratorAggregate);
+		$this->assert_equals(0, count($host->events));
+
 	}
 
 	public function test_gh_49_arrayobject_relation_with_options()
