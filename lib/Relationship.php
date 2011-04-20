@@ -790,7 +790,10 @@ class RelatedObjects implements \ArrayAccess, \Countable, \IteratorAggregate {
 		if (!isset($this->_count)) {
 			if (!isset($this->_data)) {
 				$class_name = $this->_class_name;
-				$this->_count = $class_name::count($this->_options);
+				$options = $this->_options;
+				if (isset($options['offset']))
+					unset($options['offset']);
+				$this->_count = $class_name::count($options);
 			} else {
 				$this->_count = count($this->_data);
 			}
