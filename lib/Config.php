@@ -208,7 +208,7 @@ class Config extends Singleton
 	 */
 	public function get_model_directory()
 	{
-		if (!file_exists($this->model_directory))
+		if ($this->model_directory && !file_exists($this->model_directory))
 			throw new ConfigException('Invalid or non-existent directory: '.$this->model_directory);
 
 		return $this->model_directory;
