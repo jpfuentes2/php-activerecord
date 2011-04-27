@@ -3,6 +3,8 @@ include 'helpers/config.php';
 require '../lib/Expressions.php';
 
 use ActiveRecord\Expressions;
+use ActiveRecord\ConnectionManager;
+use ActiveRecord\DatabaseException;
 
 class ExpressionsTest extends SnakeCase_PHPUnit_Framework_TestCase
 {
@@ -131,7 +133,11 @@ class ExpressionsTest extends SnakeCase_PHPUnit_Framework_TestCase
 
 	public function test_substitute_escape_quotes_with_connections_escape_method()
 	{
-		$conn = ActiveRecord\ConnectionManager::get_connection();
+		try {
+			$conn = ConnectionManager::get_connection();
+		} catch (DatabaseException $e) {
+			$this->mark_test_skipped('failed to connect. '.$e->getMessage());
+		}
 		$a = new Expressions(null,'name=?',"Tito's Guild");
 		$a->set_connection($conn);
 		$escaped = $conn->escape("Tito's Guild");
