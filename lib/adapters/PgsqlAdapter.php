@@ -40,8 +40,7 @@ class PgsqlAdapter extends Connection
 SELECT
       a.attname AS field,
       a.attlen,
-      t.typname AS type,
-      format_type(a.atttypid, a.atttypmod) AS complete_type,
+      REPLACE(pg_catalog.format_type(a.atttypid, a.atttypmod), 'character varying', 'varchar') AS type,
       a.attnotnull AS not_nullable,
       (SELECT 't'
         FROM pg_index
@@ -61,7 +60,7 @@ WHERE c.relname = ?
       AND a.atttypid = t.oid
 ORDER BY a.attnum
 SQL;
-		$values = array($table,$table);
+		$values = array($table);
 		return $this->query($sql,$values);
 	}
 
