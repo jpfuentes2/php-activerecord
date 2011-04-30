@@ -48,26 +48,47 @@ Of course, there are some differences which will be obvious to the user if they 
 
 ### Installation ##
 
-Setup is very easy and straight-forward. There are essentially only two configuration points you must concern yourself with:
+Setup is very easy and straight-forward. There are essentially only three configuration points you must concern yourself with:
 
 1. Setting the model auto_load directory.
 2. Configuring your database connections.
+3. Setting the database connection to use for your environment.
 
 Example:
 
     ActiveRecord\Config::initialize(function($cfg)
     {
 	    $cfg->set_model_directory('/path/to/your/model_directory');
-	    $cfg->set_connections(array('development' => 'mysql://username:password@localhost/database_name'));
+	    $cfg->set_connections(
+	      array(
+	        'development' => 'mysql://username:password@localhost/development_database_name',
+	        'test' => 'mysql://username:password@localhost/test_database_name',
+	        'production' => 'mysql://username:password@localhost/production_database_name'
+	      )
+	    );
     });
 
 Alternatively (w/o the 5.3 closure):
 
     $cfg = ActiveRecord\Config::instance();
     $cfg->set_model_directory('/path/to/your/model_directory');
-    $cfg->set_connections(array('development' => 'mysql://username:password@localhost/database_name'));
+    $cfg->set_connections(
+      array(
+        'development' => 'mysql://username:password@localhost/development_database_name',
+        'test' => 'mysql://username:password@localhost/test_database_name',
+        'production' => 'mysql://username:password@localhost/production_database_name'
+      )
+    );
 
-Once you have configured these two settings you are done. ActiveRecord takes care of the rest for you.
+PHP ActiveRecord will default to use your development database. For testing or production, you simply set the default
+connection according to your current environment ('test' or 'production'):
+
+    ActiveRecord\Config::initialize(function($cfg) 
+    {
+      $cfg->set_default_connection(your_environment);
+    });
+
+Once you have configured these three settings you are done. ActiveRecord takes care of the rest for you.
 It does not require that you map your table schema to yaml/xml files. It will query the database for this information and
 cache it so that it does not make multiple calls to the database for a single schema.
 
