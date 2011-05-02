@@ -1408,7 +1408,7 @@ class Model
 		{
 			if (is_hash($args[0]))
 				$options['conditions'] = $args[0];
-			else
+			else if (!(is_null($args[0]) || empty($args[0])))
 				$options['conditions'] = call_user_func_array('static::pk_conditions',$args);
 		}
 
