@@ -739,5 +739,18 @@ class RelationshipTest extends DatabaseTest
 		$this->assert_not_null($event->venue);
 		$this->assert_null($event->venue_id);
 	}
-};
+
+	public function test_gh_125_unset_existing_relation()
+	{
+		$event = new Event(array(
+			'venue' => Venue::create()
+		));
+
+		$event->venue->delete();
+		$event->venue = null;
+		$this->assert_null($event->venue);
+		$this->assert_null($event->venue_id);
+	}
+}
+
 ?>

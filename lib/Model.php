@@ -418,19 +418,21 @@ class Model
 		}
 
 		$table = static::table();
-		if (is_object($value) &&
-		    $relationship = $table->get_relationship($name)
+		if ($relationship = $table->get_relationship($name)
 		) {
-			if ($value instanceof $relationship->class_name) {
+			if (is_null($value)) {
 				$this->__relationships[$name] = $value;
-				if (!$value->is_new_record()) {
-					$pk = $value->get_primary_key(0);
-					return $this->assign_attribute(
-						$relationship->foreign_key[0],
-						$value->$pk[0]
-					);
-				}
-				return; // do nothing
+				return $this->assign_attribute($relationship->foreign_key[0], $value);
+			} elseif (
+				is_object($value) &&
+			    $value instanceof $relationship->class_name
+			) {
+				$this->__relationships[$name] = $value;
+				$pk = $value->get_primary_key(0);
+				return $this->assign_attribute(
+					$relationship->foreign_key[0],
+					$value->is_new_record() ? null : $value->{$pk[0]}
+				);
 			} else {
 				throw new RelationshipException();
 			}
@@ -1868,5 +1870,6 @@ class Model
 		}
 		return true;
 	}
-};
+}
+
 ?>
