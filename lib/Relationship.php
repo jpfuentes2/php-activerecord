@@ -499,8 +499,7 @@ class HasMany extends AbstractRelationship
 
 				$this->set_keys($this->get_table()->class->getName(), true);
 				
-				$class = $this->class_name;
-				$relation = $class::table()->get_relationship($this->through);
+				$relation = $model::table()->get_relationship($this->through);
 				$through_table = $relation->get_table();
 				$this->options['joins'] = $this->construct_inner_join_sql($through_table, true);
 
