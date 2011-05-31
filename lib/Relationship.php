@@ -129,7 +129,7 @@ abstract class AbstractRelationship implements InterfaceRelationship
 	protected function query_and_attach_related_models_eagerly(Table $table, $models, $attributes, $includes=array(), $query_keys=array(), $model_values_keys=array())
 	{
 		$values = array();
-		$options = array();
+		$options = $this->options;
 		$inflector = Inflector::instance();
 		$query_key = $query_keys[0];
 		$model_values_key = $model_values_keys[0];
@@ -138,10 +138,41 @@ abstract class AbstractRelationship implements InterfaceRelationship
 			$values[] = $value[$inflector->variablize($model_values_key)];
 
 		$values = array($values);
-		$options['conditions'] = SQLBuilder::create_conditions_from_underscored_string($table->conn,$query_key,$values);
+		$conditions = SQLBuilder::create_conditions_from_underscored_string($table->conn,$query_key,$values);
+
+		if (isset($options['conditions']) && strlen($options['conditions'][0]) > 1)
+			Utils::add_condition($options['conditions'], $conditions);
+		else
+			$options['conditions'] = $conditions;
 
 		if (!empty($includes))
 			$options['include'] = $includes;
+
+		if (!empty($options['through'])) {
+			// save old keys as we will be reseting them below for inner join convenience
+			$pk = $this->primary_key;
+			$fk = $this->foreign_key;
+
+			$this->set_keys($this->get_table()->class->getName(), true);
+
+			if (!isset($options['class_name'])) {
+				$class = classify($options['through'], true);
+				$through_table = $class::table();
+			} else {
+				$class = $options['class_name'];
+				$relation = $class::table()->get_relationship($options['through']);
+				$through_table = $relation->get_table();
+			}
+			$options['joins'] = $this->construct_inner_join_sql($through_table, true);
+
+			$query_key = $this->primary_key[0];
+
+			// reset keys
+			$this->primary_key = $pk;
+			$this->foreign_key = $fk;
+		}
+
+		$options = $this->unset_non_finder_options($options);
 
 		$class = $this->class_name;
 
@@ -236,11 +267,6 @@ abstract class AbstractRelationship implements InterfaceRelationship
 		return $options;
 	}
 
-	protected function keyify($class_name)
-	{
-		return strtolower(classify(denamespace($class_name))). '_id';
-	}
-
 	/**
 	 * Infers the $this->class_name based on $this->attribute_name.
 	 *
@@ -251,7 +277,8 @@ abstract class AbstractRelationship implements InterfaceRelationship
 	 */
 	protected function set_inferred_class_name()
 	{
-		$this->set_class_name(classify($this->attribute_name, true));
+		$singularize = ($this instanceOf HasMany ? true : false);
+		$this->set_class_name(classify($this->attribute_name, $singularize));
 	}
 
 	protected function set_class_name($class_name)
@@ -315,7 +342,7 @@ abstract class AbstractRelationship implements InterfaceRelationship
 			if ($using_through)
 			{
 				$foreign_key = $this->primary_key[0];
-				$join_primary_key = isset($this->options['join_primary_key']) ? $this->options['join_primary_key'] : $this->foreign_key[0];
+				$join_primary_key = $this->foreign_key[0];
 			}
 			else
 			{
@@ -397,15 +424,15 @@ class HasMany extends AbstractRelationship
 	 *
 	 * <ul>
 	 * <li><b>limit/offset:</b> limit the number of records</li>
-     * <li><b>primary_key:</b> name of the primary_key of the association (defaults to "id")</li>
-     * <li><b>group:</b> GROUP BY clause</li>
-     * <li><b>order:</b> ORDER BY clause</li>
-     * <li><b>through:</b> name of a model</li>
-     * </ul>
+	 * <li><b>primary_key:</b> name of the primary_key of the association (defaults to "id")</li>
+	 * <li><b>group:</b> GROUP BY clause</li>
+	 * <li><b>order:</b> ORDER BY clause</li>
+	 * <li><b>through:</b> name of a model</li>
+	 * </ul>
 	 *
 	 * @var array
 	 */
-	static protected $valid_association_options = array('primary_key', 'order', 'group', 'having', 'limit', 'offset', 'through', 'source', 'join_primary_key');
+	static protected $valid_association_options = array('primary_key', 'order', 'group', 'having', 'limit', 'offset', 'through', 'source');
 
 	protected $primary_key;
 
@@ -441,7 +468,7 @@ class HasMany extends AbstractRelationship
 	{
 		//infer from class_name
 		if (!$this->foreign_key || $override)
-			$this->foreign_key = array($this->keyify($model_class_name));
+			$this->foreign_key = array(Inflector::instance()->keyify($model_class_name));
 
 		if (!$this->primary_key || $override)
 			$this->primary_key = Table::load($model_class_name)->pk;
@@ -471,8 +498,10 @@ class HasMany extends AbstractRelationship
 				$fk = $this->foreign_key;
 
 				$this->set_keys($this->get_table()->class->getName(), true);
-
-				$through_table = Table::load(classify($this->through, true));
+				
+				$class = $this->class_name;
+				$relation = $class::table()->get_relationship($this->through);
+				$through_table = $relation->get_table();
 				$this->options['joins'] = $this->construct_inner_join_sql($through_table, true);
 
 				// reset keys
@@ -607,7 +636,7 @@ class BelongsTo extends AbstractRelationship
 
 		//infer from class_name
 		if (!$this->foreign_key)
-			$this->foreign_key = array($this->keyify($this->class_name));
+			$this->foreign_key = array(Inflector::instance()->keyify($this->class_name));
 
 		$this->primary_key = array(Table::load($this->class_name)->pk[0]);
 	}
