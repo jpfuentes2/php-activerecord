@@ -81,7 +81,7 @@ class MysqlAdapter extends Connection
 	public function native_database_types()
 	{
 		return array(
-			'primary_key' => 'int(11) DEFAULT NULL auto_increment PRIMARY KEY',
+			'primary_key' => 'int(11) UNSIGNED DEFAULT NULL auto_increment PRIMARY KEY',
 			'string' => array('name' => 'varchar', 'length' => 255),
 			'text' => array('name' => 'text'),
 			'integer' => array('name' => 'int', 'length' => 11),
