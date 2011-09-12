@@ -1404,7 +1404,7 @@ class Model
 		$options = static::extract_and_validate_options($args);
 		$options['select'] = 'COUNT(*)';
 
-		if (!empty($args))
+		if (!empty($args) && !is_null($args[0]) && !empty($args[0]))
 		{
 			if (is_hash($args[0]))
 				$options['conditions'] = $args[0];
