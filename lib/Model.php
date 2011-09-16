@@ -207,6 +207,19 @@ class Model
 	static $attr_protected = array();
 
 	/**
+	 * Saving arrays, hashes, and other non-mappable objects in text columns.
+	 *
+	 * <code>
+	 * class Person extends ActiveRecord\Model {
+	 *   static $serialize = array('preferences', 'nicknames');
+	 * }
+	 * </code>
+	 *
+	 * @var array
+	 */
+	static $serialize = array();
+
+	/**
 	 * Delegates calls to a relationship.
 	 *
 	 * <code>
@@ -265,7 +278,35 @@ class Model
 		if ($instantiating_via_find)
 			$this->__dirty = array();
 
+		// initialize attribute serialization
+		if (!empty(static::$serialize))
+			$this->unserialize_attributes();
+
 		$this->invoke_callback('after_construct',false);
+	}
+
+	/**
+	 * Serialize attributes that need to be saved to the database as an object.
+	 */
+	public function serialize_attributes()
+	{
+		foreach (static::$serialize as $name)
+		{
+			$this->attributes[$name] = serialize($this->attributes[$name]);
+			$this->flag_dirty($name);
+		}
+	}
+
+	/**
+	 * Retrieve attributes that were saved to the database as an object.
+	 */
+	public function unserialize_attributes()
+	{
+		foreach (static::$serialize as $name)
+		{
+			$this->attributes[$name] = unserialize($this->attributes[$name]);
+			$this->flag_dirty($name);
+		}
 	}
 
 	/**

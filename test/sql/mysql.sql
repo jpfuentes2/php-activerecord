@@ -40,6 +40,11 @@ CREATE TABLE events (
 	type varchar(15) default NULL
 );
 
+CREATE TABLE forms (
+	id int NOT NULL AUTO_INCREMENT PRIMARY KEY,
+	data TEXT NOT NULL
+);
+
 CREATE TABLE hosts(
 	id INT NOT NULL PRIMARY KEY AUTO_INCREMENT,
 	name VARCHAR(25)

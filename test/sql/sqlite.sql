@@ -39,6 +39,11 @@ CREATE TABLE events (
   type varchar(15) default NULL
 );
 
+CREATE TABLE forms (
+  id INTEGER NOT NULL PRIMARY KEY,
+  data TEXT NOT NULL
+);
+
 CREATE TABLE hosts(
 	id INTEGER NOT NULL PRIMARY KEY,
 	name VARCHAR(25)

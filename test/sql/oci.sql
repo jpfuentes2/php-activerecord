@@ -42,6 +42,12 @@ CREATE TABLE events (
   type varchar(15) default NULL
 );
 
+CREATE SEQUENCE forms_seq;
+CREATE TABLE forms (
+  id INT NOT NULL PRIMARY KEY,
+  venue_id TEXT NOT NULL
+);
+
 CREATE SEQUENCE hosts_seq;
 CREATE TABLE hosts(
 	id INT NOT NULL PRIMARY KEY,
