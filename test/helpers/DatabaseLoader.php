@@ -113,7 +113,18 @@ class DatabaseLoader
 			$fields = join(',',$fields);
 
 			while (($values = fgetcsv($fp)))
+			{
+				if ($this->db->protocol == 'sqlsrv')
+				{
+					try {
+						$this->db->query("SET IDENTITY_INSERT $table ON; INSERT INTO $table($fields) VALUES($markers)",$values);
+						continue;
+					} catch (ActiveRecord\DatabaseException $e) {
+						// ignore
+					}
+				}
 				$this->db->query("INSERT INTO $table($fields) VALUES($markers)",$values);
+			}
 		}
 		fclose($fp);
 	}
