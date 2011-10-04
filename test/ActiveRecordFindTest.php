@@ -226,6 +226,13 @@ class ActiveRecordFindTest extends DatabaseTest
 		$this->assert_equals(1,Author::count(array('name' => 'Tito', 'author_id' => 1)));
 	}
 
+	public function test_gh149_empty_count()
+	{
+		$total = Author::count();
+		$this->assert_equals($total, Author::count(null));
+		$this->assert_equals($total, Author::count(array()));
+	}
+
 	public function test_exists()
 	{
 		$this->assert_true(Author::exists(1));
