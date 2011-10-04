@@ -26,6 +26,11 @@ abstract class Connection
 	 */
 	public $connection;
 	/**
+	 * The string used to describe the database to PDO
+	 * @var string
+	 */
+	public $connection_string;
+	/**
 	 * The last query run.
 	 * @var string
 	 */
@@ -87,6 +92,12 @@ abstract class Connection
 			$connection_string = $connection_string_or_connection_name ?
 				$config->get_connection($connection_string_or_connection_name) :
 				$config->get_default_connection_string();
+			
+			if (!$connection_string)
+			{
+				throw new DatabaseException("Empty connection string for ".
+					"connection name '$connection_string_or_connection_name'");
+			}
 		}
 		else
 			$connection_string = $connection_string_or_connection_name;
@@ -102,11 +113,12 @@ abstract class Connection
 			$connection->protocol = $info->protocol;
 			$connection->logging = $config->get_logging();
 			$connection->logger = $connection->logging ? $config->get_logger() : null;
+			$connection->connection_string = $connection_string;
 
 			if (isset($info->charset))
 				$connection->set_encoding($info->charset);
 		} catch (PDOException $e) {
-			throw new DatabaseException($e);
+			throw new DatabaseException($e, $connection_string);
 		}
 		return $connection;
 	}
@@ -124,7 +136,8 @@ abstract class Connection
 		$source = __DIR__ . "/adapters/$class.php";
 
 		if (!file_exists($source))
-			throw new DatabaseException("$fqclass not found!");
+			throw new DatabaseException("$fqclass not found!",
+				$this->connection_string);
 
 		require_once($source);
 		return $fqclass;
@@ -157,7 +170,10 @@ abstract class Connection
 		$url = @parse_url($connection_url);
 
 		if (!isset($url['host']))
-			throw new DatabaseException('Database host must be specified in the connection string. If you want to specify an absolute filename, use e.g. sqlite://unix(/path/to/file)');
+			throw new DatabaseException('Database host must be specified '.
+				'in the connection string. If you want to specify an '.
+				'absolute filename, use e.g. sqlite://unix(/path/to/file)',
+				$connection_url);
 
 		$info = new \stdClass();
 		$info->protocol = $url['scheme'];
@@ -236,9 +252,12 @@ abstract class Connection
 			else
 				$host = "unix_socket=$info->host";
 
-			$this->connection = new PDO("$info->protocol:$host;dbname=$info->db", $info->user, $info->pass, static::$PDO_OPTIONS);
+			$connection_string = "$info->protocol:$host;dbname=$info->db";
+
+			$this->connection = new PDO($connection_string,
+				$info->user, $info->pass, static::$PDO_OPTIONS);
 		} catch (PDOException $e) {
-			throw new DatabaseException($e);
+			throw new DatabaseException($e, $connection_string);
 		}
 	}
 
@@ -298,18 +317,18 @@ abstract class Connection
 
 		try {
 			if (!($sth = $this->connection->prepare($sql)))
-				throw new DatabaseException($this);
+				throw new DatabaseException($this, $this->connection_string);
 		} catch (PDOException $e) {
-			throw new DatabaseException($this);
+			throw new DatabaseException($this, $this->connection_string);
 		}
 
 		$sth->setFetchMode(PDO::FETCH_ASSOC);
 
 		try {
 			if (!$sth->execute($values))
-				throw new DatabaseException($this);
+				throw new DatabaseException($this, $this->connection_string);
 		} catch (PDOException $e) {
-			throw new DatabaseException($sth);
+			throw new DatabaseException($sth, $this->connection_string);
 		}
 		return $sth;
 	}
@@ -364,7 +383,7 @@ abstract class Connection
 	public function transaction()
 	{
 		if (!$this->connection->beginTransaction())
-			throw new DatabaseException($this);
+			throw new DatabaseException($this, $this->connection_string);
 	}
 
 	/**
@@ -373,7 +392,7 @@ abstract class Connection
 	public function commit()
 	{
 		if (!$this->connection->commit())
-			throw new DatabaseException($this);
+			throw new DatabaseException($this, $this->connection_string);
 	}
 
 	/**
@@ -382,7 +401,7 @@ abstract class Connection
 	public function rollback()
 	{
 		if (!$this->connection->rollback())
-			throw new DatabaseException($this);
+			throw new DatabaseException($this, $this->connection_string);
 	}
 
 	/**
