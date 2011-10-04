@@ -79,12 +79,23 @@ abstract class Connection
 	 *   Everything after the protocol:// part is specific to the connection adapter.
 	 *   OR
 	 *   A connection name that is set in ActiveRecord\Config
+	 *   OR
+	 *   A live PDO connection (PDO object)
 	 *   If null it will use the default connection specified by ActiveRecord\Config->set_default_connection
 	 * @return Connection
 	 * @see parse_connection_url
 	 */
 	public static function instance($connection_string_or_connection_name=null)
 	{
+		// Allow user to poke a live Connection into the Config and
+		// have that used instead of opening a new Connection. Useful
+		// for testing with sqlite memory databases, where every time
+		// you open one, you get a different database.
+		if ($connection_string_or_connection_name instanceof Connection)
+		{
+			return $connection_string_or_connection_name;
+		}
+		
 		$config = Config::instance();
 
 		if (strpos($connection_string_or_connection_name, '://') === false)
