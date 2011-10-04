@@ -100,7 +100,16 @@ class Table
 			ConnectionManager::drop_connection($connection);
 			static::clear_cache();
 		}
-		return ($this->conn = ConnectionManager::get_connection($connection));
+		
+		try
+		{
+			return ($this->conn = ConnectionManager::get_connection($connection));
+		}
+		catch (ActiveRecord\DatabaseException $e)
+		{
+			throw new ActiveRecord\DatabaseException("Failed to open ".
+				"connection for $this->class: $e");
+		}
 	}
 
 	public function create_joins($joins)
