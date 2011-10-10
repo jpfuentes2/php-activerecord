@@ -7,6 +7,8 @@ define('PHP_ACTIVERECORD_VERSION_ID','1.0');
 if (!defined('PHP_ACTIVERECORD_AUTOLOAD_PREPEND'))
 	define('PHP_ACTIVERECORD_AUTOLOAD_PREPEND',true);
 
+namespace ActiveRecord;
+
 require 'lib/Exceptions.php';
 require 'lib/Singleton.php';
 require 'lib/Config.php';
@@ -27,10 +29,10 @@ if (!defined('PHP_ACTIVERECORD_AUTOLOAD_DISABLE'))
 
 function activerecord_autoload($class_name)
 {
-	$path = ActiveRecord\Config::instance()->get_model_directory();
+	$path = Config::instance()->get_model_directory();
 	$root = realpath(isset($path) ? $path : '.');
 
-	if (($namespaces = ActiveRecord\get_namespaces($class_name)))
+	if (($namespaces = get_namespaces($class_name)))
 	{
 		$class_name = array_pop($namespaces);
 		$directories = array();
