@@ -301,7 +301,7 @@ class XmlSerializer extends Serialization
 		$this->writer->endDocument();
 		$xml = $this->writer->outputMemory(true);
 
-		if (@$this->options['skip_instruct'] == true)
+		if (isset($this->options['skip_instruct']) && true == $this->options['skip_instruct'])
 			$xml = preg_replace('/<\?xml version.*?\?>/','',$xml);
 
 		return $xml;
