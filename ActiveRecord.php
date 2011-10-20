@@ -27,23 +27,32 @@ if (!defined('PHP_ACTIVERECORD_AUTOLOAD_DISABLE'))
 
 function activerecord_autoload($class_name)
 {
-	$path = ActiveRecord\Config::instance()->get_model_directory();
-	$root = realpath(isset($path) ? $path : '.');
-
-	if (($namespaces = ActiveRecord\get_namespaces($class_name)))
+$paths = ActiveRecord\Config::instance()->get_model_directories();
+	
+	//within each model directory, look for the model.
+	foreach((array)$paths as $path)
 	{
-		$class_name = array_pop($namespaces);
-		$directories = array();
+		$root = realpath($path);
+		
+		//namespace within the $class_name? if so, look in subdir based on namespace
+		if (($namespaces = ActiveRecord\get_namespaces($class_name)))
+		{
+			$class_name = array_pop($namespaces);
+			$directories = array();
+			foreach ($namespaces as $directory)
+				$directories[] = $directory;
 
-		foreach ($namespaces as $directory)
-			$directories[] = $directory;
+			$root .= DIRECTORY_SEPARATOR . implode($directories, DIRECTORY_SEPARATOR);
+		}
 
-		$root .= DIRECTORY_SEPARATOR . implode($directories, DIRECTORY_SEPARATOR);
+		//if file exists, include it.
+		$file = "$root/$class_name.php";
+		
+		if (file_exists($file))
+		{
+			require $file;
+			if(class_exists($class_name, false)) break; //make double-sure the file actually contains the class we're after
+		}
+
 	}
-
-	$file = "$root/$class_name.php";
-
-	if (file_exists($file))
-		require $file;
 }
-?>

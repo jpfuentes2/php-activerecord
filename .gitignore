@@ -4,3 +4,4 @@
 *.log
 test/*.db
 *.swp
+.idea
