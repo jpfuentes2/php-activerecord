@@ -301,7 +301,7 @@ class XmlSerializer extends Serialization
 		$this->writer->endDocument();
 		$xml = $this->writer->outputMemory(true);
 
-		if (isset($this->options['skip_instruct']) && true == $this->options['skip_instruct'])
+		if (isset($this->options['skip_instruct']) && $this->options['skip_instruct'])
 			$xml = preg_replace('/<\?xml version.*?\?>/','',$xml);
 
 		return $xml;
@@ -345,7 +345,9 @@ class CsvSerializer extends Serialization
 
   public function to_s()
   {
-    if (@$this->options['only_header'] == true) return $this->header();
+    if (isset($this->options['only_header']) && $this->options['only_header'])
+      return $this->header();
+
     return $this->row();
   }
 
@@ -369,4 +371,3 @@ class CsvSerializer extends Serialization
     return $buffer;
   }
 }
-?>
