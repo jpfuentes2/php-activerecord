@@ -219,7 +219,8 @@ class Config extends Singleton
 		
 		//put new directory at the beginning of the array, since client code will 
 		// tend to add a model directory right before using a model in that directory.
-		array_unshift($this->model_directories,$dir);
+		if(!in_array($dir,$this->model_directories))
+			array_unshift($this->model_directories,$dir);
 	}
 	
 	/**
