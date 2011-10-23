@@ -86,8 +86,8 @@ class Table
 		$this->set_setters_and_getters();
 
 		$this->callback = new CallBack($class_name);
-		$this->callback->register('before_save', function(Model $model) { $model->set_timestamps(); }, array('prepend' => true));
-		$this->callback->register('after_save', function(Model $model) { $model->reset_dirty(); }, array('prepend' => true));
+		$this->callback->register('before_save', function(Model $model) { $model->set_timestamps(); $model->serialize_attributes(); }, array('prepend' => true));
+		$this->callback->register('after_save', function(Model $model) { $model->reset_dirty(); $model->unserialize_attributes(); }, array('prepend' => true));
 	}
 
 	public function reestablish_connection($close=true)

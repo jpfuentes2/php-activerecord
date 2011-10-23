@@ -155,11 +155,11 @@ class ActiveRecordTest extends DatabaseTest
 		$venue->reload();
 		$this->assert_equals('NY', $venue->state);
 	}
-	
+
 	public function test_reload_protected_attribute()
 	{
 		$book = BookAttrAccessible::find(1);
-	
+
 		$book->name = "Should not stay";
 		$book->reload();
 		$this->assert_not_equals("Should not stay", $book->name);
@@ -252,6 +252,17 @@ class ActiveRecordTest extends DatabaseTest
 		$this->assert_equals(999, $book->book_id);
 	}
 
+	public function test_serialize()
+	{
+		$form = Form::first();
+		$this->assert_equals('tony', $form->data['name']);
+		$form->data['name'] = 'bob';
+		$form->save();
+
+		$form = Form::first();
+		$this->assert_equals('bob', $form->data['name']);
+	}
+
 	public function test_isset()
 	{
 		$book = new Book();
@@ -301,7 +312,7 @@ class ActiveRecordTest extends DatabaseTest
 		$this->assert_equals($original+1,Author::count());
 		$this->assert_true($ret);
 	}
-	
+
 	public function test_transaction_committed_when_returning_true()
 	{
 		$original = Author::count();
@@ -309,21 +320,21 @@ class ActiveRecordTest extends DatabaseTest
 		$this->assert_equals($original+1,Author::count());
 		$this->assert_true($ret);
 	}
-	
+
 	public function test_transaction_rolledback_by_returning_false()
 	{
 		$original = Author::count();
-		
+
 		$ret = Author::transaction(function()
 		{
 			Author::create(array("name" => "blah"));
 			return false;
 		});
-		
+
 		$this->assert_equals($original,Author::count());
 		$this->assert_false($ret);
 	}
-	
+
 	public function test_transaction_rolledback_by_throwing_exception()
 	{
 		$original = Author::count();
@@ -474,7 +485,7 @@ class ActiveRecordTest extends DatabaseTest
 		$author->save();
 		$this->assert_false($author->attribute_is_dirty('some_date'));
 	}
-	
+
 	public function test_flag_dirty_attribute()
 	{
 		$author = new Author();
@@ -482,7 +493,7 @@ class ActiveRecordTest extends DatabaseTest
 		$this->assert_null($author->dirty_attributes());
 		$this->assert_false($author->attribute_is_dirty('some_inexistant_property'));
 	}
-	
+
 	public function test_assigning_php_datetime_gets_converted_to_ar_datetime()
 	{
 		$author = new Author();

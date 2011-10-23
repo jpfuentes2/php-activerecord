@@ -2,6 +2,7 @@ SELECT setval('authors_author_id_seq', max(author_id)) FROM authors;
 SELECT setval('books_book_id_seq', max(book_id)) FROM books;
 SELECT setval('venues_Id_seq', max(Id)) FROM venues;
 SELECT setval('events_id_seq', max(id)) FROM events;
+SELECT setval('forms_id_seq', max(id)) FROM forms;
 SELECT setval('hosts_id_seq', max(id)) FROM hosts;
 SELECT setval('employees_id_seq', max(id)) FROM employees;
 SELECT setval('positions_id_seq', max(id)) FROM positions;

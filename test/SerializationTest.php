@@ -104,6 +104,21 @@ class SerializationTest extends DatabaseTest
 		$this->assert_equals($book->attributes(),(array)json_decode($json));
 	}
 
+	public function test_to_json_include_empty_associations()
+	{
+		// check $has_many association
+		$json = Host::find(5)->to_json(array('include' => 'events'));
+		$this->assert_equals(array(), json_decode($json)->events);
+
+		// check $belongs_to association
+		$json = Event::find(8)->to_json(array('include' => 'host'));
+		$this->assert_null(json_decode($json)->host);
+
+		// check $has_one association
+		$json = Author::find(5)->to_json(array('include' => 'parent_author'));
+		$this->assert_null(json_decode($json)->parent_author);
+	}
+
 	public function test_to_json_include_root()
 	{
 		ActiveRecord\JsonSerializer::$include_root = true;
