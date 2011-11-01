@@ -901,7 +901,7 @@ class Model
 		$conn = static::connection();
 		$sql = new SQLBuilder($conn, $table->get_fully_qualified_table_name());
 
-		$conditions = is_array($options) ? $options['conditions'] : $options;
+		$conditions = (is_array($options) && isset($options['conditions']))? $options['conditions'] : $options;
 
 		if (is_array($conditions) && !is_hash($conditions))
 			call_user_func_array(array($sql, 'delete'), $conditions);
