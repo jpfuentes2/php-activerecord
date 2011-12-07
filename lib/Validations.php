@@ -556,6 +556,7 @@ class Validations
 	 * <li><b>message:</b> custom error message</li>
 	 * <li><b>allow_blank:</b> allow blank strings</li>
 	 * <li><b>allow_null:</b> allow null strings</li>
+	 * <li><b>case_sensitive:</b> kook for an exact match. Ignored by non-text columns</li>
 	 * </ul>
 	 *
 	 * @param array $attrs Validation definition
@@ -563,7 +564,8 @@ class Validations
 	public function validates_uniqueness_of($attrs)
 	{
 		$configuration = array_merge(self::$DEFAULT_VALIDATION_OPTIONS, array(
-			'message' => Errors::$DEFAULT_ERROR_MESSAGES['unique']
+			'message' => Errors::$DEFAULT_ERROR_MESSAGES['unique'],
+			'case_sensitive' => true
 		));
 
 		foreach ($attrs as $attr)
@@ -597,7 +599,14 @@ class Validations
 			foreach ($fields as $field)
 			{
 				$field = $this->model->get_real_attribute_name($field);
-				$sql .= " and {$field}=?";
+				if($options['case_sensitive'])
+				{
+					$sql .= " and {$field}=?";
+				}
+				else
+				{
+					$sql .= " and {$field} like ?";
+				}
 				array_push($conditions,$this->model->$field);
 			}
 
