@@ -113,6 +113,17 @@ class Column
 	{
 		if ($value === null)
 			return null;
+			
+		/* Empty string is not an appropriate value for any
+		 * column type other than STRING. If the column is nullable,
+		 * then NULL is the closest equivalent, not the default
+		 * (0 or 1970-01-01 or whatever)
+		 */
+		if ($value === "" and $this->type != self::STRING and
+			$this->nullable)
+		{
+			return null;
+		}
 
 		switch ($this->type)
 		{
