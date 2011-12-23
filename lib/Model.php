@@ -570,7 +570,7 @@ class Model
 	public function get_primary_key($first=false)
 	{
 		$pk = static::table()->pk;
-		return $first ? $pk[0] : $pk;
+		return ($first && !empty($pk)) ? $pk[0] : $pk;
 	}
 
 	/**
