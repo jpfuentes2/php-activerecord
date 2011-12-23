@@ -815,8 +815,9 @@ class Model
 			$table->insert($attributes);
 
 		// if we've got an autoincrementing/sequenced pk set it
-		// don't need this check until the day comes that we decide to support composite pks
-		// if (count($pk) == 1)
+        // this is needed because we might have a table without primary key
+		// @TODO: support composite pks
+		if (count($pk) == 1)
 		{
 			$column = $table->get_column_by_inflected_name($pk);
 
