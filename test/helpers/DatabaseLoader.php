@@ -3,10 +3,20 @@ class DatabaseLoader
 {
 	private $db;
 	static $instances = array();
+	protected $fixtures_path;
 
-	public function __construct($db)
+	public function __construct($db, $fixtures_path = NULL)
 	{
 		$this->db = $db;
+		
+		if ($fixtures_path)
+		{
+			$this->fixtures_path = $fixtures_path;
+		}
+		else
+		{
+			$this->fixtures_path = __DIR__ . '/../fixtures';
+		}
 
 		if (!isset(static::$instances[$db->protocol]))
 			static::$instances[$db->protocol] = 0;
@@ -14,10 +24,15 @@ class DatabaseLoader
 		if (static::$instances[$db->protocol]++ == 0)
 		{
 			// drop and re-create the tables one time only
-			$this->drop_tables();
-			$this->exec_sql_script($db->protocol);
+			$this->drop_and_recreate_tables();
 		}
 	}
+	
+	public function drop_and_recreate_tables()
+	{
+		$this->drop_tables();
+		$this->exec_sql_script($db->protocol);
+	}	
 
 	public function reset_table_data()
 	{
@@ -67,10 +82,13 @@ class DatabaseLoader
 
 	public function exec_sql_script($file)
 	{
-		foreach (explode(';',$this->get_sql($file)) as $sql)
+		foreach (explode(";\n", $this->get_sql($file)) as $sql)
 		{
 			if (trim($sql) != '')
+			{
+				// print "executing query \{$sql\}\n";
 				$this->db->query($sql);
+			}
 		}
 	}
 
@@ -78,11 +96,14 @@ class DatabaseLoader
 	{
 		$tables = array();
 
-		foreach (glob(__DIR__ . '/../fixtures/*.csv') as $file)
+		foreach (glob($this->fixtures_path."/*.csv") as $file)
 		{
 			$info = pathinfo($file);
 			$tables[] = $info['filename'];
 		}
+
+		print "fixtures in ".$this->fixtures_path.": ".
+			print_r($tables, TRUE)."\n";
 
 		return $tables;
 	}
@@ -99,7 +120,7 @@ class DatabaseLoader
 
 	public function load_fixture_data($table)
 	{
-		$fp = fopen(__DIR__ . "/../fixtures/$table.csv",'r');
+		$fp = fopen($this->fixtures_path."/$table.csv",'r');
 		$fields = fgetcsv($fp);
 
 		if (!empty($fields))
