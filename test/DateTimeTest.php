@@ -1,6 +1,7 @@
 <?php
 include 'helpers/config.php';
 use ActiveRecord\DateTime as DateTime;
+use ActiveRecord\DatabaseException;
 
 class DateTimeTest extends SnakeCase_PHPUnit_Framework_TestCase
 {
@@ -17,7 +18,11 @@ class DateTimeTest extends SnakeCase_PHPUnit_Framework_TestCase
 
 	private function assert_dirtifies($method /*, method params, ...*/)
 	{
-		$model = new Author();
+		try {
+			$model = new Author();
+		} catch (DatabaseException $e) {
+			$this->mark_test_skipped('failed to connect. '.$e->getMessage());
+		}
 		$datetime = new DateTime();
 		$datetime->attribute_of($model,'some_date');
 
