@@ -39,8 +39,26 @@ class SqliteAdapterTest extends AdapterTest
 		$this->assert_true(strpos($this->conn->last_query, 'LIMIT 1') !== false);
 	}
 
+	public function test_gh183_sqliteadapter_autoincrement()
+	{
+		// defined in lowercase: id integer not null primary key
+		$columns = $this->conn->columns('awesome_people');
+		$this->assert_true($columns['id']->auto_increment);
+
+		// defined in uppercase: `amenity_id` INTEGER NOT NULL PRIMARY KEY
+		$columns = $this->conn->columns('amenities');
+		$this->assert_true($columns['amenity_id']->auto_increment);
+
+		// defined using int: `rm-id` INT NOT NULL
+		$columns = $this->conn->columns('`rm-bldg`');
+		$this->assert_false($columns['rm-id']->auto_increment);
+
+		// defined using int: id INT NOT NULL PRIMARY KEY
+		$columns = $this->conn->columns('hosts');
+		$this->assert_true($columns['id']->auto_increment);
+	}
+
 	// not supported
-	public function testCompositeKey() {}
-	public function testConnectWithPort() {}
+	public function test_connect_with_port() {}
 }
 ?>
