@@ -207,6 +207,20 @@ class Model
 	static $attr_protected = array();
 
 	/**
+	 * Whitelist of relations that can be set through nested attributes with assign_attributes().
+	 *
+	 * <code>
+	 * class Person extends ActiveRecord\Model {
+	 *   static $accepts_nested_attributes_for = array('city');
+	 * }
+	 * </code>
+	 *
+	 * @var array
+	 */
+
+	static $accepts_nested_attributes_for = array();
+
+	/**
 	 * Delegates calls to a relationship.
 	 *
 	 * <code>
@@ -452,6 +466,174 @@ class Model
 		$this->attributes[$name] = $value;
 		$this->flag_dirty($name);
 		return $value;
+	}
+
+	public function assign_attributes(array $attributes, $assignment_opts = array()) {
+		$fields = $this->attributes();
+		$results = array();
+		$result = true;
+		foreach ($attributes as $attribute => $value) {
+			# If the field is an array, it should contain fields and values for a related model.
+			$results = array();
+			if (is_array($value) && array_search($attribute, static::$accepts_nested_attributes_for) !== false) {
+				# Check first value in $value array to determine if this is a
+				# polyrelation and if we have values for more than one instance.
+				reset($value);
+				$first_key = key($value);
+
+				if (is_array($value[$first_key])) {
+					# Polyrelation with more than one instance.
+					$results[$attribute] = $this->assign_nested_attributes_for_collection_association($attribute, $value, $assignment_opts);
+				} else {
+					# Single relation instance.
+					$results[$attributes] = $this->assign_nested_attributes_for_one_to_one_association($attribute, $value, $assignment_opts);
+				}
+			} else if (array_key_exists($attribute, $fields)) {
+				$this->$attribute = $value;
+			}
+		}
+		foreach ($results as $result) {
+			if ($result === false) {
+				break;
+			}
+		}
+		$result = $result && $this->save();
+		return $result;
+	}
+
+	protected function assign_nested_attributes_for_one_to_one_association($association_name, array $attributes, array $assignment_opts = array()) {
+		$relationship = $this->table()->get_relationship($association_name);
+		if (is_null($relationship)) {
+			return false;
+		}
+		$association_class = $relationship->class_name;
+		$associated_model = new $association_class();
+		$pk = $associated_model->get_primary_key();
+		$pk = $pk[0];
+
+		$ordered_models = $this->associated_models_by_primary_key($association_name, $attributes);
+		$result = null;
+
+		if (!is_null($this->$association_name) && $attributes[$pk] != $this->$association_name->$pk) {
+			$self_pk = $this->get_primary_key();
+			$associated_model = $relationship->first_or_create_association(array($pk => $attributes[$pk]));
+		}
+		$result = $this->$association_name->assign_attributes($attributes, $assignment_opts);
+
+		return !$this->$association_name->is_dirty();
+	}
+
+	protected function assign_nested_attributes_for_collection_association($association_name, array $attributes_collection, array $assignment_opts = array()) {
+		$relationship = $this->table()->get_relationship($association_name);
+		if (is_null($relationship)) {
+			return false;
+		}
+		$association_class = $relationship->class_name;
+		$associated_model = new $association_class();
+		$pk = $associated_model->get_primary_key();
+		$pk = $pk[0];
+		# Array of seperate model save results.
+		$association_results = array();
+
+		# Combined result. (ie. if one of the models return false)
+		$result_combined = false;
+
+		$ordered_models = $this->associated_models_by_primary_key($association_name, $attributes_collection);
+
+		# We are now set to begin assignment.
+		foreach ($attributes_collection as $association_index => $association_attributes) {
+			# Primary key for the current posted instance.
+			$current_pk = (!empty($association_attributes[$pk])) ? $association_attributes[$pk] : null;
+
+			# Check if the instance exist (If it does we've already loaded it).
+			if ($current_pk && !empty($ordered_models[$current_pk])) {
+				unset($association_attributes[$pk]);
+				$association_results[$association_name] = $ordered_models[$current_pk]->assign_attributes($association_attributes, $assignment_opts);
+			} elseif ($current_pk) {
+				# Instance does not exist, error!
+				$new_association = $relationship->first_or_create_association($this, array($pk => $association_attributes[$pk]));
+				$new_association->assign_attributes($association_attributes, $assignment_opts);
+				$association_results[$association_name] = ($new_association->is_dirty()) ? false : true;
+			} else {
+				# Create the instance.
+				$new_association = $relationship->first_or_create_association($this, array());
+				$new_association->assign_attributes($association_attributes, $assignment_opts);
+				$association_results[$association_name] = ($new_association->is_dirty()) ? false : true;
+			}
+		}
+		# Check results and combine.
+		if (!empty($association_results)) {
+			foreach ($association_results as $result) {
+				if (!$result) {
+					break;
+				}
+			}
+		}
+		return $result;
+	}
+
+	protected function needs_reload_for($relationship, $association_name, $attributes_array, $pk) {
+		# Array to be populated with a check to see if the relation instances are already loaded.
+		$need_to_load = false;
+		$pks_already_loaded = array();
+		if (!is_null($this->$association_name)) {
+			if ($relationship->is_poly() && is_array($this->$association_name)) {
+				foreach ($this->$association_name as &$association) {
+					if (!empty($association->$pk)) {
+						# Mark as already loaded
+						$pks_already_loaded[$association->$pk] = true;
+					}
+				}
+			} else {
+				$pks_already_loaded[$this->$association_name->$pk] = true;
+			}
+		} else {
+			# Find out if instances are missing..
+			$need_to_load = false;
+			if ($relationship->is_poly()) {
+				foreach ($attributes_array as $index => $attributes) {
+					if (!empty($attributes[$pk]) && !array_key_exists($attributes[$pk], $pks_already_loaded)) {
+						$need_to_load = true;
+						break;
+					}
+				}
+			} else {
+				# Single relationship that is null, load!
+				$need_to_load = true;
+			}
+		}
+		return $need_to_load;
+	}
+
+	protected function associated_models_by_primary_key($association_name, array $attributes_array) {
+
+		$relationship = $this->table()->get_relationship($association_name);
+		$association_class = $relationship->class_name;
+		$associated_model = new $association_class();
+		$pk = $associated_model->get_primary_key();
+		$pk = $pk[0];
+
+		# We need to load all instances that needs updating which are not allready loaded.
+		if ($this->needs_reload_for($relationship, $association_name, $attributes_array, $pk)) {
+			$models = array(&$this);
+			$relationship->load_eagerly($models, $this->attributes(), array(), static::table());
+		}
+
+		# Order the newly loaded instances by primary key.
+		$associated_models = array();
+		if ($relationship->is_poly()) {
+			if (!is_null($this->$association_name) && count($this->$association_name)) {
+				foreach ($this->$association_name as &$association) {
+					$associated_models[$association->$pk] = &$association;
+				}
+			}
+		} else {
+			if (!is_null($this->$association_name)) {
+				$associated_models[$this->$association_name->$pk] = &$this->$association_name;
+			}
+		}
+
+		return $associated_models;
 	}
 
 	/**
@@ -1531,7 +1713,7 @@ class Model
 					$single = false;
 					break;
 
-			 	case 'last':
+				case 'last':
 					if (!array_key_exists('order',$options))
 						$options['order'] = join(' DESC, ',static::table()->pk) . ' DESC';
 					else
@@ -1539,10 +1721,10 @@ class Model
 
 					// fall thru
 
-			 	case 'first':
-			 		$options['limit'] = 1;
-			 		$options['offset'] = 0;
-			 		break;
+				case 'first':
+					$options['limit'] = 1;
+					$options['offset'] = 0;
+					break;
 			}
 
 			$args = array_slice($args,1);
@@ -1744,7 +1926,7 @@ class Model
    */
   public function to_csv(array $options=array())
   {
-    return $this->serialize('Csv', $options);
+	return $this->serialize('Csv', $options);
   }
 
 	/**
