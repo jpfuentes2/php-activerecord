@@ -472,33 +472,52 @@ class Model
 		$fields = $this->attributes();
 		$results = array();
 		$result = true;
+		$nested_attributes = array();
+
 		foreach ($attributes as $attribute => $value) {
 			# If the field is an array, it should contain fields and values for a related model.
 			$results = array();
 			if (is_array($value) && array_search($attribute, static::$accepts_nested_attributes_for) !== false) {
-				# Check first value in $value array to determine if this is a
-				# polyrelation and if we have values for more than one instance.
-				reset($value);
-				$first_key = key($value);
-
-				if (is_array($value[$first_key])) {
-					# Polyrelation with more than one instance.
-					$results[$attribute] = $this->assign_nested_attributes_for_collection_association($attribute, $value, $assignment_opts);
-				} else {
-					# Single relation instance.
-					$results[$attributes] = $this->assign_nested_attributes_for_one_to_one_association($attribute, $value, $assignment_opts);
-				}
+				# We have to save these for later, or there will be no key to reference on this model.
+				$nested_attributes[$attribute] = $value;
 			} else if (array_key_exists($attribute, $fields)) {
 				$this->$attribute = $value;
 			}
 		}
-		foreach ($results as $result) {
-			if ($result === false) {
+
+		# Save the model so an id gets generated.
+		if ($this->is_dirty()) {
+			$result = $result && $this->save();
+		}
+
+		foreach ($nested_attributes as $attribute => $value) {
+			# Check first value in $value array to determine if this is a
+			# polyrelation and if we have values for more than one instance.
+			reset($value);
+			$first_key = key($value);
+
+			if (is_array($value[$first_key])) {
+				# Polyrelation with more than one instance.
+				$results[$attribute] = $this->assign_nested_attributes_for_collection_association($attribute, $value, $assignment_opts);
+			} else {
+				# Single relation instance.
+				$results[$attribute] = $this->assign_nested_attributes_for_one_to_one_association($attribute, $value, $assignment_opts);
+			}
+		}
+
+		# Some relations might set id's on the model. (TODO: find a better way to do this. Should not have to save twice).
+		if ($this->is_dirty()) {
+			$result = $result && $this->save();
+		}
+
+		$relation_result = true;
+		foreach ($results as $relation_result) {
+			if ($relation_result === false) {
 				break;
 			}
 		}
-		$result = $result && $this->save();
-		return $result;
+
+		return $result && $relation_result;
 	}
 
 	protected function assign_nested_attributes_for_one_to_one_association($association_name, array $attributes, array $assignment_opts = array()) {
@@ -513,10 +532,9 @@ class Model
 
 		$ordered_models = $this->associated_models_by_primary_key($association_name, $attributes);
 		$result = null;
-
-		if (!is_null($this->$association_name) && $attributes[$pk] != $this->$association_name->$pk) {
+		if (!is_null($this->$association_name) && !empty($attributes[$pk]) && $attributes[$pk] != $this->$association_name->$pk) {
 			$self_pk = $this->get_primary_key();
-			$associated_model = $relationship->first_or_create_association(array($pk => $attributes[$pk]));
+			$associated_model = $relationship->first_or_create_association($this, array($pk => $attributes[$pk]));
 		}
 		$result = $this->$association_name->assign_attributes($attributes, $assignment_opts);
 
@@ -556,7 +574,7 @@ class Model
 				$association_results[$association_name] = ($new_association->is_dirty()) ? false : true;
 			} else {
 				# Create the instance.
-				$new_association = $relationship->first_or_create_association($this, array());
+				$new_association = $relationship->create_association($this);
 				$new_association->assign_attributes($association_attributes, $assignment_opts);
 				$association_results[$association_name] = ($new_association->is_dirty()) ? false : true;
 			}

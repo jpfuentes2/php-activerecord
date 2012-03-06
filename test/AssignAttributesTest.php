@@ -49,7 +49,7 @@ class AssignAttributesTest extends DatabaseTest {
 	static $single_data = array(
 		'name' => 'Test Person',
 		'awesome_person' => array(
-			'author_id' => 2,
+			'id' => 2,
 		)
 	);
 
@@ -62,22 +62,50 @@ class AssignAttributesTest extends DatabaseTest {
 		$data = static::$poly_data2;
 		Author::$accepts_nested_attributes_for = array('books');
 		$author = new Author();
-		$author->assign_attributes($data);
+		$result = $author->assign_attributes($data);
+
 
 		$this->assert_equals(3, count($author->books));
 		$this->assert_equals(true, $author->books[0] instanceof Book);
 		$this->assert_equals($data['books'][0]['name'], $author->books[0]->name);
+		$this->assert_equals(false, $author->books[0]->is_new_record());
+		$this->assert_equals(false, $author->books[0]->is_dirty());
 
 		$book = Book::find($data['books'][1]['book_id']);
 		$this->assert_equals(true, $author->books[1] instanceof Book);
 		$this->assert_equals(1, $author->books[1]->id);
-		$this->assert_equals($book->name, $author->books[1]->name);
+		$this->assert_equals(false, $author->books[1]->is_new_record());
+		$this->assert_equals(false, $author->books[1]->is_dirty());
 
 		$this->assert_equals(true, $author->books[2] instanceof Book);
 		$this->assert_equals(2, $author->books[2]->id);
-		$this->assert_equals($data['books'][2]['name'], $author->books[2]->name);
+		$this->assert_equals(false, $author->books[2]->is_new_record());
+		$this->assert_equals(false, $author->books[2]->is_dirty());
+
+		//Verify everything was saved.
+
+		$id = $author->author_id;
+		$author = Author::find($id, array('include' => 'books'));
+
+		$this->assert_equals(3, count($author->books));
 	}
 
+	public function test_single_relation_assign_attributes() {
+		$data = static::$single_data;
+		Author::$accepts_nested_attributes_for = array('awesome_person');
+		$author = Author::find(3);
+		$author->assign_attributes($data);
+
+		$this->assert_equals(2, $author->awesome_person->id);
+		$this->assert_equals(3, $author->awesome_person->author_id);
+
+		//Verify everything was saved.
+
+		$author = Author::find(3);
+		$this->assert_equals(2, $author->awesome_person->id);
+		$this->assert_equals(3, $author->awesome_person->author_id);
+
+	}
 
 	/*public function test_poly_relation_assign_attributes_has_many_through() {
 		Host::$accepts_nested_attributes_for = array('venues');
