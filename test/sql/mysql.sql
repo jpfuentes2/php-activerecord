@@ -4,7 +4,7 @@ CREATE TABLE authors(
 	name VARCHAR(25) NOT NULL DEFAULT 'default_name',
 	updated_at datetime,
 	created_at datetime,
-	some_date date,
+	some_Date date,
 	some_time time,
 	some_text text,
 	some_enum enum('a','b','c'),
