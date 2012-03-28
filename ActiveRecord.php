@@ -47,12 +47,19 @@ $paths = ActiveRecord\Config::instance()->get_model_directories();
 
 		//if file exists, include it.
 		$file = "$root/$class_name.php";
-		
+		log_message('debug','Searching for '.$class_name.' class in '.$file);
 		if (file_exists($file))
 		{
+			log_message('debug',basename($file).' found.');
 			require $file;
-			if(class_exists($class_name, false)) break; //make double-sure the file actually contains the class we're after
+			if(class_exists($class_name, false)) 
+			{
+				log_message('debug','....and class '.$class_name.' exists.');
+				break; //make double-sure the file actually contains the class we're after
+			}
+			else log_message('error','.....but class '.$class_name.' is not there!');
 		}
+		else log_message('debug',basename($file).' not found there.  Alas.');
 
 	}
 }
