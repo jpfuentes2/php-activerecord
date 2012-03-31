@@ -64,7 +64,7 @@ abstract class AbstractRelationship implements InterfaceRelationship
 	 *
 	 * @var array
 	 */
-	static protected $valid_association_options = array('class_name', 'class', 'foreign_key', 'conditions', 'select', 'readonly');
+	static protected $valid_association_options = array('class_name', 'class', 'foreign_key', 'conditions', 'select', 'readonly', 'namespace');
 
 	/**
 	 * Constructs a relationship.
@@ -157,6 +157,9 @@ abstract class AbstractRelationship implements InterfaceRelationship
 
 			if (!isset($options['class_name'])) {
 				$class = classify($options['through'], true);
+				if (isset($this->options['namespace']) && !class_exists($class))
+					$class = $this->options['namespace'].'\\'.$class;
+
 				$through_table = $class::table();
 			} else {
 				$class = $options['class_name'];
@@ -283,7 +286,16 @@ abstract class AbstractRelationship implements InterfaceRelationship
 
 	protected function set_class_name($class_name)
 	{
-		$reflection = Reflections::instance()->add($class_name)->get($class_name);
+		try {
+			$reflection = Reflections::instance()->add($class_name)->get($class_name);
+		} catch (\ReflectionException $e) {
+			if (isset($this->options['namespace'])) {
+				$class_name = $this->options['namespace'].'\\'.$class_name;
+				$reflection = Reflections::instance()->add($class_name)->get($class_name);
+			} else {
+				throw $e;
+			}
+		}
 
 		if (!$reflection->isSubClassOf('ActiveRecord\\Model'))
 			throw new RelationshipException("'$class_name' must extend from ActiveRecord\\Model");
