@@ -61,7 +61,7 @@ class ActiveRecordFindTest extends DatabaseTest
 	}
 
 	/**
-	 * @expectedException Exception
+	 * @expectedException ActiveRecord\RecordNotFound
 	 */
 	public function test_find_nothing_with_sql_in_string()
 	{
