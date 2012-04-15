@@ -112,9 +112,9 @@ class AdapterTest extends DatabaseTest
 	public function test_date()
 	{
 		$columns = $this->conn->columns('authors');
-		$this->assert_equals('date',$columns['some_date']->raw_type);
-		$this->assert_equals(Column::DATE,$columns['some_date']->type);
-		$this->assert_true($columns['some_date']->length >= 7);
+		$this->assert_equals('date', $columns['some_Date']->raw_type);
+		$this->assert_equals(Column::DATE, $columns['some_Date']->type);
+		$this->assert_true($columns['some_Date']->length >= 7);
 	}
 
 	public function test_columns_no_inflection_on_hash_key()
@@ -258,7 +258,7 @@ class AdapterTest extends DatabaseTest
 	public function test_columnsx()
 	{
 		$columns = $this->conn->columns('authors');
-		$names = array('author_id','parent_author_id','name','updated_at','created_at','some_date','some_time','some_text','encrypted_password','mixedCaseField');
+		$names = array('author_id','parent_author_id','name','updated_at','created_at','some_Date','some_time','some_text','encrypted_password','mixedCaseField');
 
 		if ($this->conn instanceof ActiveRecord\OciAdapter)
 			$names = array_filter(array_map('strtolower',$names),function($s) { $s !== 'some_time'; });
