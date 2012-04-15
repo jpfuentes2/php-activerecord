@@ -26,25 +26,26 @@ class ConnectionManager extends Singleton
 	 */
 	public static function get_connection($name=null)
 	{
-        $config = Config::instance();
-        $name = $name ? $name : $config->get_default_connection();
+		$config = Config::instance();
+		$name = $name ? $name : $config->get_default_connection();
 
 		if (!isset(self::$connections[$name]) || !self::$connections[$name]->connection)
-            self::$connections[$name] = Connection::instance($config->get_connection($name));
+			self::$connections[$name] = Connection::instance($config->get_connection($name));
 
 		return self::$connections[$name];
 	}
 
-  /**
-   * Drops the connection from the connection manager. Does not actually close it since there
-   * is no close method in PDO.
-   *
-   * @param string $name Name of the connection to forget about
-   */
+	/**
+	 * Drops the connection from the connection manager. Does not actually close it since there
+	 * is no close method in PDO.
+	 *
+	 * @param string $name Name of the connection to forget about
+	 */
 	public static function drop_connection($name=null)
 	{
 		if (isset(self::$connections[$name]))
 			unset(self::$connections[$name]);
 	}
-};
+}
+
 ?>
