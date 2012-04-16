@@ -649,9 +649,26 @@ class BelongsTo extends AbstractRelationship
 		//infer from class_name
 		if (!$this->foreign_key)
 			$this->foreign_key = array(Inflector::instance()->keyify($this->class_name));
-
-		$this->primary_key = array(Table::load($this->class_name)->pk[0]);
 	}
+
+	/**
+	 * Magic method, the getter. Lazy calculation of the primary_key. 
+	 * Aside from a slight performance gain it prevents an error when the 
+	 * referenced table doesn't exist yet (the relation is marked but the 
+	 * table doesn't exist and all the foreign keys are null).
+	 * 
+	 * Why is this needed only in BelongsTo? Because for HasOne/Many the primary key 
+	 * always exists. In those cases we can't be sure about the foreign key, but that's 
+	 * infered without SQL queries
+	 */
+	public function __get($name)
+	{
+		if($name=='primary_key' && !isset($this->primary_key)) {
+			$this->primary_key = array(Table::load($this->class_name)->pk[0]);
+		}
+		return @$this->$name;
+	}	
+
 
 	public function load(Model $model)
 	{
