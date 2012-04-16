@@ -58,7 +58,7 @@ class Table
 		{
 			/* do not place set_assoc in constructor..it will lead to infinite loop due to
 			   relationships requesting the model's table, but the cache hasn't been set yet */
-			self::$cache[$model_class_name] = new Table($model_class_name);
+			self::$cache[$model_class_name] = new static($model_class_name);
 			self::$cache[$model_class_name]->set_associations();
 		}
 
@@ -552,4 +552,3 @@ class Table
 			http://www.phpactiverecord.org/projects/main/wiki/Utilities#attribute-setters and http://www.phpactiverecord.org/projects/main/wiki/Utilities#attribute-getters on how to make use of this option.', E_USER_DEPRECATED);
 	}
 };
-?>
