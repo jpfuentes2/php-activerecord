@@ -37,7 +37,7 @@ class PgsqlAdapter extends Connection
 	public function query_column_info($table)
 	{
         if (false === strpos($table, '.')) {
-            $values   = [$table, $table];
+            $values   = array($table, $table);
             $addon    = '';
         } else {
             $values   = explode('.', str_replace('"', '', $table));
@@ -143,3 +143,4 @@ class PgsqlAdapter extends Connection
 	}
 
 }
+?>
