@@ -36,32 +36,39 @@ class PgsqlAdapter extends Connection
 
 	public function query_column_info($table)
 	{
-		$sql = <<<SQL
-SELECT
-      a.attname AS field,
-      a.attlen,
-      REPLACE(pg_catalog.format_type(a.atttypid, a.atttypmod), 'character varying', 'varchar') AS type,
-      a.attnotnull AS not_nullable,
-      (SELECT 't'
-        FROM pg_index
-        WHERE c.oid = pg_index.indrelid
-        AND a.attnum = ANY (pg_index.indkey)
-        AND pg_index.indisprimary = 't'
-      ) IS NOT NULL AS pk,      
-      REGEXP_REPLACE(REGEXP_REPLACE(REGEXP_REPLACE((SELECT pg_attrdef.adsrc
-        FROM pg_attrdef
-        WHERE c.oid = pg_attrdef.adrelid
-        AND pg_attrdef.adnum=a.attnum
-      ),'::[a-z_ ]+',''),'''$',''),'^''','') AS default
-FROM pg_attribute a, pg_class c, pg_type t
-WHERE c.relname = ?
-      AND a.attnum > 0
-      AND a.attrelid = c.oid
-      AND a.atttypid = t.oid
-ORDER BY a.attnum
-SQL;
-		$values = array($table);
-		return $this->query($sql,$values);
+        if (false === strpos($table, '.')) {
+            $values   = [$table, $table];
+            $addon    = '';
+        } else {
+            $values   = explode('.', str_replace('"', '', $table));
+            $values[] = $values[1];
+            $addon    = ' JOIN pg_namespace AS n ON c.relnamespace = n.oid AND n.nspname = ? ';
+        }
+
+        $sql = "
+            SELECT
+                  a.attname AS field
+                , a.attlen
+                , REPLACE(pg_catalog.format_type(a.atttypid, a.atttypmod), 'character varying', 'varchar') AS type
+                , a.attnotnull AS not_nullable
+                , i.indisprimary as pk
+                , REGEXP_REPLACE(REGEXP_REPLACE(REGEXP_REPLACE(s.column_default, '::[a-z_ ]+', ''), '''$', ''), '^''', '') AS default
+            FROM
+                pg_catalog.pg_attribute a
+            LEFT JOIN
+                pg_catalog.pg_class c ON(a.attrelid=c.oid)
+            $addon
+            LEFT JOIN
+                pg_catalog.pg_index i ON(c.oid=i.indrelid AND a.attnum=any(i.indkey))
+            LEFT JOIN
+                information_schema.columns s ON(s.table_name=? AND a.attname=s.column_name)
+            WHERE
+                a.attrelid = (SELECT c.oid from pg_catalog.pg_class c
+                              INNER JOIN pg_catalog.pg_namespace n on(n.oid=c.relnamespace) WHERE c.relname=?)
+                AND a.attnum > 0 AND NOT a.attisdropped
+            ORDER BY a.attnum";
+
+        return $this->query($sql, $values);
 	}
 
 	public function query_for_tables()
@@ -136,4 +143,3 @@ SQL;
 	}
 
 }
-?>
