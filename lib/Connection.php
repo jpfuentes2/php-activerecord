@@ -19,6 +19,7 @@ use Closure;
  */
 abstract class Connection
 {
+	const PRIMARY_KEY	= 'primary_key';
 
 	/**
 	 * The PDO connection object.
@@ -47,6 +48,13 @@ abstract class Connection
 	 * @var string
 	 */
 	public $protocol;
+	
+	/**
+	 * The amount of time that passed for execution of query
+	 * @var float
+	 */
+	private $execution_time;
+	
 	/**
 	 * Default PDO options to set for each connection.
 	 * @var array
@@ -295,7 +303,7 @@ abstract class Connection
 			$this->logger->log($sql);
 
 		$this->last_query = $sql;
-
+		$start	= microtime(true);
 		try {
 			if (!($sth = $this->connection->prepare($sql)))
 				throw new DatabaseException($this);
@@ -311,7 +319,27 @@ abstract class Connection
 		} catch (PDOException $e) {
 			throw new DatabaseException($sth);
 		}
+		$end	= microtime(true);
+		$this->set_execution_time($end - $start);
+		
 		return $sth;
+	}
+	
+	/**
+	 * Getter for execution time
+	 * @return float
+	 */
+	public function get_execution_time() {
+		return $this->execution_time;
+	}
+	
+	/**
+	 * Setter for execution time
+	 * @param float $time
+	 */
+	private function set_execution_time($time) {
+		$this->execution_time	= $time;
+		return $this;
 	}
 
 	/**
@@ -516,7 +544,42 @@ abstract class Connection
 	{
 		return false;
 	}
-
+	
+	/**
+	 * Creates column sql
+	 * @param string $name
+	 * @param string $type
+	 * @param integer $length
+	 * @param boolean $null
+	 * @return string
+	 * @throws ActiveRecordException
+	 */
+	public function column($name, $type, $length = null, $null = true)
+	{
+		$native_types	= $this->native_database_types();
+		if (!isset($native_types[$type]))
+		throw new ActiveRecordException("Column type not known for $name $type");
+		
+		$type	= $native_types[$type];
+		if ($name == self::PRIMARY_KEY) 
+			return $type;
+		
+		$sql	= "$name {$type['name']}";
+		
+		if (!$length && isset($type['length'])) {
+			$sql	.= ' (' . $type['length'] . ')';
+		} elseif ($length) {
+			$sql	.= ' (' . $length . ')';
+		}
+		
+		if ($null) {
+			$sql	.= ' NULL';
+		} else {
+			$sql	.= ' NOT NULL';
+		}
+		
+		return $sql;
+	}
 }
 
 ;

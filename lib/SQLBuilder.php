@@ -30,6 +30,9 @@ class SQLBuilder
 	// for insert/update
 	private $data;
 	private $sequence;
+	
+	// for create
+	private $columns;
 
 	/**
 	 * Constructor.
