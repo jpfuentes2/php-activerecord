@@ -1,8 +1,11 @@
 # PHP ActiveRecord #
 
+Forked from:
 Version 1.0
-
 by Kien La and Jacques Fuentes
+
+by Zachary Quintana
+Added migrations and collections for return arrays
 
 <http://www.phpactiverecord.org/>
 

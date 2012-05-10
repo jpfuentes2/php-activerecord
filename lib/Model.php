@@ -982,6 +982,13 @@ class Model
 		return $ret->rowCount();
 
 	}
+	
+	/**
+	 * Alias for delete
+	 */
+	public function destroy() {
+		return $this->delete();
+	}
 
 	/**
 	 * Deletes this model from the database and returns true if successful.
@@ -1100,7 +1107,7 @@ class Model
 	 */
 	public function set_timestamps()
 	{
-		$now = date('Y-m-d H:i:s');
+		$now = @date('Y-m-d H:i:s');
 
 		if (isset($this->updated_at))
 			$this->updated_at = $now;

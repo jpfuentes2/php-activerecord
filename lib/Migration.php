@@ -15,6 +15,7 @@ abstract class Migration {
 	private $columns;
 	private $id = false;
 	private $version;
+	private $record;
 	private $migrated = null;
 	private $direction	= null;
 	private $log	= array();
@@ -26,21 +27,38 @@ abstract class Migration {
 		if (!$connection)
 			throw new ActiveRecordException('A valid database connection is required.');
 		
-		$path	= pathinfo(__FILE__);
+		$reflection	= new \ReflectionClass($this);
+		$path	= pathinfo($reflection->getFileName());
 		$filename	= $path['filename'];
 		$filenameArr= explode('_', $filename);
 		$version	= $filenameArr[0];
 		$this->connection	= $connection;
-		$this->version	= $version;
+		$this->set_version($version);
 		
-		$migrated	= SchemaMigrations::find_by_version($this->version);
-		if ($migrated) 
+		if ($this->migrated()) 
 			$this->direction = self::DOWN;
 		else 
 			$this->direction = self::UP;
 	}
 	
 	abstract public function change();
+	
+	/**
+	 * Getter for record
+	 */
+	public function record() {	
+		return $this->record;
+	}
+	
+	/**
+	 * Record setter
+	 * @param \ActiveRecord\Model $record
+	 * @return \ActiveRecord\Migration
+	 */
+	private function set_record($record) {
+		$this->record	= $record;
+		return $this;
+	}
 	
 	public function log() {
 		return $this->log;
@@ -51,18 +69,39 @@ abstract class Migration {
 		return $this;
 	}
 	
+	/**
+	 * Test if current migration has been migrated already
+	 * @throws MigrationException
+	 * @return boolean
+	 */
 	public function migrated() {
 		if ($this->migrated === null) {
-			if ($this->direction === self::UP) {
-				$this->migrated = true;
-			} elseif ($this->direction === self::DOWN) {
-				$this->migrated = false;
-			} else {
-				throw new MigrationException('Unexcepted value for direction while determining if has been migrated');
-			}
-		}
+			$this->set_record(SchemaMigration::find_by_version($this->version()));
 		
+			if ($this->record()) 
+				$this->migrated	= true;
+			else
+				$this->migrated = false;
+		}
+
 		return $this->migrated;
+	}
+	
+	/**
+	 * Setter for version
+	 * @param integer $version
+	 */
+	private function set_version($version) {
+		$this->version	= $version;
+		return $this;
+	}
+	
+	/**
+	 * Version getter
+	 * @return integer
+	 */
+	public function version() {
+		return $this->version;
 	}
 	
 	public function create_table($name, $closure)
@@ -72,7 +111,7 @@ abstract class Migration {
 			$this->pushLog("Created table $name {$this->connection->get_execution_time()} ms");
 			return;
 		} elseif ($this->direction() === self::DOWN) {
-			$this->connection->query($this->build_drop_table($name, $closure));
+			$this->connection->query($this->build_drop_table($name));
 			$this->pushLog("Dropped table $name {$this->connection->get_execution_time()} ms");
 			return;
 		}
@@ -81,7 +120,7 @@ abstract class Migration {
 	}
 	
 	public function set_direction($direction) {
-		if ($direction != self::UP || $direction != self::DOWN) {
+		if ($direction != self::UP && $direction != self::DOWN) {
 			throw new MigrationException('Unknown value for direction');
 		}
 		
@@ -100,12 +139,21 @@ abstract class Migration {
 	
 	public function up() 
 	{
-		return $this->set_direction(self::UP)->migrate();
+		$this->set_direction(self::UP)->migrate();
+		
+		$record	= new SchemaMigration(array('version' => $this->version()));
+		$record->save();
+		$this->set_record($record);
+		
+		return;
 	}
 	
 	public function down() 
 	{
-		return $this->set_direction(self::DOWN)->migrate();
+		$this->set_direction(self::DOWN)->migrate();
+		$this->record()->delete();
+		
+		return;
 	}
 	
 	public function direction() 
@@ -120,7 +168,7 @@ abstract class Migration {
 		$this->sql	= "CREATE TABLE $name (";
 		$closure();
 		if (!$this->id) {
-			$this->sql	.=	 $this->connection->column('primary_key') . ', ';
+			$this->sql	.=	'id ' . $this->connection->column('primary_key') . ', ';
 		}
 		
 		if (empty($this->columns))
@@ -197,5 +245,5 @@ abstract class Migration {
 	
 }
 
-class SchemaMigrations extends Model {}
+class SchemaMigration extends Model {}
 ?>

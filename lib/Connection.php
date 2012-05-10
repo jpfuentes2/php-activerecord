@@ -320,7 +320,7 @@ abstract class Connection
 			throw new DatabaseException($sth);
 		}
 		$end	= microtime(true);
-		$this->set_execution_time($end - $start);
+		$this->set_execution_time(round($end - $start, 4));
 		
 		return $sth;
 	}
@@ -409,7 +409,7 @@ abstract class Connection
 	 */
 	public function rollback()
 	{
-		if (!$this->connection->rollback())
+		if (!$this->connection->rollBack())
 			throw new DatabaseException($this);
 	}
 
@@ -488,7 +488,7 @@ abstract class Connection
 	 */
 	public function string_to_datetime($string)
 	{
-		$date = date_create($string);
+		$date = @date_create($string);
 		$errors = \DateTime::getLastErrors();
 
 		if ($errors['warning_count'] > 0 || $errors['error_count'] > 0)
@@ -554,20 +554,20 @@ abstract class Connection
 	 * @return string
 	 * @throws ActiveRecordException
 	 */
-	public function column($name, $type, $length = null, $null = true)
+	public function column($name, $type = null, $length = null, $null = true)
 	{
 		$native_types	= $this->native_database_types();
+		$typeDefaults	= $native_types[$type];
+		if ($name == self::PRIMARY_KEY)
+			return $native_types[$name];
+		
 		if (!isset($native_types[$type]))
-		throw new ActiveRecordException("Column type not known for $name $type");
+			throw new ActiveRecordException("Column type not known for $name $type");
 		
-		$type	= $native_types[$type];
-		if ($name == self::PRIMARY_KEY) 
-			return $type;
+		$sql	= "$name {$typeDefaults['name']}";
 		
-		$sql	= "$name {$type['name']}";
-		
-		if (!$length && isset($type['length'])) {
-			$sql	.= ' (' . $type['length'] . ')';
+		if (!$length && isset($typeDefaults['length'])) {
+			$sql	.= ' (' . $typeDefaults['length'] . ')';
 		} elseif ($length) {
 			$sql	.= ' (' . $length . ')';
 		}
