@@ -94,10 +94,10 @@ class Expressions
 		$values = array_key_exists('values',$options) ? $options['values'] : $this->values;
 
 		$ret = "";
-		$replace = array();
+		$replace = array(); 
 		$num_values = count($values);
 		$len = strlen($this->expressions);
-		$quotes = 0;
+		$quotes = 0; 
 
 		for ($i=0,$n=strlen($this->expressions),$j=0; $i<$n; ++$i)
 		{

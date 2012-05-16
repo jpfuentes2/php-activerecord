@@ -42,7 +42,7 @@ abstract class Connection
 	 *
 	 * @var object
 	 */
-	private $logger;
+	public $logger;
 	/**
 	 * The name of the protocol that is used.
 	 * @var string
@@ -311,7 +311,7 @@ abstract class Connection
 			throw new DatabaseException($this);
 		}
 
-		$sth->setFetchMode(PDO::FETCH_ASSOC);
+		$sth->setFetchMode(PDO::FETCH_ASSOC); 
 
 		try {
 			if (!$sth->execute($values))
@@ -321,6 +321,9 @@ abstract class Connection
 		}
 		$end	= microtime(true);
 		$this->set_execution_time(round($end - $start, 4));
+		$this->logger
+				->push_execution_time($this->get_execution_time())
+				->push_number_rows($sth->rowCount());
 		
 		return $sth;
 	}

@@ -46,6 +46,16 @@ class ConnectionManager extends Singleton
 		if (isset(self::$connections[$name]))
 			unset(self::$connections[$name]);
 	}
+	
+	/**
+	 * Getter for connections
+	 * 
+	 * @return array
+	 */
+	public static function get_connections() 
+	{
+		return self::$connections;
+	}
 }
 
 ?>
