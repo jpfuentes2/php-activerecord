@@ -1,3 +1,13 @@
 {
-	"name" : "zquintana/activerecord"
+	"name" : "SpeedyPHP/ActiveRecord",
+	"description" : "ActiveRecord package being used with SpeedyPHP",
+	"keywords" : ["SpeedyPHP", "ActiveRecord"],	
+	"license": "MIT",
+	"authors": [{
+		"name":"SpeedyPHP Development Team"
+	},{
+		"name":"php-activerecord development team"
+	},{
+		"name":"Zachary Quintana"
+	}]
 }
