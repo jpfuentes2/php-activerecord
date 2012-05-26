@@ -4,6 +4,7 @@
  */
 namespace ActiveRecord;
 
+use \ActiveRecord\Object;
 /**
  * The base class for your models.
  *
@@ -71,7 +72,7 @@ namespace ActiveRecord;
  * @see Serialization
  * @see Validations
  */
-class Model
+class Model extends Object
 {
 	/**
 	 * An instance of {@link Errors} and will be instantiated once a write method is called.
