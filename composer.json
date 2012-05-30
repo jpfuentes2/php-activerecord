@@ -9,5 +9,10 @@
 		"name":"php-activerecord development team"
 	},{
 		"name":"Zachary Quintana"
-	}]
+	}],
+	"autoload":{
+		"psr-0": {
+			"SpeedyPHP\\ActiveRecord" : "lib/"
+		}
+	}
 }
