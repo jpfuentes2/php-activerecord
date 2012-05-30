@@ -1,13 +1,13 @@
 <?php
 /**
- * @package ActiveRecord
+ * @package SpeedyPHP\ActiveRecord
  */
-namespace ActiveRecord;
+namespace SpeedyPHP\ActiveRecord;
 
 /**
  * Adapter for Postgres (not completed yet)
  * 
- * @package ActiveRecord
+ * @package SpeedyPHP\ActiveRecord
  */
 class PgsqlAdapter extends Connection
 {

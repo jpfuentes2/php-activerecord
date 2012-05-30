@@ -1,11 +1,11 @@
 <?php
 /**
- * @package ActiveRecord
+ * @package SpeedyPHP\ActiveRecord
  */
-namespace ActiveRecord;
+namespace SpeedyPHP\ActiveRecord;
 
 /**
- * @package ActiveRecord
+ * @package SpeedyPHP\ActiveRecord
  */
 abstract class Inflector
 {
@@ -110,7 +110,7 @@ abstract class Inflector
 }
 
 /**
- * @package ActiveRecord
+ * @package SpeedyPHP\ActiveRecord
  */
 class StandardInflector extends Inflector
 {

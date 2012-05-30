@@ -1,5 +1,5 @@
 <?php 
-namespace ActiveRecord\Logger;
+namespace SpeedyPHP\ActiveRecord\Logger;
 
 use \ActiveRecord\Singleton;
 

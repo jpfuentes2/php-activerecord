@@ -1,15 +1,15 @@
 <?php
 /**
- * @package ActiveRecord
+ * @package SpeedyPHP\ActiveRecord
  */
-namespace ActiveRecord;
+namespace SpeedyPHP\ActiveRecord;
 
 use PDO;
 
 /**
  * Adapter for OCI (not completed yet).
  * 
- * @package ActiveRecord
+ * @package SpeedyPHP\ActiveRecord
  */
 class OciAdapter extends Connection
 {

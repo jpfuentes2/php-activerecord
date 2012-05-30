@@ -1,8 +1,8 @@
 <?php
 /**
- * @package ActiveRecord
+ * @package SpeedyPHP\ActiveRecord
  */
-namespace ActiveRecord;
+namespace SpeedyPHP\ActiveRecord;
 
 /**
  * Manages reading and writing to a database table.
@@ -11,7 +11,7 @@ namespace ActiveRecord;
  * reading and writing to its database table. There is one instance of Table
  * for every table you have a model for.
  *
- * @package ActiveRecord
+ * @package SpeedyPHP\ActiveRecord
  */
 class Table
 {
@@ -43,7 +43,7 @@ class Table
 	/**
 	 * A instance of CallBack for this model/table
 	 * @static
-	 * @var object ActiveRecord\CallBack
+	 * @var object SpeedyPHP\ActiveRecord\CallBack
 	 */
 	public $callback;
 

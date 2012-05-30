@@ -1,8 +1,8 @@
 <?php
 /**
- * @package ActiveRecord
+ * @package SpeedyPHP\ActiveRecord
  */
-namespace ActiveRecord;
+namespace SpeedyPHP\ActiveRecord;
 
 /**
  * An extension of PHP's DateTime class to provide dirty flagging and easier formatting options.
@@ -12,8 +12,8 @@ namespace ActiveRecord;
  * Example of formatting and changing the default format:
  *
  * <code>
- * $now = new ActiveRecord\DateTime('2010-01-02 03:04:05');
- * ActiveRecord\DateTime::$DEFAULT_FORMAT = 'short';
+ * $now = new SpeedyPHP\ActiveRecord\DateTime('2010-01-02 03:04:05');
+ * SpeedyPHP\ActiveRecord\DateTime::$DEFAULT_FORMAT = 'short';
  *
  * echo $now->format();         # 02 Jan 03:04
  * echo $now->format('atom');   # 2010-01-02T03:04:05-05:00
@@ -26,11 +26,11 @@ namespace ActiveRecord;
  * You can also add your own pre-defined friendly formatters:
  *
  * <code>
- * ActiveRecord\DateTime::$FORMATS['awesome_format'] = 'H:i:s m/d/Y';
+ * SpeedyPHP\ActiveRecord\DateTime::$FORMATS['awesome_format'] = 'H:i:s m/d/Y';
  * echo $now->format('awesome_format')  # 03:04:05 01/02/2010
  * </code>
  *
- * @package ActiveRecord
+ * @package SpeedyPHP\ActiveRecord
  * @see http://php.net/manual/en/class.datetime.php
  */
 class DateTime extends \DateTime

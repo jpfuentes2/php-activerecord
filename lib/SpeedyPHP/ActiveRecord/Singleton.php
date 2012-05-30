@@ -1,8 +1,8 @@
 <?php
 /**
- * @package ActiveRecord
+ * @package SpeedyPHP\ActiveRecord
  */
-namespace ActiveRecord;
+namespace SpeedyPHP\ActiveRecord;
 
 /**
  * This implementation of the singleton pattern does not conform to the strong definition
@@ -10,7 +10,7 @@ namespace ActiveRecord;
  * a singleton pattern is capable of being achieved; however, multiple instantiations are also
  * possible. This allows the user more freedom with this pattern.
  *
- * @package ActiveRecord
+ * @package SpeedyPHP\ActiveRecord
  */
 abstract class Singleton
 {

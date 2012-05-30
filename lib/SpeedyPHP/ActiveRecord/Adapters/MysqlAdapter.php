@@ -1,13 +1,13 @@
 <?php
 /**
- * @package ActiveRecord
+ * @package SpeedyPHP\ActiveRecord
  */
-namespace ActiveRecord;
+namespace SpeedyPHP\ActiveRecord;
 
 /**
  * Adapter for MySQL.
  *
- * @package ActiveRecord
+ * @package SpeedyPHP\ActiveRecord
  */
 class MysqlAdapter extends Connection
 {

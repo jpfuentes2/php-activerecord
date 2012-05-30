@@ -1,13 +1,13 @@
 <?php
 /**
- * @package ActiveRecord
+ * @package SpeedyPHP\ActiveRecord
  */
-namespace ActiveRecord;
+namespace SpeedyPHP\ActiveRecord;
 
 /**
  * Singleton to manage any and all database connections.
  *
- * @package ActiveRecord
+ * @package SpeedyPHP\ActiveRecord
  */
 class ConnectionManager extends Singleton
 {

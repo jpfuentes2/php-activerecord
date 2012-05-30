@@ -1,8 +1,8 @@
 <?php
 /**
- * @package ActiveRecord
+ * @package SpeedyPHP\ActiveRecord
  */
-namespace ActiveRecord;
+namespace SpeedyPHP\ActiveRecord;
 
 /**
  * Templating like class for building SQL statements.
@@ -12,7 +12,7 @@ namespace ActiveRecord;
  * 'id = IN(:ids)'
  * 'id IN(:subselect)'
  * 
- * @package ActiveRecord
+ * @package SpeedyPHP\ActiveRecord
  */
 class Expressions
 {

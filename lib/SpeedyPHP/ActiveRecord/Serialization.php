@@ -1,8 +1,8 @@
 <?php
 /**
- * @package ActiveRecord
+ * @package SpeedyPHP\ActiveRecord
  */
-namespace ActiveRecord;
+namespace SpeedyPHP\ActiveRecord;
 use XmlWriter;
 
 /**
@@ -37,7 +37,7 @@ use XmlWriter;
  * $model->to_xml(array('except' => 'password')));
  * </code>
  *
- * @package ActiveRecord
+ * @package SpeedyPHP\ActiveRecord
  * @link http://www.phpactiverecord.org/guides/utilities#topic-serialization
  */
 abstract class Serialization
@@ -242,7 +242,7 @@ abstract class Serialization
 /**
  * Array serializer.
  *
- * @package ActiveRecord
+ * @package SpeedyPHP\ActiveRecord
  */
 class ArraySerializer extends Serialization
 {
@@ -257,7 +257,7 @@ class ArraySerializer extends Serialization
 /**
  * JSON serializer.
  *
- * @package ActiveRecord
+ * @package SpeedyPHP\ActiveRecord
  */
 class JsonSerializer extends ArraySerializer
 {
@@ -273,7 +273,7 @@ class JsonSerializer extends ArraySerializer
 /**
  * XML serializer.
  *
- * @package ActiveRecord
+ * @package SpeedyPHP\ActiveRecord
  */
 class XmlSerializer extends Serialization
 {
@@ -336,7 +336,7 @@ class XmlSerializer extends Serialization
 /**
  * CSV serializer.
  *
- * @package ActiveRecord
+ * @package SpeedyPHP\ActiveRecord
  */
 class CsvSerializer extends Serialization
 {

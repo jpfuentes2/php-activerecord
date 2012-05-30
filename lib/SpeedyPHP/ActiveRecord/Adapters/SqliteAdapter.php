@@ -1,15 +1,15 @@
 <?php
 /**
- * @package ActiveRecord
+ * @package SpeedyPHP\ActiveRecord
  */
-namespace ActiveRecord;
+namespace SpeedyPHP\ActiveRecord;
 
 use PDO;
 
 /**
  * Adapter for SQLite.
  *
- * @package ActiveRecord
+ * @package SpeedyPHP\ActiveRecord
  */
 class SqliteAdapter extends Connection
 {
@@ -83,7 +83,7 @@ class SqliteAdapter extends Connection
 
 	public function set_encoding($charset)
 	{
-		throw new ActiveRecordException("SqliteAdapter::set_charset not supported.");
+		throw new SpeedyPHP\ActiveRecordException("SqliteAdapter::set_charset not supported.");
 	}
 
 	public function accepts_limit_and_order_for_update_and_delete() { return true; }

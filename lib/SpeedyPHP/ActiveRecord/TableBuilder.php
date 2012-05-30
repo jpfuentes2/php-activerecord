@@ -1,5 +1,5 @@
 <?php 
-namespace ActiveRecord;
+namespace SpeedyPHP\ActiveRecord;
 
 class TableBuilder
 {
@@ -12,7 +12,7 @@ class TableBuilder
 	
 	public function __construct($connection) {
 		if (!$connection)
-		throw new ActiveRecordException('A valid database connection is required.');
+		throw new SpeedyPHP\ActiveRecordException('A valid database connection is required.');
 	
 		$this->connection	= $connection;
 	}

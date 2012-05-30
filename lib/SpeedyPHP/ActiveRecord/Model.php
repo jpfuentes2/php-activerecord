@@ -1,14 +1,14 @@
 <?php
 /**
- * @package ActiveRecord
+ * @package SpeedyPHP\ActiveRecord
  */
-namespace ActiveRecord;
+namespace SpeedyPHP\ActiveRecord;
 
 use \ActiveRecord\Object;
 /**
  * The base class for your models.
  *
- * Defining an ActiveRecord model for a table called people and orders:
+ * Defining an SpeedyPHP\ActiveRecord model for a table called people and orders:
  *
  * <code>
  * CREATE TABLE people(
@@ -27,7 +27,7 @@ use \ActiveRecord\Object;
  * </code>
  *
  * <code>
- * class Person extends ActiveRecord\Model {
+ * class Person extends SpeedyPHP\ActiveRecord\Model {
  *   static $belongs_to = array(
  *     array('parent', 'foreign_key' => 'parent_id', 'class_name' => 'Person')
  *   );
@@ -43,7 +43,7 @@ use \ActiveRecord\Object;
  *   );
  * }
  *
- * class Order extends ActiveRecord\Model {
+ * class Order extends SpeedyPHP\ActiveRecord\Model {
  *   static $belongs_to = array(
  *     array('person')
  *   );
@@ -64,7 +64,7 @@ use \ActiveRecord\Object;
  * For a more in-depth look at defining models, relationships, callbacks and many other things
  * please consult our {@link http://www.phpactiverecord.org/guides Guides}.
  *
- * @package ActiveRecord
+ * @package SpeedyPHP\ActiveRecord
  * @see BelongsTo
  * @see CallBack
  * @see HasMany
@@ -134,7 +134,7 @@ class Model extends Object
 	 * Set this to explicitly specify the model's table name if different from inferred name.
 	 *
 	 * If your table doesn't follow our table name convention you can set this to the
-	 * name of your table to explicitly tell ActiveRecord what your table is called.
+	 * name of your table to explicitly tell SpeedyPHP\ActiveRecord what your table is called.
 	 *
 	 * @var string
 	 */
@@ -158,7 +158,7 @@ class Model extends Object
 	 * Allows you to create aliases for attributes.
 	 *
 	 * <code>
-	 * class Person extends ActiveRecord\Model {
+	 * class Person extends SpeedyPHP\ActiveRecord\Model {
 	 *   static $alias_attribute = array(
 	 *     'alias_first_name' => 'first_name',
 	 *     'alias_last_name' => 'last_name');
@@ -179,7 +179,7 @@ class Model extends Object
 	 * This is the opposite of {@link attr_protected $attr_protected}.
 	 *
 	 * <code>
-	 * class Person extends ActiveRecord\Model {
+	 * class Person extends SpeedyPHP\ActiveRecord\Model {
 	 *   static $attr_accessible = array('first_name','last_name');
 	 * }
 	 *
@@ -211,7 +211,7 @@ class Model extends Object
 	 * Delegates calls to a relationship.
 	 *
 	 * <code>
-	 * class Person extends ActiveRecord\Model {
+	 * class Person extends SpeedyPHP\ActiveRecord\Model {
 	 *   static $belongs_to = array(array('venue'),array('host'));
 	 *   static $delegate = array(
 	 *     array('name', 'state', 'to' => 'venue'),
@@ -234,7 +234,7 @@ class Model extends Object
 	/**
 	 * Constructs a model.
 	 *
-	 * When a user instantiates a new object (e.g.: it was not ActiveRecord that instantiated via a find)
+	 * When a user instantiates a new object (e.g.: it was not SpeedyPHP\ActiveRecord that instantiated via a find)
 	 * then @var $attributes will be mapped according to the schema's defaults. Otherwise, the given
 	 * $attributes will be mapped via set_attributes_via_mass_assignment.
 	 *
@@ -278,7 +278,7 @@ class Model extends Object
 	 *
 	 * EXAMPLE:
 	 * <code>
-	 * class User extends ActiveRecord\Model {
+	 * class User extends SpeedyPHP\ActiveRecord\Model {
 	 *
 	 *   # define custom getter methods. Note you must
 	 *   # prepend get_ to your method name:
@@ -299,7 +299,7 @@ class Model extends Object
 	 * custom getter for 'name':
 	 *
 	 * <code>
-	 * class User extends ActiveRecord\Model {
+	 * class User extends SpeedyPHP\ActiveRecord\Model {
 	 *
 	 *   # INCORRECT way to do it
 	 *   # function get_name() {
@@ -352,7 +352,7 @@ class Model extends Object
 	 *
 	 * EXAMPLE:
 	 * <code>
-	 * class User extends ActiveRecord\Model {
+	 * class User extends SpeedyPHP\ActiveRecord\Model {
 	 *
 	 *   # define custom setter methods. Note you must
 	 *   # prepend set_ to your method name:
@@ -373,7 +373,7 @@ class Model extends Object
 	 * custom setter for 'name':
 	 *
 	 * <code>
-	 * class User extends ActiveRecord\Model {
+	 * class User extends SpeedyPHP\ActiveRecord\Model {
 	 *
 	 *   # INCORRECT way to do it
 	 *   # function set_name($name) {
@@ -694,7 +694,7 @@ class Model extends Object
 	/**
 	 * Throws an exception if this model is set to readonly.
 	 *
-	 * @throws ActiveRecord\ReadOnlyException
+	 * @throws SpeedyPHP\ActiveRecord\ReadOnlyException
 	 * @param string $method_name Name of method that was invoked on model for exception message
 	 */
 	private function verify_not_readonly($method_name)
@@ -856,7 +856,7 @@ class Model extends Object
 			$pk = $this->values_for_pk();
 
 			if (empty($pk))
-				throw new ActiveRecordException("Cannot update, no primary key defined for: " . get_called_class());
+				throw new SpeedyPHP\ActiveRecordException("Cannot update, no primary key defined for: " . get_called_class());
 
 			if (!$this->invoke_callback('before_update',false))
 				return false;
@@ -1003,7 +1003,7 @@ class Model extends Object
 		$pk = $this->values_for_pk();
 
 		if (empty($pk))
-			throw new ActiveRecordException("Cannot delete, no primary key defined for: " . get_called_class());
+			throw new SpeedyPHP\ActiveRecordException("Cannot delete, no primary key defined for: " . get_called_class());
 
 		if (!$this->invoke_callback('before_destroy',false))
 			return false;
@@ -1159,7 +1159,7 @@ class Model extends Object
 	/**
 	 * Passing $guard_attributes as true will throw an exception if an attribute does not exist.
 	 *
-	 * @throws ActiveRecord\UndefinedPropertyException
+	 * @throws SpeedyPHP\ActiveRecord\UndefinedPropertyException
 	 * @param array $attributes An array in the form array(name => value, ...)
 	 * @param boolean $guard_attributes Flag of whether or not protected/non-accessible attributes should be guarded
 	 */
@@ -1316,7 +1316,7 @@ class Model extends Object
 	 * @param string $method Name of method
 	 * @param mixed $args Method args
 	 * @return Model
-	 * @throws {@link ActiveRecordException} if invalid query
+	 * @throws {@link SpeedyPHP\ActiveRecordException} if invalid query
 	 * @see find
 	 */
 	public static function __callStatic($method, $args)
@@ -1330,7 +1330,7 @@ class Model extends Object
 
 			// can't take any finders with OR in it when doing a find_or_create_by
 			if (strpos($attributes,'_or_') !== false)
-				throw new ActiveRecordException("Cannot use OR'd attributes in find_or_create_by");
+				throw new SpeedyPHP\ActiveRecordException("Cannot use OR'd attributes in find_or_create_by");
 
 			$create = true;
 			$method = 'find_by' . substr($method,17);
@@ -1357,7 +1357,7 @@ class Model extends Object
 			return static::count($options);
 		}
 
-		throw new ActiveRecordException("Call to undefined method: $method");
+		throw new SpeedyPHP\ActiveRecordException("Call to undefined method: $method");
 	}
 
 	/**
@@ -1389,7 +1389,7 @@ class Model extends Object
 			}
 		}
 
-		throw new ActiveRecordException("Call to undefined method: $method");
+		throw new SpeedyPHP\ActiveRecordException("Call to undefined method: $method");
 	}
 
 	/**
@@ -1640,12 +1640,12 @@ class Model extends Object
 	}
 
 	/**
-	 * Determines if the specified array is a valid ActiveRecord options array.
+	 * Determines if the specified array is a valid SpeedyPHP\ActiveRecord options array.
 	 *
 	 * @param array $array An options array
 	 * @param bool $throw True to throw an exception if not valid
 	 * @return boolean True if valid otherwise valse
-	 * @throws {@link ActiveRecordException} if the array contained any invalid options
+	 * @throws {@link SpeedyPHP\ActiveRecordException} if the array contained any invalid options
 	 */
 	public static function is_options_hash($array, $throw=true)
 	{
@@ -1655,7 +1655,7 @@ class Model extends Object
 			$diff = array_diff($keys,self::$VALID_OPTIONS);
 
 			if (!empty($diff) && $throw)
-				throw new ActiveRecordException("Unknown key(s): " . join(', ',$diff));
+				throw new SpeedyPHP\ActiveRecordException("Unknown key(s): " . join(', ',$diff));
 
 			$intersect = array_intersect($keys,self::$VALID_OPTIONS);
 
@@ -1744,8 +1744,8 @@ class Model extends Object
    *
    * Ex:
    * <code>
-   * ActiveRecord\CsvSerializer::$delimiter=';';
-   * ActiveRecord\CsvSerializer::$enclosure='';
+   * SpeedyPHP\ActiveRecord\CsvSerializer::$delimiter=';';
+   * SpeedyPHP\ActiveRecord\CsvSerializer::$enclosure='';
    * YourModel::find('first')->to_csv(array('only'=>array('name','level')));
    * returns: Joe,2
    *

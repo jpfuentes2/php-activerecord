@@ -1,13 +1,13 @@
 <?php
 /**
- * @package ActiveRecord
+ * @package SpeedyPHP\ActiveRecord
  */
-namespace ActiveRecord;
+namespace SpeedyPHP\ActiveRecord;
 
 /**
  * Class for a table column.
  *
- * @package ActiveRecord
+ * @package SpeedyPHP\ActiveRecord
  */
 class Column
 {

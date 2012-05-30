@@ -1,13 +1,13 @@
 <?php
 /**
- * @package ActiveRecord
+ * @package SpeedyPHP\ActiveRecord
  */
-namespace ActiveRecord;
+namespace SpeedyPHP\ActiveRecord;
 
 /**
  * Interface for a table relationship.
  *
- * @package ActiveRecord
+ * @package SpeedyPHP\ActiveRecord
  */
 interface InterfaceRelationship
 {
@@ -19,7 +19,7 @@ interface InterfaceRelationship
 /**
  * Abstract class that all relationships must extend from.
  *
- * @package ActiveRecord
+ * @package SpeedyPHP\ActiveRecord
  * @see http://www.phpactiverecord.org/guides/associations
  */
 abstract class AbstractRelationship implements InterfaceRelationship
@@ -298,7 +298,7 @@ abstract class AbstractRelationship implements InterfaceRelationship
 		}
 
 		if (!$reflection->isSubClassOf('ActiveRecord\\Model'))
-			throw new RelationshipException("'$class_name' must extend from ActiveRecord\\Model");
+			throw new RelationshipException("'$class_name' must extend from SpeedyPHP\ActiveRecord\\Model");
 
 		$this->class_name = $class_name;
 	}
@@ -394,11 +394,11 @@ abstract class AbstractRelationship implements InterfaceRelationship
  * # Table: people
  * # Primary key: id
  * # Foreign key: school_id
- * class Person extends ActiveRecord\Model {}
+ * class Person extends SpeedyPHP\ActiveRecord\Model {}
  *
  * # Table: schools
  * # Primary key: id
- * class School extends ActiveRecord\Model {
+ * class School extends SpeedyPHP\ActiveRecord\Model {
  *   static $has_many = array(
  *     array('people')
  *   );
@@ -408,14 +408,14 @@ abstract class AbstractRelationship implements InterfaceRelationship
  * Example using options:
  *
  * <code>
- * class Payment extends ActiveRecord\Model {
+ * class Payment extends SpeedyPHP\ActiveRecord\Model {
  *   static $belongs_to = array(
  *     array('person'),
  *     array('order')
  *   );
  * }
  *
- * class Order extends ActiveRecord\Model {
+ * class Order extends SpeedyPHP\ActiveRecord\Model {
  *   static $has_many = array(
  *     array('people',
  *           'through'    => 'payments',
@@ -425,7 +425,7 @@ abstract class AbstractRelationship implements InterfaceRelationship
  * }
  * </code>
  *
- * @package ActiveRecord
+ * @package SpeedyPHP\ActiveRecord
  * @see http://www.phpactiverecord.org/guides/associations
  * @see valid_association_options
  */
@@ -568,16 +568,16 @@ class HasMany extends AbstractRelationship
  * <code>
  * # Table name: states
  * # Primary key: id
- * class State extends ActiveRecord\Model {}
+ * class State extends SpeedyPHP\ActiveRecord\Model {}
  *
  * # Table name: people
  * # Foreign key: state_id
- * class Person extends ActiveRecord\Model {
+ * class Person extends SpeedyPHP\ActiveRecord\Model {
  *   static $has_one = array(array('state'));
  * }
  * </code>
  *
- * @package ActiveRecord
+ * @package SpeedyPHP\ActiveRecord
  * @see http://www.phpactiverecord.org/guides/associations
  */
 class HasOne extends HasMany
@@ -586,7 +586,7 @@ class HasOne extends HasMany
 
 /**
  * @todo implement me
- * @package ActiveRecord
+ * @package SpeedyPHP\ActiveRecord
  * @see http://www.phpactiverecord.org/guides/associations
  */
 class HasAndBelongsToMany extends AbstractRelationship
@@ -612,9 +612,9 @@ class HasAndBelongsToMany extends AbstractRelationship
  * Belongs to relationship.
  *
  * <code>
- * class School extends ActiveRecord\Model {}
+ * class School extends SpeedyPHP\ActiveRecord\Model {}
  *
- * class Person extends ActiveRecord\Model {
+ * class Person extends SpeedyPHP\ActiveRecord\Model {
  *   static $belongs_to = array(
  *     array('school')
  *   );
@@ -624,16 +624,16 @@ class HasAndBelongsToMany extends AbstractRelationship
  * Example using options:
  *
  * <code>
- * class School extends ActiveRecord\Model {}
+ * class School extends SpeedyPHP\ActiveRecord\Model {}
  *
- * class Person extends ActiveRecord\Model {
+ * class Person extends SpeedyPHP\ActiveRecord\Model {
  *   static $belongs_to = array(
  *     array('school', 'primary_key' => 'school_id')
  *   );
  * }
  * </code>
  *
- * @package ActiveRecord
+ * @package SpeedyPHP\ActiveRecord
  * @see valid_association_options
  * @see http://www.phpactiverecord.org/guides/associations
  */

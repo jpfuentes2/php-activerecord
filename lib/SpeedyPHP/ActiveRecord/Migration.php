@@ -1,8 +1,8 @@
 <?php 
 /**
- * @package ActiveRecord
+ * @package SpeedyPHP\ActiveRecord
  */
-namespace ActiveRecord;
+namespace SpeedyPHP\ActiveRecord;
 
 abstract class Migration {
 	
@@ -25,7 +25,7 @@ abstract class Migration {
 	public function __construct($connection) 
 	{
 		if (!$connection)
-			throw new ActiveRecordException('A valid database connection is required.');
+			throw new SpeedyPHP\ActiveRecordException('A valid database connection is required.');
 		
 		$reflection	= new \ReflectionClass($this);
 		$path	= pathinfo($reflection->getFileName());

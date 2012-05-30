@@ -1,5 +1,5 @@
 <?php 
-namespace ActiveRecord;
+namespace SpeedyPHP\ActiveRecord;
 
 class Collection extends \ArrayIterator {
 	

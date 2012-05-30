@@ -1,7 +1,7 @@
 <?php
 /**
  *
- * @package ActiveRecord
+ * @package SpeedyPHP\ActiveRecord
  */
 
 /*
@@ -32,7 +32,7 @@
  *   Added rule for potato -> potatoes
  *   Added rule for *us -> *uses
  */
-namespace ActiveRecord;
+namespace SpeedyPHP\ActiveRecord;
 
 use \Closure;
 
@@ -157,7 +157,7 @@ function wrap_strings_in_arrays(&$strings)
 /**
  * Some internal utility functions.
  *
- * @package ActiveRecord
+ * @package SpeedyPHP\ActiveRecord
  */
 class Utils
 {

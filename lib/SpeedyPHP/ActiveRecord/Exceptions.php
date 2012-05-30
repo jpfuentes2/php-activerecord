@@ -1,31 +1,31 @@
 <?php
 /**
- * @package ActiveRecord
+ * @package SpeedyPHP\ActiveRecord
  */
-namespace ActiveRecord;
+namespace SpeedyPHP\ActiveRecord;
 
 /**
- * Generic base exception for all ActiveRecord specific errors.
+ * Generic base exception for all SpeedyPHP\ActiveRecord specific errors.
  *
- * @package ActiveRecord
+ * @package SpeedyPHP\ActiveRecord
  */
 class ActiveRecordException extends \Exception {};
 
 /**
  * Thrown when a record cannot be found.
  *
- * @package ActiveRecord
+ * @package SpeedyPHP\ActiveRecord
  */
-class RecordNotFound extends ActiveRecordException {};
+class RecordNotFound extends SpeedyPHP\ActiveRecordException {};
 
 /**
  * Thrown when there was an error performing a database operation.
  *
  * The error will be specific to whatever database you are running.
  *
- * @package ActiveRecord
+ * @package SpeedyPHP\ActiveRecord
  */
-class DatabaseException extends ActiveRecordException
+class DatabaseException extends SpeedyPHP\ActiveRecordException
 {
 	public function __construct($adapter_or_string_or_mystery)
 	{
@@ -49,28 +49,28 @@ class DatabaseException extends ActiveRecordException
 /**
  * Thrown by {@link Model}.
  *
- * @package ActiveRecord
+ * @package SpeedyPHP\ActiveRecord
  */
-class ModelException extends ActiveRecordException {};
+class ModelException extends SpeedyPHP\ActiveRecordException {};
 
 /**
  * Thrown by {@link Expressions}.
  *
- * @package ActiveRecord
+ * @package SpeedyPHP\ActiveRecord
  */
-class ExpressionsException extends ActiveRecordException {};
+class ExpressionsException extends SpeedyPHP\ActiveRecordException {};
 
 /**
  * Thrown for configuration problems.
  *
- * @package ActiveRecord
+ * @package SpeedyPHP\ActiveRecord
  */
-class ConfigException extends ActiveRecordException {};
+class ConfigException extends SpeedyPHP\ActiveRecordException {};
 
 /**
  * Thrown when attempting to access an invalid property on a {@link Model}.
  *
- * @package ActiveRecord
+ * @package SpeedyPHP\ActiveRecord
  */
 class UndefinedPropertyException extends ModelException
 {
@@ -96,7 +96,7 @@ class UndefinedPropertyException extends ModelException
 /**
  * Thrown when attempting to perform a write operation on a {@link Model} that is in read-only mode.
  *
- * @package ActiveRecord
+ * @package SpeedyPHP\ActiveRecord
  */
 class ReadOnlyException extends ModelException
 {
@@ -117,21 +117,21 @@ class ReadOnlyException extends ModelException
 /**
  * Thrown for validations exceptions.
  *
- * @package ActiveRecord
+ * @package SpeedyPHP\ActiveRecord
  */
-class ValidationsArgumentError extends ActiveRecordException {};
+class ValidationsArgumentError extends SpeedyPHP\ActiveRecordException {};
 
 /**
  * Thrown for relationship exceptions.
  *
- * @package ActiveRecord
+ * @package SpeedyPHP\ActiveRecord
  */
-class RelationshipException extends ActiveRecordException {};
+class RelationshipException extends SpeedyPHP\ActiveRecordException {};
 
 /**
  * Thrown for has many thru exceptions.
  *
- * @package ActiveRecord
+ * @package SpeedyPHP\ActiveRecord
  */
 class HasManyThroughAssociationException extends RelationshipException {};
 
@@ -139,7 +139,7 @@ class HasManyThroughAssociationException extends RelationshipException {};
  * 
  * Thrown for Migration Exceptions
  * @author Zachary Quintana
- * @package ActiveRecord
+ * @package SpeedyPHP\ActiveRecord
  */
-class MigrationException extends ActiveRecordException {};
+class MigrationException extends SpeedyPHP\ActiveRecordException {};
 ?>

@@ -1,14 +1,14 @@
 <?php
 /**
- * @package ActiveRecord
+ * @package SpeedyPHP\ActiveRecord
  */
-namespace ActiveRecord;
+namespace SpeedyPHP\ActiveRecord;
 use ReflectionClass;
 
 /**
  * Simple class that caches reflections of classes.
  *
- * @package ActiveRecord
+ * @package SpeedyPHP\ActiveRecord
  */
 class Reflections extends Singleton
 {
@@ -54,7 +54,7 @@ class Reflections extends Singleton
 	 *
 	 * @param string $class Optional name of a class
 	 * @return mixed null or a ReflectionClass instance
-	 * @throws ActiveRecordException if class was not found
+	 * @throws SpeedyPHP\ActiveRecordException if class was not found
 	 */
 	public function get($class=null)
 	{
@@ -63,7 +63,7 @@ class Reflections extends Singleton
 		if (isset($this->reflections[$class]))
 			return $this->reflections[$class];
 
-		throw new ActiveRecordException("Class not found: $class");
+		throw new SpeedyPHP\ActiveRecordException("Class not found: $class");
 	}
 
 	/**

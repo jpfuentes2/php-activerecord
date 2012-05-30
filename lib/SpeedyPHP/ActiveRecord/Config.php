@@ -1,15 +1,15 @@
 <?php
 /**
- * @package ActiveRecord
+ * @package SpeedyPHP\ActiveRecord
  */
-namespace ActiveRecord;
+namespace SpeedyPHP\ActiveRecord;
 use Closure;
 
 /**
- * Manages configuration options for ActiveRecord.
+ * Manages configuration options for SpeedyPHP\ActiveRecord.
  *
  * <code>
- * ActiveRecord::initialize(function($cfg) {
+ * SpeedyPHP\ActiveRecord::initialize(function($cfg) {
  *   $cfg->set_model_home('models');
  *   $cfg->set_connections(array(
  *     'development' => 'mysql://user:pass@development.com/awesome_development',
@@ -17,7 +17,7 @@ use Closure;
  * });
  * </code>
  *
- * @package ActiveRecord
+ * @package SpeedyPHP\ActiveRecord
  */
 class Config extends Singleton
 {
@@ -25,7 +25,7 @@ class Config extends Singleton
 	 * Name of the connection to use by default.
 	 *
 	 * <code>
-	 * ActiveRecord\Config::initialize(function($cfg) {
+	 * SpeedyPHP\ActiveRecord\Config::initialize(function($cfg) {
 	 *   $cfg->set_model_directory('/your/app/models');
 	 *   $cfg->set_connections(array(
 	 *     'development' => 'mysql://user:pass@development.com/awesome_development',
@@ -36,7 +36,7 @@ class Config extends Singleton
 	 * This is a singleton class so you can retrieve the {@link Singleton} instance by doing:
 	 *
 	 * <code>
-	 * $config = ActiveRecord\Config::instance();
+	 * $config = SpeedyPHP\ActiveRecord\Config::instance();
 	 * </code>
 	 *
 	 * @var string
@@ -85,7 +85,7 @@ class Config extends Singleton
 	 * This method is just syntatic sugar.
 	 *
 	 * <code>
-	 * ActiveRecord\Config::initialize(function($cfg) {
+	 * SpeedyPHP\ActiveRecord\Config::initialize(function($cfg) {
 	 *   $cfg->set_model_directory('/path/to/your/model_directory');
 	 *   $cfg->set_connections(array(
 	 *     'development' => 'mysql://username:password@127.0.0.1/database_name'));
@@ -95,7 +95,7 @@ class Config extends Singleton
 	 * You can also initialize by grabbing the singleton object:
 	 *
 	 * <code>
-	 * $cfg = ActiveRecord\Config::instance();
+	 * $cfg = SpeedyPHP\ActiveRecord\Config::instance();
 	 * $cfg->set_model_directory('/path/to/your/model_directory');
 	 * $cfg->set_connections(array('development' =>
   	 *   'mysql://username:password@localhost/database_name'));
@@ -120,7 +120,7 @@ class Config extends Singleton
 	 * @param array $connections Array of connections
 	 * @param string $default_connection Optionally specify the default_connection
 	 * @return void
-	 * @throws ActiveRecord\ConfigException
+	 * @throws SpeedyPHP\ActiveRecord\ConfigException
 	 */
 	public function set_connections($connections, $default_connection=null)
 	{
@@ -267,7 +267,7 @@ class Config extends Singleton
 	 */
 	public function get_date_format()
 	{
-		trigger_error('Use ActiveRecord\Serialization::$DATETIME_FORMAT. Config::get_date_format() has been deprecated.', E_USER_DEPRECATED);
+		trigger_error('Use SpeedyPHP\ActiveRecord\Serialization::$DATETIME_FORMAT. Config::get_date_format() has been deprecated.', E_USER_DEPRECATED);
 		return Serialization::$DATETIME_FORMAT;
 	}
 
@@ -276,7 +276,7 @@ class Config extends Singleton
 	 */
 	public function set_date_format($format)
 	{
-		trigger_error('Use ActiveRecord\Serialization::$DATETIME_FORMAT. Config::set_date_format() has been deprecated.', E_USER_DEPRECATED);
+		trigger_error('Use SpeedyPHP\ActiveRecord\Serialization::$DATETIME_FORMAT. Config::set_date_format() has been deprecated.', E_USER_DEPRECATED);
 		Serialization::$DATETIME_FORMAT = $format;
 	}
 

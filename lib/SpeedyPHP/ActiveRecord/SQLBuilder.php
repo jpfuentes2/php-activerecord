@@ -1,13 +1,13 @@
 <?php
 /**
- * @package ActiveRecord
+ * @package SpeedyPHP\ActiveRecord
  */
-namespace ActiveRecord;
+namespace SpeedyPHP\ActiveRecord;
 
 /**
  * Helper class for building sql statements progmatically.
  *
- * @package ActiveRecord
+ * @package SpeedyPHP\ActiveRecord
  */
 class SQLBuilder
 {
@@ -40,12 +40,12 @@ class SQLBuilder
 	 * @param Connection $connection A database connection object
 	 * @param string $table Name of a table
 	 * @return SQLBuilder
-	 * @throws ActiveRecordException if connection was invalid
+	 * @throws SpeedyPHP\ActiveRecordException if connection was invalid
 	 */
 	public function __construct($connection, $table)
 	{
 		if (!$connection)
-			throw new ActiveRecordException('A valid database connection is required.');
+			throw new SpeedyPHP\ActiveRecordException('A valid database connection is required.');
 
 		$this->connection	= $connection;
 		$this->table		= $table;
@@ -148,7 +148,7 @@ class SQLBuilder
 	public function insert($hash, $pk=null, $sequence_name=null)
 	{
 		if (!is_hash($hash))
-			throw new ActiveRecordException('Inserting requires a hash.');
+			throw new SpeedyPHP\ActiveRecordException('Inserting requires a hash.');
 
 		$this->operation = 'INSERT';
 		$this->data = $hash;
@@ -168,7 +168,7 @@ class SQLBuilder
 		elseif (is_string($mixed))
 			$this->update = $mixed;
 		else
-			throw new ActiveRecordException('Updating requires a hash or string.');
+			throw new SpeedyPHP\ActiveRecordException('Updating requires a hash or string.');
 
 		return $this;
 	}

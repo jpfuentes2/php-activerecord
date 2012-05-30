@@ -2,9 +2,9 @@
 /**
  * Basic object class that supports mixins
  * @author Zachary Quintana
- * @package ActiveRecord
+ * @package SpeedyPHP\ActiveRecord
  */
-namespace ActiveRecord;
+namespace SpeedyPHP\ActiveRecord;
 
 class Object {
 	

@@ -1,15 +1,15 @@
 <?php
 /**
- * @package ActiveRecord
+ * @package SpeedyPHP\ActiveRecord
  */
-namespace ActiveRecord;
+namespace SpeedyPHP\ActiveRecord;
 use Closure;
 
 /**
  * Callbacks allow the programmer to hook into the life cycle of a {@link Model}.
  *
  * You can control the state of your object by declaring certain methods to be
- * called before or after methods are invoked on your object inside of ActiveRecord.
+ * called before or after methods are invoked on your object inside of SpeedyPHP\ActiveRecord.
  *
  * Valid callbacks are:
  * <ul>
@@ -33,7 +33,7 @@ use Closure;
  * This class isn't meant to be used directly. Callbacks are defined on your model like the example below:
  *
  * <code>
- * class Person extends ActiveRecord\Model {
+ * class Person extends SpeedyPHP\ActiveRecord\Model {
  *   static $before_save = array('make_name_uppercase');
  *   static $after_save = array('do_happy_dance');
  *
@@ -53,7 +53,7 @@ use Closure;
  * <li><b>prepend:</b> puts the callback at the top of the callback chain instead of the bottom</li>
  * </ul>
  *
- * @package ActiveRecord
+ * @package SpeedyPHP\ActiveRecord
  * @link http://www.phpactiverecord.org/guides/callbacks
  */
 class CallBack
@@ -159,7 +159,7 @@ class CallBack
 	public function invoke($model, $name, $must_exist=true)
 	{
 		if ($must_exist && !array_key_exists($name, $this->registry))
-			throw new ActiveRecordException("No callbacks were defined for: $name on " . get_class($model));
+			throw new SpeedyPHP\ActiveRecordException("No callbacks were defined for: $name on " . get_class($model));
 
 		// if it doesn't exist it might be a /(after|before)_(create|update)/ so we still need to run the save
 		// callback
@@ -206,7 +206,7 @@ class CallBack
 	 * @param mixed $closure_or_method_name Either a closure or the name of a method on the {@link Model}
 	 * @param array $options Options array
 	 * @return void
-	 * @throws ActiveRecordException if invalid callback type or callback method was not found
+	 * @throws SpeedyPHP\ActiveRecordException if invalid callback type or callback method was not found
 	 */
 	public function register($name, $closure_or_method_name=null, $options=array())
 	{
@@ -216,7 +216,7 @@ class CallBack
 			$closure_or_method_name = $name;
 
 		if (!in_array($name,self::$VALID_CALLBACKS))
-			throw new ActiveRecordException("Invalid callback: $name");
+			throw new SpeedyPHP\ActiveRecordException("Invalid callback: $name");
 
 		if (!($closure_or_method_name instanceof Closure))
 		{
@@ -228,13 +228,13 @@ class CallBack
 				if ($this->klass->hasMethod($closure_or_method_name))
 				{
 					// Method is private or protected
-					throw new ActiveRecordException("Callback methods need to be public (or anonymous closures). " .
+					throw new SpeedyPHP\ActiveRecordException("Callback methods need to be public (or anonymous closures). " .
 						"Please change the visibility of " . $this->klass->getName() . "->" . $closure_or_method_name . "()");
 				}
 				else
 				{
 					// i'm a dirty ruby programmer
-					throw new ActiveRecordException("Unknown method for callback: $name" .
+					throw new SpeedyPHP\ActiveRecordException("Unknown method for callback: $name" .
 						(is_string($closure_or_method_name) ? ": #$closure_or_method_name" : ""));
 				}
 			}

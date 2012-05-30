@@ -1,10 +1,10 @@
 <?php
 
 /**
- * @package ActiveRecord
+ * @package SpeedyPHP\ActiveRecord
  */
 
-namespace ActiveRecord;
+namespace SpeedyPHP\ActiveRecord;
 
 require 'Column.php';
 
@@ -15,7 +15,7 @@ use Closure;
 /**
  * The base class for database connection adapters.
  *
- * @package ActiveRecord
+ * @package SpeedyPHP\ActiveRecord
  */
 abstract class Connection
 {
@@ -81,8 +81,8 @@ abstract class Connection
 	 * @param string $connection_string_or_connection_name A database connection string (ex. mysql://user:pass@host[:port]/dbname)
 	 *   Everything after the protocol:// part is specific to the connection adapter.
 	 *   OR
-	 *   A connection name that is set in ActiveRecord\Config
-	 *   If null it will use the default connection specified by ActiveRecord\Config->set_default_connection
+	 *   A connection name that is set in SpeedyPHP\ActiveRecord\Config
+	 *   If null it will use the default connection specified by SpeedyPHP\ActiveRecord\Config->set_default_connection
 	 * @return Connection
 	 * @see parse_connection_url
 	 */
@@ -555,7 +555,7 @@ abstract class Connection
 	 * @param integer $length
 	 * @param boolean $null
 	 * @return string
-	 * @throws ActiveRecordException
+	 * @throws SpeedyPHP\ActiveRecordException
 	 */
 	public function column($name, $type = null, $length = null, $null = true)
 	{
@@ -565,7 +565,7 @@ abstract class Connection
 			return $native_types[$name];
 		
 		if (!isset($native_types[$type]))
-			throw new ActiveRecordException("Column type not known for $name $type");
+			throw new SpeedyPHP\ActiveRecordException("Column type not known for $name $type");
 		
 		$sql	= "$name {$typeDefaults['name']}";
 		

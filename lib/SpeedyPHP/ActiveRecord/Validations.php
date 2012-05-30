@@ -1,15 +1,15 @@
 <?php
 /**
- * These two classes have been <i>heavily borrowed</i> from Ruby on Rails' ActiveRecord so much that
+ * These two classes have been <i>heavily borrowed</i> from Ruby on Rails' SpeedyPHP\ActiveRecord so much that
  * this piece can be considered a straight port. The reason for this is that the vaildation process is
  * tricky due to order of operations/events. The former combined with PHP's odd typecasting means
  * that it was easier to formulate this piece base on the rails code.
  *
- * @package ActiveRecord
+ * @package SpeedyPHP\ActiveRecord
  */
 
-namespace ActiveRecord;
-use ActiveRecord\Model;
+namespace SpeedyPHP\ActiveRecord;
+use SpeedyPHP\ActiveRecord\Model;
 use IteratorAggregate;
 use ArrayIterator;
 
@@ -20,7 +20,7 @@ use ArrayIterator;
  * validators thru static variables in your {@link Model}. Example:
  *
  * <code>
- * class Person extends ActiveRecord\Model {
+ * class Person extends SpeedyPHP\ActiveRecord\Model {
  *   static $validates_length_of = array(
  *     array('name', 'within' => array(30,100),
  *     array('state', 'is' => 2)
@@ -35,7 +35,7 @@ use ArrayIterator;
  *   print_r($person->errors);
  * </code>
  *
- * @package ActiveRecord
+ * @package SpeedyPHP\ActiveRecord
  * @see Errors
  * @link http://www.phpactiverecord.org/guides/validations
  */
@@ -154,7 +154,7 @@ class Validations
 	 * Validates a field is not null and not blank.
 	 *
 	 * <code>
-	 * class Person extends ActiveRecord\Model {
+	 * class Person extends SpeedyPHP\ActiveRecord\Model {
 	 *   static $validates_presence_of = array(
 	 *     array('first_name'),
 	 *     array('last_name')
@@ -187,7 +187,7 @@ class Validations
 	 * Validates that a value is included the specified array.
 	 *
 	 * <code>
-	 * class Car extends ActiveRecord\Model {
+	 * class Car extends SpeedyPHP\ActiveRecord\Model {
 	 *   static $validates_inclusion_of = array(
 	 *     array('fuel_type', 'in' => array('hyrdogen', 'petroleum', 'electric')),
 	 *   );
@@ -279,7 +279,7 @@ class Validations
 	 * Validates that a value is numeric.
 	 *
 	 * <code>
-	 * class Person extends ActiveRecord\Model {
+	 * class Person extends SpeedyPHP\ActiveRecord\Model {
 	 *   static $validates_numericality_of = array(
 	 *     array('salary', 'greater_than' => 19.99, 'less_than' => 99.99)
 	 *   );
@@ -394,7 +394,7 @@ class Validations
 	 * Validates that a value is matches a regex.
 	 *
 	 * <code>
-	 * class Person extends ActiveRecord\Model {
+	 * class Person extends SpeedyPHP\ActiveRecord\Model {
 	 *   static $validates_format_of = array(
 	 *     array('email', 'with' => '/^.*?@.*$/')
 	 *   );
@@ -439,7 +439,7 @@ class Validations
 	 * Validates the length of a value.
 	 *
 	 * <code>
-	 * class Person extends ActiveRecord\Model {
+	 * class Person extends SpeedyPHP\ActiveRecord\Model {
 	 *   static $validates_length_of = array(
 	 *     array('name', 'within' => array(1,50))
 	 *   );
@@ -541,7 +541,7 @@ class Validations
 	 * Validates the uniqueness of a value.
 	 *
 	 * <code>
-	 * class Person extends ActiveRecord\Model {
+	 * class Person extends SpeedyPHP\ActiveRecord\Model {
 	 *   static $validates_uniqueness_of = array(
 	 *     array('name'),
 	 *     array(array('blah','bleh'), 'message' => 'blech')
@@ -622,7 +622,7 @@ class Validations
 /**
  * Class that holds {@link Validations} errors.
  *
- * @package ActiveRecord
+ * @package SpeedyPHP\ActiveRecord
  */
 class Errors implements IteratorAggregate
 {
