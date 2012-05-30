@@ -7,20 +7,20 @@ define('PHP_ACTIVERECORD_VERSION_ID','1.0');
 if (!defined('PHP_ACTIVERECORD_AUTOLOAD_PREPEND'))
 	define('PHP_ACTIVERECORD_AUTOLOAD_PREPEND',true);
 
-require 'lib/Singleton.php';
-require 'lib/Config.php';
-require 'lib/Utils.php';
-require 'lib/DateTime.php';
-require 'lib/Model.php';
-require 'lib/Table.php';
-require 'lib/ConnectionManager.php';
-require 'lib/Connection.php';
-require 'lib/SQLBuilder.php';
-require 'lib/Reflections.php';
-require 'lib/Inflector.php';
-require 'lib/CallBack.php';
-require 'lib/Exceptions.php';
-require 'lib/Cache.php';
+require 'lib/SpeedyPHP/ActiveRecord/Singleton.php';
+require 'lib/SpeedyPHP/ActiveRecord/Config.php';
+require 'lib/SpeedyPHP/ActiveRecord/Utils.php';
+require 'lib/SpeedyPHP/ActiveRecord/DateTime.php';
+require 'lib/SpeedyPHP/ActiveRecord/Model.php';
+require 'lib/SpeedyPHP/ActiveRecord/Table.php';
+require 'lib/SpeedyPHP/ActiveRecord/ConnectionManager.php';
+require 'lib/SpeedyPHP/ActiveRecord/Connection.php';
+require 'lib/SpeedyPHP/ActiveRecord/SQLBuilder.php';
+require 'lib/SpeedyPHP/ActiveRecord/Reflections.php';
+require 'lib/SpeedyPHP/ActiveRecord/Inflector.php';
+require 'lib/SpeedyPHP/ActiveRecord/CallBack.php';
+require 'lib/SpeedyPHP/ActiveRecord/Exceptions.php';
+require 'lib/SpeedyPHP/ActiveRecord/Cache.php';
 
 if (!defined('PHP_ACTIVERECORD_AUTOLOAD_DISABLE'))
 	spl_autoload_register('activerecord_autoload',false,PHP_ACTIVERECORD_AUTOLOAD_PREPEND);

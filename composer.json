@@ -12,7 +12,7 @@
 	}],
 	"autoload":{
 		"psr-0": {
-			"SpeedyPHP\\ActiveRecord" : "lib/"
+			"SpeedyPHP\\ActiveRecord" : "lib"
 		}
 	}
 }
