@@ -5,6 +5,9 @@
 namespace Speedy\ActiveRecord;
 use Closure;
 
+
+require_once "Exceptions.php";
+require_once 'Utils.php';
 /**
  * Manages configuration options for Speedy\ActiveRecord.
  *

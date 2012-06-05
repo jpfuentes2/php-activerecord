@@ -25,7 +25,7 @@ abstract class Migration {
 	public function __construct($connection) 
 	{
 		if (!$connection)
-			throw new Speedy\ActiveRecordException('A valid database connection is required.');
+			throw new \Speedy\ActiveRecord\ActiveRecordException('A valid database connection is required.');
 		
 		$reflection	= new \ReflectionClass($this);
 		$path	= pathinfo($reflection->getFileName());

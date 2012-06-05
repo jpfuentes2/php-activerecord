@@ -132,7 +132,7 @@ abstract class Connection
 		$source = __DIR__ . "/adapters/$class.php";
 
 		if (!file_exists($source))
-			throw new DatabaseException("$fqclass not found!");
+			throw new \Speedy\ActiveRecord\DatabaseException("$fqclass not found!");
 
 		require_once($source);
 		return $fqclass;
@@ -165,7 +165,7 @@ abstract class Connection
 		$url = @parse_url($connection_url);
 
 		if (!isset($url['host']))
-			throw new DatabaseException('Database host must be specified in the connection string. If you want to specify an absolute filename, use e.g. sqlite://unix(/path/to/file)');
+			throw new \Speedy\ActiveRecord\DatabaseException('Database host must be specified in the connection string. If you want to specify an absolute filename, use e.g. sqlite://unix(/path/to/file)');
 
 		$info = new \stdClass();
 		$info->protocol = $url['scheme'];
@@ -246,7 +246,7 @@ abstract class Connection
 
 			$this->connection = new PDO("$info->protocol:$host;dbname=$info->db", $info->user, $info->pass, static::$PDO_OPTIONS);
 		} catch (PDOException $e) {
-			throw new DatabaseException($e);
+			throw new \Speedy\ActiveRecord\DatabaseException($e);
 		}
 	}
 
@@ -306,18 +306,18 @@ abstract class Connection
 		$start	= microtime(true);
 		try {
 			if (!($sth = $this->connection->prepare($sql)))
-				throw new DatabaseException($this);
+				throw new \Speedy\ActiveRecord\DatabaseException($this);
 		} catch (PDOException $e) {
-			throw new DatabaseException($this);
+			throw new \Speedy\ActiveRecord\DatabaseException($this);
 		}
 
 		$sth->setFetchMode(PDO::FETCH_ASSOC); 
 
 		try {
 			if (!$sth->execute($values))
-				throw new DatabaseException($this);
+				throw new \Speedy\ActiveRecord\DatabaseException($this);
 		} catch (PDOException $e) {
-			throw new DatabaseException($sth);
+			throw new \Speedy\ActiveRecord\DatabaseException($sth);
 		}
 		$end	= microtime(true);
 		$this->set_execution_time(round($end - $start, 4));
@@ -395,7 +395,7 @@ abstract class Connection
 	public function transaction()
 	{
 		if (!$this->connection->beginTransaction())
-			throw new DatabaseException($this);
+			throw new \Speedy\ActiveRecord\DatabaseException($this);
 	}
 
 	/**
@@ -404,7 +404,7 @@ abstract class Connection
 	public function commit()
 	{
 		if (!$this->connection->commit())
-			throw new DatabaseException($this);
+			throw new \Speedy\ActiveRecord\DatabaseException($this);
 	}
 
 	/**
@@ -413,7 +413,7 @@ abstract class Connection
 	public function rollback()
 	{
 		if (!$this->connection->rollBack())
-			throw new DatabaseException($this);
+			throw new \Speedy\ActiveRecord\DatabaseException($this);
 	}
 
 	/**
@@ -565,7 +565,7 @@ abstract class Connection
 			return $native_types[$name];
 		
 		if (!isset($native_types[$type]))
-			throw new Speedy\ActiveRecordException("Column type not known for $name $type");
+			throw new \Speedy\ActiveRecord\ActiveRecordException("Column type not known for $name $type");
 		
 		$sql	= "$name {$typeDefaults['name']}";
 		

@@ -1,6 +1,10 @@
 <?php
 namespace Speedy\ActiveRecord;
+
+
+
 use Closure;
+use \Speedy\ActiveRecord\Inflector;
 
 /**
  * Cache::get('the-cache-key', function() {

@@ -4,7 +4,7 @@
  */
 namespace Speedy\ActiveRecord;
 
-use \ActiveRecord\Object;
+use \Speedy\ActiveRecord\Object;
 /**
  * The base class for your models.
  *
