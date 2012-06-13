@@ -20,24 +20,38 @@ class Memcached
 		$this->memcached = new \Memcached();
 		$options['port'] = isset($options['port']) ? $options['port'] : self::DEFAULT_PORT;
                 $options['host'] = isset($options['host']) ? $options['host'] : self::DEFAULT_HOST;
-
-		if (!$this->memcached->addServer($options['host'], $options['port']))
-			throw new CacheException("Could not connect to $options[host]:$options[port]");
+                $this->memcached->addServer($options['host'], $options['port']);
 	}
 
 	public function flush()
 	{
-		$this->memcached->flush();
+                if(!$this->memcached->flush())
+                        throw new CacheException("Memcached: ".$this->memcached->getResultCode()
+                            ." - ".$this->memcached->getResultMessage());
 	}
 
 	public function read($key)
 	{
-		return $this->memcached->get($key);
+                $data = $this->memcached->get($key);
+                if(!$data)
+                        throw new CacheException("Memcached: ".$this->memcached->getResultCode()
+                            ." - ".$this->memcached->getResultMessage());
+                return $data;
 	}
+        
+        public function delete($key)
+        {
+                if(!$this->memcached->delete($key))
+                        throw new CacheException("Memcached: ".$this->memcached->getResultCode()
+                            ." - ".$this->memcached->getResultMessage());
+        }
 
 	public function write($key, $value, $expire)
 	{
-		$this->memcached->set($key, $value, $expire);
+            	if(!$this->memcached->set($key, $value, $expire))
+                        throw new CacheException("Memcached: ".$this->memcached->getResultCode()
+                            ." - ".$this->memcached->getResultMessage());
 	}
+        
 }
 ?>
