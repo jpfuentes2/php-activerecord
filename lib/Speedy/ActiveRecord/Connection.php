@@ -128,7 +128,7 @@ abstract class Connection
 	private static function load_adapter_class($adapter)
 	{
 		$class = ucwords($adapter) . 'Adapter';
-		$fqclass = 'ActiveRecord\\' . $class;
+		$fqclass = 'Speedy\\ActiveRecord\\' . $class;
 		$source = __DIR__ . "/adapters/$class.php";
 
 		if (!file_exists($source))
