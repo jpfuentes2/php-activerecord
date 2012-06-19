@@ -16,7 +16,7 @@ class ActiveRecordException extends \Exception {};
  *
  * @package Speedy\ActiveRecord
  */
-class RecordNotFound extends Speedy\ActiveRecordException {};
+class RecordNotFound extends ActiveRecordException {};
 
 /**
  * Thrown when there was an error performing a database operation.
@@ -25,7 +25,7 @@ class RecordNotFound extends Speedy\ActiveRecordException {};
  *
  * @package Speedy\ActiveRecord
  */
-class DatabaseException extends Speedy\ActiveRecordException
+class DatabaseException extends ActiveRecordException
 {
 	public function __construct($adapter_or_string_or_mystery)
 	{
@@ -51,21 +51,21 @@ class DatabaseException extends Speedy\ActiveRecordException
  *
  * @package Speedy\ActiveRecord
  */
-class ModelException extends Speedy\ActiveRecordException {};
+class ModelException extends ActiveRecordException {};
 
 /**
  * Thrown by {@link Expressions}.
  *
  * @package Speedy\ActiveRecord
  */
-class ExpressionsException extends Speedy\ActiveRecordException {};
+class ExpressionsException extends ActiveRecordException {};
 
 /**
  * Thrown for configuration problems.
  *
  * @package Speedy\ActiveRecord
  */
-class ConfigException extends Speedy\ActiveRecordException {};
+class ConfigException extends ActiveRecordException {};
 
 /**
  * Thrown when attempting to access an invalid property on a {@link Model}.
@@ -119,14 +119,14 @@ class ReadOnlyException extends ModelException
  *
  * @package Speedy\ActiveRecord
  */
-class ValidationsArgumentError extends Speedy\ActiveRecordException {};
+class ValidationsArgumentError extends ActiveRecordException {};
 
 /**
  * Thrown for relationship exceptions.
  *
  * @package Speedy\ActiveRecord
  */
-class RelationshipException extends Speedy\ActiveRecordException {};
+class RelationshipException extends ActiveRecordException {};
 
 /**
  * Thrown for has many thru exceptions.
@@ -141,5 +141,5 @@ class HasManyThroughAssociationException extends RelationshipException {};
  * @author Zachary Quintana
  * @package Speedy\ActiveRecord
  */
-class MigrationException extends Speedy\ActiveRecordException {};
+class MigrationException extends ActiveRecordException {};
 ?>
