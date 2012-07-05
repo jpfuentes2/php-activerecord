@@ -245,5 +245,4 @@ abstract class Migration {
 	
 }
 
-class SchemaMigration extends Model {}
 ?>
