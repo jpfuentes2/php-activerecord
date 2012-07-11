@@ -521,7 +521,8 @@ class Validations
 
 					$message = str_replace('%d', $option, $message);
 					$attribute_value = $this->model->$attribute;
-					$len = strlen($attribute_value);
+					$attribute_value = str_replace("\r", '', $attribute_value);
+					$len = mb_strlen($attribute_value, 'UTF-8');
 					$value = (int)$attr[$range_option];
 
 					if ('maximum' == $range_option && $len > $value)
