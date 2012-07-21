@@ -414,7 +414,11 @@ class Validations
 	 */
 	public function validates_format_of($attrs)
 	{
-		$configuration = array_merge(self::$DEFAULT_VALIDATION_OPTIONS, array('message' => Errors::$DEFAULT_ERROR_MESSAGES['invalid'], 'on' => 'save', 'with' => null));
+		$configuration = array_merge(self::$DEFAULT_VALIDATION_OPTIONS, array(
+			'message' => Errors::$DEFAULT_ERROR_MESSAGES['invalid'],
+			'on' => 'save',
+			'with' => null
+		));
 
 		foreach ($attrs as $attr)
 		{
