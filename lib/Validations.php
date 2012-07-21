@@ -45,6 +45,7 @@ class Validations
 	private $options = array();
 	private $validators = array();
 	private $record;
+	private $validation_mode = null;
 
 	private static $VALIDATION_FUNCTIONS = array(
 		'validates_presence_of',
@@ -179,7 +180,9 @@ class Validations
 		foreach ($attrs as $attr)
 		{
 			$options = array_merge($configuration, $attr);
-			$this->record->add_on_blank($options[0], $options['message']);
+			
+			if( $this->validation_mode_matches($options['on']) )
+				$this->record->add_on_blank($options[0], $options['message']);
 		}
 	}
 
@@ -249,11 +252,17 @@ class Validations
 	 */
 	public function validates_inclusion_or_exclusion_of($type, $attrs)
 	{
-		$configuration = array_merge(self::$DEFAULT_VALIDATION_OPTIONS, array('message' => Errors::$DEFAULT_ERROR_MESSAGES[$type], 'on' => 'save'));
+		$configuration = array_merge(self::$DEFAULT_VALIDATION_OPTIONS, array(
+			'message' => Errors::$DEFAULT_ERROR_MESSAGES[$type]
+		));
 
 		foreach ($attrs as $attr)
 		{
 			$options = array_merge($configuration, $attr);
+			
+			if (!$this->validation_mode_matches($options['on']))
+				continue;
+			
 			$attribute = $options[0];
 			$var = $this->model->$attribute;
 
@@ -313,6 +322,10 @@ class Validations
 		foreach ($attrs as $attr)
 		{
 			$options = array_merge($configuration, $attr);
+			
+			if (!$this->validation_mode_matches($options['on']))
+				continue;
+			
 			$attribute = $options[0];
 			$var = $this->model->$attribute;
 
@@ -416,13 +429,16 @@ class Validations
 	{
 		$configuration = array_merge(self::$DEFAULT_VALIDATION_OPTIONS, array(
 			'message' => Errors::$DEFAULT_ERROR_MESSAGES['invalid'],
-			'on' => 'save',
 			'with' => null
 		));
 
 		foreach ($attrs as $attr)
 		{
 			$options = array_merge($configuration, $attr);
+			
+			if (!$this->validation_mode_matches($options['on']))
+				continue;
+			
 			$attribute = $options[0];
 			$var = $this->model->$attribute;
 
@@ -474,6 +490,10 @@ class Validations
 		foreach ($attrs as $attr)
 		{
 			$options = array_merge($configuration, $attr);
+			
+			if (!$this->validation_mode_matches($options['on']))
+				continue;
+			
 			$range_options = array_intersect(array_keys(self::$ALL_RANGE_OPTIONS), array_keys($attr));
 			sort($range_options);
 
@@ -575,6 +595,10 @@ class Validations
 		foreach ($attrs as $attr)
 		{
 			$options = array_merge($configuration, $attr);
+			
+			if (!$this->validation_mode_matches($options['on']))
+				continue;
+			
 			$pk = $this->model->get_primary_key();
 			$pk_value = $this->model->$pk[0];
 
@@ -613,6 +637,49 @@ class Validations
 			if ($this->model->exists(array('conditions' => $conditions)))
 				$this->record->add($add_record, $options['message']);
 		}
+	}
+	
+	/**
+	 * Set the validation mode.
+	 *
+	 * The validation mode is used to check if a validation rule should be executed.
+	 * This is decided based on the "on" option for validation rules.
+	 *
+	 * The "on" option can have the following values:
+	 *
+	 * <ul>
+	 * <li><b>save:</b> Invoked before saving changes to either a new or an existing model.
+	 * <li><b>create:</b> Invoked only before inserting a new model.
+	 * <li><b>update:</b> Invoked only before updating an existing model.
+	 * <li><b>delete:</b> Invoked before deletion of a model (unimplemented).
+	 * </ul>
+	 *
+	 * @param string $mode The mode to set, one of "create", "update" or "delete".
+	 * @todo implement "delete" value for option "on"
+	 */
+	public function set_validation_mode($mode)
+	{
+		$this->validation_mode = $mode;
+	}
+	
+	/**
+	 * Check if the current validation mode matches the specified mode.
+	 *
+	 * See {@link set_validation_mode} for more information on validation modes.
+	 *
+	 * @param string $mode The mode to be matched, one of "create", "update" or "delete".
+	 * @return boolean
+	 */
+	private function validation_mode_matches($mode)
+	{
+		// The validation mode is not always set, run the validation anyway in that case
+		if( $this->validation_mode == null )
+			return true;
+		
+		if( $mode == 'save' )
+			return in_array($this->validation_mode, array('create', 'update'));
+		
+		return $mode == $this->validation_mode;
 	}
 
 	private function is_null_with_option($var, &$options)
