@@ -71,6 +71,11 @@ class Cache
 
 		return $value;
 	}
+        
+        public static function delete($key)
+        {
+            static::$adapter->delete($key);
+        }
 
 	private static function get_namespace()
 	{

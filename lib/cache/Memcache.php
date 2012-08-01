@@ -36,6 +36,11 @@ class Memcache
 	{
 		return $this->memcache->get($key);
 	}
+        
+        public function delete($key)
+        {
+            $this->memcache->delete($key);
+        }
 
 	public function write($key, $value, $expire)
 	{
