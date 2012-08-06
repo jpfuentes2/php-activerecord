@@ -751,7 +751,7 @@ class Model
 	 * @param boolean $validate True if the validators should be run
 	 * @return Model
 	 */
-	public static function create($attributes, $validate=true)
+	public static function create($attributes=array(), $validate=true)
 	{
 		$class_name = get_called_class();
 		$model = new $class_name($attributes);
