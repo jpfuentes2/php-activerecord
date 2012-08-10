@@ -22,6 +22,7 @@ class SQLBuilder
 	private $group;
 	private $having;
 	private $update;
+  private $mysql_calc_found_rows = false;
 
 	// for where
 	private $where;
@@ -98,6 +99,11 @@ class SQLBuilder
 		$this->apply_where_conditions(func_get_args());
 		return $this;
 	}
+
+	public function mysql_calc_found_rows($mysql_calc_found_rows) {
+	  $this->mysql_calc_found_rows = $mysql_calc_found_rows;
+	  return $this;
+  }
 
 	public function order($order)
 	{
@@ -363,7 +369,13 @@ class SQLBuilder
 
 	private function build_select()
 	{
-		$sql = "SELECT $this->select FROM $this->table";
+		//$sql = "SELECT $this->select FROM $this->table";
+    $sql = "SELECT ";
+    if ($this->mysql_calc_found_rows) {
+      $sql .= " SQL_CALC_FOUND_ROWS ";
+    }
+    
+    $sql .=	 "$this->select FROM $this->table";
 
 		if ($this->joins)
 			$sql .= ' ' . $this->joins;
