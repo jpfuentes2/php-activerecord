@@ -570,9 +570,9 @@ abstract class Connection
 		$sql	= "$name {$typeDefaults['name']}";
 		
 		if (!$length && isset($typeDefaults['length'])) {
-			$sql	.= ' (' . $typeDefaults['length'] . ')';
+			$sql	.= '(' . $typeDefaults['length'] . ')';
 		} elseif ($length) {
-			$sql	.= ' (' . $length . ')';
+			$sql	.= '(' . $length . ')';
 		}
 		
 		if ($null) {
