@@ -619,7 +619,7 @@ class Validations
 	{
 		foreach ($attrs as $attr) {
 			$options = array_merge(self::$DEFAULT_VALIDATION_OPTIONS, 
-					['message' => 'confirm field %@ doesn\'t match'], 
+					['message' => 'confirm field doesn\'t match %@'], 
 					$attr);
 			
 			$confirmField = $options[0] . "_confirm";
