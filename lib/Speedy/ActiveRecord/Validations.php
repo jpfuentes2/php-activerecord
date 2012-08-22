@@ -55,7 +55,8 @@ class Validations
 		'validates_exclusion_of',
 		'validates_format_of',
 		'validates_numericality_of',
-		'validates_uniqueness_of'
+		'validates_uniqueness_of',
+		'validates_confirmation_of'
 	);
 
 	private static $DEFAULT_VALIDATION_OPTIONS = array(
@@ -606,6 +607,31 @@ class Validations
 
 			if ($this->model->exists(array('conditions' => $conditions)))
 				$this->record->add($add_record, $options['message']);
+		}
+	}
+	
+	/**
+	 * Validates confirmation of field
+	 * 
+	 * @param array $attrs
+	 */
+	public function validates_confirmation_of($attrs) 
+	{
+		foreach ($attrs as $attr) {
+			$options = array_merge(self::$DEFAULT_VALIDATION_OPTIONS, 
+					['message' => 'confirm field %@ doesn\'t match'], 
+					$attr);
+			
+			$confirmField = $options[0] . "_confirm";
+			
+			if (!isset($this->model->$confirmField)) {
+				throw new  ValidationsArgumentError("No confirmation field found");
+			}
+			
+			$message = str_replace('%@', $options[0], $options['message']);
+			if ($this->model->$confirmField != $this->model->{$options[0]}) {
+				$this->record->add($options[0], $message);
+			}
 		}
 	}
 
