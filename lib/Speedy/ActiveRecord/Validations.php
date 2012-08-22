@@ -624,7 +624,7 @@ class Validations
 			
 			$confirmField = $options[0] . "_confirm";
 			
-			if (!isset($this->model->$confirmField)) {
+			if (!property_exists($this->model, $confirmField)) {
 				throw new  ValidationsArgumentError("No confirmation field found");
 			}
 			
