@@ -287,7 +287,7 @@ class Errors implements IteratorAggregate
 	 */
 	public function getIterator()
 	{
-		return new ArrayIterator($this->full_messages());
+		return new \ArrayIterator($this->full_messages());
 	}
 	
 	public function count()
