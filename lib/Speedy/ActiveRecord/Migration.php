@@ -126,11 +126,11 @@ abstract class Migration {
 	
 	public function add_column($table_name, $column, $type, $length = null, $null = true)
 	{
-		if ($this->direction() === SELF::UP) {
+		if ($this->direction() === self::UP) {
 			$this->connection->query($this->build_add_column($table_name, $column, $type, $length, $null));
 			$this->pushLog("Added column $column to $table_name {$this->connection->get_execution_time()} ms");
 			return;
-		} elseif ($this->direction() === SELF::DOWN) {
+		} elseif ($this->direction() === self::DOWN) {
 			$this->connection->query($this->build_drop_column($table_name, $column));
 			$this->pushLog("Droppped column $column from $table_name {$this->connection->get_execution_time()}");
 			return;
