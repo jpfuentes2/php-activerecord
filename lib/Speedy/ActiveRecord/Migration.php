@@ -189,9 +189,9 @@ abstract class Migration {
 	}
 	
 	private function build_add_column($table_name, $column, $type, $length = null, $null = true) {
-		$this->sql = "ALTER TABLE $table_name ADD COLUMN ";
-		$this->sql .= $this->column($column, $type, $length, $null);
-		return $this->sql;
+		$this->column($column, $type, $length, $null);
+		
+		return "ALTER TABLE $table_name ADD COLUMN {$this->columns}";
 	}
 	
 	private function build_create_table($name, $closure) 
