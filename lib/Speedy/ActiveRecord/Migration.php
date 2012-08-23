@@ -12,6 +12,11 @@ abstract class Migration {
 	
 	private $connection;
 	private $sql;
+	
+	/**
+	 * Sql representation of columns
+	 * @var string
+	 */
 	private $columns;
 	private $id = false;
 	private $version;
@@ -119,6 +124,21 @@ abstract class Migration {
 		throw new MigrationException('Unknown error occured while creating table ' . $name);
 	}
 	
+	public function add_column($table_name, $column, $type, $length = null, $null = true)
+	{
+		if ($this->direction() === SELF::UP) {
+			$this->connection->query($this->build_add_column($table_name, $column, $type, $length, $null));
+			$this->pushLog("Added column $column to $table_name {$this->connection->get_execution_time()} ms");
+			return;
+		} elseif ($this->direction() === SELF::DOWN) {
+			$this->connection->query($this->build_drop_column($table_name, $column));
+			$this->pushLog("Droppped column $column from $table_name {$this->connection->get_execution_time()}");
+			return;
+		}
+		
+		throw new MigrationException('Unable to determine direction in current migration');
+	}
+	
 	public function set_direction($direction) {
 		if ($direction != self::UP && $direction != self::DOWN) {
 			throw new MigrationException('Unknown value for direction');
@@ -161,6 +181,17 @@ abstract class Migration {
 		if (!$this->direction) 
 			throw new MigrationException('Unable to determine the direction');
 		return $this->direction;
+	}
+	
+	private function build_drop_column($table_name, $column)
+	{
+		return "ALTER TABLE $table_name DROP COLUMN $column";
+	}
+	
+	private function build_add_column($table_name, $column, $type, $length = null, $null = true) {
+		$this->sql = "ALTER TABLE $table_name ADD COLUMN ";
+		$this->sql .= $this->column($column, $type, $length, $null);
+		return $this->sql;
 	}
 	
 	private function build_create_table($name, $closure) 
