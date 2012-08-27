@@ -281,7 +281,19 @@ abstract class AbstractRelationship implements InterfaceRelationship
 	protected function set_inferred_class_name()
 	{
 		$singularize = ($this instanceOf HasMany ? true : false);
-		$this->set_class_name(classify($this->attribute_name, $singularize));
+		
+		$class = classify($this->attribute_name, $singularize);
+		$current_class = get_class($this);
+		
+		// Check if using namespaces and if so add the current NS
+		if (strrpos($current_class, '\\') !== false) {
+			$current_class_array = explode('\\', $current_class);
+			array_pop($current_class_array);
+			$ns = implode('\\', $current_class_array);	
+			$class = $ns . '\\' .  $class;
+		}
+		
+		$this->set_class_name($class);
 	}
 
 	protected function set_class_name($class_name)
