@@ -282,7 +282,7 @@ abstract class AbstractRelationship implements InterfaceRelationship
 	{
 		$ns 	= ($model) ? get_namespace($model) : null;
 		$class	= $this->get_inferred_class_name();
-		if ($ns) $class = $ns . '\\' . $class;
+		if ($ns) $class = '\\' . $ns . '\\' . $class;
 		
 		$this->set_class_name($class);
 	}
