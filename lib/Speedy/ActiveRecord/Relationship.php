@@ -306,7 +306,7 @@ abstract class AbstractRelationship implements InterfaceRelationship
 			}
 		}
 
-		if (!$reflection->isSubClassOf('ActiveRecord\\Model'))
+		if (!$reflection->isSubClassOf('Speedy\\ActiveRecord\\Model'))
 			throw new RelationshipException("'$class_name' must extend from Speedy\ActiveRecord\\Model");
 
 		$this->class_name = $class_name;
