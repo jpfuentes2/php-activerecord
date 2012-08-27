@@ -278,22 +278,19 @@ abstract class AbstractRelationship implements InterfaceRelationship
 	 * @return void
 	 * @see attribute_name
 	 */
-	protected function set_inferred_class_name()
+	protected function set_inferred_class_name($model = null)
 	{
-		$singularize = ($this instanceOf HasMany ? true : false);
-		
-		$class = classify($this->attribute_name, $singularize);
-		$current_class = get_class($this);
-		
-		// Check if using namespaces and if so add the current NS
-		if (strrpos($current_class, '\\') !== false) {
-			$current_class_array = explode('\\', $current_class);
-			array_pop($current_class_array);
-			$ns = implode('\\', $current_class_array);	
-			$class = $ns . '\\' .  $class;
-		}
+		$ns 	= ($model) ? get_namespace($model) : null;
+		$class	= $this->get_inferred_class_name();
+		if ($ns) $class = $ns . '\\' . $class;
 		
 		$this->set_class_name($class);
+	}
+	
+	protected function get_inferred_class_name()
+	{
+		$singularize = ($this instanceOf HasMany ? true : false);
+		return classify($this->attribute_name, $singularize);
 	}
 
 	protected function set_class_name($class_name)
@@ -463,30 +460,7 @@ class HasMany extends AbstractRelationship
 	private $has_one = false;
 	private $through;
 
-	/**
-	 * Constructs a {@link HasMany} relationship.
-	 *
-	 * @param array $options Options for the association
-	 * @return HasMany
-	 */
-	public function __construct($options=array())
-	{
-		parent::__construct($options);
 
-		if (isset($this->options['through']))
-		{
-			$this->through = $this->options['through'];
-
-			if (isset($this->options['source']))
-				$this->set_class_name($this->options['source']);
-		}
-
-		if (!$this->primary_key && isset($this->options['primary_key']))
-			$this->primary_key = is_array($this->options['primary_key']) ? $this->options['primary_key'] : array($this->options['primary_key']);
-
-		if (!$this->class_name)
-			$this->set_inferred_class_name();
-	}
 
 	protected function set_keys($model_class_name, $override=false)
 	{
@@ -497,9 +471,34 @@ class HasMany extends AbstractRelationship
 		if (!$this->primary_key || $override)
 			$this->primary_key = Table::load($model_class_name)->pk;
 	}
+	
+	/**
+	 * Sets up a {@link HasMany} relationship.
+	 *
+	 * @param array $options Options for the association
+	 * @return HasMany
+	 */
+	public function setup(Model $model)
+	{
+		if (isset($this->options['through']))
+		{
+			$this->through = $this->options['through'];
+		
+			if (isset($this->options['source']))
+				$this->set_class_name($this->options['source']);
+		}
+		
+		if (!$this->primary_key && isset($this->options['primary_key']))
+			$this->primary_key = is_array($this->options['primary_key']) ? $this->options['primary_key'] : array($this->options['primary_key']);
+		
+		if (!$this->class_name)
+			$this->set_inferred_class_name($model);
+	}
 
 	public function load(Model $model)
 	{
+		$this->setup($model);
+		
 		$class_name = $this->class_name;
 		$this->set_keys(get_class($model));
 
@@ -572,6 +571,7 @@ class HasMany extends AbstractRelationship
 		$this->set_keys($table->class->name);
 		$this->query_and_attach_related_models_eagerly($table,$models,$attributes,$includes,$this->foreign_key, $table->pk);
 	}
+	
 };
 
 /**
@@ -594,6 +594,13 @@ class HasMany extends AbstractRelationship
  */
 class HasOne extends HasMany
 {
+	
+	public function load(Model $model)
+	{
+		if (!$this->class_name)
+			$this->set_inferred_class_name($model);
+	}
+	
 };
 
 /**
@@ -616,7 +623,8 @@ class HasAndBelongsToMany extends AbstractRelationship
 
 	public function load(Model $model)
 	{
-
+		if (!$this->class_name)
+			$this->set_inferred_class_name($model);
 	}
 };
 
@@ -651,22 +659,23 @@ class HasAndBelongsToMany extends AbstractRelationship
  */
 class BelongsTo extends AbstractRelationship
 {
-	public function __construct($options=array())
+	
+	public function setup(Model $model)
 	{
-		parent::__construct($options);
-
 		if (!$this->class_name)
-			$this->set_inferred_class_name();
-
+			$this->set_inferred_class_name($model);
+		
 		//infer from class_name
 		if (!$this->foreign_key)
 			$this->foreign_key = array(Inflector::instance()->keyify($this->class_name));
-
+		
 		$this->primary_key = array(Table::load($this->class_name)->pk[0]);
 	}
 
 	public function load(Model $model)
 	{
+		$this->setup($model);
+		
 		$keys = array();
 		$inflector = Inflector::instance();
 
