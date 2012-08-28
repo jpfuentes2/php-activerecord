@@ -80,7 +80,6 @@ abstract class AbstractRelationship implements InterfaceRelationship
 		$relationship = strtolower(denamespace(get_called_class()));
 
 		if ($relationship === 'hasmany' || $relationship === 'hasandbelongstomany')
-			$this->poly_relationship = true;
 
 		if (isset($this->options['conditions']) && !is_array($this->options['conditions']))
 			$this->options['conditions'] = array($this->options['conditions']);
@@ -280,7 +279,7 @@ abstract class AbstractRelationship implements InterfaceRelationship
 	 */
 	protected function set_inferred_class_name($model = null)
 	{
-		$ns 	= ($model) ? get_namespace($model) : null;
+		$ns 	= ($model && !isset($this->options['namespace'])) ? get_namespace($model) : null;
 		$class	= $this->get_inferred_class_name();
 		if ($ns) $class = '\\' . $ns . '\\' . $class;
 		
