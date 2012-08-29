@@ -487,8 +487,10 @@ class HasMany extends AbstractRelationship
 	 * @param array $options Options for the association
 	 * @return HasMany
 	 */
-	public function setup(Model $model)
+	public function __construct($options = [])
 	{
+		parent::__construct($options);
+		
 		if (isset($this->options['through']))
 		{
 			$this->through = $this->options['through'];
@@ -501,7 +503,7 @@ class HasMany extends AbstractRelationship
 			$this->primary_key = is_array($this->options['primary_key']) ? $this->options['primary_key'] : array($this->options['primary_key']);
 		
 		if (!$this->class_name)
-			$this->set_inferred_class_name($model);
+			$this->set_inferred_class_name();
 	}
 
 	public function load(Model $model)
@@ -603,13 +605,6 @@ class HasMany extends AbstractRelationship
  */
 class HasOne extends HasMany
 {
-	
-	public function load(Model $model)
-	{
-		if (!$this->class_name)
-			$this->set_inferred_class_name();
-	}
-	
 };
 
 /**
@@ -628,12 +623,15 @@ class HasAndBelongsToMany extends AbstractRelationship
 		 *   uniq - if true duplicate assoc objects will be ignored
 		 *   validate
 		 */
+		parent::__construct($options);
+		
+		if (!$this->class_name)
+			$this->set_inferred_class_name();
 	}
 
 	public function load(Model $model)
 	{
-		if (!$this->class_name)
-			$this->set_inferred_class_name();
+		
 	}
 };
 
@@ -671,6 +669,8 @@ class BelongsTo extends AbstractRelationship
 	
 	public function __construct($options = [])
 	{
+		parent::__construct($options);
+		
 		if (!$this->class_name)
 			$this->set_inferred_class_name();
 		
