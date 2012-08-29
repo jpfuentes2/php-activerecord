@@ -310,6 +310,16 @@ abstract class AbstractRelationship implements InterfaceRelationship
 
 		$this->class_name = $class_name;
 	}
+	
+	protected function class_name() {
+		if (!$this->class_name) {
+			$this->class_name = $this->get_inferred_class_name();
+			if (isset($this->options['namespace'])) 
+				$this->class_name = $this->options['namespace'] . '\\' . $this->class_name;
+		}
+		
+		return $this->class_name;
+	}
 
 	protected function create_conditions_from_keys(Model $model, $condition_keys=array(), $value_keys=array())
 	{

@@ -123,14 +123,15 @@ class Table
 					$rel = $this->get_relationship($value);
 
 					// if there is more than 1 join for a given table we need to alias the table names
-					if (array_key_exists($rel->class_name, $existing_tables))
+					$class = $rel->class_name();
+					if (array_key_exists($class, $existing_tables))
 					{
 						$alias = $value;
-						$existing_tables[$rel->class_name]++;
+						$existing_tables[$class]++;
 					}
 					else
 					{
-						$existing_tables[$rel->class_name] = true;
+						$existing_tables[$class] = true;
 						$alias = null;
 					}
 
