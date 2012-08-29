@@ -157,9 +157,9 @@ abstract class Migration {
 		return;
 	}
 	
-	public function up() 
-	{
+	public function runUp() {
 		$this->set_direction(self::UP)->migrate();
+		$this->up();
 		
 		$record	= new SchemaMigration(array('version' => $this->version()));
 		$record->save();
@@ -168,9 +168,14 @@ abstract class Migration {
 		return;
 	}
 	
-	public function down() 
+	public function up() {}
+	
+	public function down() {}
+	
+	public function runDown()
 	{
 		$this->set_direction(self::DOWN)->migrate();
+		$this->down();
 		$this->record()->delete();
 		
 		return;
