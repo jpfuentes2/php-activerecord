@@ -394,7 +394,7 @@ abstract class AbstractRelationship implements InterfaceRelationship
 		else
 			$aliased_join_table_name = $join_table_name;
 
-		return "INNER JOIN $join_table_name {$alias}ON($from_table_name.$foreign_key = $aliased_join_table_name.$join_primary_key)";
+		return "INNER JOIN $join_table_name {$alias}ON ($from_table_name.$foreign_key = $aliased_join_table_name.$join_primary_key)";
 	}
 
 	/**
@@ -607,7 +607,7 @@ class HasOne extends HasMany
 	public function load(Model $model)
 	{
 		if (!$this->class_name)
-			$this->set_inferred_class_name($model);
+			$this->set_inferred_class_name();
 	}
 	
 };
@@ -633,7 +633,7 @@ class HasAndBelongsToMany extends AbstractRelationship
 	public function load(Model $model)
 	{
 		if (!$this->class_name)
-			$this->set_inferred_class_name($model);
+			$this->set_inferred_class_name();
 	}
 };
 
@@ -669,10 +669,10 @@ class HasAndBelongsToMany extends AbstractRelationship
 class BelongsTo extends AbstractRelationship
 {
 	
-	public function setup(Model $model)
+	public function __construct($options = [])
 	{
 		if (!$this->class_name)
-			$this->set_inferred_class_name($model);
+			$this->set_inferred_class_name();
 		
 		//infer from class_name
 		if (!$this->foreign_key)
@@ -682,9 +682,7 @@ class BelongsTo extends AbstractRelationship
 	}
 
 	public function load(Model $model)
-	{
-		$this->setup($model);
-		
+	{	
 		$keys = array();
 		$inflector = Inflector::instance();
 
