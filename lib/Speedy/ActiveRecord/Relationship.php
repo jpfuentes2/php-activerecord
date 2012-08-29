@@ -311,7 +311,7 @@ abstract class AbstractRelationship implements InterfaceRelationship
 		$this->class_name = $class_name;
 	}
 	
-	protected function class_name() {
+	public function class_name() {
 		if (!$this->class_name) {
 			$this->class_name = $this->get_inferred_class_name();
 			if (isset($this->options['namespace'])) 
