@@ -109,14 +109,18 @@ abstract class Migration {
 		return $this->version;
 	}
 	
+	public function query($sql) {
+		return $this->connection->query($sql);
+	}
+	
 	public function create_table($name, $closure)
 	{
 		if ($this->direction() === self::UP) {
-			$this->connection->query($this->build_create_table($name, $closure));
+			$this->query($this->build_create_table($name, $closure));
 			$this->pushLog("Created table $name {$this->connection->get_execution_time()} ms");
 			return;
 		} elseif ($this->direction() === self::DOWN) {
-			$this->connection->query($this->build_drop_table($name));
+			$this->query($this->build_drop_table($name));
 			$this->pushLog("Dropped table $name {$this->connection->get_execution_time()} ms");
 			return;
 		}
@@ -127,11 +131,11 @@ abstract class Migration {
 	public function add_column($table_name, $column, $type, $length = null, $null = true)
 	{
 		if ($this->direction() === self::UP) {
-			$this->connection->query($this->build_add_column($table_name, $column, $type, $length, $null));
+			$this->query($this->build_add_column($table_name, $column, $type, $length, $null));
 			$this->pushLog("Added column $column to $table_name {$this->connection->get_execution_time()} ms");
 			return;
 		} elseif ($this->direction() === self::DOWN) {
-			$this->connection->query($this->build_drop_column($table_name, $column));
+			$this->query($this->build_drop_column($table_name, $column));
 			$this->pushLog("Droppped column $column from $table_name {$this->connection->get_execution_time()}");
 			return;
 		}
