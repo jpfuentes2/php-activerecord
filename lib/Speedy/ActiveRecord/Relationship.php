@@ -80,7 +80,6 @@ abstract class AbstractRelationship implements InterfaceRelationship
 		$relationship = strtolower(denamespace(get_called_class()));
 
 		if ($relationship === 'hasmany' || $relationship === 'hasandbelongstomany')
-			$this->poly_relationship = true;
 
 		if (isset($this->options['conditions']) && !is_array($this->options['conditions']))
 			$this->options['conditions'] = array($this->options['conditions']);
@@ -278,10 +277,19 @@ abstract class AbstractRelationship implements InterfaceRelationship
 	 * @return void
 	 * @see attribute_name
 	 */
-	protected function set_inferred_class_name()
+	protected function set_inferred_class_name($model = null)
+	{
+		$ns 	= ($model && !isset($this->options['namespace'])) ? get_namespace($model) : null;
+		$class	= $this->get_inferred_class_name();
+		if ($ns) $class = '\\' . $ns . '\\' . $class;
+		
+		$this->set_class_name($class);
+	}
+	
+	protected function get_inferred_class_name()
 	{
 		$singularize = ($this instanceOf HasMany ? true : false);
-		$this->set_class_name(classify($this->attribute_name, $singularize));
+		return classify($this->attribute_name, $singularize);
 	}
 
 	protected function set_class_name($class_name)
@@ -297,10 +305,20 @@ abstract class AbstractRelationship implements InterfaceRelationship
 			}
 		}
 
-		if (!$reflection->isSubClassOf('ActiveRecord\\Model'))
+		if (!$reflection->isSubClassOf('Speedy\\ActiveRecord\\Model'))
 			throw new RelationshipException("'$class_name' must extend from Speedy\ActiveRecord\\Model");
 
 		$this->class_name = $class_name;
+	}
+	
+	public function class_name() {
+		if (!$this->class_name) {
+			$this->class_name = $this->get_inferred_class_name();
+			if (isset($this->options['namespace'])) 
+				$this->class_name = $this->options['namespace'] . '\\' . $this->class_name;
+		}
+		
+		return $this->class_name;
 	}
 
 	protected function create_conditions_from_keys(Model $model, $condition_keys=array(), $value_keys=array())
@@ -376,7 +394,7 @@ abstract class AbstractRelationship implements InterfaceRelationship
 		else
 			$aliased_join_table_name = $join_table_name;
 
-		return "INNER JOIN $join_table_name {$alias}ON($from_table_name.$foreign_key = $aliased_join_table_name.$join_primary_key)";
+		return "INNER JOIN $join_table_name {$alias}ON ($from_table_name.$foreign_key = $aliased_join_table_name.$join_primary_key)";
 	}
 
 	/**
@@ -451,30 +469,7 @@ class HasMany extends AbstractRelationship
 	private $has_one = false;
 	private $through;
 
-	/**
-	 * Constructs a {@link HasMany} relationship.
-	 *
-	 * @param array $options Options for the association
-	 * @return HasMany
-	 */
-	public function __construct($options=array())
-	{
-		parent::__construct($options);
 
-		if (isset($this->options['through']))
-		{
-			$this->through = $this->options['through'];
-
-			if (isset($this->options['source']))
-				$this->set_class_name($this->options['source']);
-		}
-
-		if (!$this->primary_key && isset($this->options['primary_key']))
-			$this->primary_key = is_array($this->options['primary_key']) ? $this->options['primary_key'] : array($this->options['primary_key']);
-
-		if (!$this->class_name)
-			$this->set_inferred_class_name();
-	}
 
 	protected function set_keys($model_class_name, $override=false)
 	{
@@ -485,9 +480,36 @@ class HasMany extends AbstractRelationship
 		if (!$this->primary_key || $override)
 			$this->primary_key = Table::load($model_class_name)->pk;
 	}
+	
+	/**
+	 * Sets up a {@link HasMany} relationship.
+	 *
+	 * @param array $options Options for the association
+	 * @return HasMany
+	 */
+	public function __construct($options = [])
+	{
+		parent::__construct($options);
+		
+		if (isset($this->options['through']))
+		{
+			$this->through = $this->options['through'];
+		
+			if (isset($this->options['source']))
+				$this->set_class_name($this->options['source']);
+		}
+		
+		if (!$this->primary_key && isset($this->options['primary_key']))
+			$this->primary_key = is_array($this->options['primary_key']) ? $this->options['primary_key'] : array($this->options['primary_key']);
+		
+		if (!$this->class_name)
+			$this->set_inferred_class_name();
+	}
 
 	public function load(Model $model)
 	{
+		$this->setup($model);
+		
 		$class_name = $this->class_name;
 		$this->set_keys(get_class($model));
 
@@ -560,6 +582,7 @@ class HasMany extends AbstractRelationship
 		$this->set_keys($table->class->name);
 		$this->query_and_attach_related_models_eagerly($table,$models,$attributes,$includes,$this->foreign_key, $table->pk);
 	}
+	
 };
 
 /**
@@ -600,11 +623,15 @@ class HasAndBelongsToMany extends AbstractRelationship
 		 *   uniq - if true duplicate assoc objects will be ignored
 		 *   validate
 		 */
+		parent::__construct($options);
+		
+		if (!$this->class_name)
+			$this->set_inferred_class_name();
 	}
 
 	public function load(Model $model)
 	{
-
+		
 	}
 };
 
@@ -639,22 +666,23 @@ class HasAndBelongsToMany extends AbstractRelationship
  */
 class BelongsTo extends AbstractRelationship
 {
-	public function __construct($options=array())
+	
+	public function __construct($options = [])
 	{
 		parent::__construct($options);
-
+		
 		if (!$this->class_name)
 			$this->set_inferred_class_name();
-
+		
 		//infer from class_name
 		if (!$this->foreign_key)
 			$this->foreign_key = array(Inflector::instance()->keyify($this->class_name));
-
+		
 		$this->primary_key = array(Table::load($this->class_name)->pk[0]);
 	}
 
 	public function load(Model $model)
-	{
+	{	
 		$keys = array();
 		$inflector = Inflector::instance();
 

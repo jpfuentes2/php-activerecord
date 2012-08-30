@@ -45,6 +45,17 @@ function classify($class_name, $singularize=false)
 	return ucfirst($class_name);
 }
 
+function get_namespace(object $object) 
+{
+	$current_class = get_class($object);
+	if (strpos($current_class, '\\') === FALSE) return '';
+	
+	$current_class_array = explode('\\', $current_class);
+	array_pop($current_class_array);
+	
+	return implode('\\', $current_class_array); 
+}
+
 // http://snippets.dzone.com/posts/show/4660
 function array_flatten(array $array)
 {
