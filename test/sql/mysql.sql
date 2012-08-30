@@ -99,3 +99,9 @@ CREATE TABLE user_newsletters (
     user_id INT NOT NULL,
     newsletter_id INT NOT NULL
 ) ENGINE=InnoDB;
+
+CREATE TABLE valuestore (
+  `id` INT NOT NULL AUTO_INCREMENT PRIMARY KEY,
+  `key` varchar(20) NOT NULL DEFAULT '',
+  `value` varchar(255) NOT NULL DEFAULT ''
+) ENGINE=InnoDB;
