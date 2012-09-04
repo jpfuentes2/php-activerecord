@@ -856,7 +856,7 @@ class Model extends Object implements \ArrayAccess
 			$pk = $this->values_for_pk();
 
 			if (empty($pk))
-				throw new Speedy\ActiveRecordException("Cannot update, no primary key defined for: " . get_called_class());
+				throw new \Speedy\ActiveRecord\Exception("Cannot update, no primary key defined for: " . get_called_class());
 
 			if (!$this->invoke_callback('before_update',false))
 				return false;
@@ -1003,7 +1003,7 @@ class Model extends Object implements \ArrayAccess
 		$pk = $this->values_for_pk();
 
 		if (empty($pk))
-			throw new Speedy\ActiveRecordException("Cannot delete, no primary key defined for: " . get_called_class());
+			throw new \Speedy\ActiveRecord\Exception("Cannot delete, no primary key defined for: " . get_called_class());
 
 		if (!$this->invoke_callback('before_destroy',false))
 			return false;
@@ -1330,7 +1330,7 @@ class Model extends Object implements \ArrayAccess
 
 			// can't take any finders with OR in it when doing a find_or_create_by
 			if (strpos($attributes,'_or_') !== false)
-				throw new Speedy\ActiveRecordException("Cannot use OR'd attributes in find_or_create_by");
+				throw new \Speedy\ActiveRecord\Exception("Cannot use OR'd attributes in find_or_create_by");
 
 			$create = true;
 			$method = 'find_by' . substr($method,17);
@@ -1357,7 +1357,7 @@ class Model extends Object implements \ArrayAccess
 			return static::count($options);
 		}
 
-		throw new Speedy\ActiveRecordException("Call to undefined method: $method");
+		throw new \Speedy\ActiveRecord\Exception("Call to undefined method: $method");
 	}
 
 	/**
@@ -1389,7 +1389,7 @@ class Model extends Object implements \ArrayAccess
 			}
 		}
 
-		throw new Speedy\ActiveRecordException("Call to undefined method: $method");
+		throw new \Speedy\ActiveRecord\Exception("Call to undefined method: $method");
 	}
 
 	/**
@@ -1655,7 +1655,7 @@ class Model extends Object implements \ArrayAccess
 			$diff = array_diff($keys,self::$VALID_OPTIONS);
 
 			if (!empty($diff) && $throw)
-				throw new Speedy\ActiveRecordException("Unknown key(s): " . join(', ',$diff));
+				throw new \Speedy\ActiveRecord\Exception("Unknown key(s): " . join(', ',$diff));
 
 			$intersect = array_intersect($keys,self::$VALID_OPTIONS);
 
@@ -1702,7 +1702,7 @@ class Model extends Object implements \ArrayAccess
 					$options = $last;
 				}
 			}
-			catch (ActiveRecordException $e)
+			catch (\Speedy\ActiveRecord\Exception $e)
 			{
 				if (!is_hash($last))
 					throw $e;
