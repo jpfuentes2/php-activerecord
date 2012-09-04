@@ -1574,7 +1574,7 @@ class Model extends Object
 		$options['mapped_names'] = static::$alias_attribute;
 		$list = static::table()->find($options);
 
-		return $single ? (!empty($list) ? $list[0] : null) : $list;
+		return $single ? ((count($list) > 0) ? $list[0] : null) : $list;
 	}
 
 	/**
