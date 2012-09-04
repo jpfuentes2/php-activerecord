@@ -72,7 +72,7 @@ use \Speedy\ActiveRecord\Object;
  * @see Serialization
  * @see Validations
  */
-class Model extends Object
+class Model extends Object implements \ArrayAccess
 {
 	/**
 	 * An instance of {@link Errors} and will be instantiated once a write method is called.
@@ -1864,6 +1864,29 @@ class Model extends Object
 			throw $e;
 		}
 		return true;
+	}
+	
+	/**
+	 * ArrayAccess methods
+	 */
+	public function offsetExists($offset) 
+	{
+		return isset($this->{$offset});
+	}
+	
+	public function offsetGet($offset)
+	{
+		return $this->{$offset};
+	}
+	
+	public function offsetSet($offset, $value)
+	{
+		$this->{$offset} = $value;
+	}
+	
+	public function offsetUnset($offset)
+	{
+		unset($this->{$offset});
 	}
 };
 ?>
