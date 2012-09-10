@@ -129,7 +129,7 @@ abstract class Connection
 	{
 		$class = ucwords($adapter) . 'Adapter';
 		$fqclass = 'Speedy\\ActiveRecord\\' . $class;
-		$source = __DIR__ . "/adapters/$class.php";
+		$source = __DIR__ . "/Adapters/$class.php";
 
 		if (!file_exists($source))
 			throw new \Speedy\ActiveRecord\DatabaseException("$fqclass not found!");

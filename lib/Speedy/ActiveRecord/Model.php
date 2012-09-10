@@ -72,7 +72,7 @@ use \Speedy\ActiveRecord\Object;
  * @see Serialization
  * @see Validations
  */
-class Model extends Object
+class Model extends Object implements \ArrayAccess
 {
 	/**
 	 * An instance of {@link Errors} and will be instantiated once a write method is called.
@@ -856,7 +856,7 @@ class Model extends Object
 			$pk = $this->values_for_pk();
 
 			if (empty($pk))
-				throw new Speedy\ActiveRecordException("Cannot update, no primary key defined for: " . get_called_class());
+				throw new \Speedy\ActiveRecord\Exception("Cannot update, no primary key defined for: " . get_called_class());
 
 			if (!$this->invoke_callback('before_update',false))
 				return false;
@@ -1003,7 +1003,7 @@ class Model extends Object
 		$pk = $this->values_for_pk();
 
 		if (empty($pk))
-			throw new Speedy\ActiveRecordException("Cannot delete, no primary key defined for: " . get_called_class());
+			throw new \Speedy\ActiveRecord\Exception("Cannot delete, no primary key defined for: " . get_called_class());
 
 		if (!$this->invoke_callback('before_destroy',false))
 			return false;
@@ -1330,7 +1330,7 @@ class Model extends Object
 
 			// can't take any finders with OR in it when doing a find_or_create_by
 			if (strpos($attributes,'_or_') !== false)
-				throw new Speedy\ActiveRecordException("Cannot use OR'd attributes in find_or_create_by");
+				throw new \Speedy\ActiveRecord\Exception("Cannot use OR'd attributes in find_or_create_by");
 
 			$create = true;
 			$method = 'find_by' . substr($method,17);
@@ -1357,7 +1357,7 @@ class Model extends Object
 			return static::count($options);
 		}
 
-		throw new Speedy\ActiveRecordException("Call to undefined method: $method");
+		throw new \Speedy\ActiveRecord\Exception("Call to undefined method: $method");
 	}
 
 	/**
@@ -1389,7 +1389,7 @@ class Model extends Object
 			}
 		}
 
-		throw new Speedy\ActiveRecordException("Call to undefined method: $method");
+		throw new \Speedy\ActiveRecord\Exception("Call to undefined method: $method");
 	}
 
 	/**
@@ -1574,7 +1574,7 @@ class Model extends Object
 		$options['mapped_names'] = static::$alias_attribute;
 		$list = static::table()->find($options);
 
-		return $single ? (!empty($list) ? $list[0] : null) : $list;
+		return $single ? ((count($list) > 0) ? $list[0] : null) : $list;
 	}
 
 	/**
@@ -1655,7 +1655,7 @@ class Model extends Object
 			$diff = array_diff($keys,self::$VALID_OPTIONS);
 
 			if (!empty($diff) && $throw)
-				throw new Speedy\ActiveRecordException("Unknown key(s): " . join(', ',$diff));
+				throw new \Speedy\ActiveRecord\Exception("Unknown key(s): " . join(', ',$diff));
 
 			$intersect = array_intersect($keys,self::$VALID_OPTIONS);
 
@@ -1702,7 +1702,7 @@ class Model extends Object
 					$options = $last;
 				}
 			}
-			catch (ActiveRecordException $e)
+			catch (\Speedy\ActiveRecord\Exception $e)
 			{
 				if (!is_hash($last))
 					throw $e;
@@ -1864,6 +1864,29 @@ class Model extends Object
 			throw $e;
 		}
 		return true;
+	}
+	
+	/**
+	 * ArrayAccess methods
+	 */
+	public function offsetExists($offset) 
+	{
+		return isset($this->{$offset});
+	}
+	
+	public function offsetGet($offset)
+	{
+		return $this->{$offset};
+	}
+	
+	public function offsetSet($offset, $value)
+	{
+		$this->{$offset} = $value;
+	}
+	
+	public function offsetUnset($offset)
+	{
+		unset($this->{$offset});
 	}
 };
 ?>
