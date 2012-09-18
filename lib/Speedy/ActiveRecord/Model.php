@@ -1450,6 +1450,15 @@ class Model extends Object implements \ArrayAccess
 	}
 	
 	/**
+	 * Update all 
+	 * @param array $attrs
+	 * @param array $where
+	 */
+	public static function update_all($attrs, $where = []) {
+		return static::table()->update($attrs, $where);
+	}
+	
+	/**
 	 * @see find
 	 * @return mixed all records matching where condition
 	 */
