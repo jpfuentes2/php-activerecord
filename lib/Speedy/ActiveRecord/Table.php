@@ -394,7 +394,7 @@ class Table
 
 	private function &process_data($hash)
 	{
-		if (!$hash)
+		if (!$hash || is_string($hash))
 			return $hash;
 
 		foreach ($hash as $name => &$value)
