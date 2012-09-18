@@ -1440,13 +1440,25 @@ class Model extends Object implements \ArrayAccess
 	 * @return mixed Max value
 	 */
 	public static function maximum($column, $options = []) {
-		$options	= self::extract_and_validate_options($options);
+		$options	= static::extract_and_validate_options($options);
 		$options['select']	= "MAX($column)";
 	
 		$table = static::table();
 		$sql = $table->options_to_sql($options);
 		
 		return static::connection()->query_and_fetch_one($sql->to_s());
+	}
+	
+	/**
+	 * @see find
+	 * @return mixed all records matching where condition
+	 */
+	public static function where() {
+		$args	= func_get_args();
+		$where	= array_shift($args);
+		$options= (array) @array_shift($args);
+		
+		return call_user_func_array('static::all', array_merge(['conditions' => $where], $options));
 	}
 
 	/**
