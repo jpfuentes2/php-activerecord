@@ -1455,7 +1455,23 @@ class Model extends Object implements \ArrayAccess
 	 * @param array $where
 	 */
 	public static function update_all($attrs, $where = []) {
-		return static::table()->update($attrs, $where);
+		$table = static::table();
+		$conn = static::connection();
+		$sql = new SQLBuilder($conn, $table->get_fully_qualified_table_name());
+		
+		$sql->update($attrs);
+		
+		if (!empty($where))
+		{
+			if (is_array($where) && !is_hash($where))
+				call_user_func_array(array($sql, 'where'), $where);
+			else
+				$sql->where($where);
+		}
+		
+		$values = $sql->bind_values();
+		$ret = $conn->query(($table->last_sql = $sql->to_s()), $values);
+		return $ret->rowCount();
 	}
 	
 	/**
