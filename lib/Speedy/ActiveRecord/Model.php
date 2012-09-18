@@ -956,7 +956,7 @@ class Model extends Object implements \ArrayAccess
 	 * @params array $options
 	 * return integer Number of rows affected
 	 */
-	public static function update_all($options=array())
+	/*public static function update_all($options=array())
 	{
 		$table = static::table();
 		$conn = static::connection();
@@ -982,7 +982,7 @@ class Model extends Object implements \ArrayAccess
 		$ret = $conn->query(($table->last_sql = $sql->to_s()), $values);
 		return $ret->rowCount();
 
-	}
+	}*/
 	
 	/**
 	 * Alias for delete
