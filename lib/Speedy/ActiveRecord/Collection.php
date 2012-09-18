@@ -17,5 +17,9 @@ class Collection extends \ArrayIterator {
 		return;
 	}
 	
+	public function first() {
+		return $this[0];
+	}
+	
 }
 ?>
