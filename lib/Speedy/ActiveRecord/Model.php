@@ -1432,6 +1432,22 @@ class Model extends Object implements \ArrayAccess
 		$values = $sql->get_where_values();
 		return static::connection()->query_and_fetch_one($sql->to_s(),$values);
 	}
+	
+	/**
+	 * 
+	 * @param string $column
+	 * @param array optional $options
+	 * @return mixed Max value
+	 */
+	public static function maximum($column, $options = []) {
+		$options	= self::extract_and_validate_options($options);
+		$options['select']	= "MAX($column)";
+	
+		$table = static::table();
+		$sql = $table->options_to_sql($options);
+		
+		return static::connection()->query_and_fetch_one($sql->to_s());
+	}
 
 	/**
 	 * Determine if a record exists.
