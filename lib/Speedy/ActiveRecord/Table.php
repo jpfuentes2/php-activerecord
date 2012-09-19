@@ -363,7 +363,7 @@ class Table
 	 *
 	 * @param Relationship $relationship a Relationship object
 	 */
-	private function add_relationship($relationship)
+	public function add_relationship($relationship)
 	{
 		$this->relationships[$relationship->attribute_name] = $relationship;
 	}
