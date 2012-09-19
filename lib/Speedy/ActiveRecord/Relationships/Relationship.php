@@ -335,7 +335,7 @@ abstract class Relationship implements InterfaceRelationship
 		$condition_values = array_values($model->get_values_for($value_keys));
 
 		// return null if all the foreign key values are null so that we don't try to do a query like "id is null"
-		if (all(null,$condition_values))
+		if (\Speedy\ActiveRecord\all(null,$condition_values))
 			return null;
 
 		$conditions = SQLBuilder::create_conditions_from_underscored_string(Table::load(get_class($model))->conn,$condition_string,$condition_values);
