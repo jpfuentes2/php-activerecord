@@ -5,6 +5,8 @@
 namespace Speedy\ActiveRecord;
 
 use PDO;
+use \Speedy\ActiveRecord\Exceptions\DatabaseException;
+use \Speedy\ActiveRecord\Exceptions\Exception as ActiveRecordException;
 
 /**
  * Adapter for SQLite.
@@ -83,7 +85,7 @@ class SqliteAdapter extends Connection
 
 	public function set_encoding($charset)
 	{
-		throw new Speedy\ActiveRecordException("SqliteAdapter::set_charset not supported.");
+		throw new ActiveRecordException("SqliteAdapter::set_charset not supported.");
 	}
 
 	public function accepts_limit_and_order_for_update_and_delete() { return true; }

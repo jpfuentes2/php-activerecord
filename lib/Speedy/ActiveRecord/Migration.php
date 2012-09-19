@@ -4,6 +4,10 @@
  */
 namespace Speedy\ActiveRecord;
 
+
+use \Speedy\ActiveRecord\Exceptions\Exception as ActiveRecordException;
+use \Speedy\ActiveRecord\Exceptions\MigrationException;
+
 abstract class Migration {
 	
 	const ID	= 'id';
@@ -30,7 +34,7 @@ abstract class Migration {
 	public function __construct($connection) 
 	{
 		if (!$connection)
-			throw new \Speedy\ActiveRecord\ActiveRecordException('A valid database connection is required.');
+			throw new ActiveRecordException('A valid database connection is required.');
 		
 		$reflection	= new \ReflectionClass($this);
 		$path	= pathinfo($reflection->getFileName());

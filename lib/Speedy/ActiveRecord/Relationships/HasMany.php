@@ -1,5 +1,8 @@
 <?php
 namespace Speedy\ActiveRecord\Relationships; 
+
+
+use \Speedy\ActiveRecord\Exceptions\HasManyThroughAssociationException;
 /**
  * One-to-many relationship.
  *

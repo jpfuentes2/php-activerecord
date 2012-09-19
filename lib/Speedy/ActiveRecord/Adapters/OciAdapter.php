@@ -5,6 +5,7 @@
 namespace Speedy\ActiveRecord;
 
 use PDO;
+use \Speedy\ActiveRecord\Exceptions\DatabaseException;
 
 /**
  * Adapter for OCI (not completed yet).

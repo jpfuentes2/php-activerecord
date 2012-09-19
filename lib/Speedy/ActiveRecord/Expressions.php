@@ -4,6 +4,8 @@
  */
 namespace Speedy\ActiveRecord;
 
+
+use \Speedy\ActiveRecord\Exceptions\ExpressionsException;
 /**
  * Templating like class for building SQL statements.
  *

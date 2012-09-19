@@ -8,6 +8,7 @@ namespace Speedy\ActiveRecord\Relationships;
 
 use \Speedy\ActiveRecord\Inflector;
 use \Speedy\ActiveRecord\Reflections;
+use \Speedy\ActiveRecord\Exceptions\RelationshipException;
 
 /**
  * Interface for a table relationship.

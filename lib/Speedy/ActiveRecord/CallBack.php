@@ -3,8 +3,10 @@
  * @package Speedy\ActiveRecord
  */
 namespace Speedy\ActiveRecord;
-use Closure;
 
+
+use Closure;
+use \Speedy\ActiveRecord\Exceptions\Exception as ActiveRecordException;
 /**
  * Callbacks allow the programmer to hook into the life cycle of a {@link Model}.
  *
@@ -159,7 +161,7 @@ class CallBack
 	public function invoke($model, $name, $must_exist=true)
 	{
 		if ($must_exist && !array_key_exists($name, $this->registry))
-			throw new Speedy\ActiveRecordException("No callbacks were defined for: $name on " . get_class($model));
+			throw new ActiveRecordException("No callbacks were defined for: $name on " . get_class($model));
 
 		// if it doesn't exist it might be a /(after|before)_(create|update)/ so we still need to run the save
 		// callback
@@ -206,7 +208,7 @@ class CallBack
 	 * @param mixed $closure_or_method_name Either a closure or the name of a method on the {@link Model}
 	 * @param array $options Options array
 	 * @return void
-	 * @throws Speedy\ActiveRecordException if invalid callback type or callback method was not found
+	 * @throws ActiveRecordException if invalid callback type or callback method was not found
 	 */
 	public function register($name, $closure_or_method_name=null, $options=array())
 	{
@@ -216,7 +218,7 @@ class CallBack
 			$closure_or_method_name = $name;
 
 		if (!in_array($name,self::$VALID_CALLBACKS))
-			throw new Speedy\ActiveRecordException("Invalid callback: $name");
+			throw new ActiveRecordException("Invalid callback: $name");
 
 		if (!($closure_or_method_name instanceof Closure))
 		{
@@ -228,13 +230,13 @@ class CallBack
 				if ($this->klass->hasMethod($closure_or_method_name))
 				{
 					// Method is private or protected
-					throw new Speedy\ActiveRecordException("Callback methods need to be public (or anonymous closures). " .
+					throw new ActiveRecordException("Callback methods need to be public (or anonymous closures). " .
 						"Please change the visibility of " . $this->klass->getName() . "->" . $closure_or_method_name . "()");
 				}
 				else
 				{
 					// i'm a dirty ruby programmer
-					throw new Speedy\ActiveRecordException("Unknown method for callback: $name" .
+					throw new ActiveRecordException("Unknown method for callback: $name" .
 						(is_string($closure_or_method_name) ? ": #$closure_or_method_name" : ""));
 				}
 			}

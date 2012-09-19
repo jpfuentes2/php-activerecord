@@ -1,6 +1,9 @@
 <?php
 namespace Speedy\ActiveRecord;
 
+
+use \Speedy\ActiveRecord\Exceptions\CacheException;
+
 class Memcache
 {
 	const DEFAULT_PORT = 11211;

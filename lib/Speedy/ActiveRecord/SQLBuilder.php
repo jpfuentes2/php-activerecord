@@ -4,6 +4,8 @@
  */
 namespace Speedy\ActiveRecord;
 
+
+use \Speedy\ActiveRecord\Exceptions\Exception as ActiveRecordException;
 /**
  * Helper class for building sql statements progmatically.
  *
@@ -45,7 +47,7 @@ class SQLBuilder
 	public function __construct($connection, $table)
 	{
 		if (!$connection)
-			throw new Speedy\ActiveRecordException('A valid database connection is required.');
+			throw new ActiveRecordException('A valid database connection is required.');
 
 		$this->connection	= $connection;
 		$this->table		= $table;
@@ -148,7 +150,7 @@ class SQLBuilder
 	public function insert($hash, $pk=null, $sequence_name=null)
 	{
 		if (!is_hash($hash))
-			throw new Speedy\ActiveRecordException('Inserting requires a hash.');
+			throw new ActiveRecordException('Inserting requires a hash.');
 
 		$this->operation = 'INSERT';
 		$this->data = $hash;
@@ -168,7 +170,7 @@ class SQLBuilder
 		elseif (is_string($mixed))
 			$this->update = $mixed;
 		else
-			throw new Speedy\ActiveRecordException('Updating requires a hash or string.');
+			throw new ActiveRecordException('Updating requires a hash or string.');
 
 		return $this;
 	}

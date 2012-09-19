@@ -1,6 +1,9 @@
 <?php 
 namespace Speedy\ActiveRecord;
 
+
+use \Speedy\ActiveRecord\Exceptions\Exception as ActiveRecordException;
+
 class TableBuilder
 {
 	
@@ -12,7 +15,7 @@ class TableBuilder
 	
 	public function __construct($connection) {
 		if (!$connection)
-		throw new Speedy\ActiveRecordException('A valid database connection is required.');
+		throw new ActiveRecordException('A valid database connection is required.');
 	
 		$this->connection	= $connection;
 	}

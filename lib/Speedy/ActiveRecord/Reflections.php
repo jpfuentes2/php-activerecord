@@ -3,7 +3,10 @@
  * @package Speedy\ActiveRecord
  */
 namespace Speedy\ActiveRecord;
+
+
 use ReflectionClass;
+use \Speedy\ActiveRecord\Exceptions\Exception as ActiveRecordException;
 
 /**
  * Simple class that caches reflections of classes.
@@ -54,7 +57,7 @@ class Reflections extends Singleton
 	 *
 	 * @param string $class Optional name of a class
 	 * @return mixed null or a ReflectionClass instance
-	 * @throws Speedy\ActiveRecordException if class was not found
+	 * @throws ActiveRecordException if class was not found
 	 */
 	public function get($class=null)
 	{
@@ -63,7 +66,7 @@ class Reflections extends Singleton
 		if (isset($this->reflections[$class]))
 			return $this->reflections[$class];
 
-		throw new Speedy\ActiveRecordException("Class not found: $class");
+		throw new ActiveRecordException("Class not found: $class");
 	}
 
 	/**

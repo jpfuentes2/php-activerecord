@@ -9,8 +9,12 @@
  */
 
 namespace Speedy\ActiveRecord;
+
+
+
 use Speedy\ActiveRecord\Model;
 use Speedy\ActiveRecord\Errors;
+use Speedy\ActiveRecord\Exceptions\ValidationsArgumentError;
 use IteratorAggregate;
 use ArrayIterator;
 

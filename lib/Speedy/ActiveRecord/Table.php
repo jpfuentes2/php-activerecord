@@ -14,6 +14,7 @@ namespace Speedy\ActiveRecord;
  * @package Speedy\ActiveRecord
  */
 
+use \Speedy\ActiveRecord\Exceptions\RelationshipException;
 use \Speedy\ActiveRecord\Relationships\BelongsTo;
 use \Speedy\ActiveRecord\Relationships\HasAndBelongsToMany;
 use \Speedy\ActiveRecord\Relationships\HasMany;
