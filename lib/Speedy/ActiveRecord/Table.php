@@ -13,6 +13,13 @@ namespace Speedy\ActiveRecord;
  *
  * @package Speedy\ActiveRecord
  */
+
+use \Speedy\ActiveRecord\Relationships\BelongsTo;
+use \Speedy\ActiveRecord\Relationships\HasAndBelongsToMany;
+use \Speedy\ActiveRecord\Relationships\HasMany;
+use \Speedy\ActiveRecord\Relationships\HasOne;
+
+
 class Table
 {
 	private static $cache = array();
