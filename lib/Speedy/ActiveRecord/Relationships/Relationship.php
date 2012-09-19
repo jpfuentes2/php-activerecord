@@ -10,6 +10,7 @@ use Speedy\ActiveRecord\Inflector;
 use Speedy\ActiveRecord\Reflections;
 use Speedy\ActiveRecord\Model;
 use Speedy\ActiveRecord\Table;
+use Speedy\ActiveRecord\SQLBuilder;
 use Speedy\ActiveRecord\Exceptions\RelationshipException;
 
 /**
