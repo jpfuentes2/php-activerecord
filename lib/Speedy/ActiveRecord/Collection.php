@@ -21,7 +21,7 @@ class Collection extends \ArrayIterator {
 		return $this[0];
 	}
 	
-	public function count() {
+	public function length() {
 		return count($this);
 	}
 	

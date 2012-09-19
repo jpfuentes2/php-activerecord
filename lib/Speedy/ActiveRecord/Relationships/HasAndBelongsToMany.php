@@ -1,5 +1,8 @@
 <?php 
 namespace Speedy\ActiveRecord\Relationships;
+
+
+use Speedy\ActiveRecord\Model;
 /**
  * @todo implement me
  * @package Speedy\ActiveRecord

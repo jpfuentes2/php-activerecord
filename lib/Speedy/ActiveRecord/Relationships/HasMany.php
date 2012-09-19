@@ -3,6 +3,7 @@ namespace Speedy\ActiveRecord\Relationships;
 
 
 use Speedy\ActiveRecord\Inflector;
+use Speedy\ActiveRecord\Model;
 use Speedy\ActiveRecord\Table;
 use Speedy\ActiveRecord\Exceptions\HasManyThroughAssociationException;
 /**
