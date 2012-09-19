@@ -32,6 +32,7 @@ namespace Speedy\ActiveRecord\Relationships;
 
 
 use Speedy\ActiveRecord\Inflector;
+use Speedy\ActiveRecord\Table;
 
 class BelongsTo extends Relationship
 {
