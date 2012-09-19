@@ -6,8 +6,6 @@ namespace Speedy\ActiveRecord\Relationships;
 
 
 
-use \Speedy\ActiveRecord\denamespace;
-
 /**
  * Interface for a table relationship.
  *
@@ -81,7 +79,7 @@ abstract class Relationship implements InterfaceRelationship
 		$this->attribute_name = $options[0];
 		$this->options = $this->merge_association_options($options);
 
-		$relationship = strtolower(denamespace(get_called_class()));
+		$relationship = strtolower(\Speedy\ActiveRecord\denamespace(get_called_class()));
 
 		if ($relationship === 'hasmany' || $relationship === 'hasandbelongstomany')
 
