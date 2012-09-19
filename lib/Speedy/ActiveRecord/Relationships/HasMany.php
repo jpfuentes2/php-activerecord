@@ -2,7 +2,9 @@
 namespace Speedy\ActiveRecord\Relationships; 
 
 
-use \Speedy\ActiveRecord\Exceptions\HasManyThroughAssociationException;
+use Speedy\ActiveRecord\Inflector;
+use Speedy\ActiveRecord\Table;
+use Speedy\ActiveRecord\Exceptions\HasManyThroughAssociationException;
 /**
  * One-to-many relationship.
  *
