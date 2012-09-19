@@ -11,6 +11,7 @@ use Speedy\ActiveRecord\Reflections;
 use Speedy\ActiveRecord\Model;
 use Speedy\ActiveRecord\Table;
 use Speedy\ActiveRecord\SQLBuilder;
+use Speedy\ActiveRecord\Utils;
 use Speedy\ActiveRecord\Exceptions\RelationshipException;
 
 /**
