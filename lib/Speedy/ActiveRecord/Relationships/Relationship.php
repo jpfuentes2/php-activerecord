@@ -4,6 +4,10 @@
  */
 namespace Speedy\ActiveRecord\Relationships;
 
+
+
+use \Speedy\ActiveRecord\denamespace;
+
 /**
  * Interface for a table relationship.
  *
