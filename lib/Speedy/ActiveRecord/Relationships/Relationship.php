@@ -293,7 +293,7 @@ abstract class Relationship implements InterfaceRelationship
 	protected function get_inferred_class_name()
 	{
 		$singularize = ($this instanceOf HasMany ? true : false);
-		return classify($this->attribute_name, $singularize);
+		return \Speedy\ActiveRecord\classify($this->attribute_name, $singularize);
 	}
 
 	protected function set_class_name($class_name)
