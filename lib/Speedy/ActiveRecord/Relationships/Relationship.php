@@ -6,6 +6,8 @@ namespace Speedy\ActiveRecord\Relationships;
 
 
 
+use \Speedy\ActiveRecord\Inflector;
+
 /**
  * Interface for a table relationship.
  *
