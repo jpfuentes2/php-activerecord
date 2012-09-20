@@ -43,6 +43,10 @@ class HasManyThroughTest extends DatabaseTest
 
 		$venue = Venue::find(1, array('include' => array('hosts')));
 		$this->assert_equals(1, $venue->hosts[0]->id);
+
+    $venue = Venue::find(2, array('include' => array('hosts')));
+    $this->assert_equals(2, $venue->hosts[0]->id);
+    $this->assert_equals(2, count($venue->hosts));
 	}
 
 	public function test_gh107_has_many_though_include_eager_with_namespace()
