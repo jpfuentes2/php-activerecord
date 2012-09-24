@@ -35,6 +35,11 @@ abstract class Connection
 	 */
 	public $last_query;
 	/**
+	 * The last statement run.
+	 * @var PDOStatement
+	 */
+	public $last_sth;
+	/**
 	 * Switch for logging.
 	 *
 	 * @var bool
@@ -315,6 +320,7 @@ abstract class Connection
 		}
 
 		$sth->setFetchMode(PDO::FETCH_ASSOC); 
+		$this->last_sth = $sth;
 
 		try {
 			if (!$sth->execute($values))
