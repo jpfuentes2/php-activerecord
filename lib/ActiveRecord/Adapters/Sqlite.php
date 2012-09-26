@@ -1,9 +1,11 @@
 <?php
 namespace ActiveRecord\Adapters;
 
+
 use PDO;
-use \Speedy\ActiveRecord\Exceptions\DatabaseException;
-use \Speedy\ActiveRecord\Exceptions\Exception as ActiveRecordException;
+use ActiveRecord\Connection;
+use ActiveRecord\Exceptions\DatabaseException;
+use ActiveRecord\Exceptions\Exception as ActiveRecordException;
 
 /**
  * Adapter for SQLite.

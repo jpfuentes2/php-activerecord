@@ -1,6 +1,9 @@
 <?php
 namespace ActiveRecord\Adapters;
 
+
+use ActiveRecord\Connection;
+
 /**
  * Adapter for Postgres (not completed yet)
  * 
