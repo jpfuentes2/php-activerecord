@@ -5,6 +5,7 @@
 namespace ActiveRecord\Adapters;
 
 
+use ActiveRecord\Column;
 use ActiveRecord\Connection;
 
 /**

@@ -4,7 +4,9 @@
  */
 namespace ActiveRecord\Adapters;
 
+
 use PDO;
+use ActiveRecord\Column;
 use ActiveRecord\Connection;
 use ActiveRecord\Exceptions\DatabaseException;
 
