@@ -7,6 +7,7 @@ namespace ActiveRecord\Adapters;
 
 use ActiveRecord\Column;
 use ActiveRecord\Connection;
+use ActiveRecord\Inflector;
 
 /**
  * Adapter for MySQL.
