@@ -171,7 +171,10 @@ abstract class AbstractRelationship implements InterfaceRelationship
       $through_models = $class::find('all', $through_options);
       $through_models = group_collect($through_models, $query_key, $this->foreign_key[0]);
 
-      $options['select'] = 'DISTINCT `' . $this->attribute_name . '`.*';
+      $linking_table = $this->class_name;
+      $linking_table = $linking_table::table();
+
+      $options['select'] = 'DISTINCT `' . $linking_table->table . '`.*';
 			$options['joins'] = $this->construct_inner_join_sql($through_table, true);
 
 			$query_key = $this->primary_key[0];
