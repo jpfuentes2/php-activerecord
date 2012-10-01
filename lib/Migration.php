@@ -3,6 +3,7 @@
  * @package ActiveRecord
  * @author Zachary Quintana
  */
+namespace ActiveRecord;
 
 
 class SchemaMigration extends Model {}
