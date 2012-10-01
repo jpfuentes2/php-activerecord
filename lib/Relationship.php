@@ -649,8 +649,15 @@ class BelongsTo extends AbstractRelationship
 		//infer from class_name
 		if (!$this->foreign_key)
 			$this->foreign_key = array(Inflector::instance()->keyify($this->class_name));
+	}
 
-		$this->primary_key = array(Table::load($this->class_name)->pk[0]);
+	public function __get($name)
+	{
+		if($name === 'primary_key' && !isset($this->primary_key)) {
+			$this->primary_key = array(Table::load($this->class_name)->pk[0]);
+		}
+
+		return $this->$name;
 	}
 
 	public function load(Model $model)
