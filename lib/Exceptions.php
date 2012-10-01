@@ -134,4 +134,12 @@ class RelationshipException extends ActiveRecordException {};
  * @package ActiveRecord
  */
 class HasManyThroughAssociationException extends RelationshipException {};
+
+/**
+ *
+ * Thrown for Migration Exceptions
+ * @author Zachary Quintana
+ * @package ActiveRecord\Exceptions
+ */
+class MigrationException extends Exception {};
 ?>
