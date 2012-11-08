@@ -95,6 +95,9 @@ class ColumnTest extends SnakeCase_PHPUnit_Framework_TestCase
 		// 64 bit
 		elseif (PHP_INT_SIZE === 8)
 			$this->assert_cast(Column::INTEGER,'9223372036854775808',(((float) PHP_INT_MAX) + 1));
+
+		$this->assert_cast(Column::BOOLEAN,'1',true);
+		$this->assert_cast(Column::BOOLEAN,'',false);
 	}
 
 	public function test_cast_leave_null_alone()
