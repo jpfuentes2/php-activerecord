@@ -329,7 +329,13 @@ class Model
 			$value = $this->$name();
 			return $value;
 		}
-
+        // or a method with the same name as the property
+        else if (method_exists($this, $name))
+        {
+            $value = $this->$name();
+            return $value;
+        }
+        // delegete read_attribute()
 		return $this->read_attribute($name);
 	}
 
