@@ -30,22 +30,26 @@ class DatabaseException extends ActiveRecordException
 	public function __construct($adapter_or_string_or_mystery,
 		$database_connection = NULL)
 	{
+		$connection_suffix = isset($database_connection) ?
+			" ($database_connection)" : "";
+					
 		if ($adapter_or_string_or_mystery instanceof Connection)
 		{
 			parent::__construct(
-				join(", ",$adapter_or_string_or_mystery->connection->errorInfo()),
-				intval($adapter_or_string_or_mystery->connection->errorCode()));
+				join(", ",$adapter_or_string_or_mystery->connection->errorInfo()).
+				$connection_suffix);
 		}
 		elseif ($adapter_or_string_or_mystery instanceof \PDOStatement)
 		{
 			parent::__construct(
 				join(", ",$adapter_or_string_or_mystery->errorInfo()).
-				(isset($database_connection) ? " ($database_connection)" : ""),
-				intval($adapter_or_string_or_mystery->errorCode()));
+				$connection_suffix);
 		}
 		else
+		{
 			parent::__construct($adapter_or_string_or_mystery.
-				(isset($database_connection) ? " ($database_connection)" : ""));
+				$connection_suffix);
+		}
 	}
 };
 
