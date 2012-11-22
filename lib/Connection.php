@@ -287,6 +287,14 @@ abstract class Connection
 			$c = $this->create_column($row);
 			$columns[$c->name] = $c;
 		}
+		
+		if (!count($columns))
+		{
+			throw new ConfigException("Table $table appears to have ".
+				"no columns, perhaps it doesn't exist in ".
+				$this->connection_string);
+		}
+		
 		return $columns;
 	}
 
