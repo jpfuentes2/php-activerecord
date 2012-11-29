@@ -791,25 +791,25 @@ class Model
 		if (!($attributes = $this->dirty_attributes()))
 			$attributes = $this->attributes;
 
-		$pk = $this->get_primary_key(true);
+		$pks = $this->get_primary_key();
 		$use_sequence = false;
 
-		if ($table->sequence && !isset($attributes[$pk]))
+		if ($table->sequence && !isset($attributes[$pks[0]]))
 		{
 			if (($conn = static::connection()) instanceof OciAdapter)
 			{
 				// terrible oracle makes us select the nextval first
-				$attributes[$pk] = $conn->get_next_sequence_value($table->sequence);
+				$attributes[$pks[0]] = $conn->get_next_sequence_value($table->sequence);
 				$table->insert($attributes);
-				$this->attributes[$pk] = $attributes[$pk];
+				$this->attributes[$pks[0]] = $attributes[$pks[0]];
 			}
 			else
 			{
 				// unset pk that was set to null
-				if (array_key_exists($pk,$attributes))
-					unset($attributes[$pk]);
+				if (array_key_exists($pks[0],$attributes))
+					unset($attributes[$pks[0]]);
 
-				$table->insert($attributes,$pk,$table->sequence);
+				$table->insert($attributes,$pks[0],$table->sequence);
 				$use_sequence = true;
 			}
 		}
@@ -817,13 +817,12 @@ class Model
 			$table->insert($attributes);
 
 		// if we've got an autoincrementing/sequenced pk set it
-		// don't need this check until the day comes that we decide to support composite pks
-		// if (count($pk) == 1)
+		if (!isset($attributes[$pks[0]]))
 		{
-			$column = $table->get_column_by_inflected_name($pk);
+			$column = $table->get_column_by_inflected_name($pks[0]);
 
 			if ($column->auto_increment || $use_sequence)
-				$this->attributes[$pk] = static::connection()->insert_id($table->sequence);
+				$this->attributes[$pks[0]] = static::connection()->insert_id($table->sequence);
 		}
 
 		$this->invoke_callback('after_create',false);
