@@ -57,7 +57,7 @@ class SqliteAdapter extends Connection
 		$c->name			= $column['name'];
 		$c->nullable		= $column['notnull'] ? false : true;
 		$c->pk				= $column['pk'] ? true : false;
-		$c->auto_increment	= $column['type'] == 'INTEGER' && $c->pk;
+		$c->auto_increment	= strtoupper($column['type']) == 'INTEGER' && $c->pk;
 
 		$column['type'] = preg_replace('/ +/',' ',$column['type']);
 		$column['type'] = str_replace(array('(',')'),' ',$column['type']);
