@@ -162,5 +162,19 @@ class Column
 
 		return $this->type;
 	}
+
+	/**
+	 * Return a useful string representation of a column type, which
+	 * happens to be valid SQL at the moment, but no guarantees.
+	 */
+	public function __toString()
+    {
+    	return $this->inflected_name." ".$this->raw_type."(".
+    		$this->length.") ".
+    		($this->nullable ? "NULL" : "NOT NULL")." ".
+    		(!is_null($this->default) ? "DEFAULT ".$this->default : "")." ".
+    		($this->pk ? "PRIMARY KEY" : "")." ".
+    		($this->auto_increment ? "AUTO_INCREMENT" : "");
+	}
 }
 ?>
