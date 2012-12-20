@@ -98,3 +98,9 @@ CREATE TABLE user_newsletters (
     user_id INTEGER NOT NULL,
     newsletter_id INTEGER NOT NULL
 );
+
+CREATE TABLE valuestore (
+  `id` INTEGER NOT NULL PRIMARY KEY,
+  `key` varchar(20) NOT NULL DEFAULT '',
+  `value` varchar(255) NOT NULL DEFAULT ''
+);
