@@ -88,3 +88,10 @@ CREATE TABLE property_amenities(
   amenity_id int not null,
   property_id int not null
 );
+
+CREATE SEQUENCE valuestore_seq;
+CREATE TABLE valuestore(
+  id int primary key,
+ `key` varchar(20) NOT NULL DEFAULT '',
+ `value` varchar(255) NOT NULL DEFAULT ''
+);
