@@ -698,5 +698,59 @@ class RelationshipTest extends DatabaseTest
 	{
 		Author::find(999999, array('include' => array('books')));
 	}
-};
+
+	public function test_gh_125_auto_setter_for_relation()
+	{
+		$event = new Event(array(
+			'venue' => new Venue()
+		));
+
+		$this->assert_not_null($event->venue);
+		$this->assert_null($event->venue_id);
+	}
+
+	public function test_gh_125_auto_setter_for_relation_with_id()
+	{
+		$event = new Event(array(
+			'venue' => Venue::create()
+		));
+
+		$this->assert_not_null($event->venue);
+		$this->assert_not_null($event->venue_id);
+		$event->venue->delete();
+	}
+
+	/**
+	 * @expectedException ActiveRecord\RelationshipException
+	 */
+	public function test_gh_125_auto_setter_for_relation_raises_exception()
+	{
+		$event = new Event(array(
+			'venue' => new Book()
+		));
+	}
+
+	public function test_gh_125_auto_setter_for_relation_using_subclass()
+	{
+		$event = new Event(array(
+			'venue' => new SubVenue()
+		));
+
+		$this->assert_not_null($event->venue);
+		$this->assert_null($event->venue_id);
+	}
+
+	public function test_gh_125_unset_existing_relation()
+	{
+		$event = new Event(array(
+			'venue' => Venue::create()
+		));
+
+		$event->venue->delete();
+		$event->venue = null;
+		$this->assert_null($event->venue);
+		$this->assert_null($event->venue_id);
+	}
+}
+
 ?>
