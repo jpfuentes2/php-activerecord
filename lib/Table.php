@@ -327,6 +327,17 @@ class Table
 		return $this->conn->query(($this->last_sql = $sql->to_s()),$values);
 	}
 
+	public function insert_ignore(&$data, $pk=null, $sequence_name=null)
+	{
+		$data = $this->process_data($data);
+
+		$sql = new SQLBuilder($this->conn,$this->get_fully_qualified_table_name());
+		$sql->insert_ignore($data,$pk,$sequence_name);
+
+		$values = array_values($data);
+		return $this->conn->query(($this->last_sql = $sql->to_s()),$values);
+	}
+
 	public function update(&$data, $where)
 	{
 		$data = $this->process_data($data);
