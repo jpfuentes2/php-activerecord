@@ -155,6 +155,20 @@ class SQLBuilder
 
 		return $this;
 	}
+	
+	public function insert_ignore($hash, $pk=null, $sequence_name=null)
+	{
+		if (!is_hash($hash))
+			throw new ActiveRecordException('Inserting requires a hash.');
+
+		$this->operation = 'INSERT_IGNORE';
+		$this->data = $hash;
+
+		if ($pk && $sequence_name)
+			$this->sequence = array($pk,$sequence_name);
+
+		return $this;
+	}
 
 	public function update($mixed)
 	{
@@ -356,6 +370,24 @@ class SQLBuilder
 		}
 		else
 			$sql = "INSERT INTO $this->table($keys) VALUES(?)";
+
+		$e = new Expressions($this->connection,$sql,array_values($this->data));
+		return $e->to_s();
+	}
+	
+	private function build_insert_ignore()
+	{
+		require_once 'Expressions.php';
+		$keys = join(',',$this->quoted_key_names());
+
+		if ($this->sequence)
+		{
+			$sql =
+				"INSERT IGNORE INTO $this->table($keys," . $this->connection->quote_name($this->sequence[0]) .
+				") VALUES(?," . $this->connection->next_sequence_value($this->sequence[1]) . ")";
+		}
+		else
+			$sql = "INSERT IGNORE INTO $this->table($keys) VALUES(?)";
 
 		$e = new Expressions($this->connection,$sql,array_values($this->data));
 		return $e->to_s();
