@@ -771,10 +771,10 @@ class Model
 	 * @param boolean $validate Set to true or false depending on if you want the validators to run or not
 	 * @return boolean True if the model was saved to the database otherwise false
 	 */
-	public function save($validate=true)
+	public function save($validate=true, $ignore = false)
 	{
 		$this->verify_not_readonly('save');
-		return $this->is_new_record() ? $this->insert($validate) : $this->update($validate);
+		return $this->is_new_record() ? $this->insert($validate, $ignore) : $this->update($validate);
 	}
 
 	/**
@@ -784,7 +784,7 @@ class Model
 	 * @param boolean $validate Set to true or false depending on if you want the validators to run or not
 	 * @return boolean True if the model was saved to the database otherwise false
 	 */
-	private function insert($validate=true)
+	private function insert($validate=true, $ignore = false)
 	{
 		$this->verify_not_readonly('insert');
 
@@ -805,7 +805,8 @@ class Model
 			{
 				// terrible oracle makes us select the nextval first
 				$attributes[$pk] = $conn->get_next_sequence_value($table->sequence);
-				$table->insert($attributes);
+				if($ignore) $table->insert_ignore($attributes);
+				else $table->insert($attributes);
 				$this->attributes[$pk] = $attributes[$pk];
 			}
 			else
@@ -814,12 +815,16 @@ class Model
 				if (array_key_exists($pk,$attributes))
 					unset($attributes[$pk]);
 
-				$table->insert($attributes,$pk,$table->sequence);
+				if($ignore) $table->insert_ignore($attributes);
+				else $table->insert($attributes);
 				$use_sequence = true;
 			}
 		}
-		else
-			$table->insert($attributes);
+		else {
+			if($ignore) $table->insert_ignore($attributes);
+			else $table->insert($attributes);
+		}
+
 
 		// if we've got an autoincrementing/sequenced pk set it
 		// don't need this check until the day comes that we decide to support composite pks
