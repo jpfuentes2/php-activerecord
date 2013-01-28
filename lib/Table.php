@@ -57,7 +57,7 @@ class Table
 		if (!isset(self::$cache[$model_class_name]))
 		{
 			/* do not place set_assoc in constructor..it will lead to infinite loop due to
-			   relationships requesting the model's table, but the cache hasn't been set yet */
+				 relationships requesting the model's table, but the cache hasn't been set yet */
 			self::$cache[$model_class_name] = new Table($model_class_name);
 			self::$cache[$model_class_name]->set_associations();
 		}
@@ -499,8 +499,8 @@ class Table
 	 * Will end up consisting of array of:
 	 *
 	 * array('delegate' => array('field1','field2',...),
-	 *       'to'       => 'delegate_to_relationship',
-	 *       'prefix'	=> 'prefix')
+	 *			 'to'			 => 'delegate_to_relationship',
+	 *			 'prefix'	=> 'prefix')
 	 */
 	private function set_delegates()
 	{

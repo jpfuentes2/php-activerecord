@@ -23,23 +23,23 @@ CREATE TABLE books(
 
 CREATE SEQUENCE venues_seq;
 CREATE TABLE venues (
-  Id INT NOT NULL PRIMARY KEY,
-  name varchar(50),
-  city varchar(60),
-  state char(2),
-  address varchar(50),
-  phone varchar(10) default NULL,
-  UNIQUE(name,address)
+	Id INT NOT NULL PRIMARY KEY,
+	name varchar(50),
+	city varchar(60),
+	state char(2),
+	address varchar(50),
+	phone varchar(10) default NULL,
+	UNIQUE(name,address)
 );
 
 CREATE SEQUENCE events_seq;
 CREATE TABLE events (
-  id INT NOT NULL PRIMARY KEY,
-  venue_id int NOT NULL,
-  host_id int NOT NULL,
-  title varchar(60) NOT NULL,
-  description varchar(10),
-  type varchar(15) default NULL
+	id INT NOT NULL PRIMARY KEY,
+	venue_id int NOT NULL,
+	host_id int NOT NULL,
+	title varchar(60) NOT NULL,
+	description varchar(10),
+	type varchar(15) default NULL
 );
 
 CREATE SEQUENCE hosts_seq;
@@ -58,10 +58,10 @@ CREATE TABLE employees (
 
 CREATE SEQUENCE positions_seq;
 CREATE TABLE positions (
-  id INT NOT NULL PRIMARY KEY,
-  employee_id int NOT NULL,
-  title VARCHAR(255) NOT NULL,
-  active SMALLINT NOT NULL
+	id INT NOT NULL PRIMARY KEY,
+	employee_id int NOT NULL,
+	title VARCHAR(255) NOT NULL,
+	active SMALLINT NOT NULL
 );
 
 CREATE SEQUENCE awesome_people_seq;
@@ -73,25 +73,25 @@ CREATE TABLE awesome_people(
 
 CREATE SEQUENCE amenities_seq;
 CREATE TABLE amenities(
-  amenity_id int primary key,
-  type varchar(40) NOT NULL
+	amenity_id int primary key,
+	type varchar(40) NOT NULL
 );
 
 CREATE SEQUENCE property_seq;
 CREATE TABLE property(
-  property_id int primary key
+	property_id int primary key
 );
 
 CREATE SEQUENCE property_amenities_seq;
 CREATE TABLE property_amenities(
-  id int primary key,
-  amenity_id int not null,
-  property_id int not null
+	id int primary key,
+	amenity_id int not null,
+	property_id int not null
 );
 
 CREATE SEQUENCE valuestore_seq;
 CREATE TABLE valuestore(
-  id int primary key,
+	id int primary key,
  `key` varchar(20) NOT NULL DEFAULT '',
  `value` varchar(255) NOT NULL DEFAULT ''
 );

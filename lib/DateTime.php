@@ -15,19 +15,19 @@ namespace ActiveRecord;
  * $now = new ActiveRecord\DateTime('2010-01-02 03:04:05');
  * ActiveRecord\DateTime::$DEFAULT_FORMAT = 'short';
  *
- * echo $now->format();         # 02 Jan 03:04
- * echo $now->format('atom');   # 2010-01-02T03:04:05-05:00
- * echo $now->format('Y-m-d');  # 2010-01-02
+ * echo $now->format();				 # 02 Jan 03:04
+ * echo $now->format('atom');	 # 2010-01-02T03:04:05-05:00
+ * echo $now->format('Y-m-d');	# 2010-01-02
  *
  * # __toString() uses the default formatter
- * echo (string)$now;           # 02 Jan 03:04
+ * echo (string)$now;					 # 02 Jan 03:04
  * </code>
  *
  * You can also add your own pre-defined friendly formatters:
  *
  * <code>
  * ActiveRecord\DateTime::$FORMATS['awesome_format'] = 'H:i:s m/d/Y';
- * echo $now->format('awesome_format')  # 03:04:05 01/02/2010
+ * echo $now->format('awesome_format')	# 03:04:05 01/02/2010
  * </code>
  *
  * @package ActiveRecord
@@ -44,22 +44,22 @@ class DateTime extends \DateTime
 	 * Pre-defined format strings.
 	 */
 	public static $FORMATS = array(
-		'db'      => 'Y-m-d H:i:s',
-		'number'  => 'YmdHis',
-		'time'    => 'H:i',
-		'short'   => 'd M H:i',
-		'long'    => 'F d, Y H:i',
-		'atom'    => \DateTime::ATOM,
-		'cookie'  => \DateTime::COOKIE,
+		'db'			=> 'Y-m-d H:i:s',
+		'number'	=> 'YmdHis',
+		'time'		=> 'H:i',
+		'short'	 => 'd M H:i',
+		'long'		=> 'F d, Y H:i',
+		'atom'		=> \DateTime::ATOM,
+		'cookie'	=> \DateTime::COOKIE,
 		'iso8601' => \DateTime::ISO8601,
-		'rfc822'  => \DateTime::RFC822,
-		'rfc850'  => \DateTime::RFC850,
+		'rfc822'	=> \DateTime::RFC822,
+		'rfc850'	=> \DateTime::RFC850,
 		'rfc1036' => \DateTime::RFC1036,
 		'rfc1123' => \DateTime::RFC1123,
 		'rfc2822' => \DateTime::RFC2822,
 		'rfc3339' => \DateTime::RFC3339,
-		'rss'     => \DateTime::RSS,
-		'w3c'     => \DateTime::W3C);
+		'rss'		 => \DateTime::RSS,
+		'w3c'		 => \DateTime::W3C);
 
 	private $model;
 	private $attribute_name;
@@ -74,9 +74,9 @@ class DateTime extends \DateTime
 	 * Formats the DateTime to the specified format.
 	 *
 	 * <code>
-	 * $datetime->format();         # uses the format defined in DateTime::$DEFAULT_FORMAT
-	 * $datetime->format('short');  # d M H:i
-	 * $datetime->format('Y-m-d');  # Y-m-d
+	 * $datetime->format();				 # uses the format defined in DateTime::$DEFAULT_FORMAT
+	 * $datetime->format('short');	# d M H:i
+	 * $datetime->format('Y-m-d');	# Y-m-d
 	 * </code>
 	 *
 	 * @see FORMATS

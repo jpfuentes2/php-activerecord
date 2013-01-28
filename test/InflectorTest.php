@@ -11,7 +11,7 @@ class InflectorTest extends SnakeCase_PHPUnit_Framework_TestCase
 
 	public function test_underscorify()
 	{
-		$this->assert_equals('rm__name__bob',$this->inflector->variablize('rm--name  bob'));
+		$this->assert_equals('rm__name__bob',$this->inflector->variablize('rm--name	bob'));
 		$this->assert_equals('One_Two_Three',$this->inflector->underscorify('OneTwoThree'));
 	}
 

@@ -379,7 +379,7 @@ class ActiveRecordFindTest extends DatabaseTest
 		{
 			$author = Author::first(array(
 				'select' => 'to_char(created_at,\'YYYY-MM-DD\') as created_at',
-				'group'  => 'to_char(created_at,\'YYYY-MM-DD\')',
+				'group'	=> 'to_char(created_at,\'YYYY-MM-DD\')',
 				'having' => "to_char(created_at,'YYYY-MM-DD') > '2009-01-01'"));
 			$this->assert_sql_has("GROUP BY to_char(created_at,'YYYY-MM-DD') HAVING to_char(created_at,'YYYY-MM-DD') > '2009-01-01'",Author::table()->last_sql);
 		}
@@ -387,7 +387,7 @@ class ActiveRecordFindTest extends DatabaseTest
 		{
 			$author = Author::first(array(
 				'select' => 'date(created_at) as created_at',
-				'group'  => 'date(created_at)',
+				'group'	=> 'date(created_at)',
 				'having' => "date(created_at) > '2009-01-01'"));
 			$this->assert_sql_has("GROUP BY date(created_at) HAVING date(created_at) > '2009-01-01'",Author::table()->last_sql);
 		}

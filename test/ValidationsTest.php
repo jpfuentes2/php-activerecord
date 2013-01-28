@@ -33,7 +33,7 @@ class ValidationsTest extends DatabaseTest
 
 		BookValidations::$validates_presence_of[0] = 'name';
 		BookValidations::$validates_uniqueness_of[0] = 'name';
-		
+
 		ValuestoreValidations::$validates_uniqueness_of[0] = 'key';
 	}
 
@@ -93,13 +93,13 @@ class ValidationsTest extends DatabaseTest
 
 		$this->assert_equals(array("name" => array("Name can't be blank")), $book->errors->to_array());
 	}
-	
+
 	public function test_toString()
 	{
 		$book = new BookValidations();
 		$book->is_valid();
 		$book->errors->add('secondary_author_id', "is invalid");
-		
+
 		$this->assert_equals("Name can't be blank\nSecondary author id is invalid", (string) $book->errors);
 	}
 

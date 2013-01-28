@@ -28,9 +28,9 @@ use XmlWriter;
  * # include the comments association
  * # include posts association with its own options (nested)
  * $model->to_json(array(
- *   'only' => array('id','name', 'encoded_description'),
- *   'methods' => array('encoded_description'),
- *   'include' => array('comments', 'posts' => array('only' => 'id'))
+ *	 'only' => array('id','name', 'encoded_description'),
+ *	 'methods' => array('encoded_description'),
+ *	 'include' => array('comments', 'posts' => array('only' => 'id'))
  * ));
  *
  * # except the password field from being included
@@ -62,12 +62,12 @@ abstract class Serialization
 	 *
 	 * <code>
 	 * $user = array('id' => 1, 'name' => 'Tito',
-	 *   'permissions' => array(
-	 *     'permission' => array(
-	 *       array('id' => 100, 'name' => 'admin'),
-	 *       array('id' => 101, 'name' => 'normal')
-	 *     )
-	 *   )
+	 *	 'permissions' => array(
+	 *		 'permission' => array(
+	 *			 array('id' => 100, 'name' => 'admin'),
+	 *			 array('id' => 101, 'name' => 'normal')
+	 *		 )
+	 *	 )
 	 * );
 	 * </code>
 	 *
@@ -75,10 +75,10 @@ abstract class Serialization
 	 *
 	 * <code>
 	 * $user = array('id' => 1, 'name' => 'Tito',
-	 *   'permissions' => array(
-	 *     array('id' => 100, 'name' => 'admin'),
-	 *     array('id' => 101, 'name' => 'normal')
-	 *   )
+	 *	 'permissions' => array(
+	 *		 array('id' => 100, 'name' => 'admin'),
+	 *		 array('id' => 101, 'name' => 'normal')
+	 *	 )
 	 * );
 	 * </code>
 	 *
@@ -107,7 +107,7 @@ abstract class Serialization
 		$this->check_except();
 		$this->check_methods();
 		$this->check_include();
-		$this->check_only_method();        
+		$this->check_only_method();
 	}
 
 	private function check_only()
@@ -143,7 +143,7 @@ abstract class Serialization
 			}
 		}
 	}
-	
+
 	private function check_only_method()
 	{
 		if (isset($this->options['only_method']))
@@ -340,33 +340,33 @@ class XmlSerializer extends Serialization
  */
 class CsvSerializer extends Serialization
 {
-  public static $delimiter = ',';
-  public static $enclosure = '"';
+	public static $delimiter = ',';
+	public static $enclosure = '"';
 
-  public function to_s()
-  {
-    if (@$this->options['only_header'] == true) return $this->header();
-    return $this->row();
-  }
+	public function to_s()
+	{
+		if (@$this->options['only_header'] == true) return $this->header();
+		return $this->row();
+	}
 
-  private function header()
-  {
-    return $this->to_csv(array_keys($this->to_a()));
-  }
+	private function header()
+	{
+		return $this->to_csv(array_keys($this->to_a()));
+	}
 
-  private function row()
-  {
-    return $this->to_csv($this->to_a());
-  }
+	private function row()
+	{
+		return $this->to_csv($this->to_a());
+	}
 
-  private function to_csv($arr)
-  {
-    $outstream = fopen('php://temp', 'w');
-    fputcsv($outstream, $arr, self::$delimiter, self::$enclosure);
-    rewind($outstream);
-    $buffer = trim(stream_get_contents($outstream));
-    fclose($outstream);
-    return $buffer;
-  }
+	private function to_csv($arr)
+	{
+		$outstream = fopen('php://temp', 'w');
+		fputcsv($outstream, $arr, self::$delimiter, self::$enclosure);
+		rewind($outstream);
+		$buffer = trim(stream_get_contents($outstream));
+		fclose($outstream);
+		return $buffer;
+	}
 }
 ?>

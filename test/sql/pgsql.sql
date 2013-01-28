@@ -59,9 +59,9 @@ CREATE TABLE positions (
 );
 
 CREATE TABLE "rm-bldg"(
-    "rm-id" SERIAL PRIMARY KEY,
-    "rm-name" VARCHAR(10) NOT NULL,
-    "space out" VARCHAR(1) NOT NULL
+		"rm-id" SERIAL PRIMARY KEY,
+		"rm-name" VARCHAR(10) NOT NULL,
+		"space out" VARCHAR(1) NOT NULL
 );
 
 CREATE TABLE awesome_people(
@@ -94,15 +94,15 @@ CREATE TABLE newsletters(
 );
 
 CREATE TABLE user_newsletters(
-  id serial primary key,
-  user_id int not null,
-  newsletter_id int not null
+	id serial primary key,
+	user_id int not null,
+	newsletter_id int not null
 );
 
 CREATE TABLE valuestore (
-  id serial primary key,
-  key varchar(20) NOT NULL DEFAULT '',
-  value varchar(255) NOT NULL DEFAULT ''
+	id serial primary key,
+	key varchar(20) NOT NULL DEFAULT '',
+	value varchar(255) NOT NULL DEFAULT ''
 );
 
 -- reproduces issue GH-96 for testing

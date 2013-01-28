@@ -34,16 +34,16 @@ use Closure;
  *
  * <code>
  * class Person extends ActiveRecord\Model {
- *   static $before_save = array('make_name_uppercase');
- *   static $after_save = array('do_happy_dance');
+ *	 static $before_save = array('make_name_uppercase');
+ *	 static $after_save = array('do_happy_dance');
  *
- *   public function make_name_uppercase() {
- *     $this->name = strtoupper($this->name);
- *   }
+ *	 public function make_name_uppercase() {
+ *		 $this->name = strtoupper($this->name);
+ *	 }
  *
- *   public function do_happy_dance() {
- *     happy_dance();
- *   }
+ *	 public function do_happy_dance() {
+ *		 happy_dance();
+ *	 }
  * }
  * </code>
  *

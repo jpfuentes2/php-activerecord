@@ -399,9 +399,9 @@ abstract class AbstractRelationship implements InterfaceRelationship
  * # Table: schools
  * # Primary key: id
  * class School extends ActiveRecord\Model {
- *   static $has_many = array(
- *     array('people')
- *   );
+ *	 static $has_many = array(
+ *		 array('people')
+ *	 );
  * });
  * </code>
  *
@@ -409,19 +409,19 @@ abstract class AbstractRelationship implements InterfaceRelationship
  *
  * <code>
  * class Payment extends ActiveRecord\Model {
- *   static $belongs_to = array(
- *     array('person'),
- *     array('order')
- *   );
+ *	 static $belongs_to = array(
+ *		 array('person'),
+ *		 array('order')
+ *	 );
  * }
  *
  * class Order extends ActiveRecord\Model {
- *   static $has_many = array(
- *     array('people',
- *           'through'    => 'payments',
- *           'select'     => 'people.*, payments.amount',
- *           'conditions' => 'payments.amount < 200')
- *     );
+ *	 static $has_many = array(
+ *		 array('people',
+ *					 'through'		=> 'payments',
+ *					 'select'		 => 'people.*, payments.amount',
+ *					 'conditions' => 'payments.amount < 200')
+ *		 );
  * }
  * </code>
  *
@@ -510,7 +510,7 @@ class HasMany extends AbstractRelationship
 				$fk = $this->foreign_key;
 
 				$this->set_keys($this->get_table()->class->getName(), true);
-				
+
 				$class = $this->class_name;
 				$relation = $class::table()->get_relationship($this->through);
 				$through_table = $relation->get_table();
@@ -573,7 +573,7 @@ class HasMany extends AbstractRelationship
  * # Table name: people
  * # Foreign key: state_id
  * class Person extends ActiveRecord\Model {
- *   static $has_one = array(array('state'));
+ *	 static $has_one = array(array('state'));
  * }
  * </code>
  *
@@ -594,11 +594,11 @@ class HasAndBelongsToMany extends AbstractRelationship
 	public function __construct($options=array())
 	{
 		/* options =>
-		 *   join_table - name of the join table if not in lexical order
-		 *   foreign_key -
-		 *   association_foreign_key - default is {assoc_class}_id
-		 *   uniq - if true duplicate assoc objects will be ignored
-		 *   validate
+		 *	 join_table - name of the join table if not in lexical order
+		 *	 foreign_key -
+		 *	 association_foreign_key - default is {assoc_class}_id
+		 *	 uniq - if true duplicate assoc objects will be ignored
+		 *	 validate
 		 */
 	}
 
@@ -615,9 +615,9 @@ class HasAndBelongsToMany extends AbstractRelationship
  * class School extends ActiveRecord\Model {}
  *
  * class Person extends ActiveRecord\Model {
- *   static $belongs_to = array(
- *     array('school')
- *   );
+ *	 static $belongs_to = array(
+ *		 array('school')
+ *	 );
  * }
  * </code>
  *
@@ -627,9 +627,9 @@ class HasAndBelongsToMany extends AbstractRelationship
  * class School extends ActiveRecord\Model {}
  *
  * class Person extends ActiveRecord\Model {
- *   static $belongs_to = array(
- *     array('school', 'primary_key' => 'school_id')
- *   );
+ *	 static $belongs_to = array(
+ *		 array('school', 'primary_key' => 'school_id')
+ *	 );
  * }
  * </code>
  *

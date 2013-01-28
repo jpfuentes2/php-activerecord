@@ -207,7 +207,7 @@ class SQLBuilder
 	 * @param Connection $connection
 	 * @param $name Underscored string
 	 * @param $values Array of values for the field names. This is used
-	 *   to determine what kind of bind marker to use: =?, IN(?), IS NULL
+	 *	 to determine what kind of bind marker to use: =?, IN(?), IS NULL
 	 * @param $map A hash of "mapped_column_name" => "real_column_name"
 	 * @return A conditions array in the form array(sql_string, value1, value2,...)
 	 */

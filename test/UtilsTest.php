@@ -40,8 +40,8 @@ class UtilsTest extends SnakeCase_PHPUnit_Framework_TestCase
 		$this->assert_equals(array("0a","1a"),AR\collect($this->array_hash,"a"));
 	}
 
-    public function test_array_flatten()
-    {
+		public function test_array_flatten()
+		{
 		$this->assert_equals(array(), AR\array_flatten(array()));
 		$this->assert_equals(array(1), AR\array_flatten(array(1)));
 		$this->assert_equals(array(1), AR\array_flatten(array(array(1))));
