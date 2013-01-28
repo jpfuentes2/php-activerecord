@@ -769,6 +769,7 @@ class Model
 	 * If saving an existing model only data that has changed will be saved.
 	 *
 	 * @param boolean $validate Set to true or false depending on if you want the validators to run or not
+	 * @param boolean $ignore Set to true if you want use "insert ignore" mode
 	 * @return boolean True if the model was saved to the database otherwise false
 	 */
 	public function save($validate=true, $ignore = false)
