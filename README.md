@@ -56,37 +56,37 @@ Setup is very easy and straight-forward. There are essentially only three config
 
 Example:
 
-    ActiveRecord\Config::initialize(function($cfg)
-    {
-	    $cfg->set_model_directory('/path/to/your/model_directory');
-	    $cfg->set_connections(
-	      array(
-	        'development' => 'mysql://username:password@localhost/development_database_name',
-	        'test' => 'mysql://username:password@localhost/test_database_name',
-	        'production' => 'mysql://username:password@localhost/production_database_name'
-	      )
-	    );
-    });
+		ActiveRecord\Config::initialize(function($cfg)
+		{
+			$cfg->set_model_directory('/path/to/your/model_directory');
+			$cfg->set_connections(
+				array(
+					'development' => 'mysql://username:password@localhost/development_database_name',
+					'test' => 'mysql://username:password@localhost/test_database_name',
+					'production' => 'mysql://username:password@localhost/production_database_name'
+				)
+			);
+		});
 
 Alternatively (w/o the 5.3 closure):
 
-    $cfg = ActiveRecord\Config::instance();
-    $cfg->set_model_directory('/path/to/your/model_directory');
-    $cfg->set_connections(
-      array(
-        'development' => 'mysql://username:password@localhost/development_database_name',
-        'test' => 'mysql://username:password@localhost/test_database_name',
-        'production' => 'mysql://username:password@localhost/production_database_name'
-      )
-    );
+		$cfg = ActiveRecord\Config::instance();
+		$cfg->set_model_directory('/path/to/your/model_directory');
+		$cfg->set_connections(
+			array(
+				'development' => 'mysql://username:password@localhost/development_database_name',
+				'test' => 'mysql://username:password@localhost/test_database_name',
+				'production' => 'mysql://username:password@localhost/production_database_name'
+			)
+		);
 
 PHP ActiveRecord will default to use your development database. For testing or production, you simply set the default
 connection according to your current environment ('test' or 'production'):
 
-    ActiveRecord\Config::initialize(function($cfg) 
-    {
-      $cfg->set_default_connection(your_environment);
-    });
+		ActiveRecord\Config::initialize(function($cfg)
+		{
+			$cfg->set_default_connection(your_environment);
+		});
 
 Once you have configured these three settings you are done. ActiveRecord takes care of the rest for you.
 It does not require that you map your table schema to yaml/xml files. It will query the database for this information and

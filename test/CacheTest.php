@@ -12,7 +12,7 @@ class CacheTest extends SnakeCase_PHPUnit_Framework_TestCase
 			$this->markTestSkipped('The memcache extension is not available');
 			return;
 		}
-		
+
 		Cache::initialize('memcache://localhost');
 	}
 
@@ -73,12 +73,12 @@ class CacheTest extends SnakeCase_PHPUnit_Framework_TestCase
 
 		$this->assert_same(false, Cache::$adapter->read("1337"));
 	}
-	
+
 	public function test_namespace_is_set_properly()
 	{
-	  Cache::$options['namespace'] = 'myapp';
-	  $this->cache_get();
-	  $this->assert_same("abcd", Cache::$adapter->read("myapp::1337"));
+		Cache::$options['namespace'] = 'myapp';
+		$this->cache_get();
+		$this->assert_same("abcd", Cache::$adapter->read("myapp::1337"));
 	}
 }
 ?>

@@ -71,10 +71,10 @@ abstract class Connection
 	 * Retrieve a database connection.
 	 *
 	 * @param string $connection_string_or_connection_name A database connection string (ex. mysql://user:pass@host[:port]/dbname)
-	 *   Everything after the protocol:// part is specific to the connection adapter.
-	 *   OR
-	 *   A connection name that is set in ActiveRecord\Config
-	 *   If null it will use the default connection specified by ActiveRecord\Config->set_default_connection
+	 *	 Everything after the protocol:// part is specific to the connection adapter.
+	 *	 OR
+	 *	 A connection name that is set in ActiveRecord\Config
+	 *	 If null it will use the default connection specified by ActiveRecord\Config->set_default_connection
 	 * @return Connection
 	 * @see parse_connection_url
 	 */

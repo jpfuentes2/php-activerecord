@@ -283,8 +283,8 @@ class RelationshipTest extends DatabaseTest
 	{
 		Venue::$has_many[0] = array('events',
 			'select' => 'type',
-			'group'  => 'type',
-			'limit'  => 2,
+			'group'	=> 'type',
+			'limit'	=> 2,
 			'offset' => 1);
 		Venue::first()->events;
 		$this->assert_sql_has($this->conn->limit("SELECT type FROM events WHERE venue_id=? GROUP BY type",1,2),Event::table()->last_sql);
@@ -508,7 +508,7 @@ class RelationshipTest extends DatabaseTest
 
 		$this->assert_sql_has("WHERE length(title) = ? AND venue_id IN(?,?) ORDER BY id asc",ActiveRecord\Table::load('Event')->last_sql);
 		$this->assert_equals(1, count($venues[0]->events));
-    }
+		}
 
 	public function test_eager_loading_has_many_x()
 	{

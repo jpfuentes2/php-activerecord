@@ -223,7 +223,7 @@ class ValidatesLengthOfTest extends DatabaseTest
 			$book->name = null;
 			$book->save();
 		} catch (ActiveRecord\ValidationsArgumentError $e) {
-			$this->assert_equals('Range unspecified.  Specify the [within], [maximum], or [is] option.', $e->getMessage());
+			$this->assert_equals('Range unspecified.	Specify the [within], [maximum], or [is] option.', $e->getMessage());
 			return;
 		}
 
@@ -240,7 +240,7 @@ class ValidatesLengthOfTest extends DatabaseTest
 			$book->name = null;
 			$book->save();
 		} catch (ActiveRecord\ValidationsArgumentError $e) {
-			$this->assert_equals('Too many range options specified.  Choose only one.', $e->getMessage());
+			$this->assert_equals('Too many range options specified.	Choose only one.', $e->getMessage());
 			return;
 		}
 
@@ -257,7 +257,7 @@ class ValidatesLengthOfTest extends DatabaseTest
 			$book->name = null;
 			$book->save();
 		} catch (ActiveRecord\ValidationsArgumentError $e) {
-			$this->assert_equals('Too many range options specified.  Choose only one.', $e->getMessage());
+			$this->assert_equals('Too many range options specified.	Choose only one.', $e->getMessage());
 			return;
 		}
 

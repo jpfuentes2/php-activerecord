@@ -60,9 +60,9 @@ CREATE TABLE positions (
 );
 
 CREATE TABLE `rm-bldg`(
-    `rm-id` INT NOT NULL,
-    `rm-name` VARCHAR(10) NOT NULL,
-    `space out` VARCHAR(1) NOT NULL
+		`rm-id` INT NOT NULL,
+		`rm-name` VARCHAR(10) NOT NULL,
+		`space out` VARCHAR(1) NOT NULL
 );
 
 CREATE TABLE awesome_people(
@@ -72,36 +72,36 @@ CREATE TABLE awesome_people(
 );
 
 CREATE TABLE amenities(
-  `amenity_id` int(11) NOT NULL AUTO_INCREMENT PRIMARY KEY,
-  `type` varchar(40) NOT NULL DEFAULT ''
+	`amenity_id` int(11) NOT NULL AUTO_INCREMENT PRIMARY KEY,
+	`type` varchar(40) NOT NULL DEFAULT ''
 );
 
 CREATE TABLE property(
-  `property_id` int(11) NOT NULL AUTO_INCREMENT PRIMARY KEY
+	`property_id` int(11) NOT NULL AUTO_INCREMENT PRIMARY KEY
 );
 
 CREATE TABLE property_amenities(
-  `id` int(11) NOT NULL AUTO_INCREMENT PRIMARY KEY,
-  `amenity_id` int(11) NOT NULL DEFAULT '0',
-  `property_id` int(11) NOT NULL DEFAULT '0'
+	`id` int(11) NOT NULL AUTO_INCREMENT PRIMARY KEY,
+	`amenity_id` int(11) NOT NULL DEFAULT '0',
+	`property_id` int(11) NOT NULL DEFAULT '0'
 );
 
 CREATE TABLE users (
-    id INT NOT NULL AUTO_INCREMENT PRIMARY KEY
+		id INT NOT NULL AUTO_INCREMENT PRIMARY KEY
 ) ENGINE=InnoDB;
 
 CREATE TABLE newsletters (
-    id INT NOT NULL AUTO_INCREMENT PRIMARY KEY
+		id INT NOT NULL AUTO_INCREMENT PRIMARY KEY
 ) ENGINE=InnoDB;
 
 CREATE TABLE user_newsletters (
-    id INT NOT NULL AUTO_INCREMENT PRIMARY KEY,
-    user_id INT NOT NULL,
-    newsletter_id INT NOT NULL
+		id INT NOT NULL AUTO_INCREMENT PRIMARY KEY,
+		user_id INT NOT NULL,
+		newsletter_id INT NOT NULL
 ) ENGINE=InnoDB;
 
 CREATE TABLE valuestore (
-  `id` INT NOT NULL AUTO_INCREMENT PRIMARY KEY,
-  `key` varchar(20) NOT NULL DEFAULT '',
-  `value` varchar(255) NOT NULL DEFAULT ''
+	`id` INT NOT NULL AUTO_INCREMENT PRIMARY KEY,
+	`key` varchar(20) NOT NULL DEFAULT '',
+	`value` varchar(255) NOT NULL DEFAULT ''
 ) ENGINE=InnoDB;

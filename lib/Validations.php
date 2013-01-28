@@ -21,10 +21,10 @@ use ArrayIterator;
  *
  * <code>
  * class Person extends ActiveRecord\Model {
- *   static $validates_length_of = array(
- *     array('name', 'within' => array(30,100),
- *     array('state', 'is' => 2)
- *   );
+ *	 static $validates_length_of = array(
+ *		 array('name', 'within' => array(30,100),
+ *		 array('state', 'is' => 2)
+ *	 );
  * }
  *
  * $person = new Person();
@@ -32,7 +32,7 @@ use ArrayIterator;
  * $person->state = 'this is not two characters';
  *
  * if (!$person->is_valid())
- *   print_r($person->errors);
+ *	 print_r($person->errors);
  * </code>
  *
  * @package ActiveRecord
@@ -64,7 +64,7 @@ class Validations
 		'message' => null,
 	);
 
-	private static  $ALL_RANGE_OPTIONS = array(
+	private static	$ALL_RANGE_OPTIONS = array(
 		'is' => null,
 		'within' => null,
 		'in' => null,
@@ -74,7 +74,7 @@ class Validations
 
 	private static $ALL_NUMERICALITY_CHECKS = array(
 		'greater_than' => null,
-		'greater_than_or_equal_to'  => null,
+		'greater_than_or_equal_to'	=> null,
 		'equal_to' => null,
 		'less_than' => null,
 		'less_than_or_equal_to' => null,
@@ -155,10 +155,10 @@ class Validations
 	 *
 	 * <code>
 	 * class Person extends ActiveRecord\Model {
-	 *   static $validates_presence_of = array(
-	 *     array('first_name'),
-	 *     array('last_name')
-	 *   );
+	 *	 static $validates_presence_of = array(
+	 *		 array('first_name'),
+	 *		 array('last_name')
+	 *	 );
 	 * }
 	 * </code>
 	 *
@@ -188,9 +188,9 @@ class Validations
 	 *
 	 * <code>
 	 * class Car extends ActiveRecord\Model {
-	 *   static $validates_inclusion_of = array(
-	 *     array('fuel_type', 'in' => array('hyrdogen', 'petroleum', 'electric')),
-	 *   );
+	 *	 static $validates_inclusion_of = array(
+	 *		 array('fuel_type', 'in' => array('hyrdogen', 'petroleum', 'electric')),
+	 *	 );
 	 * }
 	 * </code>
 	 *
@@ -280,9 +280,9 @@ class Validations
 	 *
 	 * <code>
 	 * class Person extends ActiveRecord\Model {
-	 *   static $validates_numericality_of = array(
-	 *     array('salary', 'greater_than' => 19.99, 'less_than' => 99.99)
-	 *   );
+	 *	 static $validates_numericality_of = array(
+	 *		 array('salary', 'greater_than' => 19.99, 'less_than' => 99.99)
+	 *	 );
 	 * }
 	 * </code>
 	 *
@@ -395,9 +395,9 @@ class Validations
 	 *
 	 * <code>
 	 * class Person extends ActiveRecord\Model {
-	 *   static $validates_format_of = array(
-	 *     array('email', 'with' => '/^.*?@.*$/')
-	 *   );
+	 *	 static $validates_format_of = array(
+	 *		 array('email', 'with' => '/^.*?@.*$/')
+	 *	 );
 	 * }
 	 * </code>
 	 *
@@ -440,9 +440,9 @@ class Validations
 	 *
 	 * <code>
 	 * class Person extends ActiveRecord\Model {
-	 *   static $validates_length_of = array(
-	 *     array('name', 'within' => array(1,50))
-	 *   );
+	 *	 static $validates_length_of = array(
+	 *		 array('name', 'within' => array(1,50))
+	 *	 );
 	 * }
 	 * </code>
 	 *
@@ -462,8 +462,8 @@ class Validations
 	public function validates_length_of($attrs)
 	{
 		$configuration = array_merge(self::$DEFAULT_VALIDATION_OPTIONS, array(
-			'too_long'     => Errors::$DEFAULT_ERROR_MESSAGES['too_long'],
-			'too_short'    => Errors::$DEFAULT_ERROR_MESSAGES['too_short'],
+			'too_long'		 => Errors::$DEFAULT_ERROR_MESSAGES['too_long'],
+			'too_short'		=> Errors::$DEFAULT_ERROR_MESSAGES['too_short'],
 			'wrong_length' => Errors::$DEFAULT_ERROR_MESSAGES['wrong_length']
 		));
 
@@ -476,13 +476,13 @@ class Validations
 			switch (sizeof($range_options))
 			{
 				case 0:
-					throw new  ValidationsArgumentError('Range unspecified.  Specify the [within], [maximum], or [is] option.');
+					throw new	ValidationsArgumentError('Range unspecified.	Specify the [within], [maximum], or [is] option.');
 
 				case 1:
 					break;
 
 				default:
-					throw new  ValidationsArgumentError('Too many range options specified.  Choose only one.');
+					throw new	ValidationsArgumentError('Too many range options specified.	Choose only one.');
 			}
 
 			$attribute = $options[0];
@@ -494,7 +494,7 @@ class Validations
 				$range = $options[$range_options[0]];
 
 				if (!(Utils::is_a('range', $range)))
-					throw new  ValidationsArgumentError("$range_option must be an array composing a range of numbers with key [0] being less than key [1]");
+					throw new	ValidationsArgumentError("$range_option must be an array composing a range of numbers with key [0] being less than key [1]");
 				$range_options = array('minimum', 'maximum');
 				$attr['minimum'] = $range[0];
 				$attr['maximum'] = $range[1];
@@ -504,10 +504,10 @@ class Validations
 				$option = $attr[$range_option];
 
 				if ((int)$option <= 0)
-					throw new  ValidationsArgumentError("$range_option value cannot use a signed integer.");
+					throw new	ValidationsArgumentError("$range_option value cannot use a signed integer.");
 
 				if (is_float($option))
-					throw new  ValidationsArgumentError("$range_option value cannot use a float for length.");
+					throw new	ValidationsArgumentError("$range_option value cannot use a float for length.");
 
 				if (!($range_option == 'maximum' && is_null($this->model->$attribute)))
 				{
@@ -517,7 +517,7 @@ class Validations
 						$message = $options['message'];
 					else
 						$message = $options[$messageOptions[$range_option]];
-					
+
 
 					$message = str_replace('%d', $option, $message);
 					$attribute_value = $this->model->$attribute;
@@ -542,10 +542,10 @@ class Validations
 	 *
 	 * <code>
 	 * class Person extends ActiveRecord\Model {
-	 *   static $validates_uniqueness_of = array(
-	 *     array('name'),
-	 *     array(array('blah','bleh'), 'message' => 'blech')
-	 *   );
+	 *	 static $validates_uniqueness_of = array(
+	 *		 array('name'),
+	 *		 array(array('blah','bleh'), 'message' => 'blech')
+	 *	 );
 	 * }
 	 * </code>
 	 *
@@ -633,24 +633,24 @@ class Errors implements IteratorAggregate
 	private $errors;
 
 	public static $DEFAULT_ERROR_MESSAGES = array(
-		'inclusion'    => "is not included in the list",
-		'exclusion'    => "is reserved",
-		'invalid'      => "is invalid",
+		'inclusion'		=> "is not included in the list",
+		'exclusion'		=> "is reserved",
+		'invalid'			=> "is invalid",
 		'confirmation' => "doesn't match confirmation",
-		'accepted'     => "must be accepted",
-		'empty'        => "can't be empty",
-		'blank'        => "can't be blank",
-		'too_long'     => "is too long (maximum is %d characters)",
-		'too_short'    => "is too short (minimum is %d characters)",
+		'accepted'		 => "must be accepted",
+		'empty'				=> "can't be empty",
+		'blank'				=> "can't be blank",
+		'too_long'		 => "is too long (maximum is %d characters)",
+		'too_short'		=> "is too short (minimum is %d characters)",
 		'wrong_length' => "is the wrong length (should be %d characters)",
-		'taken'        => "has already been taken",
+		'taken'				=> "has already been taken",
 		'not_a_number' => "is not a number",
 		'greater_than' => "must be greater than %d",
-		'equal_to'     => "must be equal to %d",
-		'less_than'    => "must be less than %d",
-		'odd'          => "must be odd",
-		'even'         => "must be even",
-		'unique'       => "must be unique",
+		'equal_to'		 => "must be equal to %d",
+		'less_than'		=> "must be less than %d",
+		'odd'					=> "must be odd",
+		'even'				 => "must be even",
+		'unique'			 => "must be unique",
 		'less_than_or_equal_to' => "must be less than or equal to %d",
 		'greater_than_or_equal_to' => "must be greater than or equal to %d"
 	);
@@ -767,8 +767,8 @@ class Errors implements IteratorAggregate
 	 * $model->errors->get_raw_errors();
 	 *
 	 * # array(
-	 * #  "name" => array("can't be blank"),
-	 * #  "state" => array("is the wrong length (should be 2 chars)",
+	 * #	"name" => array("can't be blank"),
+	 * #	"state" => array("is the wrong length (should be 2 chars)",
 	 * # )
 	 * </code>
 	 */
@@ -784,8 +784,8 @@ class Errors implements IteratorAggregate
 	 * $model->errors->full_messages();
 	 *
 	 * # array(
-	 * #  "Name can't be blank",
-	 * #  "State is the wrong length (should be 2 chars)"
+	 * #	"Name can't be blank",
+	 * #	"State is the wrong length (should be 2 chars)"
 	 * # )
 	 * </code>
 	 *
@@ -809,14 +809,14 @@ class Errors implements IteratorAggregate
 	 * $model->errors->errors();
 	 *
 	 * # array(
-	 * #  "name" => array("Name can't be blank"),
-	 * #  "state" => array("State is the wrong length (should be 2 chars)")
+	 * #	"name" => array("Name can't be blank"),
+	 * #	"state" => array("State is the wrong length (should be 2 chars)")
 	 * # )
 	 * </code>
 	 *
 	 * @param array $closure Closure to fetch the errors in some other format (optional)
-	 *                       This closure has the signature function($attribute, $message)
-	 *                       and is called for each available error message.
+	 *											 This closure has the signature function($attribute, $message)
+	 *											 and is called for each available error message.
 	 * @return array
 	 */
 	public function to_array($closure=null)
@@ -899,7 +899,7 @@ class Errors implements IteratorAggregate
 	 *
 	 * <code>
 	 * foreach ($model->errors as $msg)
-	 *   echo "$msg\n";
+	 *	 echo "$msg\n";
 	 * </code>
 	 *
 	 * @return ArrayIterator

@@ -10,14 +10,14 @@ class Order extends ActiveRecord\Model
 	static $has_many = array(
 		array('payments'),
 		array('people',
-			'through'    => 'payments',
-			'select'     => 'people.*, payments.amount',
+			'through'		=> 'payments',
+			'select'		 => 'people.*, payments.amount',
 			'conditions' => 'payments.amount < 200'));
 
 	// order must have a price and tax > 0
 	static $validates_numericality_of = array(
 		array('price', 'greater_than' => 0),
-		array('tax',   'greater_than' => 0));
+		array('tax',	 'greater_than' => 0));
 
 	// setup a callback to automatically apply a tax
 	static $before_validation_on_create = array('apply_tax');

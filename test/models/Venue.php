@@ -3,8 +3,8 @@ class Venue extends ActiveRecord\Model
 {
 	static $use_custom_get_state_getter = false;
 	static $use_custom_set_state_setter = false;
-	
-	
+
+
 	static $has_many = array(
 		'events',
 		array('hosts', 'through' => 'events')
@@ -16,7 +16,7 @@ class Venue extends ActiveRecord\Model
 		'marquee' => 'name',
 		'mycity' => 'city'
 	);
-	
+
 	public function get_state()
 	{
 		if (self::$use_custom_get_state_getter)
@@ -24,7 +24,7 @@ class Venue extends ActiveRecord\Model
 		else
 			return $this->read_attribute('state');
 	}
-	
+
 	public function set_state($value)
 	{
 		if (self::$use_custom_set_state_setter)
@@ -32,6 +32,6 @@ class Venue extends ActiveRecord\Model
 		else
 			return $this->assign_attribute('state', $value);
 	}
-	
+
 };
 ?>

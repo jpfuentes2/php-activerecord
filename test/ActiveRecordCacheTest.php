@@ -12,7 +12,7 @@ class ActiveRecordCacheTest extends DatabaseTest
 			$this->markTestSkipped('The memcache extension is not available');
 			return;
 		}
-		
+
 		parent::set_up($connection_name);
 		ActiveRecord\Config::instance()->set_cache('memcache://localhost');
 	}

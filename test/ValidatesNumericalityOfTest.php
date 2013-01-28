@@ -80,7 +80,7 @@ class ValidatesNumericalityOfTest extends DatabaseTest
 
 	public function test_invalid_blank()
 	{
-		$this->assert_invalid(array(' ', '  '), 'is not a number');
+		$this->assert_invalid(array(' ', '	'), 'is not a number');
 	}
 
 	public function test_invalid_whitespace()

@@ -10,10 +10,10 @@ use Closure;
  *
  * <code>
  * ActiveRecord::initialize(function($cfg) {
- *   $cfg->set_model_home('models');
- *   $cfg->set_connections(array(
- *     'development' => 'mysql://user:pass@development.com/awesome_development',
- *     'production' => 'mysql://user:pass@production.com/awesome_production'));
+ *	 $cfg->set_model_home('models');
+ *	 $cfg->set_connections(array(
+ *		 'development' => 'mysql://user:pass@development.com/awesome_development',
+ *		 'production' => 'mysql://user:pass@production.com/awesome_production'));
  * });
  * </code>
  *
@@ -26,10 +26,10 @@ class Config extends Singleton
 	 *
 	 * <code>
 	 * ActiveRecord\Config::initialize(function($cfg) {
-	 *   $cfg->set_model_directory('/your/app/models');
-	 *   $cfg->set_connections(array(
-	 *     'development' => 'mysql://user:pass@development.com/awesome_development',
-	 *     'production' => 'mysql://user:pass@production.com/awesome_production'));
+	 *	 $cfg->set_model_directory('/your/app/models');
+	 *	 $cfg->set_connections(array(
+	 *		 'development' => 'mysql://user:pass@development.com/awesome_development',
+	 *		 'production' => 'mysql://user:pass@production.com/awesome_production'));
 	 * });
 	 * </code>
 	 *
@@ -86,9 +86,9 @@ class Config extends Singleton
 	 *
 	 * <code>
 	 * ActiveRecord\Config::initialize(function($cfg) {
-	 *   $cfg->set_model_directory('/path/to/your/model_directory');
-	 *   $cfg->set_connections(array(
-	 *     'development' => 'mysql://username:password@127.0.0.1/database_name'));
+	 *	 $cfg->set_model_directory('/path/to/your/model_directory');
+	 *	 $cfg->set_connections(array(
+	 *		 'development' => 'mysql://username:password@127.0.0.1/database_name'));
 	 * });
 	 * </code>
 	 *
@@ -98,7 +98,7 @@ class Config extends Singleton
 	 * $cfg = ActiveRecord\Config::instance();
 	 * $cfg->set_model_directory('/path/to/your/model_directory');
 	 * $cfg->set_connections(array('development' =>
-  	 *   'mysql://username:password@localhost/database_name'));
+		 *	 'mysql://username:password@localhost/database_name'));
 	 * </code>
 	 *
 	 * @param Closure $initializer A closure
@@ -114,7 +114,7 @@ class Config extends Singleton
 	 *
 	 * <code>
 	 * $config->set_connections(array(
-	 *     'development' => 'mysql://username:password@127.0.0.1/database_name'));
+	 *		 'development' => 'mysql://username:password@127.0.0.1/database_name'));
 	 * </code>
 	 *
 	 * @param array $connections Array of connections

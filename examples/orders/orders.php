@@ -4,11 +4,11 @@ require_once __DIR__ . '/../../ActiveRecord.php';
 // initialize ActiveRecord
 ActiveRecord\Config::initialize(function($cfg)
 {
-    $cfg->set_model_directory(__DIR__ . '/models');
-    $cfg->set_connections(array('development' => 'mysql://test:test@127.0.0.1/orders_test'));
+		$cfg->set_model_directory(__DIR__ . '/models');
+		$cfg->set_connections(array('development' => 'mysql://test:test@127.0.0.1/orders_test'));
 
 	// you can change the default connection with the below
-    //$cfg->set_default_connection('production');
+		//$cfg->set_default_connection('production');
 });
 
 // create some people
@@ -22,7 +22,7 @@ $tito = Person::create(array('name' => 'Tito', 'state' => 'VA'));
 // create_orders will automatically place the created model into $tito->orders
 // even if it failed validation
 $pokemon = $tito->create_orders(array('item_name' => 'Live Pokemon', 'price' => 6999.99));
-$coal    = $tito->create_orders(array('item_name' => 'Lump of Coal', 'price' => 100.00));
+$coal		= $tito->create_orders(array('item_name' => 'Lump of Coal', 'price' => 100.00));
 $freebie = $tito->create_orders(array('item_name' => 'Freebie', 'price' => -100.99));
 
 if (count($freebie->errors) > 0)
@@ -47,10 +47,10 @@ foreach (Order::find_all_by_person_id($tito->id) as $order)
 	{
 		// display each payment for this order
 		foreach ($order->payments as $payment)
-			echo "  payment #$payment->id of $$payment->amount by " . $payment->person->name . "\n";
+			echo "	payment #$payment->id of $$payment->amount by " . $payment->person->name . "\n";
 	}
 	else
-		echo "  no payments\n";
+		echo "	no payments\n";
 
 	echo "\n";
 }
@@ -75,5 +75,5 @@ $order = Order::find($pokemon->id);
 echo "Order #$order->id for $order->item_name ($$order->price + $$order->tax tax)\n";
 
 foreach ($order->people as $person)
-	echo "  payment of $$person->amount by " . $person->name . "\n";
+	echo "	payment of $$person->amount by " . $person->name . "\n";
 ?>

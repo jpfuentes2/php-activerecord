@@ -1,7 +1,7 @@
 CREATE TABLE authors(
 	author_id INTEGER NOT NULL PRIMARY KEY,
 	parent_author_id INT,
-	name VARCHAR  (25) NOT NULL DEFAULT default_name, -- don't touch those spaces
+	name VARCHAR	(25) NOT NULL DEFAULT default_name, -- don't touch those spaces
 	updated_at datetime,
 	created_at datetime,
 	some_Date date,
@@ -21,22 +21,22 @@ CREATE TABLE books(
 );
 
 CREATE TABLE venues (
-  Id INTEGER NOT NULL PRIMARY KEY,
-  name varchar(50),
-  city varchar(60),
-  state char(2),
-  address varchar(50),
-  phone varchar(10) default NULL,
-  UNIQUE(name,address)
+	Id INTEGER NOT NULL PRIMARY KEY,
+	name varchar(50),
+	city varchar(60),
+	state char(2),
+	address varchar(50),
+	phone varchar(10) default NULL,
+	UNIQUE(name,address)
 );
 
 CREATE TABLE events (
-  id INTEGER NOT NULL PRIMARY KEY,
-  venue_id int NOT NULL,
-  host_id int NOT NULL,
-  title varchar(60) NOT NULL,
-  description varchar(10),
-  type varchar(15) default NULL
+	id INTEGER NOT NULL PRIMARY KEY,
+	venue_id int NOT NULL,
+	host_id int NOT NULL,
+	title varchar(60) NOT NULL,
+	description varchar(10),
+	type varchar(15) default NULL
 );
 
 CREATE TABLE hosts(
@@ -52,16 +52,16 @@ CREATE TABLE employees (
 );
 
 CREATE TABLE positions (
-  id INTEGER NOT NULL PRIMARY KEY,
-  employee_id int NOT NULL,
-  title VARCHAR(255) NOT NULL,
-  active SMALLINT NOT NULL
+	id INTEGER NOT NULL PRIMARY KEY,
+	employee_id int NOT NULL,
+	title VARCHAR(255) NOT NULL,
+	active SMALLINT NOT NULL
 );
 
 CREATE TABLE `rm-bldg`(
-    `rm-id` INT NOT NULL,
-    `rm-name` VARCHAR(10) NOT NULL,
-    `space out` VARCHAR(1) NOT NULL
+		`rm-id` INT NOT NULL,
+		`rm-name` VARCHAR(10) NOT NULL,
+		`space out` VARCHAR(1) NOT NULL
 );
 
 CREATE TABLE awesome_people(
@@ -71,36 +71,36 @@ CREATE TABLE awesome_people(
 );
 
 CREATE TABLE amenities(
-  `amenity_id` INTEGER NOT NULL PRIMARY KEY,
-  `type` varchar(40) DEFAULT NULL
+	`amenity_id` INTEGER NOT NULL PRIMARY KEY,
+	`type` varchar(40) DEFAULT NULL
 );
 
 CREATE TABLE property(
-  `property_id` INTEGER NOT NULL PRIMARY KEY
+	`property_id` INTEGER NOT NULL PRIMARY KEY
 );
 
 CREATE TABLE property_amenities(
-  `id` INTEGER NOT NULL PRIMARY KEY,
-  `amenity_id` INT NOT NULL,
-  `property_id` INT NOT NULL
+	`id` INTEGER NOT NULL PRIMARY KEY,
+	`amenity_id` INT NOT NULL,
+	`property_id` INT NOT NULL
 );
 
 CREATE TABLE users (
-    id INTEGER NOT NULL PRIMARY KEY
+		id INTEGER NOT NULL PRIMARY KEY
 );
 
 CREATE TABLE newsletters (
-    id INTEGER NOT NULL PRIMARY KEY
+		id INTEGER NOT NULL PRIMARY KEY
 );
 
 CREATE TABLE user_newsletters (
-    id INTEGER NOT NULL PRIMARY KEY,
-    user_id INTEGER NOT NULL,
-    newsletter_id INTEGER NOT NULL
+		id INTEGER NOT NULL PRIMARY KEY,
+		user_id INTEGER NOT NULL,
+		newsletter_id INTEGER NOT NULL
 );
 
 CREATE TABLE valuestore (
-  `id` INTEGER NOT NULL PRIMARY KEY,
-  `key` varchar(20) NOT NULL DEFAULT '',
-  `value` varchar(255) NOT NULL DEFAULT ''
+	`id` INTEGER NOT NULL PRIMARY KEY,
+	`key` varchar(20) NOT NULL DEFAULT '',
+	`value` varchar(255) NOT NULL DEFAULT ''
 );
