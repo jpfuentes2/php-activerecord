@@ -1273,7 +1273,11 @@ class Model
 	static $VALID_OPTIONS = array('conditions', 'limit', 'offset', 'order', 'select', 'joins', 'include', 'readonly', 'group', 'from', 'having');
 
 	/**
-	 * Enables the use of dynamic finders.
+	 * Enables the use of dynamic finders and query aliases.
+	 *
+	 * Query aliases are a more quickly way of using Model:sql() to return queries. Examples:
+	 *    Using Model::where() is the same as Model::sql()->where
+	 *    Valid aliases are in Query::$builder_scopes
 	 *
 	 * Dynamic finders are just an easy way to do queries quickly without having to
 	 * specify an options array with conditions in it.
@@ -1347,6 +1351,11 @@ class Model
 		{
 			$options['conditions'] = SQLBuilder::create_conditions_from_underscored_string(static::connection(),substr($method,9),$args,static::$alias_attribute);
 			return static::count($options);
+		}
+		// Query aliases:
+		elseif (in_array($method, Query::get_builder_scopes()))
+		{
+			return call_user_func_array(array(static::sql(), $method), $args);
 		}
 
 		throw new ActiveRecordException("Call to undefined method: $method");
@@ -1462,6 +1471,16 @@ class Model
 	public static function last(/* ... */)
 	{
 		return call_user_func_array('static::find',array_merge(array('last'),func_get_args()));
+	}
+
+	/**
+	 * Returns an instance of Query, for chain sql querys. Examples:
+	 * 		Model::sql()->where(...)->order(...)->limit(...) etc
+	 * @return Query
+	 */
+	public static function sql() 
+	{
+		return new Query(get_called_class());
 	}
 
 	/**
