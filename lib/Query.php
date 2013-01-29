@@ -47,6 +47,14 @@ class Query
   {
     if (in_array($method, self::get_builder_scopes())) 
       return $this->set_option($method, $arguments[0]);
+    elseif (is_callable(array($this->model_name, $method))) 
+    {
+      $query = call_user_func_array(array($this->model_name, $method), $arguments);
+      if (!$query instanceof Query)
+        throw new ActiveRecordException("Scopes must return a Query object");
+
+      return $this->merge($query->get_options());
+    }
     else
       throw new ActiveRecordException("The scope \"$method\" does not exists");
   }
@@ -75,6 +83,17 @@ class Query
   public function readonly($flag = true) 
   {
     $this->options['readonly'] = (boolean) $flag;
+    return $this;
+  }
+
+  /**
+   * Merges the current query with the options in argument. In case of repeated options, the argument predominates
+   */
+  public function merge($options) 
+  {
+    foreach($options as $option => $value) {
+      $this->options[$option] = $value;
+    }
     return $this;
   }
 
