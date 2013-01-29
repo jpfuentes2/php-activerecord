@@ -13,6 +13,10 @@ class ScopedAuthor extends Author {
     return static::where('name LIKE ?', '%' . $name . '%');
   }
 
+  public static function id_lower_than($id) {
+    return static::where('author_id < ?', $id);
+  }
+
 };
 
 class QueryTest extends DatabaseTest
@@ -89,26 +93,57 @@ class QueryTest extends DatabaseTest
     $this->assertEquals('Bill Clinton', $result->name);
   }
 
-  public function test_where_quote() {
+  public function test_where_quote() 
+  {
     $result = $this->query->where('name = ?', 'Tito')->first();
     $this->assertEquals(1, $result->id);
   }
 
-  public function test_where_hash() {
+  public function test_where_hash()
+  {
     $result = $this->query->where(array('name' => 'Uncle Bob'))->last();
     $this->assertEquals(4, $result->id);
   }
 
-  public function test_where_array() {
+  public function test_where_array() 
+  {
     $results = $this->query->where('author_id=? AND name IN(?)',1,array('Tito','Mexican'))->all();
     $this->assertEquals(1, $results[0]->id);
     $this->assertEquals(1, count($results));
   }
 
-  public function test_multiple_wheres() { // Not implemented yet
+  public function test_multiple_wheres() 
+  {
     $results = $this->query->where(array('parent_author_id' => 2))->where('author_id > ?', 2)->order('name ASC')->all();
-    //$this->assertEquals('Uncle Bob', $results[0]->name);
-    //$this->assertEquals(1, count($results));
+    $this->assertEquals('Uncle Bob', $results[0]->name);
+    $this->assertEquals(1, count($results));
+  }
+
+  public function test_multiple_wheres_array() 
+  {
+    $results = $this->query
+      ->where('author_id IN (?)', array(1,2,3,4))
+      ->where('name LIKE ? AND name <> ?', '%b%', 'George W. Bush')
+      ->where(array('parent_author_id' => 2))
+      ->order('name ASC')
+      ->all();
+
+    $this->assertEquals('Uncle Bob', $results[0]->name);
+    $this->assertEquals(1, count($results));
+  }
+
+  public function test_multiple_wheres_merge()
+  {
+    $query = Author::where("name = 'name'");
+    $other = Author::where(array('id' => 3, 'active' => 1))->where("category = 'movies'");
+    $query->merge($other->get_options());
+
+    $options = $query->get_options();
+    $conditions = $options['conditions'];
+
+    $this->assert_sql_has("name = 'name' AND id=? AND active=? AND category = 'movies'", $conditions[0]);
+    $this->assertEquals(3, $conditions[1]);
+    $this->assertEquals(1, $conditions[2]);
   }
 
   /**
@@ -182,6 +217,14 @@ class QueryTest extends DatabaseTest
   public function test_multiple_scopes_with_default_scopes() 
   {
     $results = ScopedAuthor::offset(1)->top_three()->limit(2)->named_like('b')->order('author_id DESC')->all();
+    $this->assertEquals(2, count($results));
+    $this->assertEquals('Bill Clinton', $results[0]->name);
+    $this->assertEquals('George W. Bush', $results[1]->name);
+  }
+
+  public function test_multiple_wheres_in_scopes() 
+  {
+    $results = ScopedAuthor::named_like('b')->id_lower_than(4)->order('author_id DESC')->all();
     $this->assertEquals(2, count($results));
     $this->assertEquals('Bill Clinton', $results[0]->name);
     $this->assertEquals('George W. Bush', $results[1]->name);
