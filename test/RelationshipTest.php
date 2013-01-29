@@ -82,7 +82,7 @@ class RelationshipTest extends DatabaseTest
 		$this->assert_default_has_many($this->get_relationship());
 	}
 	
-	public function test_eager_loading_two_levels_deep()
+	public function test_eager_loading_three_levels_deep()
 	{
 		/* Before fix Undefined offset: 0 */
 		$conditions['include'] = array('events'=>array('host'=>array('events')));
