@@ -2,6 +2,19 @@
 
 include 'helpers/config.php';
 
+class ScopedAuthor extends Author {
+  static $table_name = 'authors';
+
+  public static function top_three() {
+    return static::limit(3)->order('name ASC');
+  }
+
+  public static function named_like($name) {
+    return static::where('name LIKE ?', '%' . $name . '%');
+  }
+
+};
+
 class QueryTest extends DatabaseTest
 {
 
@@ -141,6 +154,37 @@ class QueryTest extends DatabaseTest
   public function test_alias_where() 
   {
     $this->assertEquals($this->query->where('author_id = 1')->all(), Author::where('author_id = 1')->all());
+  }
+
+  public function test_single_scope() 
+  {
+    $results = ScopedAuthor::top_three()->all();
+    $this->assertEquals(3, count($results));
+    $this->assertEquals('Bill Clinton', $results[0]->name);
+  }
+
+  public function test_single_scope_with_default_scopes() 
+  {
+    $results = ScopedAuthor::offset(1)->top_three()->limit(2)->all();
+    $this->assertEquals(2, count($results));
+    $this->assertEquals('George W. Bush', $results[0]->name);
+  }
+
+  public function test_multiple_scopes() 
+  {
+    $results = ScopedAuthor::top_three()->named_like('b')->all();
+    $this->assertEquals(3, count($results));
+    $this->assertEquals('Bill Clinton', $results[0]->name);
+    $this->assertEquals('George W. Bush', $results[1]->name);
+    $this->assertEquals('Uncle Bob', $results[2]->name);
+  }
+
+  public function test_multiple_scopes_with_default_scopes() 
+  {
+    $results = ScopedAuthor::offset(1)->top_three()->limit(2)->named_like('b')->order('author_id DESC')->all();
+    $this->assertEquals(2, count($results));
+    $this->assertEquals('Bill Clinton', $results[0]->name);
+    $this->assertEquals('George W. Bush', $results[1]->name);
   }
 
 }
