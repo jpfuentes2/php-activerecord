@@ -72,12 +72,35 @@ class Query
 
   public function where() 
   {
-    // where is special because of append wheres and overrides. Example:
-    // Model:where(...)->limit(...)->where(...)
-    // Both wheres need to be considered, concatenating them with AND
-    // For while, the while is override
-    $this->options['conditions'] = func_get_args();
+    $args = func_get_args();
+
+    if (is_hash($args[0])) 
+    {
+      foreach($args[0] as $key => $value)    
+        $this->append_where("$key=?",$value);
+    }
+    else 
+    {
+      $where = $args[0];
+      $values = array_splice($args, 1);
+      $this->append_where($where, $values);
+    }
+
     return $this;
+  }
+
+  private function append_where($where, $value) 
+  {
+    if (empty($this->options['conditions'][0]))
+      $this->options['conditions'][0] = $where;
+    else
+      $this->options['conditions'][0] .= ' AND ' . $where;
+
+    if (is_array($value))
+      foreach($value as $v)
+        $this->options['conditions'][] = $v;
+    else
+      $this->options['conditions'][] = $value;
   }
 
   public function readonly($flag = true) 
@@ -91,7 +114,15 @@ class Query
    */
   public function merge($options) 
   {
-    foreach($options as $option => $value) {
+    foreach($options as $option => $value)
+    {
+      if ($option == 'conditions' && !empty($value[0])) 
+      {
+        $values = isset($value[1]) ? array_splice($value, 1) : array();
+        $this->append_where($value[0], $values);
+        continue;
+      }
+
       $this->options[$option] = $value;
     }
     return $this;
