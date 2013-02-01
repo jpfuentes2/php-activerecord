@@ -338,7 +338,9 @@ abstract class Connection
 			if (!($sth = $this->connection->prepare($sql)))
 				throw new DatabaseException($this, $this->connection_string);
 		} catch (PDOException $e) {
-			throw new DatabaseException($this, $this->connection_string);
+			throw new DatabaseException("$sql: ".
+				join(", ", $this->connection->errorInfo()),
+				$this->connection_string);
 		}
 
 		$sth->setFetchMode(PDO::FETCH_ASSOC);
@@ -347,7 +349,9 @@ abstract class Connection
 			if (!$sth->execute($values))
 				throw new DatabaseException($this, $this->connection_string);
 		} catch (PDOException $e) {
-			throw new DatabaseException($sth, $this->connection_string);
+			throw new DatabaseException("$sql ".print_r($values, TRUE).
+				": ".join(", ", $this->connection->errorInfo()),
+				$this->connection_string);
 		}
 		return $sth;
 	}
