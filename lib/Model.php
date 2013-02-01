@@ -389,7 +389,8 @@ class Model
 	 * echo $user->name; # => BOB
 	 * </code>
 	 *
-	 * @throws {@link UndefinedPropertyException} if $name does not exist
+	 * @throws {@link UndefinedPropertyException} if $name does not exist,
+	 * or is a relationship (assigning to relationships is not supported).
 	 * @param string $name Name of attribute, relationship or other to set
 	 * @param mixed $value The value
 	 * @return mixed The value
