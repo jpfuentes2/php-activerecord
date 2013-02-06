@@ -19,6 +19,20 @@ class IsNotBob extends Author
         );
     }
     
+    public function is_tito_call()
+    {
+    	return array(
+                'conditions'=>'name="tito"',
+            );
+    }
+    
+    public function last_few($number)
+    {
+    	return array(
+                'limit'=>$number,
+            );
+    }
+    
     public function default_scope()
     {
     	return array(
@@ -82,5 +96,18 @@ class ScopeTest extends DatabaseTest
 			array('conditions'=>array('name'=>'Bill Clinton')));
 		$this->assertEquals(0,count($billy));
 	}
-}
 	
+	public function test_direct_call_to_named_scope()
+	{
+		$tito = IsNotBob::is_tito()->all();
+		$this->assertEquals(1,count($tito));
+		$this->assertEquals('Tito', $tito[0]->name);
+	}
+	
+	public function test_direct_call_to_second_named_scope()
+	{
+		$tito = IsNotBob::last_two()->all();
+		$this->assertEquals(2,count($tito));
+	}
+}
+?>

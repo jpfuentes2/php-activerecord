@@ -1352,10 +1352,10 @@ class Model
 			$options['conditions'] = SQLBuilder::create_conditions_from_underscored_string(static::connection(),substr($method,9),$args,static::$alias_attribute);
 			return static::count($options);
 		}
-		// Query aliases:
-		elseif (in_array($method, Query::get_builder_scopes()))
+		$instance = new static();
+		if($scope = $instance->check_for_named_scope($method))
 		{
-			return call_user_func_array(array(static::sql(), $method), $args);
+			return static::scoped()->$method();
 		}
 		throw new ActiveRecordException("Call to undefined method: $method");
 	}
