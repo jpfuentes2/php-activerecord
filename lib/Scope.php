@@ -6,7 +6,7 @@ namespace ActiveRecord;
 class Scopes
 {
 	protected $model = null;
-	protected $scopes = array();
+	protected $scopes = null;
 	public function __construct($model,$initial_scope)
 	{
 		$this->model = $model;
@@ -16,53 +16,46 @@ class Scopes
 	}
 	public function add_scope($scope)
 	{
-		$this->scopes[] = new Scope($scope);
+		if($this->scopes)
+		{
+			$this->scopes->merge($scope);
+		}
+		else if($scope instanceof Query)//already Query Instance
+		{
+			$this->scopes = $scope;
+		}
+		else
+		{
+			$query = new Query($this->model);
+			$this->scopes = $query->merge($scope);
+		}
 	}
+	
 	
 	public function __call($method,$args)
 	{
 		$combined_options = array();
-		if($this->model->check_for_named_scope($method))
+		
+		if($options = $this->model->check_for_named_scope($method))
 		{
-			$this->scopes[] = new Scope($this->model->check_for_named_scope($method));
+			$this->add_scope($options);
+			return $this;
+		}
+		elseif(in_array($method, Query::get_builder_scopes()))
+		{
+			$query = new Query($this->model);
+			return call_user_func_array(array($query, $method), $args);
 		}
 		else
 		{
-			foreach($this->scopes as $scope)
-			{
-				$scope_options = $scope->get_options();
-				$options = Model::extract_and_validate_options($scope_options);
-				var_dump($options);
-				foreach($options as $key=>$value)
-				{
-					if(array_key_exists($key,$options))
-					{
-						$combined_options[$key] = $value;
-					}
-					else
-					{
-						$combined_options[$key] = $value;
-					}
-				}
-			}
-			$args = $combined_options;
-			return $this->model->$method($args);
+			if(isset($args[0]))
+				$this->add_scope($args[0]);
+			if($this->scopes)
+				return $this->model->$method($this->scopes->get_options());
+			else
+				return $this->model->$method();
 		}
 		return $this;
 	}
 }
-class Scope
-{
-	protected $options = null;
-	public function __construct($options=null)
-	{
-		$this->options = $options;
-	}
-	
-	public function get_options()
-	{
-		return array('all',$this->options);
-	}
-}
-
 ?>
