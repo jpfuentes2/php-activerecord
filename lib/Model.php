@@ -1357,8 +1357,28 @@ class Model
 		{
 			return call_user_func_array(array(static::sql(), $method), $args);
 		}
-
 		throw new ActiveRecordException("Call to undefined method: $method");
+	}
+	
+	public static function scoped()
+	{
+		require_once(__DIR__.'/Scope.php');
+		$instance = new static();
+		return new Scopes($instance,$instance->default_scope());
+	}
+	
+	public function default_scope()
+	{
+		return array();
+	}
+	
+	public function check_for_named_scope($scope)
+	{
+		$scopes = $this->named_scopes();
+		if(array_key_exists($scope,$scopes))
+			return $scopes[$scope];
+		else
+			return null;
 	}
 
 	/**
