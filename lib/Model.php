@@ -1347,9 +1347,30 @@ class Model
 		{
 			$options['conditions'] = SQLBuilder::create_conditions_from_underscored_string(static::connection(),substr($method,9),$args,static::$alias_attribute);
 			return static::count($options);
-		}
-
+		}		
+		
 		throw new ActiveRecordException("Call to undefined method: $method");
+	}
+	
+	public static function scoped()
+	{
+		require_once(__DIR__.'/Scope.php');
+		$instance = new static();
+		return new Scopes($instance,$instance->default_scope());
+	}
+	
+	public function default_scope()
+	{
+		return array();
+	}
+	
+	public function check_for_named_scope($scope)
+	{
+		$scopes = $this->named_scopes();
+		if(array_key_exists($scope,$scopes))
+			return $scopes[$scope];
+		else
+			return null;
 	}
 
 	/**
