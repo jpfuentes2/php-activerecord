@@ -1352,8 +1352,12 @@ class Model
 			$options['conditions'] = SQLBuilder::create_conditions_from_underscored_string(static::connection(),substr($method,9),$args,static::$alias_attribute);
 			return static::count($options);
 		}
-		else
-			throw new ActiveRecordException("Call to undefined method: $method");
+		$instance = new static();
+		if($scope = $instance->check_for_named_scope($method))
+		{
+			return static::scoped()->$method();
+		}
+		throw new ActiveRecordException("Call to undefined method: $method");
 	}
 	
 	public static function scoped()
