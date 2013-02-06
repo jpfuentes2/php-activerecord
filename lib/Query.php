@@ -86,7 +86,6 @@ class Query
       $values = array_splice($args, 1);
       $this->append_where($where, $values);
     }
-
     return $this;
   }
 
@@ -130,10 +129,7 @@ class Query
         continue;
       }elseif($option == 'conditions' && count($value))
       {
-      	foreach($value as $key=>$value)
-      	{
-      		$this->append_where($key, $value);
-      	}
+      	$this->where($value);
       	continue;
       }
       $this->options[$option] = $value;
