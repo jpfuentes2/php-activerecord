@@ -12,8 +12,7 @@ class IsNotBob extends Author
             'is_tito'=>array(
                 'conditions'=>'name="tito"',
             ),
-            'last_two'=>array(
-                'order'=>'created_at DESC',
+            'some_two'=>array(
                 'limit'=>2,
             ),
         );
@@ -21,9 +20,7 @@ class IsNotBob extends Author
     
     public function is_tito_call()
     {
-    	return array(
-                'conditions'=>'name="tito"',
-            );
+    	return self::scoped()->where('name="tito"');
     }
     
     public function last_few($number)
@@ -38,7 +35,6 @@ class IsNotBob extends Author
     	return array(
 			'conditions'=>'name != "Uncle Bob"',
 		);
-		
     }
 }
 
@@ -106,8 +102,14 @@ class ScopeTest extends DatabaseTest
 	
 	public function test_direct_call_to_second_named_scope()
 	{
-		$tito = IsNotBob::last_two()->all();
+		$tito = IsNotBob::some_two()->find('all');
 		$this->assertEquals(2,count($tito));
+	}
+	
+	public function test_stacking_three_scopes()
+	{
+		$tito = IsNotBob::some_two()->is_tito()->all();
+		$this->assertEquals(1,count($tito));
 	}
 }
 ?>
