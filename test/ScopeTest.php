@@ -4,9 +4,13 @@ include 'helpers/config.php';
 class IsNotBob extends Author
 {
 	public static $table_name = 'authors';
-	public function named_scopes()
-    {
-        return array(
+	
+	public static $has_many = array(
+		array('parents','foreign_key'=>'parent_author_id','class_name'=>'IsNotBob'),
+	);
+	
+	public static $named_scopes = 
+            array(
             'is_tito'=>array(
                 'conditions'=>'name="tito"',
             ),
@@ -17,26 +21,22 @@ class IsNotBob extends Author
 				'conditions'=>'author_id <= 2'
 			),
         );
-    }
     
     /** 
     * Applied to every query unless the default scope is disabled
     */
-    public function default_scope()
-    {
-    	return array(
+  	public static $default_scope = array(
 			'conditions'=>'name != "Uncle Bob"',
 		);
-    }
     
     /** Parameterized Scope */
-    public function is_tito_call()
+    public static function is_tito_call()
     {
     	return self::scoped()->where('name="tito"');
     }
     
     /** Parameterized Scope */
-    public function last_few($number)
+    public static function last_few($number)
     {
     	return self::scoped()->limit($number);
     }

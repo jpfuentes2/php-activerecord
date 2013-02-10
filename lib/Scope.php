@@ -15,11 +15,44 @@ class Scopes
 {
 	protected $model = null;
 	protected $scopes = null;
+	
+	/**
+	* While enabled - The default scope will be used in all find methods for the Model
+	*
+	* @var boolean
+	*/
+	protected $default_scope_enabled = true;
+	
+	/**
+	* Flag that is set if conditions are added after scopes have been applied
+	* It is used to determine whether or not a find_by_pk should be called even
+	* if conditions have been set after a find by the default scope
+	*
+	* @var boolean
+	*/
+	public $added_unscoped_conditions = false;
+	
+	
 	public function __construct($model, $initial_scope=null)
 	{
 		$this->model = $model;
 		if($initial_scope)
 			$this->add_scope($initial_scope);
+	}
+	
+	/**
+	*  Called to disable a model from using the default scope on a find.
+	* Usage Model::scoped()->disable_default_scope();
+	*/
+	public function disable_default_scope()
+	{
+		$this->default_scope_enabled = false;
+		return $this;
+	}
+	
+	public function default_scope_is_enabled()
+	{
+		return $this->default_scope_enabled;
 	}
 	
 	/**
@@ -70,13 +103,10 @@ class Scopes
 		return $this;
 	}
 	
-	/**
-	*  Prevents the default scope from being added when the model performs a find
-	*/
-	public function disable_default_scope()
+	public function default_scope()
 	{
-		$this->model->disable_default_scope();
-		return $this;
+		$model = $this->model;
+		return $model::$default_scope;
 	}
 
 	/**
@@ -90,8 +120,9 @@ class Scopes
 	public function __call($method, $args)
 	{
 		$combined_options = array();
-
-		if($options = $this->model->check_for_named_scope($method))
+		$model = $this->model;
+		$options = $model::check_for_named_scope($method);
+		if($options)
 		{
 			$this->scopes[] = new Scope($this->model->check_for_named_scope($method));
 		}
@@ -149,7 +180,7 @@ class Scopes
 	{
 		return $this->find('last',$options);
 	}
-
+	
 }
 class Scope
 {
