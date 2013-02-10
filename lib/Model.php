@@ -1429,11 +1429,27 @@ class Model
 	*/
 	public static function check_for_named_scope($scope)
 	{
+		if(!isset(static::$named_scopes))
+		{
+			return null;
+		}
 		$scopes = static::$named_scopes;
 		if(array_key_exists($scope,$scopes))
 			return $scopes[$scope];
 		else
 			return null;
+	}
+	
+	/**
+	 * Returns true if the model has a default scope declared
+	 * 
+	 * @return 
+	 */
+	public static function has_default_scope()
+	{
+		if(isset(static::$default_scope))
+			return static::$default_scope;
+		return false;
 	}
 
 	/**

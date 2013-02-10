@@ -106,7 +106,7 @@ class Scopes
 	public function default_scope()
 	{
 		$model = $this->model;
-		return $model::$default_scope;
+		return $model::has_default_scope();
 	}
 
 	/**
