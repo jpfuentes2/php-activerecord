@@ -169,5 +169,16 @@ class ScopeTest extends DatabaseTest
 		$bushId = 4;
 		$this->assertEquals('Uncle Bob',IsNotBob::find($bushId)->name);
 	}
+	
+	public function test_relation_with_scope()
+	{
+		$tito = IsNotBob::find(1);
+		$bush = IsNotBob::find(2);
+		$bush->parent_author_id = 4;
+		$bush->save();
+		
+		$this->assertEquals(1,count($tito->parents));
+		$this->assertEquals(0,count($bush->parents));
+	}
 }
 ?>
