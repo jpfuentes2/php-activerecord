@@ -56,37 +56,43 @@ Setup is very easy and straight-forward. There are essentially only three config
 
 Example:
 
-    ActiveRecord\Config::initialize(function($cfg)
-    {
-	    $cfg->set_model_directory('/path/to/your/model_directory');
-	    $cfg->set_connections(
-	      array(
-	        'development' => 'mysql://username:password@localhost/development_database_name',
-	        'test' => 'mysql://username:password@localhost/test_database_name',
-	        'production' => 'mysql://username:password@localhost/production_database_name'
-	      )
-	    );
-    });
+```php
+ActiveRecord\Config::initialize(function($cfg)
+{
+   $cfg->set_model_directory('/path/to/your/model_directory');
+   $cfg->set_connections(
+     array(
+       'development' => 'mysql://username:password@localhost/development_database_name',
+       'test' => 'mysql://username:password@localhost/test_database_name',
+       'production' => 'mysql://username:password@localhost/production_database_name'
+     )
+   );
+});
+```
 
 Alternatively (w/o the 5.3 closure):
 
-    $cfg = ActiveRecord\Config::instance();
-    $cfg->set_model_directory('/path/to/your/model_directory');
-    $cfg->set_connections(
-      array(
-        'development' => 'mysql://username:password@localhost/development_database_name',
-        'test' => 'mysql://username:password@localhost/test_database_name',
-        'production' => 'mysql://username:password@localhost/production_database_name'
-      )
-    );
+```php
+$cfg = ActiveRecord\Config::instance();
+$cfg->set_model_directory('/path/to/your/model_directory');
+$cfg->set_connections(
+  array(
+    'development' => 'mysql://username:password@localhost/development_database_name',
+    'test' => 'mysql://username:password@localhost/test_database_name',
+    'production' => 'mysql://username:password@localhost/production_database_name'
+  )
+);
+```
 
 PHP ActiveRecord will default to use your development database. For testing or production, you simply set the default
 connection according to your current environment ('test' or 'production'):
 
-    ActiveRecord\Config::initialize(function($cfg) 
-    {
-      $cfg->set_default_connection(your_environment);
-    });
+```php
+ActiveRecord\Config::initialize(function($cfg)
+{
+  $cfg->set_default_connection(your_environment);
+});
+```
 
 Once you have configured these three settings you are done. ActiveRecord takes care of the rest for you.
 It does not require that you map your table schema to yaml/xml files. It will query the database for this information and
@@ -98,52 +104,59 @@ cache it so that it does not make multiple calls to the database for a single sc
 These are your basic methods to find and retrieve records from your database.
 See the *Finders* section for more details.
 
-	$post = Post::find(1);
-	echo $post->title; # 'My first blog post!!'
-	echo $post->author_id; # 5
+```php
+$post = Post::find(1);
+echo $post->title; # 'My first blog post!!'
+echo $post->author_id; # 5
 
-	# also the same since it is the first record in the db
-	$post = Post::first();
+# also the same since it is the first record in the db
+$post = Post::first();
 
-	# finding using dynamic finders
-	$post = Post::find_by_name('The Decider');
-	$post = Post::find_by_name_and_id('The Bridge Builder',100);
-	$post = Post::find_by_name_or_id('The Bridge Builder',100);
+# finding using dynamic finders
+$post = Post::find_by_name('The Decider');
+$post = Post::find_by_name_and_id('The Bridge Builder',100);
+$post = Post::find_by_name_or_id('The Bridge Builder',100);
 
-	# finding using a conditions array
-	$posts = Post::find('all',array('conditions' => array('name=? or id > ?','The Bridge Builder',100)));
+# finding using a conditions array
+$posts = Post::find('all',array('conditions' => array('name=? or id > ?','The Bridge Builder',100)));
+```
 
 ### Create ###
 Here we create a new post by instantiating a new object and then invoking the save() method.
 
-	$post = new Post();
-	$post->title = 'My first blog post!!';
-	$post->author_id = 5;
-	$post->save();
-	# INSERT INTO `posts` (title,author_id) VALUES('My first blog post!!', 5)
+```php
+$post = new Post();
+$post->title = 'My first blog post!!';
+$post->author_id = 5;
+$post->save();
+# INSERT INTO `posts` (title,author_id) VALUES('My first blog post!!', 5)
+```
 
 ### Update ###
 To update you would just need to find a record first and then change one of its attributes.
 It keeps an array of attributes that are "dirty" (that have been modified) and so our
 sql will only update the fields modified.
 
-	$post = Post::find(1);
-	echo $post->title; # 'My first blog post!!'
-	$post->title = 'Some real title';
-	$post->save();
-	# UPDATE `posts` SET title='Some real title' WHERE id=1
+```php
+$post = Post::find(1);
+echo $post->title; # 'My first blog post!!'
+$post->title = 'Some real title';
+$post->save();
+# UPDATE `posts` SET title='Some real title' WHERE id=1
 
-	$post->title = 'New real title';
-	$post->author_id = 1;
-	$post->save();
-	# UPDATE `posts` SET title='New real title', author_id=1 WHERE id=1
+$post->title = 'New real title';
+$post->author_id = 1;
+$post->save();
+# UPDATE `posts` SET title='New real title', author_id=1 WHERE id=1
+```
 
 ### Delete ###
 Deleting a record will not *destroy* the object. This means that it will call sql to delete
 the record in your database but you can still use the object if you need to.
 
-	$post = Post::find(1);
-	$post->delete();
-	# DELETE FROM `posts` WHERE id=1
-	echo $post->title; # 'New real title'
-
+```php
+$post = Post::find(1);
+$post->delete();
+# DELETE FROM `posts` WHERE id=1
+echo $post->title; # 'New real title'
+```
