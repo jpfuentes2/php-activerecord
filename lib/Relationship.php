@@ -14,6 +14,7 @@ interface InterfaceRelationship
 	public function __construct($options=array());
 	public function build_association(Model $model, $attributes=array());
 	public function create_association(Model $model, $attributes=array());
+	public function first_or_create_association(Model $model, $attributes=array());
 }
 
 /**
@@ -234,6 +235,23 @@ abstract class AbstractRelationship implements InterfaceRelationship
 	{
 		$class_name = $this->class_name;
 		$new_record = $class_name::create($attributes);
+		return $this->append_record_to_associate($model, $new_record);
+	}
+
+	/**
+	 * Trys to find instance that matches attributes, if it doesn't exist it creates a new instance of {@link Model} and invokes save.
+	 *
+	 * @param Model $model The model which holds this association
+	 * @param array $attributes Hash containing attributes to find or initialize the model with
+	 * @return Model
+	 */
+	public function first_or_create_association(Model $model, $attributes=array()) {
+		$class_name = $this->class_name;
+		$new_record = null;
+		if (count($attributes)) {
+			$new_record = $class_name::first($attributes);
+		}
+		if (is_null($new_record)) return $this->create_association($model, $attributes);
 		return $this->append_record_to_associate($model, $new_record);
 	}
 
@@ -537,8 +555,12 @@ class HasMany extends AbstractRelationship
 		$this->set_keys($model);
 		$primary_key = Inflector::instance()->variablize($this->foreign_key[0]);
 
-		if (!isset($attributes[$primary_key]))
-			$attributes[$primary_key] = $model->id;
+		if (!isset($attributes[$primary_key])) {
+			# We need to know the models primary key.
+			$model_pk = $model->get_primary_key();
+			$model_pk = $model_pk[0];
+			$attributes[$primary_key] = $model->$model_pk;
+		}
 
 		return $attributes;
 	}
@@ -553,6 +575,26 @@ class HasMany extends AbstractRelationship
 	{
 		$attributes = $this->inject_foreign_key_for_new_association($model, $attributes);
 		return parent::create_association($model, $attributes);
+	}
+
+	/**
+	 * Trys to find instance that matches attributes, if it doesn't exist it creates a new instance 
+	 * of {@link Model}, sets keys and invokes save.
+	 *
+	 * @param Model $model The model which holds this association
+	 * @param array $attributes Hash containing attributes to find or initialize the model with
+	 * @return Model
+	 */
+	public function first_or_create_association(Model $model, $attributes=array()) {
+		$class_name = $this->class_name;
+		$new_record = null;
+		if (count($attributes)) {
+			$new_record = $class_name::first($attributes);
+		}
+		if (is_null($new_record)) return $this->create_association($model, $attributes);
+		$attributes = $this->inject_foreign_key_for_new_association($model, $attributes);
+		$new_record->assign_attributes($attributes);
+		return $this->append_record_to_associate($model, $new_record);
 	}
 
 	public function load_eagerly($models=array(), $attributes=array(), $includes, Table $table)
