@@ -516,6 +516,42 @@ abstract class Connection
 	{
 		return false;
 	}
+	
+	/**
+	 * Creates column sql
+	 * @param string $name
+	 * @param string $type
+	 * @param integer $length
+	 * @param boolean $null
+	 * @return string
+	 * @throws ActiveRecordException
+	 */
+	public function column($name, $type, $length = null, $null = true)
+	{
+		$native_types	= $this->native_database_types();
+		if (!isset($native_types[$type]))
+			throw new ActiveRecordException("Column type not known for $name $type");
+	
+		$type	= $native_types[$type];
+		if ($name == self::PRIMARY_KEY)
+			return $type;
+	
+		$sql	= "$name {$type['name']}";
+	
+		if (!$length && isset($type['length'])) {
+			$sql	.= ' (' . $type['length'] . ')';
+		} elseif ($length) {
+			$sql	.= ' (' . $length . ')';
+		}
+	
+		if ($null) {
+			$sql	.= ' NULL';
+		} else {
+			$sql	.= ' NOT NULL';
+		}
+	
+		return $sql;
+	}
 
 }
 
