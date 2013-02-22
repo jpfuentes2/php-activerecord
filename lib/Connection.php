@@ -37,11 +37,22 @@ abstract class Connection
 	 */
 	private $logging = false;
 	/**
-	 * Contains a Logger object that must impelement a log() method.
+	 * Contains a Logger object that must impelement a logging method.
 	 *
+     * The logging method is defined in the property $logger_method and
+     * defaults to 'log'
+     *
 	 * @var object
 	 */
 	private $logger;
+
+    /**
+     * contains the name of the logging method
+     *
+     * @var mixed
+     * @access private
+     */
+    private $logger_method;
 	/**
 	 * The name of the protocol that is used.
 	 * @var string
@@ -101,7 +112,10 @@ abstract class Connection
 			$connection = new $fqclass($info);
 			$connection->protocol = $info->protocol;
 			$connection->logging = $config->get_logging();
-			$connection->logger = $connection->logging ? $config->get_logger() : null;
+            if ($connection->logging) {
+			    $connection->logger = $config->get_logger();
+                $connection->logger_method = $config->get_logger_method();
+            }
 
 			if (isset($info->charset))
 				$connection->set_encoding($info->charset);
@@ -291,8 +305,10 @@ abstract class Connection
 	 */
 	public function query($sql, &$values=array())
 	{
-		if ($this->logging)
-			$this->logger->log($sql);
+		if ($this->logging) {
+            $method = $this->logger_method;
+			$this->logger->$method($sql,$values);
+        }
 
 		$this->last_query = $sql;
 
