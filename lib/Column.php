@@ -120,7 +120,7 @@ class Column
 		switch ($this->type)
 		{
 			case self::STRING:	return (string)$value;
-			case self::INTEGER:	return (int)$value;
+			case self::INTEGER:	return (int)preg_replace("/\D/","",$value);
 			case self::DECIMAL:	return (double)$value;
 			case self::BOOLEAN:	return $connection->boolean_to_string($value);
 			case self::DATETIME:
