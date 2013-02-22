@@ -87,6 +87,8 @@ class ColumnTest extends SnakeCase_PHPUnit_Framework_TestCase
 		$this->assert_cast(Column::DATE,$datetime,'2001-01-01');
 		$this->assert_cast(Column::DATE,$datetime,$datetime);
 		$this->assert_cast(Column::STRING,'bubble tea','bubble tea');
+        $this->assert_cast(Column::BOOLEAN,'1',true);
+        $this->assert_cast(Column::BOOLEAN,'',false);
 	}
 
 	public function test_cast_leave_null_alone()
