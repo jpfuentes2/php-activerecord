@@ -1039,9 +1039,14 @@ class Model
 	 */
 	private function _validate()
 	{
-		require_once 'Validations.php';
+		$config = Config::instance();
 
-		$validator = new Validations($this);
+		$validator_class = $config->get_validator();
+        if ($validator_class == '\ActiveRecord\Validations')
+            require_once 'Validations.php';
+
+		$validator = new $validator_class($this);
+		
 		$validation_on = 'validation_on_' . ($this->is_new_record() ? 'create' : 'update');
 
 		foreach (array('before_validation', "before_$validation_on") as $callback)

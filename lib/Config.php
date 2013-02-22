@@ -58,6 +58,14 @@ class Config extends Singleton
 	 */
 	private $model_directory;
 
+
+	/**
+	 * Contains a Validator object that must impelement a validate() method.
+	 *
+	 * @var object
+	 */
+	private $validator = '\ActiveRecord\Validations';
+
 	/**
 	 * Switch for logging.
 	 *
@@ -260,6 +268,37 @@ class Config extends Singleton
 	public function get_logger()
 	{
 		return $this->logger;
+	}
+
+
+	/**
+	 * Sets the validation object
+	 *
+	 * @param object $validator
+	 * @return void
+	 * @throws ConfigException if Validate object does not implement public validate() and public get_record()
+	 */
+	public function set_validator($validator)
+	{
+		$klass = Reflections::instance()->add($validator)->get($validator);
+
+		if (!$klass->getMethod('validate') || !$klass->getMethod('validate')->isPublic())
+			throw new ConfigException("Validator object must implement a public validate method");
+
+        if (!$klass->getMethod('validate') || !$klass->getMethod('get_record')->isPublic())
+            throw new ConfigException("Validator object must implement a public get_record method");
+
+		$this->validator = $validator;
+	}
+
+		/**
+	 * Returns the validator object
+	 *
+	 * @return object
+	 */
+	public function get_validator()
+	{
+		return $this->validator;
 	}
 
 	/**
