@@ -48,11 +48,11 @@ SELECT
         AND a.attnum = ANY (pg_index.indkey)
         AND pg_index.indisprimary = 't'
       ) IS NOT NULL AS pk,      
-      REGEXP_REPLACE(REGEXP_REPLACE(REGEXP_REPLACE((SELECT pg_attrdef.adsrc
+      (SELECT pg_get_expr(pg_attrdef.adbin, pg_attrdef.adrelid)
         FROM pg_attrdef
         WHERE c.oid = pg_attrdef.adrelid
         AND pg_attrdef.adnum=a.attnum
-      ),'::[a-z_ ]+',''),'''$',''),'^''','') AS default
+      ) AS default
 FROM pg_attribute a, pg_class c, pg_type t
 WHERE c.relname = ?
       AND a.attnum > 0
@@ -103,12 +103,22 @@ SQL;
 
 		if ($column['default'])
 		{
-			preg_match("/^nextval\('(.*)'\)$/",$column['default'],$matches);
+            // extract the default value
+            $default = preg_replace("/^'(.*(?=':))'::[a-z_ ]+$/", "$1", $column['default']);
+
+            // check for a sequence
+			preg_match("/^nextval\('(.*)'::[a-z_ ]+\)$/",$default,$matches);
 
 			if (count($matches) == 2)
+            {
 				$c->sequence = $matches[1];
+            }
 			else
-				$c->default = $c->cast($column['default'],$this);
+            {
+                // unescape single quotes in a default value
+                $default = preg_replace("/''/","'", $default);
+				$c->default = $c->cast($default, $this);
+            }
 		}
 		return $c;
 	}
@@ -135,9 +145,31 @@ SQL;
 		);
 	}
 
-    public function boolean_to_string($boolean) {
-        return $boolean ? "1" : "0";
+    public function boolean_to_string($value) {
+        if
+        (   // possible "false" values
+            // from php 'type-juggling':
+            // http://us1.php.net/manual/en/language.types.boolean.php#language.types.boolean.casting
+            // with additional strings recognized by postgres added
+            $value === false                ||#php
+            $value === 0                    ||#php
+            $value === 0.0                  ||#php
+            $value === ""                   ||#php
+            $value === null                 ||#php
+            $value === "0"                  ||#php/postgres
+            strtolower($value) === 'f'      ||#postgres
+            strtolower($value) === 'false'  ||#postgres
+            strtolower($value) === 'n'      ||#postgres
+            strtolower($value) === 'no'     ||#postgres
+            strtolower($value) === 'off'      #postgres
+        )
+        {
+            return "0";
+        }
+        else 
+        {   // treat anything else as true
+            return "1";
+        }
     }
-
 }
 ?>
