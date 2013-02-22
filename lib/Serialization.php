@@ -139,7 +139,14 @@ abstract class Serialization
 			foreach ($this->options['methods'] as $method)
 			{
 				if (method_exists($this->model, $method))
+                {
 					$this->attributes[$method] = $this->model->$method();
+                }
+                else if (method_exists($this->model, "get_{$method}"))
+                {
+                    $getter = "get_{$method}";
+                    $this->attributes[$method] = $this->model->$getter();
+                }
 			}
 		}
 	}
