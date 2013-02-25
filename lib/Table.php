@@ -254,7 +254,7 @@ class Table
 			// nested include
 			if (is_array($name))
 			{
-				$nested_includes = count($name) > 1 ? $name : $name[0];
+				$nested_includes = count($name) > 0 ? $name : $name[0];
 				$name = $index;
 			}
 			else
