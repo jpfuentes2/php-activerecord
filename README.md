@@ -1,8 +1,9 @@
-# PHP ActiveRecord #
+# PHP ActiveRecord - Version 1.0 #
 
-Version 1.0
+by 
 
-by @kla [Kien La] and @jpfuentes2 [Jacques Fuentes]
+* [@kla](https://github.com/kla) - Kien La
+* [@jpfuentes2](https://github.com/jpfuentes2) - Jacques Fuentes
 
 <http://www.phpactiverecord.org/>
 
