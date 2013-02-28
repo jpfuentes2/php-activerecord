@@ -474,15 +474,22 @@ class ActiveRecordTest extends DatabaseTest
 		$author->save();
 		$this->assert_false($author->attribute_is_dirty('some_date'));
 	}
-	
-	public function test_flag_dirty_attribute()
+
+	public function test_flag_dirty_attribute_which_does_not_exit()
 	{
 		$author = new Author();
 		$author->flag_dirty('some_inexistant_property');
 		$this->assert_null($author->dirty_attributes());
 		$this->assert_false($author->attribute_is_dirty('some_inexistant_property'));
 	}
-	
+
+	public function test_gh245_dirty_attribute_should_not_raise_php_notice_if_not_dirty()
+	{
+		$event = new Event(array('title' => "Fun"));
+		$this->assert_false($event->attribute_is_dirty('description'));
+		$this->assert_true($event->attribute_is_dirty('title'));
+	}
+
 	public function test_assigning_php_datetime_gets_converted_to_ar_datetime()
 	{
 		$author = new Author();
