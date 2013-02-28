@@ -2,7 +2,7 @@
 
 Version 1.0
 
-by Kien La and Jacques Fuentes
+by @kla [Kien La] and @jpfuentes2 [Jacques Fuentes]
 
 <http://www.phpactiverecord.org/>
 
