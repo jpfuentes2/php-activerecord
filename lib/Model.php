@@ -1401,10 +1401,6 @@ class Model
 	*
 	* @return array An array of finder options
 	*/
-	public function default_scope()
-	{
-		return array();
-	}
 	
 	/**
 	* To be overridden by the model. It should return an array of options that are named

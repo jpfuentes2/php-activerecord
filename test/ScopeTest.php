@@ -1,6 +1,12 @@
 <?php
 include 'helpers/config.php';
-
+class NullScope extends Author
+{
+	public static $table_name = 'authors';
+  	public static $default_scope = array(
+		'conditions'=>'parent_author_id IS NULL',
+	);
+}
 class IsNotBob extends Author
 {
 	public static $table_name = 'authors';
@@ -142,6 +148,12 @@ class ScopeTest extends DatabaseTest
 		$this->assertEquals(4,count($everyone));
 	}
 	
+	public function test_disabled_default_scope_with_array_conditions_in_search()
+	{
+		$hasBob = IsNotBob::scoped()->disable_default_scope()->find(array('parent_author_id'=>1));
+		$this->assertEquals(1,count($hasBob));
+	}
+	
 	public function test_find_uses_default_scope()
 	{
 		$notBob = IsNotBob::all();
@@ -170,6 +182,35 @@ class ScopeTest extends DatabaseTest
 		$this->assertEquals('Uncle Bob',IsNotBob::find($bushId)->name);
 	}
 	
+	public function test_null_scope_gets_removed_correctly()
+	{
+		$author1 = NullScope::find(1);
+		$author1->parent_author_id = null;
+		$author1->save();
+		
+		$author = NullScope::scoped()->all(array('conditions'=>
+				array('parent_author_id'=>1))
+			);
+		$this->assertEquals(0,count($author));
+			
+		$author = NullScope::scoped()->disable_default_scope()->all(array('conditions'=>
+				array('parent_author_id'=>1))
+			);
+		$this->assertEquals('Bill Clinton',$author[0]->name);
+	}
+	
+	public function test_using_null_in_a_comparison()
+	{
+		$author1 = NullScope::find(1);
+		$author1->parent_author_id = null;
+		$author1->save();
+		
+		$author = NullScope::scoped()->disable_default_scope()->all(
+			array('conditions'=>
+				array('parent_author_id'=>null))
+			);
+		$this->assertEquals('Tito',$author[0]->name);
+	}
 	public function test_relation_with_scope()
 	{
 		$tito = IsNotBob::find(1);

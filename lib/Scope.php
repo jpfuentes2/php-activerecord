@@ -15,6 +15,7 @@ class Scopes
 {
 	protected $model = null;
 	protected $scopes = null;
+	protected $applied_scopes = null; //Hash of applied named and default_scopes
 	
 	/**
 	* While enabled - The default scope will be used in all find methods for the Model
@@ -156,7 +157,7 @@ class Scopes
 	public function find($type,$options=array())
 	{
 		$args = array($type,$options);
-		if($this->scopes)
+		if( $this->scopes)
 		{
 			if($options)
 			{
@@ -164,7 +165,11 @@ class Scopes
 			}
 			$args = array($type,$this->get_options());
 		}
-		$args = array($type,$this->get_options());
+		else
+		{
+			$options['scope'] = $this;
+			$args = array($type,$options);
+		}
 		return call_user_func_array(array($this->model, 'find'), $args);
 	}
 	
