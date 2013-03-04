@@ -27,13 +27,18 @@ class IsNotBob extends Author
 				'conditions'=>'author_id <= 2'
 			),
         );
-    
+    public $scoped_name = null;
     /** 
     * Applied to every query unless the default scope is disabled
     */
-  	public static $default_scope = array(
-			'conditions'=>'name != "Uncle Bob"',
-		);
+  	public function default_scope()
+	{
+		if($this->scoped_name)
+		{
+			return self::scoped()->where('name = "'.$this->scoped_name.'"');
+		}
+		return self::scoped()->where('name != "Uncle Bob"');
+	} 
     
     /** Parameterized Scope */
     public static function is_tito_call()
@@ -220,6 +225,15 @@ class ScopeTest extends DatabaseTest
 		
 		$this->assertEquals(1,count($tito->parents));
 		$this->assertEquals(0,count($bush->parents));
+	}
+	public function test_scope_on_a_model_instance()
+	{
+		$first = IsNotBob::find(1);
+		$this->assertEquals('Tito',$first->name);
+		
+		$first->scoped_name = 'George W. Bush';
+		$result = $first->scope()->first();
+		$this->assertEquals('George W. Bush',$result->name);
 	}
 }
 ?>
