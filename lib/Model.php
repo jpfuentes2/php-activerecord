@@ -1855,6 +1855,10 @@ class Model
 			}
 			$options = $scope->add_scope($default)->get_options();
 		}
+		if($scope->remove_scope_from_hash_after_adding_default_scope)
+		{
+			unset($options['scope']);
+		}
 		return $options;
 	}
 

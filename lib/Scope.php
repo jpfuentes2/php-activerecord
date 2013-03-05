@@ -130,7 +130,6 @@ class Scopes
 		}
 		elseif(is_callable(array($this->model,$method)))
 		{
-			
 			$result = $this->call_model_method($method, $args);
 			if($result instanceof Scope || $result instanceof Query)
 				return $this->add_scope($result);
@@ -158,7 +157,7 @@ class Scopes
 	public function find($type,$options=array())
 	{
 		$args = array($type,$options);
-		if( $this->scopes)
+		if($this->scopes)
 		{
 			if($options)
 			{
@@ -172,6 +171,26 @@ class Scopes
 			$args = array($type,$options);
 		}
 		return call_user_func_array(array($this->model, 'find'), $args);
+	}
+	
+	public $remove_scope_from_hash_after_adding_default_scope = false;
+	public function count($options = array())
+	{
+		if($this->scopes)
+		{
+			if($options)
+			{
+				$this->add_scope($options);
+			}
+			$args = array($this->get_options());
+		}
+		else
+		{
+			$options['scope'] = $this;
+			$args = array($options);
+		}
+		$this->remove_scope_from_hash_after_adding_default_scope = true;
+		return call_user_func_array(array($this->model, 'count'), $args);
 	}
 	
 	public function all($options = array())

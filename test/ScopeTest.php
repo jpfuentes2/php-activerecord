@@ -64,6 +64,18 @@ class ScopeTest extends DatabaseTest
 		parent::tear_down();
 	}
 
+	public function test_calling_count_on_a_scope_instance()
+	{
+		$count = IsNotBob::scoped()->disable_default_scope()->count();
+		$this->assertEquals(4,$count);
+	}
+	
+	public function test_calling_count_on_a_scope_instance_with_options()
+	{
+		$count = IsNotBob::scoped()->disable_default_scope()->count(array('conditions'=>array('name'=>'tito')));
+		$this->assertEquals(1,$count);
+	}
+
 	public function test_is_tito_scope()
 	{
 		$tito = IsNotBob::scoped()->is_tito()->all();
