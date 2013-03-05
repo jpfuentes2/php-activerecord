@@ -63,8 +63,7 @@ class ScopeTest extends DatabaseTest
 	{
 		parent::tear_down();
 	}
-	
-	
+
 	public function test_is_tito_scope()
 	{
 		$tito = IsNotBob::scoped()->is_tito()->all();
@@ -226,14 +225,12 @@ class ScopeTest extends DatabaseTest
 		$this->assertEquals(1,count($tito->parents));
 		$this->assertEquals(0,count($bush->parents));
 	}
-	public function test_scope_on_a_model_instance()
+	
+	public function test_query_with_null_condition_is_generated_correctly_through_scope()
 	{
-		$first = IsNotBob::find(1);
-		$this->assertEquals('Tito',$first->name);
-		
-		$first->scoped_name = 'George W. Bush';
-		$result = $first->scope()->first();
-		$this->assertEquals('George W. Bush',$result->name);
+		$result = IsNotBob::all(array('conditions'=>array('updated_at'=>null)));
+		$this->assertEquals(3,count($result));
 	}
+	
 }
 ?>
