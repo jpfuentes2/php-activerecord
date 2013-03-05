@@ -228,8 +228,8 @@ class ScopeTest extends DatabaseTest
 	
 	public function test_query_with_null_condition_is_generated_correctly_through_scope()
 	{
-		$result = IsNotBob::all(array('conditions'=>array('updated_at'=>null)));
-		$this->assertEquals(3,count($result));
+		$result = IsNotBob::all(array('conditions'=>array('updated_at'=>null,'author_id'=>3)));
+		$this->assertEquals(1,count($result));
 	}
 	
 }
