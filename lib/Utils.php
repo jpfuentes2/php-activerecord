@@ -355,5 +355,10 @@ class Utils
 	{
 		return preg_replace("/$char+/",$char,$string);
 	}
+
+    public static function add_irregular($singular, $plural)
+    {
+        self::$irregular[$singular] = $plural;
+    }
 };
 ?>
