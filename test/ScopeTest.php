@@ -244,5 +244,20 @@ class ScopeTest extends DatabaseTest
 		$this->assertEquals(1,count($result));
 	}
 	
+	public function test_scope_on_a_model_instance()
+	{
+		$first = IsNotBob::find(1);
+		$this->assertEquals('Tito',$first->name);
+		
+		$first->scoped_name = 'George W. Bush';
+		$result = $first->scope()->first();
+		$this->assertEquals('George W. Bush',$result->name);
+	}
+	
+	public function test_adding_a_scope_returns_instance_of_scope_and_not_query()
+	{
+		$scope = IsNotBob::is_tito_call();
+		$this->assertInstanceOf('ActiveRecord\Scopes', $scope);
+	}
 }
 ?>
