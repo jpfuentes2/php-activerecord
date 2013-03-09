@@ -259,5 +259,20 @@ class ScopeTest extends DatabaseTest
 		$scope = IsNotBob::is_tito_call();
 		$this->assertInstanceOf('ActiveRecord\Scopes', $scope);
 	}
+	
+	public function test_call_to_exists()
+	{
+		$exists = IsNotBob::scoped()->disable_default_scope()->exists();
+		$this->assertTrue($exists);
+	}
+	public function test_call_to_exists_with_conditions()
+	{
+		$exists = IsNotBob::scoped()->disable_default_scope()->exists(
+			array('conditions'=>array('name'=>'made up name')));
+		$this->assertFalse($exists);
+		$exists = IsNotBob::scoped()->disable_default_scope()->exists(
+			array('conditions'=>array('name'=>'Tito')));
+		$this->assertTrue($exists);
+	}
 }
 ?>

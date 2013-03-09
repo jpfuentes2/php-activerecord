@@ -179,25 +179,12 @@ class Scopes
 	*/
 	public function find($type,$options=array())
 	{
+		$options = $this->retrieve_scoped_options($options);
 		$args = array($type,$options);
-		if($this->scopes)
-		{
-			if($options)
-			{
-				$this->add_scope($options);
-			}
-			$args = array($type,$this->get_options());
-		}
-		else
-		{
-			$options['scope'] = $this;
-			$args = array($type,$options);
-		}
 		return call_user_func_array(array($this->model, 'find'), $args);
 	}
 	
-	public $remove_scope_from_hash_after_adding_default_scope = false;
-	public function count($options = array())
+	protected function retrieve_scoped_options($options)
 	{
 		if($this->scopes)
 		{
@@ -205,13 +192,27 @@ class Scopes
 			{
 				$this->add_scope($options);
 			}
-			$args = array($this->get_options());
+			$options = $this->get_options();
 		}
 		else
 		{
 			$options['scope'] = $this;
-			$args = array($options);
 		}
+		return $options;
+	}
+	public function exists($options=array())
+	{
+		$options = $this->retrieve_scoped_options($options);
+		$args = array($options);
+		$this->remove_scope_from_hash_after_adding_default_scope = true;
+		return call_user_func_array(array($this->model, 'exists'), $args);
+	}
+	
+	public $remove_scope_from_hash_after_adding_default_scope = false;
+	public function count($options = array())
+	{
+		$options = $this->retrieve_scoped_options($options);
+		$args = array($options);
 		$this->remove_scope_from_hash_after_adding_default_scope = true;
 		return call_user_func_array(array($this->model, 'count'), $args);
 	}
