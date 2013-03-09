@@ -71,15 +71,16 @@ class Scopes
 	*
 	* @return array An options array with a reference to the scope in the ['scope'] key
 	*/
-	public function get_options()
+	public function get_options($with_scope_attached = true)
 	{
+		$options = array();
 		if($this->scopes)
 		{
 			$options = $this->scopes->get_options();
-			$options['scope'] = $this;
-			return $options;
 		}
-		return array('scope'=>$this);
+		if($with_scope_attached)
+			$options['scope'] = $this;
+		return $options;
 	}
 	
 	/**
@@ -88,18 +89,33 @@ class Scopes
 	*/
 	public function add_scope($scope)
 	{
-		if($this->scopes)
+		if(!$this->scopes)
+			$this->scopes = new Query($this->model);
+		if(is_array($scope) && isset($scope['scope']))
+		{
+			$this->add_scope($scope['scope']);
+			unset($scope['scope']);
+		}
+		
+		if($scope instanceof Query)//already Query Instance
 		{
 			$this->scopes->merge($scope);
 		}
-		else if($scope instanceof Query)//already Query Instance
+		else if($scope instanceof Scopes)
 		{
-			$this->scopes = $scope;
-		}
-		else
+			if($scope == $this)
+			{
+				return $this;
+			}
+			else
+			{
+				$options = $scope->get_options(false);
+				if($options)
+					$this->scopes->merge($options);
+			}
+		}else if(is_array($scope) && $scope)
 		{
-			$query = new Query($this->model);
-			$this->scopes = $query->merge($scope);
+			$this->scopes->merge($scope);
 		}
 		return $this;
 	}
@@ -123,15 +139,22 @@ class Scopes
 	{
 		$combined_options = array();
 		$model = $this->model;
-		$options = $model::check_for_named_scope($method);
-		if($options)
+		
+		if($named_scope = $model::check_for_named_scope($method))
 		{
-			$this->scopes[] = new Scope($this->model->check_for_named_scope($method));
+			$this->add_scope($named_scope);
+			return $this;
+		}
+		elseif(in_array($method, Query::get_builder_scopes()))
+		{
+			$query = new Query($this->model);
+			$result = call_user_func_array(array($query, $method), $args);
+			return $this->add_scope($result);
 		}
 		elseif(is_callable(array($this->model,$method)))
 		{
 			$result = $this->call_model_method($method, $args);
-			if($result instanceof Scope || $result instanceof Query)
+			if($result instanceof Scopes || $result instanceof Query)
 				return $this->add_scope($result);
 			else
 				return $this;
