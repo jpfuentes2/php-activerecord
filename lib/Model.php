@@ -831,8 +831,8 @@ class Model
 				$this->attributes[$pk] = static::connection()->insert_id($table->sequence);
 		}
 
-		$this->invoke_callback('after_create',false);
 		$this->__new_record = false;
+		$this->invoke_callback('after_create',false);
 		return true;
 	}
 
