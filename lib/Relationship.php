@@ -222,8 +222,6 @@ abstract class AbstractRelationship implements InterfaceRelationship
 		}
 	}
 
-	public static $iterations = 0;
-
 	/**
 	 * Creates a new instance of specified {@link Model} with the attributes pre-loaded.
 	 *
