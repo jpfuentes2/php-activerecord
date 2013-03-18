@@ -44,6 +44,6 @@ function activerecord_autoload($class_name)
 	$file = "$root/$class_name.php";
 
 	if (file_exists($file))
-		require $file;
+		require_once $file;
 }
 ?>
