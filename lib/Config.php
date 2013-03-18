@@ -190,6 +190,58 @@ class Config extends Singleton
 	}
 
 	/**
+	 * Instantiates a Connection object. Can be used to decide
+	 * which adapter to use on a case-by-case basis, or replace the
+	 * built-in adaptors with your own subclasses of them.
+	 *
+	 * @param array $info The connection info, parsed out of
+	 *   $connection_string by Connection::parse_connection_url();
+	 *   an array containing keys 'protocol' (e.g. 'sqlite'), 'host',
+	 *   'db', 'user', 'pass' and maybe 'charset'.
+	 * @param string $connection_string The original connection string.
+	 * @return a Connection object.
+	 */
+	public function create_connection($info, $connection_string)
+	{
+		$fqclass = $this->load_adapter_class($info->protocol);
+
+		try {
+			$connection = new $fqclass($info);
+			$connection->protocol = $info->protocol;
+			$connection->logging = $this->get_logging();
+			$connection->logger = $connection->logging ? $this->get_logger() : null;
+			$connection->connection_string = $connection_string;
+
+			if (isset($info->charset))
+				$connection->set_encoding($info->charset);
+		} catch (PDOException $e) {
+			throw new DatabaseException($e, $connection_string);
+		}
+		
+		return $connection;
+	}
+	
+	/**
+	 * Loads the specified class for an adapter.
+	 *
+	 * @param string $adapter Name of the adapter.
+	 * @return string The full name of the class including namespace.
+	 */
+	protected function load_adapter_class($adapter)
+	{
+		$class = ucwords($adapter) . 'Adapter';
+		$fqclass = 'ActiveRecord\\' . $class;
+		$source = __DIR__ . "/adapters/$class.php";
+
+		if (!file_exists($source))
+			throw new DatabaseException("$fqclass not found!",
+				$this->connection_string);
+
+		require_once($source);
+		return $fqclass;
+	}
+	
+	/**
 	 * Sets the directory where models are located.
 	 *
 	 * @param string $dir Directory path containing your models

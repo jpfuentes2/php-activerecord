@@ -40,13 +40,13 @@ abstract class Connection
 	 *
 	 * @var bool
 	 */
-	private $logging = false;
+	public $logging = false;
 	/**
 	 * Contains a Logger object that must impelement a log() method.
 	 *
 	 * @var object
 	 */
-	private $logger;
+	public $logger;
 	/**
 	 * The name of the protocol that is used.
 	 * @var string
@@ -117,41 +117,7 @@ abstract class Connection
 			throw new DatabaseException("Empty connection string");
 
 		$info = static::parse_connection_url($connection_string);
-		$fqclass = static::load_adapter_class($info->protocol);
-
-		try {
-			$connection = new $fqclass($info);
-			$connection->protocol = $info->protocol;
-			$connection->logging = $config->get_logging();
-			$connection->logger = $connection->logging ? $config->get_logger() : null;
-			$connection->connection_string = $connection_string;
-
-			if (isset($info->charset))
-				$connection->set_encoding($info->charset);
-		} catch (PDOException $e) {
-			throw new DatabaseException($e, $connection_string);
-		}
-		return $connection;
-	}
-
-	/**
-	 * Loads the specified class for an adapter.
-	 *
-	 * @param string $adapter Name of the adapter.
-	 * @return string The full name of the class including namespace.
-	 */
-	private static function load_adapter_class($adapter)
-	{
-		$class = ucwords($adapter) . 'Adapter';
-		$fqclass = 'ActiveRecord\\' . $class;
-		$source = __DIR__ . "/adapters/$class.php";
-
-		if (!file_exists($source))
-			throw new DatabaseException("$fqclass not found!",
-				$this->connection_string);
-
-		require_once($source);
-		return $fqclass;
+		return $config->create_connection($info, $connection_string);
 	}
 
 	/**
