@@ -102,9 +102,6 @@ class DatabaseLoader
 			$tables[] = $info['filename'];
 		}
 
-		print "fixtures in ".$this->fixtures_path.": ".
-			print_r($tables, TRUE)."\n";
-
 		return $tables;
 	}
 
