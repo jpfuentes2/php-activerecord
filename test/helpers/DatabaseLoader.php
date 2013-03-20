@@ -86,7 +86,6 @@ class DatabaseLoader
 		{
 			if (trim($sql) != '')
 			{
-				// print "executing query \{$sql\}\n";
 				$this->db->query($sql);
 			}
 		}
