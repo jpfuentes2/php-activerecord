@@ -105,9 +105,9 @@ class Table
 		{
 			return ($this->conn = ConnectionManager::get_connection($connection));
 		}
-		catch (ActiveRecord\DatabaseException $e)
+		catch (DatabaseException $e)
 		{
-			throw new ActiveRecord\DatabaseException("Failed to open ".
+			throw new DatabaseException("Failed to open ".
 				"connection for $this->class: $e");
 		}
 	}
