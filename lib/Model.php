@@ -229,6 +229,23 @@ class Model
 	 * @var array
 	 */
 	static $delegate = array();
+	
+	/**
+	 * Provides a way to keep values in a model instance that aren't
+	 * saved in the database, similar to Ruby's attr_accessor.
+	 *
+	 * <code>
+	 * class House extends ActiveRecord\Model {
+	 *   static $attr_accessor = array('colour');
+	 * }
+	 * $house->colour = "white";
+	 */
+	static $attr_accessor = array();
+	
+	/**
+	 * $attr_accessor values are stored here.
+	 */
+	private $accessible_attrs = array();
 
 	/**
 	 * Constructs a model.
@@ -341,7 +358,9 @@ class Model
 	 */
 	public function __isset($attribute_name)
 	{
-		return array_key_exists($attribute_name,$this->attributes) || array_key_exists($attribute_name,static::$alias_attribute);
+		return array_key_exists($attribute_name, $this->attributes) or
+			array_key_exists($attribute_name, static::$alias_attribute) or
+			array_key_exists($attribute_name, $this->accessible_attrs);
 	}
 
 	/**
@@ -398,8 +417,9 @@ class Model
 	public function __set($name, $value)
 	{
 		if (array_key_exists($name, static::$alias_attribute))
+		{
 			$name = static::$alias_attribute[$name];
-
+		}	
 		elseif (method_exists($this,"set_$name"))
 		{
 			$name = "set_$name";
@@ -412,6 +432,12 @@ class Model
 		if ($name == 'id')
 			return $this->assign_attribute($this->get_primary_key(true),$value);
 
+		if (in_array($name, static::$attr_accessor))
+		{
+			$this->accessible_attrs[$name] = $value;
+			return $value;
+		}
+
 		foreach (static::$delegate as &$item)
 		{
 			if (($delegated_name = $this->is_delegated($name,$item)))
@@ -419,7 +445,7 @@ class Model
 		}
 
 		throw new UndefinedPropertyException(get_called_class(), $name,
-			$this->attributes);
+			array_merge($this->attributes, array_flip(static::$attr_accessor)));
 	}
 
 	public function __wakeup()
@@ -474,6 +500,9 @@ class Model
 		// check for attribute
 		if (array_key_exists($name,$this->attributes))
 			return $this->attributes[$name];
+
+		if (in_array($name, static::$attr_accessor))
+			return $this->accessible_attrs[$name];
 
 		// check relationships if no attribute
 		if (array_key_exists($name,$this->__relationships))
