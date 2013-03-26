@@ -163,7 +163,7 @@ abstract class AbstractRelationship implements InterfaceRelationship
 				$relation = $class::table()->get_relationship($options['through']);
 				$through_table = $relation->get_table();
 			}
-			$options['joins'] = $this->construct_inner_join_sql($through_table, true);
+			$options['joins'] = $this->construct_join_sql($through_table, true);
 
 			$query_key = $this->primary_key[0];
 
@@ -319,7 +319,8 @@ abstract class AbstractRelationship implements InterfaceRelationship
 	 * @param string $alias a table alias for when a table is being joined twice
 	 * @return string SQL INNER JOIN fragment
 	 */
-	public function construct_inner_join_sql(Table $from_table, $using_through=false, $alias=null)
+	public function construct_join_sql(Table $from_table,
+		$using_through=false, $alias=null, $join_type="INNER")
 	{
 		if ($using_through)
 		{
@@ -364,7 +365,7 @@ abstract class AbstractRelationship implements InterfaceRelationship
 		else
 			$aliased_join_table_name = $join_table_name;
 
-		return "INNER JOIN $join_table_name {$alias}ON($from_table_name.$foreign_key = $aliased_join_table_name.$join_primary_key)";
+		return "$join_type JOIN $join_table_name {$alias}ON($from_table_name.$foreign_key = $aliased_join_table_name.$join_primary_key)";
 	}
 
 	/**
@@ -502,7 +503,7 @@ class HasMany extends AbstractRelationship
 				$class = $this->class_name;
 				$relation = $class::table()->get_relationship($this->through);
 				$through_table = $relation->get_table();
-				$this->options['joins'] = $this->construct_inner_join_sql($through_table, true);
+				$this->options['joins'] = $this->construct_join_sql($through_table, true);
 
 				// reset keys
 				$this->primary_key = $pk;

@@ -143,7 +143,17 @@ class Table
 						$alias = null;
 					}
 
-					$ret .= $rel->construct_inner_join_sql($this, false, $alias);
+					if (!$rel->is_poly() and $rel->foreign_key)
+					{
+						$nullable = $this->columns[$rel->foreign_key[0]]->nullable;
+					}
+					else
+					{
+						$nullable = FALSE;
+					}
+
+					$ret .= $rel->construct_join_sql($this, false,
+						$alias, $nullable ? "LEFT OUTER" : "INNER");
 				}
 				else
 					throw new RelationshipException("Relationship named $value has not been declared for class: {$this->class->getName()}");

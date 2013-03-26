@@ -1406,7 +1406,8 @@ class Model
 			}
 		}
 
-		throw new ActiveRecordException("Call to undefined method: $method");
+		throw new ActiveRecordException("Call to undefined method: ".
+			get_class($this)."::$method");
 	}
 
 	/**
