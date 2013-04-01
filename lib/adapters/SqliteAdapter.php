@@ -20,6 +20,11 @@ class SqliteAdapter extends Connection
 
 		$this->connection = new PDO("sqlite:$info->host",null,null,static::$PDO_OPTIONS);
 	}
+	
+	public function datetime_to_string($datetime)
+	{
+		return $datetime->format('d-M-Y h:i:s');
+	}
 
 	public function limit($sql, $offset, $limit)
 	{
