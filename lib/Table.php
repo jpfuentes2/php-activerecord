@@ -152,8 +152,9 @@ class Table
 						$nullable = FALSE;
 					}
 
-					$ret .= $rel->construct_join_sql($this, false,
-						$alias, $nullable ? "LEFT OUTER" : "INNER");
+					$ret .= $rel->construct_join_sql($this,
+						$rel->get_through_relationship_name(), $alias,
+						$nullable ? "LEFT OUTER" : "INNER");
 				}
 				else
 					throw new RelationshipException("Relationship named $value has not been declared for class: {$this->class->getName()}");

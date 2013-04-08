@@ -149,12 +149,6 @@ abstract class AbstractRelationship implements InterfaceRelationship
 			$options['include'] = $includes;
 
 		if (!empty($options['through'])) {
-			// save old keys as we will be reseting them below for inner join convenience
-			$pk = $this->primary_key;
-			$fk = $this->foreign_key;
-
-			$this->set_keys($this->get_table()->class->getName(), true);
-
 			if (!isset($options['class_name'])) {
 				$class = classify($options['through'], true);
 				if (isset($this->options['namespace']) && !class_exists($class))
@@ -166,13 +160,10 @@ abstract class AbstractRelationship implements InterfaceRelationship
 				$relation = $class::table()->get_relationship($options['through']);
 				$through_table = $relation->get_table();
 			}
-			$options['joins'] = $this->construct_join_sql($through_table, true);
+			$options['joins'] = $this->construct_join_sql($through_table,
+				$options['through']);
 
 			$query_key = $this->primary_key[0];
-
-			// reset keys
-			$this->primary_key = $pk;
-			$this->foreign_key = $fk;
 		}
 
 		$options = $this->unset_non_finder_options($options);
@@ -332,52 +323,65 @@ abstract class AbstractRelationship implements InterfaceRelationship
 	 * @return string SQL INNER JOIN fragment
 	 */
 	public function construct_join_sql(Table $from_table,
-		$using_through=false, $alias=null, $join_type="INNER")
+		$through_relationship=null, $alias=null, $join_type="INNER")
 	{
-		if ($using_through)
+		if ($through_relationship)
 		{
-			$join_table = $from_table;
-			$join_table_name = $from_table->get_fully_qualified_table_name();
+			$dest_table = $from_table;
 			$from_table_name = Table::load($this->class_name)->get_fully_qualified_table_name();
  		}
 		else
 		{
-			$join_table = Table::load($this->class_name);
-			$join_table_name = $join_table->get_fully_qualified_table_name();
+			$dest_table = Table::load($this->class_name);
 			$from_table_name = $from_table->get_fully_qualified_table_name();
 		}
+		
+		$dest_table_name = $dest_table->get_fully_qualified_table_name();
 
 		// need to flip the logic when the key is on the other table
 		if ($this instanceof HasMany || $this instanceof HasOne)
 		{
 			$this->set_keys($from_table->class->getName());
 
-			if ($using_through)
+			if ($through_relationship)
 			{
-				$foreign_key = $this->primary_key[0];
-				$join_primary_key = $this->foreign_key[0];
+				// This is the wrong way around: the "through" relationship
+				// points back to the class that we're coming FROM, so
+				// we only need it to add its foreign key to the WHERE
+				// clause conditions. We don't need it for the join, which
+				// uses the two sides of this relationship, which is the
+				// furthest away. Our foreign_key is on the intermediate
+				// table, and our primary_key is on the far table.
+				//
+				// To be revisit when
+				// https://github.com/kla/php-activerecord/issues/280 has
+				// been fixed.
+
+				$from_table_key = $this->primary_key[0];
+				$dest_table_key = $this->foreign_key[0];
 			}
 			else
 			{
-				$join_primary_key = $this->foreign_key[0];
-				$foreign_key = $this->primary_key[0];
+				$from_table_key = $this->primary_key[0];
+				$dest_table_key = $this->foreign_key[0];
 			}
 		}
 		else
 		{
-			$foreign_key = $this->foreign_key[0];
-			$join_primary_key = $this->primary_key[0];
+			$from_table_key = $this->foreign_key[0];
+			$dest_table_key = $this->primary_key[0];
 		}
 
 		if (!is_null($alias))
 		{
-			$aliased_join_table_name = $alias = $this->get_table()->conn->quote_name($alias);
+			$aliased_dest_table_name = $alias = $this->get_table()->conn->quote_name($alias);
 			$alias .= ' ';
 		}
 		else
-			$aliased_join_table_name = $join_table_name;
+			$aliased_dest_table_name = $dest_table_name;
 
-		return "$join_type JOIN $join_table_name {$alias}ON($from_table_name.$foreign_key = $aliased_join_table_name.$join_primary_key)";
+		return "$join_type JOIN $dest_table_name {$alias} ON ".
+			"($from_table_name.$from_table_key = $aliased_dest_table_name.$dest_table_key)";
 	}
 
 	/**
@@ -386,6 +390,11 @@ abstract class AbstractRelationship implements InterfaceRelationship
 	 * @param Model $model The model this relationship belongs to
 	 */
 	abstract function load(Model $model);
+
+	public function get_through_relationship_name()
+	{
+		return NULL;
+	}
 };
 
 /**
@@ -476,14 +485,19 @@ class HasMany extends AbstractRelationship
 		if (!$this->class_name)
 			$this->set_inferred_class_name();
 	}
+	
+	public function get_through_relationship_name()
+	{
+		return $this->through;
+	}
 
-	protected function set_keys($model_class_name, $override=false)
+	protected function set_keys($model_class_name)
 	{
 		//infer from class_name
-		if (!$this->foreign_key || $override)
+		if (!$this->foreign_key)
 			$this->foreign_key = array(Inflector::instance()->keyify($model_class_name));
 
-		if (!$this->primary_key || $override)
+		if (!$this->primary_key)
 			$this->primary_key = Table::load($model_class_name)->pk;
 	}
 
@@ -509,26 +523,36 @@ class HasMany extends AbstractRelationship
 				if (!($through_relationship instanceof HasMany) && !($through_relationship instanceof BelongsTo))
 					throw new HasManyThroughAssociationException('has_many through can only use a belongs_to or has_many association');
 
-				// save old keys as we will be reseting them below for inner join convenience
-				$pk = $this->primary_key;
-				$fk = $this->foreign_key;
-
-				$this->set_keys($this->get_table()->class->getName(), true);
-				
 				$class = $this->class_name;
 				$relation = $class::table()->get_relationship($this->through);
 				$through_table = $relation->get_table();
-				$this->options['joins'] = $this->construct_join_sql($through_table, true);
-
-				// reset keys
-				$this->primary_key = $pk;
-				$this->foreign_key = $fk;
+				
+				$this->options['joins'] = $this->construct_join_sql($through_table,
+					$this->through);
 			}
 
 			$this->initialized = true;
 		}
 
-		if (!($conditions = $this->create_conditions_from_keys($model, $this->foreign_key, $this->primary_key)))
+		if ($this->through)
+		{
+			// This wrong: we are the far side of the relationship, we need
+			// the near side, which we can get from $this->through. To be
+			// revisited when https://github.com/kla/php-activerecord/issues/280
+			// has been fixed.
+			
+			$class = $this->class_name;
+			$relation = $class::table()->get_relationship($this->through);
+			$conditions = $this->create_conditions_from_keys($model,
+				$relation->foreign_key, $this->primary_key);
+		}
+		else
+		{
+			$conditions = $this->create_conditions_from_keys($model,
+				$this->foreign_key, $this->primary_key);
+		}
+		
+		if (!$conditions)
 			return null;
 
 		$options = $this->unset_non_finder_options($this->options);
