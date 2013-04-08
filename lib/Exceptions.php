@@ -146,4 +146,25 @@ class RelationshipException extends ActiveRecordException {};
  * @package ActiveRecord
  */
 class HasManyThroughAssociationException extends RelationshipException {};
+
+class UndefinedAssociationException extends HasManyThroughAssociationException
+{
+	/**
+	 * Sets the exception message to show the undefined property's name.
+	 *
+	 * @param str $property_name name of undefined property
+	 * @return void
+	 */
+	public function __construct($class_name, $association_name,
+		$actual_associations)
+	{
+		$message = "Undefined association: ".
+			"{$class_name}->{$association_name} (should be one of: ".
+			join(', ', array_keys($actual_associations)).") ".
+			"at {$this->file}:{$this->line}";
+		
+		parent::__construct($message);
+	}
+};
+
 ?>

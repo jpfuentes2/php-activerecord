@@ -488,8 +488,11 @@ class HasMany extends AbstractRelationship
 			if ($this->through)
 			{
 				// verify through is a belongs_to or has_many for access of keys
+				
 				if (!($through_relationship = $this->get_table()->get_relationship($this->through)))
-					throw new HasManyThroughAssociationException("Could not find the association $this->through in model " . get_class($model));
+					throw new UndefinedAssociationException(
+						$this->get_table()->class->getName(), $this->through,
+						$this->get_table()->get_relationships());
 
 				if (!($through_relationship instanceof HasMany) && !($through_relationship instanceof BelongsTo))
 					throw new HasManyThroughAssociationException('has_many through can only use a belongs_to or has_many association');

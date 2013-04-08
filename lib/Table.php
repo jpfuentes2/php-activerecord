@@ -258,7 +258,7 @@ class Table
 	/**
 	 * Executes an eager load of a given named relationship for this table.
 	 *
-	 * @param $models array found modesl for this table
+	 * @param $models array found models for this table
 	 * @param $attrs array of attrs from $models
 	 * @param $includes array eager load directives
 	 * @return void
@@ -302,6 +302,16 @@ class Table
 			$table = $this->conn->quote_name($this->db_name) . ".$table";
 
 		return $table;
+	}
+
+	/**
+	 * Retrieve all relationship objects for this table.
+	 *
+	 * @return Array of Relationship objects
+	 */
+	public function get_relationships()
+	{
+		return $this->relationships;
 	}
 
 	/**
