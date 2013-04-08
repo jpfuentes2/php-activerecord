@@ -4,7 +4,7 @@ CREATE TABLE authors(
 	name VARCHAR(25) NOT NULL DEFAULT 'default_name',
 	updated_at datetime,
 	created_at datetime,
-	some_date date,
+	some_Date date,
 	some_time time,
 	some_text text,
 	some_enum enum('a','b','c'),
@@ -98,4 +98,10 @@ CREATE TABLE user_newsletters (
     id INT NOT NULL AUTO_INCREMENT PRIMARY KEY,
     user_id INT NOT NULL,
     newsletter_id INT NOT NULL
+) ENGINE=InnoDB;
+
+CREATE TABLE valuestore (
+  `id` INT NOT NULL AUTO_INCREMENT PRIMARY KEY,
+  `key` varchar(20) NOT NULL DEFAULT '',
+  `value` varchar(255) NOT NULL DEFAULT ''
 ) ENGINE=InnoDB;

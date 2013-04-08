@@ -24,7 +24,11 @@ class DatabaseTest extends SnakeCase_PHPUnit_Framework_TestCase
 		}
 
 		$this->connection_name = $connection_name;
-		$this->conn = ActiveRecord\ConnectionManager::get_connection($connection_name);
+		try {
+			$this->conn = ActiveRecord\ConnectionManager::get_connection($connection_name);
+		} catch (ActiveRecord\DatabaseException $e) {
+			$this->mark_test_skipped($connection_name . ' failed to connect. '.$e->getMessage());
+		}
 
 		$GLOBALS['ACTIVERECORD_LOG'] = false;
 

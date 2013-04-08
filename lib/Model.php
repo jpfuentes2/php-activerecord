@@ -464,9 +464,16 @@ class Model
 	public function assign_attribute($name, $value)
 	{
 		$table = static::table();
-
-		if (array_key_exists($name,$table->columns) && !is_object($value))
-			$value = $table->columns[$name]->cast($value,static::connection());
+		if (!is_object($value)) {
+			if (array_key_exists($name, $table->columns)) {
+				$value = $table->columns[$name]->cast($value, static::connection());
+			} else {
+				$col = $table->get_column_by_inflected_name($name);
+				if (!is_null($col)){
+					$value = $col->cast($value, static::connection());
+				}
+			}
+		}
 
 		// convert php's \DateTime to ours
 		if ($value instanceof \DateTime)
@@ -580,7 +587,7 @@ class Model
 	 */
 	public function attribute_is_dirty($attribute)
 	{
-		return $this->__dirty && $this->__dirty[$attribute] && array_key_exists($attribute, $this->attributes);
+		return $this->__dirty && isset($this->__dirty[$attribute]) && array_key_exists($attribute, $this->attributes);
 	}
 
 	/**

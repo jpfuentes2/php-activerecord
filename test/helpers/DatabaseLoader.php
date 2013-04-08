@@ -45,10 +45,11 @@ class DatabaseLoader
 			$this->load_fixture_data($table);
 		}
 
+		$after_fixtures = $this->db->protocol.'-after-fixtures';
 		try {
-			$this->exec_sql_script("{$this->db->protocol}-after-fixtures");
+			$this->exec_sql_script($after_fixtures);
 		} catch (Exception $e) {
-			// ignore
+			// pass
 		}
 	}
 
@@ -125,7 +126,7 @@ class DatabaseLoader
 			$table = $this->quote_name($table);
 
 			foreach ($fields as &$name)
-				$name = $this->quote_name($name);
+				$name = $this->quote_name(trim($name));
 
 			$fields = join(',',$fields);
 

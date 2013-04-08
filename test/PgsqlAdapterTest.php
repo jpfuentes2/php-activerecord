@@ -36,5 +36,10 @@ class PgsqlAdapterTest extends AdapterTest
 		$conn = ActiveRecord\Connection::instance($connection_string . '?charset=utf8');
 		$this->assert_equals("SET NAMES 'utf8'",$conn->last_query);
 	}
+
+	public function test_gh96_columns_not_duplicated_by_index()
+	{
+		$this->assert_equals(3,$this->conn->query_column_info("user_newsletters")->rowCount());
+	}
 }
 ?>

@@ -1,0 +1,14 @@
+{
+    "name": "php-activerecord/php-activerecord",
+    "type": "library",
+    "description": "php-activerecord is an open source ORM library based on the ActiveRecord pattern.",
+    "keywords": ["activerecord", "orm"],
+    "homepage": "http://www.phpactiverecord.org/",
+    "license": "MIT",
+    "require": {
+        "php": ">=5.3.0"
+    },
+    "autoload": {
+        "files": [ "ActiveRecord.php" ]
+    }
+}
