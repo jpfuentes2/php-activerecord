@@ -403,6 +403,16 @@ abstract class AbstractRelationship implements InterfaceRelationship
 	{
 		return NULL;
 	}
+
+	protected function set_keys($model_class_name)
+	{
+		//infer from class_name
+		if (!$this->foreign_key)
+			$this->foreign_key = array(Inflector::instance()->keyify($model_class_name));
+
+		if (!$this->primary_key)
+			$this->primary_key = Table::load($model_class_name)->pk;
+	}
 };
 
 /**
@@ -497,16 +507,6 @@ class HasMany extends AbstractRelationship
 	public function get_through_relationship_name()
 	{
 		return $this->through;
-	}
-
-	protected function set_keys($model_class_name)
-	{
-		//infer from class_name
-		if (!$this->foreign_key)
-			$this->foreign_key = array(Inflector::instance()->keyify($model_class_name));
-
-		if (!$this->primary_key)
-			$this->primary_key = Table::load($model_class_name)->pk;
 	}
 
 	public function load(Model $model)
