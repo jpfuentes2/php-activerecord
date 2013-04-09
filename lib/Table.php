@@ -498,6 +498,7 @@ class Table
 			{
 				$relationship = null;
 				$definition += compact('namespace');
+				$definition['from']= $this;
 
 				switch ($name)
 				{

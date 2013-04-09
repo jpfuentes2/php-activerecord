@@ -58,6 +58,12 @@ abstract class AbstractRelationship implements InterfaceRelationship
 	 * @var boolean
 	 */
 	protected $poly_relationship = false;
+	
+	/**
+	 * The Table where the relationship originates from; used to look up
+	 * any 'through' relationship.
+	 */
+	protected $from_table;
 
 	/**
 	 * List of valid options for relationships.
@@ -94,6 +100,8 @@ abstract class AbstractRelationship implements InterfaceRelationship
 
 		if (!$this->foreign_key && isset($this->options['foreign_key']))
 			$this->foreign_key = is_array($this->options['foreign_key']) ? $this->options['foreign_key'] : array($this->options['foreign_key']);
+		
+		$this->from_table = $options['from'];
 	}
 
 	protected function get_table()
