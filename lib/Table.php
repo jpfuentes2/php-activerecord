@@ -152,8 +152,8 @@ class Table
 						$nullable = FALSE;
 					}
 
-					$ret .= $rel->construct_join_sql($this,
-						$rel->get_through_relationship_name(), $alias,
+					$ret .= $rel->construct_join_sql(FALSE /* we are following
+						the relationship, so it's not reversed */, $alias,
 						$nullable ? "LEFT OUTER" : "INNER");
 				}
 				else
