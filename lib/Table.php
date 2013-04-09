@@ -161,6 +161,18 @@ class Table
 					{
 						$nullable = FALSE;
 					}
+					
+					$through_rel_name = $rel->get_through_relationship_name();
+					if ($through_rel_name)
+					{
+						// Need to add this relationship before we can
+						// join through it to the target table.
+						$through_rel = $this->get_relationship($through_rel_name);
+						$ret .= $through_rel->construct_join_sql(FALSE 
+							/* irrelevant on non-through joins */,
+							NULL /* no alias */,
+							$nullable ? "LEFT OUTER" : "INNER")." ";
+					}
 
 					$ret .= $rel->construct_join_sql(FALSE /* we are following
 						the relationship, so it's not reversed */, $alias,
