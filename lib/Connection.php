@@ -26,6 +26,11 @@ abstract class Connection
 	 */
 	public $connection;
 	/**
+	 * The string used to describe the database to PDO
+	 * @var string
+	 */
+	public $connection_string;
+	/**
 	 * The last query run.
 	 * @var string
 	 */
@@ -35,13 +40,13 @@ abstract class Connection
 	 *
 	 * @var bool
 	 */
-	private $logging = false;
+	public $logging = false;
 	/**
 	 * Contains a Logger object that must impelement a log() method.
 	 *
 	 * @var object
 	 */
-	private $logger;
+	public $logger;
 	/**
 	 * The name of the protocol that is used.
 	 * @var string
@@ -74,12 +79,23 @@ abstract class Connection
 	 *   Everything after the protocol:// part is specific to the connection adapter.
 	 *   OR
 	 *   A connection name that is set in ActiveRecord\Config
+	 *   OR
+	 *   A live PDO connection (PDO object)
 	 *   If null it will use the default connection specified by ActiveRecord\Config->set_default_connection
 	 * @return Connection
 	 * @see parse_connection_url
 	 */
 	public static function instance($connection_string_or_connection_name=null)
 	{
+		// Allow user to poke a live Connection into the Config and
+		// have that used instead of opening a new Connection. Useful
+		// for testing with sqlite memory databases, where every time
+		// you open one, you get a different database.
+		if ($connection_string_or_connection_name instanceof Connection)
+		{
+			return $connection_string_or_connection_name;
+		}
+		
 		$config = Config::instance();
 
 		if (strpos($connection_string_or_connection_name, '://') === false)
@@ -87,6 +103,12 @@ abstract class Connection
 			$connection_string = $connection_string_or_connection_name ?
 				$config->get_connection($connection_string_or_connection_name) :
 				$config->get_default_connection_string();
+			
+			if (!$connection_string)
+			{
+				throw new DatabaseException("Empty connection string for ".
+					"connection name '$connection_string_or_connection_name'");
+			}
 		}
 		else
 			$connection_string = $connection_string_or_connection_name;
@@ -95,39 +117,7 @@ abstract class Connection
 			throw new DatabaseException("Empty connection string");
 
 		$info = static::parse_connection_url($connection_string);
-		$fqclass = static::load_adapter_class($info->protocol);
-
-		try {
-			$connection = new $fqclass($info);
-			$connection->protocol = $info->protocol;
-			$connection->logging = $config->get_logging();
-			$connection->logger = $connection->logging ? $config->get_logger() : null;
-
-			if (isset($info->charset))
-				$connection->set_encoding($info->charset);
-		} catch (PDOException $e) {
-			throw new DatabaseException($e);
-		}
-		return $connection;
-	}
-
-	/**
-	 * Loads the specified class for an adapter.
-	 *
-	 * @param string $adapter Name of the adapter.
-	 * @return string The full name of the class including namespace.
-	 */
-	private static function load_adapter_class($adapter)
-	{
-		$class = ucwords($adapter) . 'Adapter';
-		$fqclass = 'ActiveRecord\\' . $class;
-		$source = __DIR__ . "/adapters/$class.php";
-
-		if (!file_exists($source))
-			throw new DatabaseException("$fqclass not found!");
-
-		require_once($source);
-		return $fqclass;
+		return $config->create_connection($info, $connection_string);
 	}
 
 	/**
@@ -157,7 +147,10 @@ abstract class Connection
 		$url = @parse_url($connection_url);
 
 		if (!isset($url['host']))
-			throw new DatabaseException('Database host must be specified in the connection string. If you want to specify an absolute filename, use e.g. sqlite://unix(/path/to/file)');
+			throw new DatabaseException('Database host must be specified '.
+				'in the connection string. If you want to specify an '.
+				'absolute filename, use e.g. sqlite://unix(/path/to/file)',
+				$connection_url);
 
 		$info = new \stdClass();
 		$info->protocol = $url['scheme'];
@@ -236,9 +229,12 @@ abstract class Connection
 			else
 				$host = "unix_socket=$info->host";
 
-			$this->connection = new PDO("$info->protocol:$host;dbname=$info->db", $info->user, $info->pass, static::$PDO_OPTIONS);
+			$connection_string = "$info->protocol:$host;dbname=$info->db";
+
+			$this->connection = new PDO($connection_string,
+				$info->user, $info->pass, static::$PDO_OPTIONS);
 		} catch (PDOException $e) {
-			throw new DatabaseException($e);
+			throw new DatabaseException($e, $connection_string);
 		}
 	}
 
@@ -257,6 +253,14 @@ abstract class Connection
 			$c = $this->create_column($row);
 			$columns[$c->name] = $c;
 		}
+		
+		if (!count($columns))
+		{
+			throw new ConfigException("Table $table appears to have ".
+				"no columns, perhaps it doesn't exist in ".
+				$this->connection_string);
+		}
+		
 		return $columns;
 	}
 
@@ -298,18 +302,22 @@ abstract class Connection
 
 		try {
 			if (!($sth = $this->connection->prepare($sql)))
-				throw new DatabaseException($this);
+				throw new DatabaseException($this, $this->connection_string);
 		} catch (PDOException $e) {
-			throw new DatabaseException($this);
+			throw new DatabaseException("$sql: ".
+				join(", ", $this->connection->errorInfo()),
+				$this->connection_string);
 		}
 
 		$sth->setFetchMode(PDO::FETCH_ASSOC);
 
 		try {
 			if (!$sth->execute($values))
-				throw new DatabaseException($this);
+				throw new DatabaseException($this, $this->connection_string);
 		} catch (PDOException $e) {
-			throw new DatabaseException($e);
+			throw new DatabaseException("$sql ".print_r($values, TRUE).
+				": ".join(", ", $this->connection->errorInfo()),
+				$this->connection_string);
 		}
 		return $sth;
 	}
@@ -364,7 +372,7 @@ abstract class Connection
 	public function transaction()
 	{
 		if (!$this->connection->beginTransaction())
-			throw new DatabaseException($this);
+			throw new DatabaseException($this, $this->connection_string);
 	}
 
 	/**
@@ -373,7 +381,7 @@ abstract class Connection
 	public function commit()
 	{
 		if (!$this->connection->commit())
-			throw new DatabaseException($this);
+			throw new DatabaseException($this, $this->connection_string);
 	}
 
 	/**
@@ -382,7 +390,7 @@ abstract class Connection
 	public function rollback()
 	{
 		if (!$this->connection->rollback())
-			throw new DatabaseException($this);
+			throw new DatabaseException($this, $this->connection_string);
 	}
 
 	/**

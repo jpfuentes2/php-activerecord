@@ -229,6 +229,23 @@ class Model
 	 * @var array
 	 */
 	static $delegate = array();
+	
+	/**
+	 * Provides a way to keep values in a model instance that aren't
+	 * saved in the database, similar to Ruby's attr_accessor.
+	 *
+	 * <code>
+	 * class House extends ActiveRecord\Model {
+	 *   static $attr_accessor = array('colour');
+	 * }
+	 * $house->colour = "white";
+	 */
+	static $attr_accessor = array();
+	
+	/**
+	 * $attr_accessor values are stored here.
+	 */
+	private $accessible_attrs = array();
 
 	/**
 	 * Constructs a model.
@@ -341,7 +358,9 @@ class Model
 	 */
 	public function __isset($attribute_name)
 	{
-		return array_key_exists($attribute_name,$this->attributes) || array_key_exists($attribute_name,static::$alias_attribute);
+		return array_key_exists($attribute_name, $this->attributes) or
+			array_key_exists($attribute_name, static::$alias_attribute) or
+			array_key_exists($attribute_name, $this->accessible_attrs);
 	}
 
 	/**
@@ -389,7 +408,8 @@ class Model
 	 * echo $user->name; # => BOB
 	 * </code>
 	 *
-	 * @throws {@link UndefinedPropertyException} if $name does not exist
+	 * @throws {@link UndefinedPropertyException} if $name does not exist,
+	 * or is a relationship (assigning to relationships is not supported).
 	 * @param string $name Name of attribute, relationship or other to set
 	 * @param mixed $value The value
 	 * @return mixed The value
@@ -397,8 +417,9 @@ class Model
 	public function __set($name, $value)
 	{
 		if (array_key_exists($name, static::$alias_attribute))
+		{
 			$name = static::$alias_attribute[$name];
-
+		}	
 		elseif (method_exists($this,"set_$name"))
 		{
 			$name = "set_$name";
@@ -411,13 +432,20 @@ class Model
 		if ($name == 'id')
 			return $this->assign_attribute($this->get_primary_key(true),$value);
 
+		if (in_array($name, static::$attr_accessor))
+		{
+			$this->accessible_attrs[$name] = $value;
+			return $value;
+		}
+
 		foreach (static::$delegate as &$item)
 		{
 			if (($delegated_name = $this->is_delegated($name,$item)))
 				return $this->$item['to']->$delegated_name = $value;
 		}
 
-		throw new UndefinedPropertyException(get_called_class(),$name);
+		throw new UndefinedPropertyException(get_called_class(), $name,
+			array_merge($this->attributes, array_flip(static::$attr_accessor)));
 	}
 
 	public function __wakeup()
@@ -480,6 +508,9 @@ class Model
 		if (array_key_exists($name,$this->attributes))
 			return $this->attributes[$name];
 
+		if (in_array($name, static::$attr_accessor))
+			return $this->accessible_attrs[$name];
+
 		// check relationships if no attribute
 		if (array_key_exists($name,$this->__relationships))
 			return $this->__relationships[$name];
@@ -518,7 +549,8 @@ class Model
 			}
 		}
 
-		throw new UndefinedPropertyException(get_called_class(),$name);
+		throw new UndefinedPropertyException(get_called_class(), $name,
+			$this->attributes);
 	}
 
 	/**
@@ -796,25 +828,25 @@ class Model
 		if (!($attributes = $this->dirty_attributes()))
 			$attributes = $this->attributes;
 
-		$pk = $this->get_primary_key(true);
+		$pks = $this->get_primary_key();
 		$use_sequence = false;
 
-		if ($table->sequence && !isset($attributes[$pk]))
+		if ($table->sequence && !isset($attributes[$pks[0]]))
 		{
 			if (($conn = static::connection()) instanceof OciAdapter)
 			{
 				// terrible oracle makes us select the nextval first
-				$attributes[$pk] = $conn->get_next_sequence_value($table->sequence);
+				$attributes[$pks[0]] = $conn->get_next_sequence_value($table->sequence);
 				$table->insert($attributes);
-				$this->attributes[$pk] = $attributes[$pk];
+				$this->attributes[$pks[0]] = $attributes[$pks[0]];
 			}
 			else
 			{
 				// unset pk that was set to null
-				if (array_key_exists($pk,$attributes))
-					unset($attributes[$pk]);
+				if (array_key_exists($pks[0],$attributes))
+					unset($attributes[$pks[0]]);
 
-				$table->insert($attributes,$pk,$table->sequence);
+				$table->insert($attributes,$pks[0],$table->sequence);
 				$use_sequence = true;
 			}
 		}
@@ -822,13 +854,12 @@ class Model
 			$table->insert($attributes);
 
 		// if we've got an autoincrementing/sequenced pk set it
-		// don't need this check until the day comes that we decide to support composite pks
-		// if (count($pk) == 1)
+		if (!isset($attributes[$pks[0]]))
 		{
-			$column = $table->get_column_by_inflected_name($pk);
+			$column = $table->get_column_by_inflected_name($pks[0]);
 
 			if ($column->auto_increment || $use_sequence)
-				$this->attributes[$pk] = static::connection()->insert_id($table->sequence);
+				$this->attributes[$pks[0]] = static::connection()->insert_id($table->sequence);
 		}
 
 		$this->invoke_callback('after_create',false);
@@ -1200,7 +1231,8 @@ class Model
 		}
 
 		if (!empty($exceptions))
-			throw new UndefinedPropertyException(get_called_class(),$exceptions);
+			throw new UndefinedPropertyException(get_called_class(),
+				$exceptions, $this->attributes);
 	}
 
 	/**
@@ -1381,7 +1413,8 @@ class Model
 			}
 		}
 
-		throw new ActiveRecordException("Call to undefined method: $method");
+		throw new ActiveRecordException("Call to undefined method: ".
+			get_class($this)."::$method");
 	}
 
 	/**

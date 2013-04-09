@@ -100,7 +100,16 @@ class Table
 			ConnectionManager::drop_connection($connection);
 			static::clear_cache();
 		}
-		return ($this->conn = ConnectionManager::get_connection($connection));
+		
+		try
+		{
+			return ($this->conn = ConnectionManager::get_connection($connection));
+		}
+		catch (DatabaseException $e)
+		{
+			throw new DatabaseException("Failed to open ".
+				"connection for $this->class: $e");
+		}
 	}
 
 	public function create_joins($joins)
@@ -134,7 +143,40 @@ class Table
 						$alias = null;
 					}
 
-					$ret .= $rel->construct_inner_join_sql($this, false, $alias);
+					if (!$rel->is_poly() and $rel->foreign_key)
+					{
+						if (!array_key_exists($rel->foreign_key[0],
+							$this->columns))
+						{
+							throw new DatabaseException("The specified ".
+								"foreign key ".$rel->foreign_key[0]." for ".
+								$this->table.".".$rel->attribute_name.
+								" does not exist. Valid values are: ".
+								print_r($this->columns, TRUE));
+						}
+								
+						$nullable = $this->columns[$rel->foreign_key[0]]->nullable;
+					}
+					else
+					{
+						$nullable = FALSE;
+					}
+					
+					$through_rel_name = $rel->get_through_relationship_name();
+					if ($through_rel_name)
+					{
+						// Need to add this relationship before we can
+						// join through it to the target table.
+						$through_rel = $this->get_relationship($through_rel_name);
+						$ret .= $through_rel->construct_join_sql(FALSE 
+							/* irrelevant on non-through joins */,
+							NULL /* no alias */,
+							$nullable ? "LEFT OUTER" : "INNER")." ";
+					}
+
+					$ret .= $rel->construct_join_sql(FALSE /* we are following
+						the relationship, so it's not reversed */, $alias,
+						$nullable ? "LEFT OUTER" : "INNER");
 				}
 				else
 					throw new RelationshipException("Relationship named $value has not been declared for class: {$this->class->getName()}");
@@ -239,7 +281,7 @@ class Table
 	/**
 	 * Executes an eager load of a given named relationship for this table.
 	 *
-	 * @param $models array found modesl for this table
+	 * @param $models array found models for this table
 	 * @param $attrs array of attrs from $models
 	 * @param $includes array eager load directives
 	 * @return void
@@ -286,6 +328,16 @@ class Table
 	}
 
 	/**
+	 * Retrieve all relationship objects for this table.
+	 *
+	 * @return Array of Relationship objects
+	 */
+	public function get_relationships()
+	{
+		return $this->relationships;
+	}
+
+	/**
 	 * Retrieve a relationship object for this table. Strict as true will throw an error
 	 * if the relationship name does not exist.
 	 *
@@ -300,7 +352,8 @@ class Table
 			return $this->relationships[$name];
 
 		if ($strict)
-			throw new RelationshipException("Relationship named $name has not been declared for class: {$this->class->getName()}");
+			throw new UndefinedAssociationException(
+				$this->class->getName(), $name, $this->get_relationships());
 
 		return null;
 	}
@@ -468,6 +521,7 @@ class Table
 			{
 				$relationship = null;
 				$definition += compact('namespace');
+				$definition['from']= $this;
 
 				switch ($name)
 				{

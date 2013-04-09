@@ -113,6 +113,17 @@ class Column
 	{
 		if ($value === null)
 			return null;
+			
+		/* Empty string is not an appropriate value for any
+		 * column type other than STRING. If the column is nullable,
+		 * then NULL is the closest equivalent, not the default
+		 * (0 or 1970-01-01 or whatever)
+		 */
+		if ($value === "" and $this->type != self::STRING and
+			$this->nullable)
+		{
+			return null;
+		}
 
 		switch ($this->type)
 		{
@@ -150,6 +161,20 @@ class Column
 			$this->type = self::STRING;
 
 		return $this->type;
+	}
+
+	/**
+	 * Return a useful string representation of a column type, which
+	 * happens to be valid SQL at the moment, but no guarantees.
+	 */
+	public function __toString()
+    {
+    	return $this->inflected_name." ".$this->raw_type."(".
+    		$this->length.") ".
+    		($this->nullable ? "NULL" : "NOT NULL")." ".
+    		(!is_null($this->default) ? "DEFAULT ".$this->default : "")." ".
+    		($this->pk ? "PRIMARY KEY" : "")." ".
+    		($this->auto_increment ? "AUTO_INCREMENT" : "");
 	}
 }
 ?>

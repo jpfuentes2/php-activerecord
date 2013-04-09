@@ -27,22 +27,29 @@ class RecordNotFound extends ActiveRecordException {};
  */
 class DatabaseException extends ActiveRecordException
 {
-	public function __construct($adapter_or_string_or_mystery)
+	public function __construct($adapter_or_string_or_mystery,
+		$database_connection = NULL)
 	{
+		$connection_suffix = isset($database_connection) ?
+			" ($database_connection)" : "";
+					
 		if ($adapter_or_string_or_mystery instanceof Connection)
 		{
 			parent::__construct(
-				join(", ",$adapter_or_string_or_mystery->connection->errorInfo()),
-				intval($adapter_or_string_or_mystery->connection->errorCode()));
+				join(", ",$adapter_or_string_or_mystery->connection->errorInfo()).
+				$connection_suffix);
 		}
 		elseif ($adapter_or_string_or_mystery instanceof \PDOStatement)
 		{
 			parent::__construct(
-				join(", ",$adapter_or_string_or_mystery->errorInfo()),
-				intval($adapter_or_string_or_mystery->errorCode()));
+				join(", ",$adapter_or_string_or_mystery->errorInfo()).
+				$connection_suffix);
 		}
 		else
-			parent::__construct($adapter_or_string_or_mystery);
+		{
+			parent::__construct($adapter_or_string_or_mystery.
+				$connection_suffix);
+		}
 	}
 };
 
@@ -80,7 +87,8 @@ class UndefinedPropertyException extends ModelException
 	 * @param str $property_name name of undefined property
 	 * @return void
 	 */
-	public function __construct($class_name, $property_name)
+	public function __construct($class_name, $property_name,
+		$actual_properties)
 	{
 		if (is_array($property_name))
 		{
@@ -88,7 +96,11 @@ class UndefinedPropertyException extends ModelException
 			return;
 		}
 
-		$this->message = "Undefined property: {$class_name}->{$property_name} in {$this->file} on line {$this->line}";
+		$this->message = "Undefined property: ".
+			"{$class_name}->{$property_name} (should be one of: ".
+			join(', ', array_keys($actual_properties)).") ".
+			"at {$this->file}:{$this->line}";
+		
 		parent::__construct();
 	}
 };
@@ -134,4 +146,25 @@ class RelationshipException extends ActiveRecordException {};
  * @package ActiveRecord
  */
 class HasManyThroughAssociationException extends RelationshipException {};
+
+class UndefinedAssociationException extends HasManyThroughAssociationException
+{
+	/**
+	 * Sets the exception message to show the undefined property's name.
+	 *
+	 * @param str $property_name name of undefined property
+	 * @return void
+	 */
+	public function __construct($class_name, $association_name,
+		$actual_associations)
+	{
+		$message = "Undefined association: ".
+			"{$class_name}->{$association_name} (should be one of: ".
+			join(', ', array_keys($actual_associations)).") ".
+			"at {$this->file}:{$this->line}";
+		
+		parent::__construct($message);
+	}
+};
+
 ?>

@@ -20,6 +20,16 @@ abstract class Singleton
 	 * @var array
 	 */
 	private static $instances = array();
+	
+	/**
+	 * You can subclass a Singleton and have it override the
+	 * cache slots for one of its parents by returning the
+	 * parent class name here instead.
+	 */
+	public static function cache_entry_name()
+	{
+		return get_called_class();
+	}
 
 	/**
 	 * Static method for instantiating a singleton object.
@@ -28,12 +38,16 @@ abstract class Singleton
 	 */
 	final public static function instance()
 	{
-		$class_name = get_called_class();
+		$called_class_name = get_called_class();
+		
+		$cache_entry_name = forward_static_call(array($called_class_name, 'cache_entry_name'));
+			
+		if (!isset(self::$instances[$cache_entry_name]))
+		{
+			self::$instances[$cache_entry_name] = new $called_class_name;
+		}
 
-		if (!isset(self::$instances[$class_name]))
-			self::$instances[$class_name] = new $class_name;
-
-		return self::$instances[$class_name];
+		return self::$instances[$cache_entry_name];
 	}
 
 	/**

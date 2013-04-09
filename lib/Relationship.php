@@ -58,6 +58,12 @@ abstract class AbstractRelationship implements InterfaceRelationship
 	 * @var boolean
 	 */
 	protected $poly_relationship = false;
+	
+	/**
+	 * The Table where the relationship originates from; used to look up
+	 * any 'through' relationship.
+	 */
+	protected $from_table;
 
 	/**
 	 * List of valid options for relationships.
@@ -94,6 +100,8 @@ abstract class AbstractRelationship implements InterfaceRelationship
 
 		if (!$this->foreign_key && isset($this->options['foreign_key']))
 			$this->foreign_key = is_array($this->options['foreign_key']) ? $this->options['foreign_key'] : array($this->options['foreign_key']);
+		
+		$this->from_table = $options['from'];
 	}
 
 	protected function get_table()
@@ -149,12 +157,6 @@ abstract class AbstractRelationship implements InterfaceRelationship
 			$options['include'] = $includes;
 
 		if (!empty($options['through'])) {
-			// save old keys as we will be reseting them below for inner join convenience
-			$pk = $this->primary_key;
-			$fk = $this->foreign_key;
-
-			$this->set_keys($this->get_table()->class->getName(), true);
-
 			if (!isset($options['class_name'])) {
 				$class = classify($options['through'], true);
 				if (isset($this->options['namespace']) && !class_exists($class))
@@ -166,13 +168,9 @@ abstract class AbstractRelationship implements InterfaceRelationship
 				$relation = $class::table()->get_relationship($options['through']);
 				$through_table = $relation->get_table();
 			}
-			$options['joins'] = $this->construct_inner_join_sql($through_table, true);
+			$options['joins'] = $relation->construct_join_sql(FALSE /* dunno? */);
 
 			$query_key = $this->primary_key[0];
-
-			// reset keys
-			$this->primary_key = $pk;
-			$this->foreign_key = $fk;
 		}
 
 		$options = $this->unset_non_finder_options($options);
@@ -326,57 +324,92 @@ abstract class AbstractRelationship implements InterfaceRelationship
 	/**
 	 * Creates INNER JOIN SQL for associations.
 	 *
-	 * @param Table $from_table the table used for the FROM SQL statement
-	 * @param bool $using_through is this a THROUGH relationship?
+	 * @param bool $reverse_rel TRUE if we have already joined the 
+	 *   table at the end of this relationship, and we want to join the
+	 *   far side to restrict the results; FALSE if we have not yet joined
+	 *   the table and we are just following a relationship.
 	 * @param string $alias a table alias for when a table is being joined twice
 	 * @return string SQL INNER JOIN fragment
 	 */
-	public function construct_inner_join_sql(Table $from_table, $using_through=false, $alias=null)
+	public function construct_join_sql($reverse_rel, $alias=null,
+		$join_type="INNER")
 	{
-		if ($using_through)
+		if (!empty($this->options['through']))
 		{
-			$join_table = $from_table;
-			$join_table_name = $from_table->get_fully_qualified_table_name();
-			$from_table_name = Table::load($this->class_name)->get_fully_qualified_table_name();
- 		}
-		else
-		{
-			$join_table = Table::load($this->class_name);
-			$join_table_name = $join_table->get_fully_qualified_table_name();
-			$from_table_name = $from_table->get_fully_qualified_table_name();
-		}
+			// We're joining between the intermediate and far table.
+			// The far table is already joined because it's the main
+			// table (it's the table that the results columns come from).
+			// That makes it the "from" table. The "dest" table (the one
+			// we're joining TO) is the intermediate table.
+			$through_relationship = $this->from_table->get_relationship(
+				$this->options['through'], TRUE);
 
-		// need to flip the logic when the key is on the other table
-		if ($this instanceof HasMany || $this instanceof HasOne)
-		{
-			$this->set_keys($from_table->class->getName());
-
-			if ($using_through)
+			if ($reverse_rel)
 			{
-				$foreign_key = $this->primary_key[0];
-				$join_primary_key = $this->foreign_key[0];
+				$from_table = Table::load($this->class_name);
+				$dest_table = $through_relationship->get_table();
 			}
 			else
 			{
-				$join_primary_key = $this->foreign_key[0];
-				$foreign_key = $this->primary_key[0];
+				$from_table = $through_relationship->get_table();
+				$dest_table = Table::load($this->class_name);
 			}
 		}
 		else
 		{
-			$foreign_key = $this->foreign_key[0];
-			$join_primary_key = $this->primary_key[0];
+			$from_table = $this->from_table;
+			$dest_table = Table::load($this->class_name);
 		}
 
+		/*
+		print "name = ".$this->attribute_name."\n";
+		print "through = ".(isset($this->options['through'])?$this->options['through']:"NULL").
+			", reverse=".($reverse_rel?"TRUE":"FALSE")."\n";
+		print "before set_keys(".$this->class_name."): ".
+			"primary key = ".$this->primary_key[0].", ".
+			"foreign key = ".$this->foreign_key[0]."\n";
+		*/
+		
+		$this->set_keys($this->class_name);
+
+		$dest_table_name = $dest_table->get_fully_qualified_table_name();
+		$from_table_name = $from_table->get_fully_qualified_table_name();
+
+		/*
+		print "after set_keys(".$this->class_name."): ".
+			"primary key = ".$this->primary_key[0].", ".
+			"foreign key = ".$this->foreign_key[0]."\n";
+		print "from_table_name = $from_table_name\n";
+		print "dest_table_name = $dest_table_name\n";
+		*/
+		
+		// need to flip the logic when the key is on the other table
+		// In the case of a reverse relationship, we're coming FROM
+		// the end of this relationship, so the FROM table side is the
+		// primary key, and the DEST side is the intermediate table, which
+		// has the foreign key; so we want to take this path too.
+		if (($this instanceof HasMany or $this instanceof HasOne)
+			and (empty($this->options['through']) || $reverse_rel))
+		{
+			$from_table_key = $this->primary_key[0];
+			$dest_table_key = $this->foreign_key[0];
+		}
+		else
+		{
+			$from_table_key = $this->foreign_key[0];
+			$dest_table_key = $this->primary_key[0];
+		}
+		
 		if (!is_null($alias))
 		{
-			$aliased_join_table_name = $alias = $this->get_table()->conn->quote_name($alias);
+			$aliased_dest_table_name = $alias = $this->get_table()->conn->quote_name($alias);
 			$alias .= ' ';
 		}
 		else
-			$aliased_join_table_name = $join_table_name;
+			$aliased_dest_table_name = $dest_table_name;
 
-		return "INNER JOIN $join_table_name {$alias}ON($from_table_name.$foreign_key = $aliased_join_table_name.$join_primary_key)";
+		return "$join_type JOIN $dest_table_name {$alias} ON ".
+			"($from_table_name.$from_table_key = $aliased_dest_table_name.$dest_table_key)";
 	}
 
 	/**
@@ -385,6 +418,21 @@ abstract class AbstractRelationship implements InterfaceRelationship
 	 * @param Model $model The model this relationship belongs to
 	 */
 	abstract function load(Model $model);
+
+	public function get_through_relationship_name()
+	{
+		return NULL;
+	}
+
+	protected function set_keys($model_class_name)
+	{
+		//infer from class_name
+		if (!$this->foreign_key)
+			$this->foreign_key = array(Inflector::instance()->keyify($model_class_name));
+
+		if (!$this->primary_key)
+			$this->primary_key = Table::load($model_class_name)->pk;
+	}
 };
 
 /**
@@ -475,59 +523,50 @@ class HasMany extends AbstractRelationship
 		if (!$this->class_name)
 			$this->set_inferred_class_name();
 	}
-
-	protected function set_keys($model_class_name, $override=false)
+	
+	public function get_through_relationship_name()
 	{
-		//infer from class_name
-		if (!$this->foreign_key || $override)
-			$this->foreign_key = array(Inflector::instance()->keyify($model_class_name));
-
-		if (!$this->primary_key || $override)
-			$this->primary_key = Table::load($model_class_name)->pk;
+		return $this->through;
 	}
 
 	public function load(Model $model)
 	{
-		$class_name = $this->class_name;
 		$this->set_keys(get_class($model));
-
-		// since through relationships depend on other relationships we can't do
-		// this initiailization in the constructor since the other relationship
-		// may not have been created yet and we only want this to run once
-		if (!isset($this->initialized))
-		{
-			if ($this->through)
-			{
-				// verify through is a belongs_to or has_many for access of keys
-				if (!($through_relationship = $this->get_table()->get_relationship($this->through)))
-					throw new HasManyThroughAssociationException("Could not find the association $this->through in model " . get_class($model));
-
-				if (!($through_relationship instanceof HasMany) && !($through_relationship instanceof BelongsTo))
-					throw new HasManyThroughAssociationException('has_many through can only use a belongs_to or has_many association');
-
-				// save old keys as we will be reseting them below for inner join convenience
-				$pk = $this->primary_key;
-				$fk = $this->foreign_key;
-
-				$this->set_keys($this->get_table()->class->getName(), true);
-				
-				$class = $this->class_name;
-				$relation = $class::table()->get_relationship($this->through);
-				$through_table = $relation->get_table();
-				$this->options['joins'] = $this->construct_inner_join_sql($through_table, true);
-
-				// reset keys
-				$this->primary_key = $pk;
-				$this->foreign_key = $fk;
-			}
-
-			$this->initialized = true;
-		}
-
-		if (!($conditions = $this->create_conditions_from_keys($model, $this->foreign_key, $this->primary_key)))
-			return null;
+		$class_name = $this->class_name;
 
 		$options = $this->unset_non_finder_options($this->options);
+
+		if ($this->through)
+		{
+			$through_relation = $model::table()->get_relationship($this->through, TRUE);
+			
+			if (!isset($this->initialized))
+			{
+				// verify through is a belongs_to or has_many for access of keys
+				
+				if (!($through_relation instanceof HasMany) &&
+					!($through_relation instanceof BelongsTo))
+					throw new HasManyThroughAssociationException('has_many through can only use a belongs_to or has_many association');
+
+				$options['joins'] = $this->construct_join_sql(TRUE
+					/* we have already joined the model at the end of this
+					relationship, so we are using it in reverse */);
+				// print "joins = ".$options['joins']."\n";
+			}
+			
+			$through_relation->set_keys(get_class($model));	
+			$conditions = $through_relation->create_conditions_from_keys($model,
+				$through_relation->foreign_key, $through_relation->primary_key);
+		}
+		else
+		{
+			$conditions = $this->create_conditions_from_keys($model,
+				$this->foreign_key, $this->primary_key);
+		}
+		
+		if (!$conditions)
+			return null;
+
 		$options['conditions'] = $conditions;
 		return $class_name::find($this->poly_relationship ? 'all' : 'first',$options);
 	}

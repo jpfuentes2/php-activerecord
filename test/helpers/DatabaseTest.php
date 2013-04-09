@@ -32,12 +32,17 @@ class DatabaseTest extends SnakeCase_PHPUnit_Framework_TestCase
 
 		$GLOBALS['ACTIVERECORD_LOG'] = false;
 
-		$loader = new DatabaseLoader($this->conn);
-		$loader->reset_table_data();
+		$this->reset_table_data();
 
 		if (self::$log)
 			$GLOBALS['ACTIVERECORD_LOG'] = true;
 	}
+	
+	public function reset_table_data()
+	{
+		$loader = new DatabaseLoader($this->conn);
+		$loader->reset_table_data();
+	}	
 
 	public function tear_down()
 	{
