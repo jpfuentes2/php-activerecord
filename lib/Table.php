@@ -352,7 +352,8 @@ class Table
 			return $this->relationships[$name];
 
 		if ($strict)
-			throw new RelationshipException("Relationship named $name has not been declared for class: {$this->class->getName()}");
+			throw new UndefinedAssociationException(
+				$this->class->getName(), $name, $this->get_relationships());
 
 		return null;
 	}
