@@ -145,6 +145,16 @@ class Table
 
 					if (!$rel->is_poly() and $rel->foreign_key)
 					{
+						if (!array_key_exists($rel->foreign_key[0],
+							$this->columns))
+						{
+							throw new DatabaseException("The specified ".
+								"foreign key ".$rel->foreign_key[0]." for ".
+								$this->table.".".$rel->attribute_name.
+								" does not exist. Valid values are: ".
+								print_r($this->columns, TRUE));
+						}
+								
 						$nullable = $this->columns[$rel->foreign_key[0]]->nullable;
 					}
 					else
