@@ -1,5 +1,4 @@
 <?php
-include 'helpers/config.php';
 use ActiveRecord\DateTime;
 
 class DirtyAuthor extends ActiveRecord\Model
