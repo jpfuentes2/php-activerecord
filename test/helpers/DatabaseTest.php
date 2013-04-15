@@ -1,5 +1,5 @@
 <?php
-require_once 'DatabaseLoader.php';
+require_once __DIR__ . '/DatabaseLoader.php';
 
 class DatabaseTest extends SnakeCase_PHPUnit_Framework_TestCase
 {
