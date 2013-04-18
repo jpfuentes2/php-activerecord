@@ -457,6 +457,8 @@ class Table
 					$this->pk[] = $c->inflected_name;
 			}
 		}
+		// make sure the primary key is stored in lowercase
+		$this->pk = array_map('strtolower', $this->pk);
 	}
 
 	private function set_table_name()
