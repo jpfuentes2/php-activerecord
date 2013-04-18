@@ -93,6 +93,15 @@ class Model
 	 * @var array
 	 */
 	private $__dirty = null;
+	
+	/**
+	 * Flag whether or not this model has been validated. Only used in is_valid and _validate
+	 *
+	 * @var boolean
+	 * @see is_valid
+	 * @see is_invalid
+	 */
+	private $__validated = false;
 
 	/**
 	 * Flag that determines of this model can have a writer method invoked such as: save/update/insert/delete
@@ -1040,6 +1049,8 @@ class Model
 	private function _validate()
 	{
 		require_once 'Validations.php';
+		
+		$this->__validated = false;
 
 		$validator = new Validations($this);
 		$validation_on = 'validation_on_' . ($this->is_new_record() ? 'create' : 'update');
@@ -1079,9 +1090,13 @@ class Model
 	 * @see is_invalid
 	 * @return boolean
 	 */
-	public function is_valid()
+	public function is_valid($force_validation = false)
 	{
-		return $this->_validate();
+		if(!$this->__validated || $force_validation)
+			return $this->_validate();
+
+		// If validated without errors, then it's valid
+		return empty($this->errors);
 	}
 
 	/**
@@ -1090,9 +1105,9 @@ class Model
 	 * @see is_valid
 	 * @return boolean
 	 */
-	public function is_invalid()
+	public function is_invalid($force_validation = false)
 	{
-		return !$this->_validate();
+		return !$this->is_valid($force_validation);
 	}
 
 	/**
@@ -1239,19 +1254,18 @@ class Model
 	 */
 	public function reload()
 	{
-		$this->__relationships = array();
+		$this->clear_state();
+		
 		$pk = array_values($this->get_values_for($this->get_primary_key()));
 
 		$this->set_attributes_via_mass_assignment($this->find($pk)->attributes, false);
-		$this->reset_dirty();
 
 		return $this;
 	}
 
 	public function __clone()
-	{
-		$this->__relationships = array();
-		$this->reset_dirty();
+	{	
+		$this->clear_state();
 		return $this;
 	}
 
@@ -1263,6 +1277,16 @@ class Model
 	public function reset_dirty()
 	{
 		$this->__dirty = null;
+	}
+	
+	/**
+	 * Clear the state of model.
+	 */
+	public function clear_state() {
+		$this->reset_dirty();
+		$this->__relationships = array();
+		$this->__validated = false;
+		$this->errors = array();
 	}
 
 	/**
