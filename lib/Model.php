@@ -1096,7 +1096,7 @@ class Model
 			return $this->_validate();
 
 		// If validated without errors, then it's valid
-		return empty($this->errors);
+		return $this->errors->is_empty();
 	}
 
 	/**
