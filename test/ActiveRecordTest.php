@@ -167,8 +167,19 @@ class ActiveRecordTest extends DatabaseTest
 	public function test_active_record_model_home_not_set()
 	{
 		$home = ActiveRecord\Config::instance()->get_model_directory();
-		ActiveRecord\Config::instance()->set_model_directory(__FILE__);
+		ActiveRecord\Config::instance()->set_model_directory(__DIR__);
 		$this->assert_equals(false,class_exists('TestAutoload'));
+
+		ActiveRecord\Config::instance()->set_model_directory($home);
+	}
+
+	public function test_auto_load_with_model_in_secondary_model_directory(){
+		$home = ActiveRecord\Config::instance()->get_model_directory();
+		ActiveRecord\Config::instance()->set_model_directories(array(
+			realpath(__DIR__ . '/models'),
+			realpath(__DIR__ . '/backup-models'),
+		));
+		$this->assert_true(class_exists('Backup'));
 
 		ActiveRecord\Config::instance()->set_model_directory($home);
 	}
@@ -176,6 +187,17 @@ class ActiveRecordTest extends DatabaseTest
 	public function test_auto_load_with_namespaced_model()
 	{
 		$this->assert_true(class_exists('NamespaceTest\Book'));
+	}
+
+	public function test_auto_load_with_namespaced_model_in_secondary_model_directory(){
+		$home = ActiveRecord\Config::instance()->get_model_directory();
+		ActiveRecord\Config::instance()->set_model_directories(array(
+			realpath(__DIR__ . '/models'),
+			realpath(__DIR__ . '/backup-models'),
+		));
+		$this->assert_true(class_exists('NamespaceTest\Backup'));
+
+		ActiveRecord\Config::instance()->set_model_directory($home);
 	}
 
 	public function test_namespace_gets_stripped_from_table_name()

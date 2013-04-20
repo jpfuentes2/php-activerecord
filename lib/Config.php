@@ -56,7 +56,7 @@ class Config extends Singleton
 	 * @see activerecord_autoload
 	 * @var array
 	 */
-	private $model_directories;
+	private $model_directories = array();
 
 	/**
 	 * Switch for logging.
@@ -192,19 +192,18 @@ class Config extends Singleton
 	/**
 	 * Sets the directory where models are located.
 	 *
-	 * @param string $dir Directory path containing your models
+	 * @param string $directory Directory path containing your models
 	 * @return void
 	 */
-	public function set_model_directory($dir)
+	public function set_model_directory($directory)
 	{
-		$this->set_model_directories(array($dir));
+		$this->set_model_directories(array($directory));
 	}
 	
 	/**
-	 * Returns the model directory.
+	 * Returns the first model directory.
 	 *
 	 * @return string
-	 * @throws ConfigException if specified directory was not found
 	 */
 	public function get_model_directory()
 	{
@@ -215,30 +214,30 @@ class Config extends Singleton
 	/**
 	 * Sets the directories where models are located.
 	 *
-	 * @param array $dir Array with directory paths containing your models
+	 * @param array $directories Array with directory paths containing your models
 	 * @return void
+	 * @throws ConfigException if one of the model directories was not found
 	 */
-	public function set_model_directories(array $dirs)
+	public function set_model_directories($directories)
 	{
-		$this->model_directories = $dirs;
+		if (!is_array($directories))
+			throw new ConfigException("Directories must be an array");
+		
+		foreach($directories as $directory)
+		{
+			if(!file_exists($directory) || !is_dir($directory))
+				throw new ConfigException('Invalid or non-existent directory: '. $directory);
+		}
+		$this->model_directories = $directories;
 	}
 
 	/**
 	 * Returns the array of model directories.
 	 *
 	 * @return array
-	 * @throws ConfigException if one of the model directories was not found
 	 */
 	public function get_model_directories()
 	{
-		if ($this->model_directories)
-		{
-			foreach($this->model_directories as $model_directory)
-			{
-				if(!file_exists($model_directory))
-					throw new ConfigException('Invalid or non-existent directory: '. $model_directory);
-			}
-		}
 		return $this->model_directories;
 	}
 

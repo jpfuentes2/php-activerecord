@@ -71,6 +71,49 @@ class ConfigTest extends SnakeCase_PHPUnit_Framework_TestCase
 		$this->assert_equals('test',$this->config->get_default_connection());
 	}
 
+	/**
+	 * @expectedException ActiveRecord\ConfigException
+	 */
+	public function test_set_model_directories_must_be_array()
+	{
+		$this->config->set_model_directories(null);
+	}
+
+	/**
+	 * @expectedException ActiveRecord\ConfigException
+	 */
+	public function test_set_model_directories_directories_must_exist(){
+		$home = ActiveRecord\Config::instance()->get_model_directory();
+
+		$this->config->set_model_directories(array(
+			realpath(__DIR__ . '/models'),
+			'/some-non-existing-directory'
+		));
+
+		ActiveRecord\Config::instance()->set_model_directory($home);
+	}
+
+	public function test_set_model_directory_stores_as_array(){
+		$home = ActiveRecord\Config::instance()->get_model_directory();
+
+		$this->config->set_model_directory(realpath(__DIR__ . '/models'));
+		$this->assertInternalType('array', $this->config->get_model_directories());
+
+		ActiveRecord\Config::instance()->set_model_directory($home);
+	}
+
+	public function test_get_model_directory_returns_first_model_directory(){
+		$home = ActiveRecord\Config::instance()->get_model_directory();
+
+		$this->config->set_model_directories(array(
+			realpath(__DIR__ . '/models'),
+			realpath(__DIR__ . '/backup-models'),
+		));
+		$this->assert_equals(realpath(__DIR__ . '/models'), $this->config->get_model_directory());
+
+		ActiveRecord\Config::instance()->set_model_directory($home);
+	}
+
 	public function test_initialize_closure()
 	{
 		$test = $this;
