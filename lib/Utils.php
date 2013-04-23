@@ -101,9 +101,16 @@ function get_namespaces($class_name)
 
 function has_namespace($class_name)
 {
-	if (strpos($class_name, '\\') !== false)
-		return true;
-	return false;
+    if (strpos($class_name, '\\') !== false)
+        return true;
+    return false;
+}
+
+function has_absolute_namespace($class_name)
+{
+    if (substr($class_name, 0, 1) == '\\')
+        return true;
+    return false;
 }
 
 /**
