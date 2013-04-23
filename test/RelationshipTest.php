@@ -716,5 +716,32 @@ class RelationshipTest extends DatabaseTest
 	{
 		Author::find(999999, array('include' => array('books')));
 	}
+
+	public function test_gh_296_class_name_should_prepend_relations_namespace(){
+		NamespaceTest\Book::$belongs_to = array(array(
+			'book', 'class_name' => 'Book'
+		));
+		$relationship = NamespaceTest\Book::table()->get_relationship('book');
+		$this->assert_equals('NamespaceTest\\Book', $relationship->class_name);
+	}
+
+	/**
+	 * @expectedException ReflectionException
+	 */
+	public function test_gh_296_namespaced_class_name_should_prepend_relations_namespace(){
+		NamespaceTest\Book::$belongs_to = array(array(
+			'book', 'class_name' => 'NamespaceTest\\Book'
+		));
+		$relationship = NamespaceTest\Book::table()->get_relationship('book');
+		$this->assert_equals('NamespaceTest\\NamespaceTest\\Book', $relationship->class_name);
+	}
+
+	public function test_gh_296_root_namespaced_class_name_should_not_prepend_namespace(){
+		NamespaceTest\Book::$belongs_to = array(array(
+			'book', 'class_name' => '\\NamespaceTest\\Book'
+		));
+		$relationship = NamespaceTest\Book::table()->get_relationship('book');
+		$this->assert_equals('\\NamespaceTest\\Book', $relationship->class_name);
+	}
 };
 ?>
