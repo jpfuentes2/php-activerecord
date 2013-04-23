@@ -286,16 +286,12 @@ abstract class AbstractRelationship implements InterfaceRelationship
 
 	protected function set_class_name($class_name)
 	{
-		try {
-			$reflection = Reflections::instance()->add($class_name)->get($class_name);
-		} catch (\ReflectionException $e) {
-			if (isset($this->options['namespace'])) {
-				$class_name = $this->options['namespace'].'\\'.$class_name;
-				$reflection = Reflections::instance()->add($class_name)->get($class_name);
-			} else {
-				throw $e;
-			}
+		// Use the namespace if it exists
+		if (isset($this->options['namespace'])) {
+			$class_name = $this->options['namespace'].'\\'.$class_name;
 		}
+		
+		$reflection = Reflections::instance()->add($class_name)->get($class_name);
 
 		if (!$reflection->isSubClassOf('ActiveRecord\\Model'))
 			throw new RelationshipException("'$class_name' must extend from ActiveRecord\\Model");
