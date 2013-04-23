@@ -30,6 +30,19 @@ class CallBackTest extends DatabaseTest
 		$this->assert_equals(array($first_method,$second_method),$i_ran);
 	}
 
+	public function test_gh_266_calling_save_in_after_save_callback_uses_update_instead_of_insert()
+	{
+		$venue = new VenueAfterCreate();
+		$venue->name = 'change me';
+		$venue->city = 'Awesome City';
+		$venue->save();
+		
+		$this->assert_true(VenueAfterCreate::exists(array('conditions'=>
+		     array('name'=>'changed!'))));
+		$this->assert_false(VenueAfterCreate::exists(array('conditions'=>
+		     array('name'=>'change me'))));
+	}
+	
 	public function test_generic_callback_was_auto_registered()
 	{
 		$this->assert_has_callback('after_construct');
