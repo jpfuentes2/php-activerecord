@@ -38,6 +38,11 @@ class SqliteAdapter extends Connection
 		return $this->query("SELECT name FROM sqlite_master");
 	}
 
+	public function datetime_to_string($datetime)
+    {
+        return $datetime->format('Y-m-d h:i:s');
+    }
+
 	public function create_column($column)
 	{
 		$c = new Column();
