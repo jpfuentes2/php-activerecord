@@ -1,6 +1,4 @@
 <?php
-include 'helpers/config.php';
-
 use ActiveRecord\Cache;
 
 class CacheTest extends SnakeCase_PHPUnit_Framework_TestCase

@@ -1,7 +1,2 @@
-<phpunit>
-  <testSuites>
-    <testSuite name="default">
-      <directory>test/</directory>
-    </testSuite>
-  </testSuites>
+<phpunit bootstrap="test/helpers/config.php">
 </phpunit>
