@@ -188,7 +188,44 @@ class ActiveRecordTest extends DatabaseTest
 	{
 		$model = new NamespaceTest\Book();
 		$table = ActiveRecord\Table::load(get_class($model));
+
 		$this->assert_equals($table->get_relationship('parent_book')->foreign_key[0], 'book_id');
+		$this->assert_equals($table->get_relationship('parent_book_2')->foreign_key[0], 'book_id');
+		$this->assert_equals($table->get_relationship('parent_book_3')->foreign_key[0], 'book_id');
+	}
+
+	public function test_namespaced_relationship_associates_correctly()
+	{
+		$model = new NamespaceTest\Book();
+		$table = ActiveRecord\Table::load(get_class($model));
+
+		$this->assert_not_null($table->get_relationship('parent_book'));
+		$this->assert_not_null($table->get_relationship('parent_book_2'));
+		$this->assert_not_null($table->get_relationship('parent_book_3'));
+
+		$this->assert_not_null($table->get_relationship('pages'));
+		$this->assert_not_null($table->get_relationship('pages_2'));
+
+		$this->assert_null($table->get_relationship('parent_book_4'));
+		$this->assert_null($table->get_relationship('pages_3'));
+
+		// Should refer to the same class
+		$this->assert_same(
+			ltrim($table->get_relationship('parent_book')->class_name, '\\'),
+			ltrim($table->get_relationship('parent_book_2')->class_name, '\\')
+		);
+
+		// Should refer to different classes
+		$this->assert_not_same(
+			ltrim($table->get_relationship('parent_book_2')->class_name, '\\'),
+			ltrim($table->get_relationship('parent_book_3')->class_name, '\\')
+		);
+
+		// Should refer to the same class
+		$this->assert_same(
+			ltrim($table->get_relationship('pages')->class_name, '\\'),
+			ltrim($table->get_relationship('pages_2')->class_name, '\\')
+		);
 	}
 
 	public function test_should_have_all_column_attributes_when_initializing_with_array()
