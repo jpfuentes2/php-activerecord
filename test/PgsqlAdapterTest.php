@@ -40,11 +40,5 @@ class PgsqlAdapterTest extends AdapterTest
 	{
 		$this->assert_equals(3,$this->conn->query_column_info("user_newsletters")->rowCount());
 	}
-	
-	public function test_gh295_datetime_to_string_uses_database_specific_format()
-	{
-		$datetime = '2009-01-01 01:01:01 CEST';
-		$this->assert_equals($datetime,$this->conn->datetime_to_string(date_create($datetime)));
-	}
 }
 ?>
