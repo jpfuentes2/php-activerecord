@@ -33,11 +33,5 @@ class MysqlAdapterTest extends AdapterTest
 
 		$this->assert_true(strpos($this->conn->last_query, 'LIMIT 1') !== false);
 	}
-
-	public function test_gh295_datetime_to_string_uses_database_specific_format()
-	{
-		$datetime = '2009-01-01 01:01:01 CEST';
-		$this->assert_equals($datetime,$this->conn->datetime_to_string(date_create($datetime)));
-	}
 }
 ?>
