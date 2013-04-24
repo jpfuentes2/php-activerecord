@@ -79,26 +79,11 @@ class OptionBinder
 			$this->options['conditions'][0] .= ' AND '.$where;
 
 		if(is_array($value))
-		{
-			foreach($value as $key=>$v)
+			foreach($value as $v)
 			{
-				if(is_array($v))
-				{
-					foreach($v as $key=>$subv)
-					{
-						if(is_string($key))
-							$this->options['conditions'][$key] = $subv;
-						else
-							$this->options['conditions'][] = $subv;
-					}
-				}
-				else
-				{
-					if($v !== null)
-						$this->options['conditions'][] = $v;
-				}
+				if($v !== null)
+					$this->options['conditions'][] = $v;
 			}
-		}
 		else
 		{
 			if($value !== null)

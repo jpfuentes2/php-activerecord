@@ -1846,6 +1846,11 @@ class Model
 			$scope = static::scoped();
 		}
 		
+		if(!$scope->default_scope())
+    	{
+			return $options;
+    	}
+		
 		if($options)
 		{
 			$scope->added_unscoped_conditions = true;
