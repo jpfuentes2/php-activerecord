@@ -1270,7 +1270,7 @@ class Model
 	 *
 	 * @var array
 	 */
-	static $VALID_OPTIONS = array('conditions', 'limit', 'offset', 'order', 'select', 'joins', 'include', 'readonly', 'group', 'from', 'having', 'scope');
+	static $VALID_OPTIONS = array('conditions', 'limit', 'offset', 'order', 'select', 'joins', 'include', 'readonly', 'group', 'from', 'having', 'scope_options');
 
 	/**
 	 * Enables the use of dynamic finders and scopes.
@@ -1576,13 +1576,13 @@ class Model
 	}
 
 	/**
-	 * Returns an instance of Query, for chain sql querys. Examples:
+	 * Returns an instance of OptionBinder, for chain sql querys. Examples:
 	 * 		Model::sql()->where(...)->order(...)->limit(...) etc
-	 * @return Query
+	 * @return OptionBinder
 	 */
 	public static function sql() 
 	{
-		return new Query(get_called_class());
+		return new OptionBinder(get_called_class());
 	}
 
 	/**
@@ -1681,7 +1681,7 @@ class Model
 			$args = $args[0];
 		// anything left in $args is a find by pk
 		if ($num_args > 0 && (!isset($options['conditions']) || 
-			(isset($options['scope']) && !$options['scope']->added_unscoped_conditions)))
+			(isset($options['scope_options']) && !$options['scope_options']->added_unscoped_conditions)))
 		{
 			return static::find_by_pk($args, $options);
 		}
@@ -1835,29 +1835,35 @@ class Model
 	* @param array &$array An array
 	* @return array A valid options array
 	*/
-	protected static function append_default_scope_to_options($options)
+	public static function append_default_scope_to_options($options)
 	{
-		if(isset($options['scope']))
+		if(isset($options['scope_options']))
 		{
-			$scope = $options['scope'];
+			$scope = $options['scope_options'];
 		}
 		else
 		{
 			$scope = static::scoped();
 		}
+		
+		if($options)
+		{
+			$scope->added_unscoped_conditions = true;
+			$scope = $scope->add_scope($options);
+		}
+		
 		//Default scope is always applied last
 		if($scope->default_scope_is_enabled() && $default = $scope->default_scope())
 		{
-			if($options)
-			{
-				$scope->added_unscoped_conditions = true;
-				$scope->add_scope($options);
-			}
 			$options = $scope->add_scope($default)->get_options();
+		}
+		elseif($options)
+		{
+			$options = $scope->get_options();
 		}
 		if($scope->remove_scope_from_hash_after_adding_default_scope)
 		{
-			unset($options['scope']);
+			unset($options['scope_options']);
 		}
 		return $options;
 	}

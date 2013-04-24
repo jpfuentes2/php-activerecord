@@ -40,11 +40,15 @@ class IsNotBob extends Author
 		return self::scoped()->where('name != "Uncle Bob"');
 	} 
     
-    /** Parameterized Scope */
     public static function is_tito_call()
     {
     	return self::scoped()->where('name="tito"');
     }
+
+	public static function is_bob_call()
+	{
+		return self::scoped()->where('name=? AND name = ?','bob','bob');
+	}
     
     /** Parameterized Scope */
     public static function last_few($number)
@@ -62,6 +66,12 @@ class ScopeTest extends DatabaseTest
 	public function tear_down()
 	{
 		parent::tear_down();
+	}
+	
+	public function test_combining_scopes_creates_a_valid_query()
+	{
+		$scope = IsNotBob::is_bob_call()->is_tito_call();
+		$scope->all();
 	}
 
 	public function test_calling_count_on_a_scope_instance()
@@ -273,6 +283,19 @@ class ScopeTest extends DatabaseTest
 		$exists = IsNotBob::scoped()->disable_default_scope()->exists(
 			array('conditions'=>array('name'=>'Tito')));
 		$this->assertTrue($exists);
+	}
+	
+	public function test_calling_undefined_method_on_a_scope()
+	{
+		try
+		{
+			IsNotBob::is_tito_call()->boogalooga();
+		}
+		catch(ActiveRecord\ActiveRecordException $e)
+		{
+			return true;
+		}
+		$this->fail('No exception was thrown');
 	}
 }
 ?>

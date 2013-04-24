@@ -19,16 +19,16 @@ class ScopedAuthor extends Author {
 
 };
 
-class QueryTest extends DatabaseTest
+class OptionBinderTest extends DatabaseTest
 {
 
   public function setUp() 
   {
     parent::setUp();
-    $this->query = Author::sql();
+    $this->query = Author::scoped();
   }
 
-  public function test_all() 
+  /*public function test_all() 
   {
     $results = $this->query->all(); 
     $this->assertEquals(4, count($results));
@@ -75,6 +75,7 @@ class QueryTest extends DatabaseTest
   /**
    * @expectedException ActiveRecord\UndefinedPropertyException
    */
+   /*
   public function test_select() 
   {
     $results = $this->query->select('author_id')->all();
@@ -130,13 +131,13 @@ class QueryTest extends DatabaseTest
 
     $this->assertEquals('Uncle Bob', $results[0]->name);
     $this->assertEquals(1, count($results));
-  }
+  }*/
 
   public function test_multiple_wheres_merge()
   {
-    $query = Author::where("name = 'name'");
-    $other = Author::where(array('id' => 3, 'active' => 1))->where("category = 'movies'");
-    $query->merge($other->get_options());
+    $query = Author::scoped()->where("name = 'name'");
+    $other = $query->where(array('id' => 3, 'active' => 1))->where("category = 'movies'");
+    $query->add_scope($other->get_options());
 
     $options = $query->get_options();
     $conditions = $options['conditions'];
@@ -149,85 +150,85 @@ class QueryTest extends DatabaseTest
   /**
    * @expectedException ActiveRecord\ReadOnlyException
    */
-  public function test_readonly() 
-  {
-    $result = $this->query->readonly()->first();
-    $result->name = '';
-    $result->save();
-  }  
+  // public function test_readonly() 
+  // {
+    // $result = $this->query->readonly()->first();
+    // $result->name = '';
+    // $result->save();
+  // }  
 
-  public function test_alias_order() 
-  {
-    $this->assertEquals($this->query->order('name ASC')->first(), Author::order('name ASC')->first());
-  }
-
-  public function test_alias_limit() 
-  {
-    $this->assertEquals($this->query->limit(1)->all(), Author::limit(1)->all());
-  }
-  
-  public function test_alias_group() 
-  {
-    $this->assertEquals($this->query->group('parent_author_id')->all(), Author::group('parent_author_id')->all());
-  }
-  
-  public function test_alias_offset() 
-  {
-    $this->assertEquals($this->query->offset(2)->first(), Author::offset(2)->first());
-  }
-
-  public function test_alias_select() 
-  {
-    $this->assertEquals($this->query->select('author_id')->first(), Author::select('author_id')->first());
-  }
-
-  public function test_alias_having() 
-  {
-    $this->assertEquals($this->query->having('author_id > 2')->all(), Author::having('author_id > 2')->all());
-  }
-
-  public function test_alias_where() 
-  {
-    $this->assertEquals($this->query->where('author_id = 1')->all(), Author::where('author_id = 1')->all());
-  }
-
-  public function test_single_scope() 
-  {
-    $results = ScopedAuthor::top_three()->all();
-    $this->assertEquals(3, count($results));
-    $this->assertEquals('Bill Clinton', $results[0]->name);
-  }
-
-  public function test_single_scope_with_default_scopes() 
-  {
-    $results = ScopedAuthor::offset(1)->top_three()->limit(2)->all();
-    $this->assertEquals(2, count($results));
-    $this->assertEquals('George W. Bush', $results[0]->name);
-  }
-
-  public function test_multiple_scopes() 
-  {
-    $results = ScopedAuthor::top_three()->named_like('b')->all();
-    $this->assertEquals(3, count($results));
-    $this->assertEquals('Bill Clinton', $results[0]->name);
-    $this->assertEquals('George W. Bush', $results[1]->name);
-    $this->assertEquals('Uncle Bob', $results[2]->name);
-  }
-
-  public function test_multiple_scopes_with_default_scopes() 
-  {
-    $results = ScopedAuthor::offset(1)->top_three()->limit(2)->named_like('b')->order('author_id DESC')->all();
-    $this->assertEquals(2, count($results));
-    $this->assertEquals('Bill Clinton', $results[0]->name);
-    $this->assertEquals('George W. Bush', $results[1]->name);
-  }
-
-  public function test_multiple_wheres_in_scopes() 
-  {
-    $results = ScopedAuthor::named_like('b')->id_lower_than(4)->order('author_id DESC')->all();
-    $this->assertEquals(2, count($results));
-    $this->assertEquals('Bill Clinton', $results[0]->name);
-    $this->assertEquals('George W. Bush', $results[1]->name);
-  }
+  // public function test_alias_order() 
+  // {
+    // $this->assertEquals($this->query->order('name ASC')->first(), Author::scoped()->order('name ASC')->first());
+  // }
+// 
+  // public function test_alias_limit() 
+  // {
+    // $this->assertEquals($this->query->limit(1)->all(), Author::scoped()->limit(1)->all());
+  // }
+//   
+  // public function test_alias_group() 
+  // {
+    // $this->assertEquals($this->query->group('parent_author_id')->all(), Author::scoped()->group('parent_author_id')->all());
+  // }
+//   
+  // public function test_alias_offset() 
+  // {
+    // $this->assertEquals($this->query->offset(2)->first(), Author::scoped()->offset(2)->first());
+  // }
+// 
+  // public function test_alias_select() 
+  // {
+    // $this->assertEquals($this->query->select('author_id')->first(), Author::scoped()->select('author_id')->first());
+  // }
+// 
+  // public function test_alias_having() 
+  // {
+    // $this->assertEquals($this->query->having('author_id > 2')->all(), Author::scoped()->having('author_id > 2')->all());
+  // }
+// 
+  // public function test_alias_where() 
+  // {
+    // $this->assertEquals($this->query->where('author_id = 1')->all(), Author::scoped()->where('author_id = 1')->all());
+  // }
+// 
+  // public function test_single_scope() 
+  // {
+    // $results = ScopedAuthor::top_three()->all();
+    // $this->assertEquals(3, count($results));
+    // $this->assertEquals('Bill Clinton', $results[0]->name);
+  // }
+// 
+  // public function test_single_scope_with_default_scopes() 
+  // {
+    // $results = ScopedAuthor::scoped()->offset(1)->top_three()->limit(2)->all();
+    // $this->assertEquals(2, count($results));
+    // $this->assertEquals('George W. Bush', $results[0]->name);
+  // }
+// 
+  // public function test_multiple_scopes() 
+  // {
+    // $results = ScopedAuthor::scoped()->top_three()->named_like('b')->all();
+    // $this->assertEquals(3, count($results));
+    // $this->assertEquals('Bill Clinton', $results[0]->name);
+    // $this->assertEquals('George W. Bush', $results[1]->name);
+    // $this->assertEquals('Uncle Bob', $results[2]->name);
+  // }
+// 
+  // public function test_multiple_scopes_with_default_scopes() 
+  // {
+    // $results = ScopedAuthor::scoped()->offset(1)->top_three()->limit(2)->named_like('b')->order('author_id DESC')->all();
+    // $this->assertEquals(2, count($results));
+    // $this->assertEquals('Bill Clinton', $results[0]->name);
+    // $this->assertEquals('George W. Bush', $results[1]->name);
+  // }
+// 
+  // public function test_multiple_wheres_in_scopes() 
+  // {
+    // $results = ScopedAuthor::named_like('b')->id_lower_than(4)->order('author_id DESC')->all();
+    // $this->assertEquals(2, count($results));
+    // $this->assertEquals('Bill Clinton', $results[0]->name);
+    // $this->assertEquals('George W. Bush', $results[1]->name);
+  // }
 
 }
