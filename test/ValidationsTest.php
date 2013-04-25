@@ -19,6 +19,31 @@ class BookValidations extends ActiveRecord\Model
 	}
 }
 
+class UserValidations extends AR\Model
+{
+	static $table_name = 'user';
+    public $password_confirm;
+
+    // Only for test purpose. This will double encrypt pass from the DB!
+    public function set_password($pass)
+    {
+        $this->assign_attribute('password', static::encrypt($pass));
+    }
+
+    public function validate()
+    {
+       $this->password_confirm = static::encrypt($password_confirm); 
+       if($this->password_confirm !== $this->password)
+           $this->errors->add('password', 'Password Mismatch');
+    }
+
+    public static function encrypt($data)
+    {
+        return base64_encode($data);
+    }
+    
+}
+
 class ValuestoreValidations extends ActiveRecord\Model
 {
 	static $table_name = 'valuestore';
@@ -68,6 +93,68 @@ class ValidationsTest extends DatabaseTest
 		$book = new BookValidations();
 		$this->assert_true($book->is_invalid());
 	}
+
+    public function test_is_valid_dont_revalidate() {
+        $attrs = array(
+            'password' => 'secret',
+            'password_confirm' => 'secret'
+        );
+
+        $user = new UserValidations($attrs);
+        $invalid = !( $valid = $user->is_valid() );
+        /**
+         * The `is_valid()` method will validate the User. In this test it will 
+         * be valid.
+         * If `is_valid()` had revalidated it again, `password_confirm` would be
+         * rehashed, becoming different from `password` and then the result 
+         * would be different from precedent (and also a bug).
+         */
+        $this->assert($valid, $user->is_valid());
+        $this->assert($invalid, $user->is_invalid());
+    }
+    public function test_is_valid_will_revalidate_if_attribute_changes() {
+        $attrs = array(
+            'password' => 'bad',
+            'password_confirm' => 'secret'
+        );
+
+        $user = new UserValidations($attrs);
+        $this->assert_false($user->is_valid());
+
+        $user->password = 'secret';
+        $this->assert_true($user->is_valid());
+    }
+    public function test_is_invalid_will_revalidate_if_attribute_changes()
+    {
+        $attrs = array(
+            'password' => 'bad',
+            'password_confirm' => 'secret'
+        );
+
+        $user = new UserValidations($attrs);
+        $this->assert_true($user->is_invalid());
+
+        $user->password = 'secret';
+        $this->assert_false($user->is_invalid());
+    }
+    public function test_is_valid_must_be_forced_if_a_virtual_attribute_changes()
+    {
+        $attrs = array(
+            'password' => 'secret',
+            'password_confirm' => 'bad'
+        );
+
+        $user = new UserValidations($attrs);
+        $this->assert_false($user->is_valid());
+
+        $user->password_confirm = 'secret';
+        // Actually we check only attribute set by `__set` magic method.
+        $this->assert_false( $user->is_valid() );
+
+        // Passing `true` will force the validation of `user`, giving the 
+        // right result.
+        $this->assert_true( $user->is_valid(true) );
+    }
 
 	public function test_is_iterable()
 	{
