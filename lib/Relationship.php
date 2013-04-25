@@ -444,9 +444,9 @@ class HasMany extends AbstractRelationship
 	 *
 	 * @var array
 	 */
-	static protected $valid_association_options = array('primary_key', 'order', 'group', 'having', 'limit', 'offset', 'through', 'source');
+	static protected $valid_association_options = array('primary_key', 'order', 'group', 'having', 'limit', 'offset', 'through', 'through_key', 'source');
 
-	protected $primary_key;
+	protected $primary_key, $through_key;
 
 	private $has_one = false;
 	private $through;
@@ -461,13 +461,22 @@ class HasMany extends AbstractRelationship
 	{
 		parent::__construct($options);
 
-		if (isset($this->options['through']))
+		if(isset($this->options['through']))
 		{
 			$this->through = $this->options['through'];
 
+            if($this->options['through_key'])
+                $this->through_key = (array)$this->options['through_key'];
+            else
+                $this->through_key = &$this->foreign_key;
+
 			if (isset($this->options['source']))
 				$this->set_class_name($this->options['source']);
+
+            $this->initialized = false;
 		}
+        else
+            $this->initialized = true;
 
 		if (!$this->primary_key && isset($this->options['primary_key']))
 			$this->primary_key = is_array($this->options['primary_key']) ? $this->options['primary_key'] : array($this->options['primary_key']);
@@ -494,35 +503,8 @@ class HasMany extends AbstractRelationship
 		// since through relationships depend on other relationships we can't do
 		// this initiailization in the constructor since the other relationship
 		// may not have been created yet and we only want this to run once
-		if (!isset($this->initialized))
-		{
-			if ($this->through)
-			{
-				// verify through is a belongs_to or has_many for access of keys
-				if (!($through_relationship = $this->get_table()->get_relationship($this->through)))
-					throw new HasManyThroughAssociationException("Could not find the association $this->through in model " . get_class($model));
-
-				if (!($through_relationship instanceof HasMany) && !($through_relationship instanceof BelongsTo))
-					throw new HasManyThroughAssociationException('has_many through can only use a belongs_to or has_many association');
-
-				// save old keys as we will be reseting them below for inner join convenience
-				$pk = $this->primary_key;
-				$fk = $this->foreign_key;
-
-				$this->set_keys($this->get_table()->class->getName(), true);
-				
-				$class = $this->class_name;
-				$relation = $class::table()->get_relationship($this->through);
-				$through_table = $relation->get_table();
-				$this->options['joins'] = $this->construct_inner_join_sql($through_table, true);
-
-				// reset keys
-				$this->primary_key = $pk;
-				$this->foreign_key = $fk;
-			}
-
-			$this->initialized = true;
-		}
+		if(!$this->initialized)
+            $this->init_through();
 
 		if (!($conditions = $this->create_conditions_from_keys($model, $this->foreign_key, $this->primary_key)))
 			return null;
@@ -532,6 +514,54 @@ class HasMany extends AbstractRelationship
 		return $class_name::find($this->poly_relationship ? 'all' : 'first',$options);
 	}
 
+    public function init_through() {
+        if(!$this->through || $this->initialized)
+            return;
+
+        // verify through is a belongs_to or has_many for access of keys
+        if (!($through_relationship = $this->get_table()->get_relationship($this->through)))
+            throw new HasManyThroughAssociationException("Could not find the association $this->through in model " . get_class($model));
+
+        if (!($through_relationship instanceof HasMany) && !($through_relationship instanceof BelongsTo))
+            throw new HasManyThroughAssociationException('has_many through can only use a belongs_to or has_many association');
+
+        // save old keys as we will be reseting them below for inner join convenience
+        $pk = $this->primary_key;
+        $fk = $this->foreign_key;
+
+        $this->set_keys($this->get_table()->class->getName(), true);
+
+        $class = $this->class_name;
+        $relation = $class::table()->get_relationship($this->through);
+        $through_table = $relation->get_table();
+        $this->options['joins'] = $this->construct_inner_join_sql($through_table, true);
+
+        // reset keys
+        $this->primary_key = $pk;
+        $this->foreign_key = $fk;
+        $this->initialized = true;
+
+        return $this;
+    }
+
+    public function get_through() {
+        return $this->through;
+    }
+
+    public function is_has_many_through() {
+        return !empty($this->through);
+    }
+    public function get_joins($swap_table = false) {
+        $j = $this->options['joins'];
+        if( empty($j) )
+            return null;
+
+        if($swap_table)
+            $j = preg_replace('/`[^`]+`/', $this->get_table()->get_fully_qualified_table_name(), $j, 1);
+        return $j;
+    }
+
+    
 	private function inject_foreign_key_for_new_association(Model $model, &$attributes)
 	{
 		$this->set_keys($model);
