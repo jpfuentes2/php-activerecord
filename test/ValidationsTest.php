@@ -109,8 +109,8 @@ class ValidationsTest extends DatabaseTest
          * rehashed, becoming different from `password` and then the result 
          * would be different from precedent (and also a bug).
          */
-        $this->assert($valid, $user->is_valid());
-        $this->assert($invalid, $user->is_invalid());
+        $this->assert_equals($valid, $user->is_valid());
+        $this->assert_equals($invalid, $user->is_invalid());
     }
     public function test_is_valid_will_revalidate_if_attribute_changes() {
         $attrs = array(
