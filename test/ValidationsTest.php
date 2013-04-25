@@ -32,14 +32,15 @@ class UserValidations extends AR\Model
 
     public function validate()
     {
-       $this->password_confirm = static::encrypt($password_confirm); 
+       // Another BAD idea
+       $this->password_confirm = static::encrypt($this->password_confirm); 
        if($this->password_confirm !== $this->password)
            $this->errors->add('password', 'Password Mismatch');
     }
 
     public static function encrypt($data)
     {
-        return base64_encode($data);
+        return md5($data);
     }
     
 }
@@ -94,7 +95,8 @@ class ValidationsTest extends DatabaseTest
 		$this->assert_true($book->is_invalid());
 	}
 
-    public function test_is_valid_dont_revalidate() {
+    public function test_is_valid_does_not_revalidate()
+    {
         $attrs = array(
             'password' => 'secret',
             'password_confirm' => 'secret'
@@ -112,7 +114,9 @@ class ValidationsTest extends DatabaseTest
         $this->assert_equals($valid, $user->is_valid());
         $this->assert_equals($invalid, $user->is_invalid());
     }
-    public function test_is_valid_will_revalidate_if_attribute_changes() {
+
+    public function test_is_valid_will_revalidate_if_attribute_changes()
+    {
         $attrs = array(
             'password' => 'bad',
             'password_confirm' => 'secret'
@@ -122,6 +126,9 @@ class ValidationsTest extends DatabaseTest
         $this->assert_false($user->is_valid());
 
         $user->password = 'secret';
+        // because custom validation is codeded bad (on purpose), we have to 
+        // reset password_confirm
+        $user->password_confirm = 'secret';
         $this->assert_true($user->is_valid());
     }
     public function test_is_invalid_will_revalidate_if_attribute_changes()
@@ -135,8 +142,12 @@ class ValidationsTest extends DatabaseTest
         $this->assert_true($user->is_invalid());
 
         $user->password = 'secret';
+        // because custom validation is codeded bad (on purpose), we have to 
+        // reset password_confirm
+        $user->password_confirm = 'secret';
         $this->assert_false($user->is_invalid());
     }
+
     public function test_is_valid_must_be_forced_if_a_virtual_attribute_changes()
     {
         $attrs = array(

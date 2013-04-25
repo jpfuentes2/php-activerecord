@@ -86,7 +86,8 @@ CREATE TABLE property_amenities(
 );
 
 CREATE TABLE users (
-    id INTEGER NOT NULL PRIMARY KEY
+    id INTEGER NOT NULL PRIMARY KEY,
+    password varchar(255) NOT NULL
 );
 
 CREATE TABLE newsletters (
@@ -97,6 +98,17 @@ CREATE TABLE user_newsletters (
     id INTEGER NOT NULL PRIMARY KEY,
     user_id INTEGER NOT NULL,
     newsletter_id INTEGER NOT NULL
+);
+
+CREATE TABLE services (
+    id INT NOT NULL PRIMARY KEY,
+    code VARCHAR(255) NOT NULL
+);
+
+CREATE TABLE active_services (
+    id INT NOT NULL PRIMARY KEY,
+    user_id INT NOT NULL,
+    serv_id INT NOT NULL
 );
 
 CREATE TABLE valuestore (

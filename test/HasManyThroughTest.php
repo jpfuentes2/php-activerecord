@@ -62,17 +62,19 @@ class HasManyThroughTest extends DatabaseTest
 
 	public function test_has_many_through_rely_into_through_relation_for_foreign_key()
 	{
-		$service = Service::find(2);
-		$this->assert_equals(1, $service->users[0]->id);
+		$user = User::find(1);
+		$this->assert_not_empty($user->services);
+		$this->assert_equals(2, $user->services[0]->id);
 	}
 	public function test_has_many_through_can_be_used_in_joins()
 	{
 		$users = User::all(array(
-			'joins' => 'services',
+			'joins' => array('services'),
 			// code is a Service's field
 			'conditions' => "code = 'daily_mail'"
 		));
 		$ids = array_map(function($u){ return $u->id; }, $users);
+		$this->assert_count(2, $users);
 		$this->assert_equals(array(2,4), $ids);
 	}
 }

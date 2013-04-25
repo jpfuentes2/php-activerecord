@@ -115,13 +115,15 @@ class Table
 		foreach ($joins as $value)
 		{
 			$ret .= $space;
+            $rel_thr = false;
 
 			if (stripos($value,'JOIN ') === false)
 			{
 				if (array_key_exists($value, $this->relationships))
 				{
 					$rel = $this->get_relationship($value);
-                    if($rel instanceof HasMany && $rel->is_has_many_through()) {
+                    if($rel instanceof HasMany && $rel->is_has_many_through())
+                    {
                         $rel_thr = $rel;
                         $rel = $this->get_relationship($rel->get_through());
                     }
@@ -139,8 +141,12 @@ class Table
 					}
 
 					$ret .= $rel->construct_inner_join_sql($this, false, $alias);
+
                     if($rel_thr)
-                        $ret .= ' '.$rel_thr->init_through()->get_joins(true);
+                    {
+                        $ret .= ' '
+                             . $rel_thr->construct_inner_join_sql($rel_thr->get_table());
+                    }
 				}
 				else
 					throw new RelationshipException("Relationship named $value has not been declared for class: {$this->class->getName()}");
@@ -217,6 +223,8 @@ class Table
 	public function find_by_sql($sql, $values=null, $readonly=false, $includes=null)
 	{
 		$this->last_sql = $sql;
+        //~ var_dump("$sql\n", $values);
+        //~ exit;
 
 		$collect_attrs_for_includes = is_null($includes) ? false : true;
 		$list = $attrs = array();

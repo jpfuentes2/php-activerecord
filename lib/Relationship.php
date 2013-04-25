@@ -96,7 +96,7 @@ abstract class AbstractRelationship implements InterfaceRelationship
 			$this->foreign_key = is_array($this->options['foreign_key']) ? $this->options['foreign_key'] : array($this->options['foreign_key']);
 	}
 
-	protected function get_table()
+	public function get_table()
 	{
 		return Table::load($this->class_name);
 	}
@@ -333,11 +333,27 @@ abstract class AbstractRelationship implements InterfaceRelationship
 	 */
 	public function construct_inner_join_sql(Table $from_table, $using_through=false, $alias=null)
 	{
+        list($from_table, $join_table, $foreign_key, $join_primary_key)
+            = $this->get_join_tables_and_keys($from_table, $using_through);
+
+		if (!is_null($alias))
+		{
+			$aliased_join_table = $alias = $this->get_table()->conn->quote_name($alias);
+			$alias .= ' ';
+		}
+		else
+			$aliased_join_table = $join_table;
+
+		return "INNER JOIN $join_table {$alias}ON($from_table.$foreign_key = $aliased_join_table.$join_primary_key)";
+	}
+
+    protected function get_join_tables_and_keys(Table $from_table, $using_through)
+    {
 		if ($using_through)
 		{
-			$join_table = $from_table;
-			$join_table_name = $from_table->get_fully_qualified_table_name();
-			$from_table_name = Table::load($this->class_name)->get_fully_qualified_table_name();
+            $join_table = $from_table;
+            $join_table_name = $from_table->get_fully_qualified_table_name();
+            $from_table_name = Table::load($class_name)->get_fully_qualified_table_name();
  		}
 		else
 		{
@@ -347,20 +363,11 @@ abstract class AbstractRelationship implements InterfaceRelationship
 		}
 
 		// need to flip the logic when the key is on the other table
-		if ($this instanceof HasMany || $this instanceof HasOne)
+        if ($this instanceof HasMany || $this instanceof HasOne)
 		{
 			$this->set_keys($from_table->class->getName());
-
-			if ($using_through)
-			{
-				$foreign_key = $this->primary_key[0];
-				$join_primary_key = $this->through_key[0];
-			}
-			else
-			{
-				$join_primary_key = $this->foreign_key[0];
-				$foreign_key = $this->primary_key[0];
-			}
+            $foreign_key = $this->primary_key[0];
+            $join_primary_key = $this->foreign_key[0];
 		}
 		else
 		{
@@ -368,16 +375,8 @@ abstract class AbstractRelationship implements InterfaceRelationship
 			$join_primary_key = $this->primary_key[0];
 		}
 
-		if (!is_null($alias))
-		{
-			$aliased_join_table_name = $alias = $this->get_table()->conn->quote_name($alias);
-			$alias .= ' ';
-		}
-		else
-			$aliased_join_table_name = $join_table_name;
-
-		return "INNER JOIN $join_table_name {$alias}ON($from_table_name.$foreign_key = $aliased_join_table_name.$join_primary_key)";
-	}
+        return array($from_table_name, $join_table_name, $foreign_key, $join_primary_key);
+    }
 
 	/**
 	 * This will load the related model data.
@@ -446,10 +445,10 @@ class HasMany extends AbstractRelationship
 	 */
 	static protected $valid_association_options = array('primary_key', 'order', 'group', 'having', 'limit', 'offset', 'through', 'source');
 
+	protected $through;
 	protected $primary_key;
 
 	private $has_one = false;
-	private $through;
 
 	/**
 	 * Constructs a {@link HasMany} relationship.
@@ -497,8 +496,13 @@ class HasMany extends AbstractRelationship
 		// since through relationships depend on other relationships we can't do
 		// this initiailization in the constructor since the other relationship
 		// may not have been created yet and we only want this to run once
-		if(!$this->initialized)
+        if( $this->is_has_many_through() ) {
             $this->init_through();
+            $class = get_class($model);
+            $rel = $class::table()->get_relationship($this->through);
+            $rel->set_keys( get_class($model) );
+            $this->foreign_key = $rel->foreign_key;
+        }
 
 		if (!($conditions = $this->create_conditions_from_keys($model, $this->foreign_key, $this->primary_key)))
 			return null;
@@ -508,7 +512,8 @@ class HasMany extends AbstractRelationship
 		return $class_name::find($this->poly_relationship ? 'all' : 'first',$options);
 	}
 
-    public function init_through() {
+    public function init_through()
+    {
         if(!$this->through || $this->initialized)
             return;
 
@@ -528,7 +533,6 @@ class HasMany extends AbstractRelationship
         $class = $this->class_name;
         $relation = $class::table()->get_relationship($this->through);
         $through_table = $relation->get_table();
-        $this->through_key = $relation->foreign_key;
         $this->options['joins'] = $this->construct_inner_join_sql($through_table, true);
 
         // reset keys
@@ -539,24 +543,50 @@ class HasMany extends AbstractRelationship
         return $this;
     }
 
-    public function get_through() {
+	public function get_join_tables_and_keys(Table $from_table, $using_through)
+    {
+        if( !$this->is_has_many_through() )
+            return parent::get_join_tables_and_keys($from_table, $using_through);
+
+        $join_table = $from_table;
+        $join_table_name = $from_table->get_fully_qualified_table_name();
+
+        if($from_table === $this->get_table())
+        {
+            $class_name = $from_table->get_relationship($this->through)
+                          ->class_name;
+        }
+        else
+            $class_name = $this->class_name;
+        $from_table_name = Table::load($class_name)
+                                      ->get_fully_qualified_table_name();
+        
+        $rel = Table::load($this->class_name)->get_relationship($this->through);
+        $rel->set_keys($this->class_name);
+        if($using_through)
+        {
+            $foreign_key = $rel->primary_key[0];
+            $join_primary_key = $rel->foreign_key[0];
+        }
+        else
+        {
+            $foreign_key = $rel->foreign_key[0];
+            $join_primary_key = $rel->primary_key[0];
+        }
+
+        return array($from_table_name, $join_table_name, $foreign_key, $join_primary_key);
+    }
+
+    public function get_through()
+    {
         return $this->through;
     }
 
-    public function is_has_many_through() {
+    public function is_has_many_through()
+    {
         return !empty($this->through);
     }
-    public function get_joins($swap_table = false) {
-        $j = $this->options['joins'];
-        if( empty($j) )
-            return null;
 
-        if($swap_table)
-            $j = preg_replace('/`[^`]+`/', $this->get_table()->get_fully_qualified_table_name(), $j, 1);
-        return $j;
-    }
-
-    
 	private function inject_foreign_key_for_new_association(Model $model, &$attributes)
 	{
 		$this->set_keys($model);
