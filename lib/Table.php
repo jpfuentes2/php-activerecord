@@ -121,6 +121,10 @@ class Table
 				if (array_key_exists($value, $this->relationships))
 				{
 					$rel = $this->get_relationship($value);
+                    if($rel instanceof HasMany && $rel->is_has_many_through()) {
+                        $rel_thr = $rel;
+                        $rel = $this->get_relationship($rel->get_through());
+                    }
 
 					// if there is more than 1 join for a given table we need to alias the table names
 					if (array_key_exists($rel->class_name, $existing_tables))
@@ -135,6 +139,8 @@ class Table
 					}
 
 					$ret .= $rel->construct_inner_join_sql($this, false, $alias);
+                    if($rel_thr)
+                        $ret .= ' '.$rel_thr->init_through()->get_joins(true);
 				}
 				else
 					throw new RelationshipException("Relationship named $value has not been declared for class: {$this->class->getName()}");
