@@ -1845,8 +1845,8 @@ class Model
 		{
 			$scope = static::scoped();
 		}
-		
-		if(!$scope->default_scope())
+
+		if(!isset($options['scope_options']) && !$scope->default_scope())//Model does not use scopes at all
     	{
 			return $options;
     	}

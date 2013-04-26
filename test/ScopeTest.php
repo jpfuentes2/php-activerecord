@@ -7,6 +7,7 @@ class NullScope extends Author
 		'conditions'=>'parent_author_id IS NULL',
 	);
 }
+
 class IsNotBob extends Author
 {
 	public static $table_name = 'authors';
@@ -56,6 +57,13 @@ class IsNotBob extends Author
     	return self::scoped()->limit($number);
     }
 }
+class IsNotBobNoDefault extends IsNotBob
+{
+	public function default_scope()
+	{
+		return null;
+	}
+}
 
 class ScopeTest extends DatabaseTest
 {
@@ -66,6 +74,13 @@ class ScopeTest extends DatabaseTest
 	public function tear_down()
 	{
 		parent::tear_down();
+	}
+	
+	public function test_class_with_no_default_scope_also_behaves_correctly()
+	{
+		$tito = IsNotBobNoDefault::is_tito()->all();
+		$this->assertEquals(1,count($tito));
+		$this->assertEquals('Tito', $tito[0]->name);
 	}
 	
 	public function test_combining_scopes_creates_a_valid_query()
@@ -297,5 +312,6 @@ class ScopeTest extends DatabaseTest
 		}
 		$this->fail('No exception was thrown');
 	}
+	
 }
 ?>
