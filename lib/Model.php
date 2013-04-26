@@ -1390,25 +1390,6 @@ class Model
 	}
 	
 	/**
-	*  To be overridden by the model.  It should return an options array that is 
-	*  to be applied every time the model is called
-	*
-	*	<code>
-	*	public function default_scope()
-	*    {
-	*        return array(
-	*       			'conditions'=>'deleted == 0',
-	*       			'limit'=>3,
-	*        	);
-	*    }
-	*    //Model::all() will then never return a result that is flagged as deleted
-	*    //unless you call Model::scoped()->disable_default_scope()->all();
-	*    </code>
-	*
-	* @return array An array of finder options
-	*/
-	
-	/**
 	* To be overridden by the model. It should return an array of options that are named
 	* by their key.
 	*
@@ -1459,6 +1440,24 @@ class Model
 		return null;
 	}
 	
+	/**
+	*  To be overridden by the model.  It should return an options array that is 
+	*  to be applied every time the model is called
+	*
+	*	<code>
+	*	public function default_scope()
+	*    {
+	*        return array(
+	*       			'conditions'=>'deleted == 0',
+	*       			'limit'=>3,
+	*        	);
+	*    }
+	*    //Model::all() will then never return a result that is flagged as deleted
+	*    //unless you call Model::scoped()->disable_default_scope()->all();
+	*    </code>
+	*
+	* @return array An array of finder options
+	*/
 	public function default_scope()
 	{
 		return array();
@@ -1573,16 +1572,6 @@ class Model
 	public static function last(/* ... */)
 	{
 		return call_user_func_array('static::find',array_merge(array('last'),func_get_args()));
-	}
-
-	/**
-	 * Returns an instance of OptionBinder, for chain sql querys. Examples:
-	 * 		Model::sql()->where(...)->order(...)->limit(...) etc
-	 * @return OptionBinder
-	 */
-	public static function sql() 
-	{
-		return new OptionBinder(get_called_class());
 	}
 
 	/**
