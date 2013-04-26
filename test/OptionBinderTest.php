@@ -1,7 +1,5 @@
 <?php
 
-include 'helpers/config.php';
-
 class ScopedAuthor extends Author {
   static $table_name = 'authors';
 
