@@ -37,7 +37,8 @@ class MysqlAdapterTest extends AdapterTest
 	public function test_datetime_to_string()
 	{
 		$datetime = new DateTime('2009-01-01 01:01:01 EST');
-		$this->assert_equals($datetime->getTimestamp(), (new DateTime($this->conn->datetime_to_string($datetime)))->getTimestamp());
+		$roundtrip = $this->conn->string_to_datetime($this->conn->datetime_to_string($datetime));
+		$this->assert_equals($datetime->getTimestamp(), $roundtrip->getTimestamp());
 	}
 }
 ?>
