@@ -436,20 +436,21 @@ class Model
 	public function assign_attribute($name, $value)
 	{
 		$table = static::table();
+		$connection = static::connection();
 		if (!is_object($value)) {
 			if (array_key_exists($name, $table->columns)) {
-				$value = $table->columns[$name]->cast($value, static::connection());
+				$value = $table->columns[$name]->cast($value, $connection);
 			} else {
 				$col = $table->get_column_by_inflected_name($name);
 				if (!is_null($col)){
-					$value = $col->cast($value, static::connection());
+					$value = $col->cast($value, $connection);
 				}
 			}
 		}
 
 		// convert php's \DateTime to ours
 		if ($value instanceof \DateTime)
-			$value = new DateTime($value->format('Y-m-d H:i:s T'));
+			$value = new DateTime($value->format($connection::$datetime_format));
 
 		// make sure DateTime values know what model they belong to so
 		// dirty stuff works when calling set methods on the DateTime object
@@ -1100,7 +1101,8 @@ class Model
 	 */
 	public function set_timestamps()
 	{
-		$now = date('Y-m-d H:i:s');
+		$connection = static::connection();
+		$now = date($connection::$datetime_format);
 
 		if (isset($this->updated_at))
 			$this->updated_at = $now;
