@@ -96,8 +96,8 @@ class ColumnTest extends SnakeCase_PHPUnit_Framework_TestCase
 		elseif (PHP_INT_SIZE === 8)
 			$this->assert_cast(Column::INTEGER,'9223372036854775808',(((float) PHP_INT_MAX) + 1));
 
-		$this->assert_cast(Column::BOOLEAN,'1',true);
-		$this->assert_cast(Column::BOOLEAN,'',false);
+		$this->assert_cast(Column::BOOLEAN,$this->conn->boolean_to_string(true),true);
+		$this->assert_cast(Column::BOOLEAN,$this->conn->boolean_to_string(false),false);
 	}
 
 	public function test_cast_leave_null_alone()
@@ -107,7 +107,8 @@ class ColumnTest extends SnakeCase_PHPUnit_Framework_TestCase
 			Column::INTEGER,
 			Column::DECIMAL,
 			Column::DATETIME,
-			Column::DATE);
+			Column::DATE,
+			Column::BOOLEAN);
 
 		foreach ($types as $type) {
 			$this->assert_cast($type,null,null);
