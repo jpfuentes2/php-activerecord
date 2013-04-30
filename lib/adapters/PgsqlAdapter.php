@@ -135,8 +135,31 @@ SQL;
 		);
 	}
 
-	public function boolean_to_string($boolean)
+	public function boolean_to_string($value)
 	{
-		return $boolean ? "1" : "0";
+		if
+		(	// possible "false" values
+			// from php 'type-juggling':
+			// http://us1.php.net/manual/en/language.types.boolean.php#language.types.boolean.casting
+			// with additional strings recognized by postgres added
+			$value === false                ||#php
+			$value === 0                    ||#php
+			$value === 0.0                  ||#php
+			$value === ""                   ||#php
+			$value === null                 ||#php
+			$value === "0"                  ||#php/postgres
+			strtolower($value) === 'f'      ||#postgres
+			strtolower($value) === 'false'  ||#postgres
+			strtolower($value) === 'n'      ||#postgres
+			strtolower($value) === 'no'     ||#postgres
+			strtolower($value) === 'off'      #postgres
+		)
+		{
+			return "0";
+		}
+		else
+		{	// treat anything else as true
+			return "1";
+		}
 	}
 }
