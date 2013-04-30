@@ -488,12 +488,13 @@ abstract class Connection
 	 * The converted string representation should be in a format acceptable by the
 	 * underlying database connection.
 	 *
-	 * @param bool $boolean
+	 * @param mixed $value
 	 * @access public
 	 * @return string
 	 */
-	public function boolean_to_string($boolean)
+	public function boolean_to_string($value)
 	{
+		$boolean = (boolean)$value;
 		return (string)$boolean;
 	}
 
