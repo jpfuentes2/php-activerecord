@@ -482,20 +482,20 @@ abstract class Connection
 		return new DateTime($date->format(static::$datetime_format));
 	}
 
-    /**
-     * Converts a boolean value to a string representation.
-     *
-     * The converted string representation should be in a format acceptable by the
-     * underlying database connection.
-     *
-     * @param bool $boolean
-     * @access public
-     * @return string
-     */
-    public function boolean_to_string($boolean)
-    {
-        return (string)$boolean;
-    }
+	/**
+	 * Converts a boolean value to a string representation.
+	 *
+	 * The converted string representation should be in a format acceptable by the
+	 * underlying database connection.
+	 *
+	 * @param bool $boolean
+	 * @access public
+	 * @return string
+	 */
+	public function boolean_to_string($boolean)
+	{
+		return (string)$boolean;
+	}
 
 	/**
 	 * Adds a limit clause to the SQL query.
