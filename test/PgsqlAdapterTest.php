@@ -40,4 +40,10 @@ class PgsqlAdapterTest extends AdapterTest
 	{
 		$this->assert_equals(3,$this->conn->query_column_info("user_newsletters")->rowCount());
 	}
+
+	public function test_boolean_to_string()
+	{
+		$this->assert_equals("0", $this->conn->boolean_to_string(false));
+		$this->assert_equals("1", $this->conn->boolean_to_string(true));
+	}
 }
