@@ -1,5 +1,4 @@
 <?php
-include 'helpers/config.php';
 include 'helpers/foo.php';
 
 use foo\bar\biz\User;

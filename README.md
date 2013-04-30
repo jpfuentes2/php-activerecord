@@ -1,10 +1,14 @@
-# PHP ActiveRecord #
+# PHP ActiveRecord - Version 1.0 #
 
-Version 1.0
+[![Build Status](https://travis-ci.org/kla/php-activerecord.png?branch=master)](https://travis-ci.org/kla/php-activerecord)
 
-by Kien La and Jacques Fuentes
+by 
 
-<http://www.phpactiverecord.org/>
+* [@kla](https://github.com/kla) - Kien La
+* [@jpfuentes2](https://github.com/jpfuentes2) - Jacques Fuentes
+* [And these terrific Contributors](https://github.com/kla/php-activerecord/contributors)
+
+<http://www.phpactiverecord.org/> 
 
 ## Introduction ##
 A brief summarization of what ActiveRecord is:

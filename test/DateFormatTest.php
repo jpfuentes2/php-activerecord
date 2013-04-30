@@ -1,5 +1,4 @@
 <?php
-include 'helpers/config.php';
 
 class DateFormatTest extends DatabaseTest
 {

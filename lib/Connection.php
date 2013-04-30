@@ -6,7 +6,7 @@
 
 namespace ActiveRecord;
 
-require 'Column.php';
+require_once 'Column.php';
 
 use PDO;
 use PDOException;
@@ -58,6 +58,16 @@ abstract class Connection
 	 * @var string
 	 */
 	public $protocol;
+	/**
+	 * Database's date format
+	 * @var string
+	 */
+	static $date_format = 'Y-m-d';
+	/**
+	 * Database's datetime format
+	 * @var string
+	 */
+	static $datetime_format = 'Y-m-d H:i:s T';
 	/**
 	 * Default PDO options to set for each connection.
 	 * @var array
@@ -305,10 +315,12 @@ abstract class Connection
 	 */
 	public function query($sql, &$values=array())
 	{
-		if ($this->logging) {
-            $method = $this->logger_method;
-			$this->logger->$method($sql,$values);
-        }
+		if ($this->logging)
+		{
+			$method = $this->logger_method;
+			$this->logger->$method($sql);
+			if ( $values ) $this->logger->$method($values);
+		}
 
 		$this->last_query = $sql;
 
@@ -454,7 +466,7 @@ abstract class Connection
 	 */
 	public function date_to_string($datetime)
 	{
-		return $datetime->format('Y-m-d');
+		return $datetime->format(static::$date_format);
 	}
 
 	/**
@@ -465,7 +477,7 @@ abstract class Connection
 	 */
 	public function datetime_to_string($datetime)
 	{
-		return $datetime->format('Y-m-d H:i:s T');
+		return $datetime->format(static::$datetime_format);
 	}
 
 	/**
@@ -482,7 +494,7 @@ abstract class Connection
 		if ($errors['warning_count'] > 0 || $errors['error_count'] > 0)
 			return null;
 
-		return new DateTime($date->format('Y-m-d H:i:s T'));
+		return new DateTime($date->format(static::$datetime_format));
 	}
 
     /**

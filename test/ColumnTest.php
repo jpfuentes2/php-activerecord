@@ -1,5 +1,4 @@
 <?php
-include 'helpers/config.php';
 
 use ActiveRecord\Column;
 use ActiveRecord\DateTime;
