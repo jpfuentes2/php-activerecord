@@ -43,7 +43,21 @@ class PgsqlAdapterTest extends AdapterTest
 
 	public function test_boolean_to_string()
 	{
+		// false values
 		$this->assert_equals("0", $this->conn->boolean_to_string(false));
+		$this->assert_equals("0", $this->conn->boolean_to_string('0'));
+		$this->assert_equals("0", $this->conn->boolean_to_string('f'));
+		$this->assert_equals("0", $this->conn->boolean_to_string('false'));
+		$this->assert_equals("0", $this->conn->boolean_to_string('n'));
+		$this->assert_equals("0", $this->conn->boolean_to_string('no'));
+		$this->assert_equals("0", $this->conn->boolean_to_string('off'));
+		// true values
 		$this->assert_equals("1", $this->conn->boolean_to_string(true));
+		$this->assert_equals("1", $this->conn->boolean_to_string('1'));
+		$this->assert_equals("1", $this->conn->boolean_to_string('t'));
+		$this->assert_equals("1", $this->conn->boolean_to_string('true'));
+		$this->assert_equals("1", $this->conn->boolean_to_string('y'));
+		$this->assert_equals("1", $this->conn->boolean_to_string('yes'));
+		$this->assert_equals("1", $this->conn->boolean_to_string('on'));
 	}
 }
