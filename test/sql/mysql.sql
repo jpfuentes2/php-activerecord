@@ -87,7 +87,8 @@ CREATE TABLE property_amenities(
 );
 
 CREATE TABLE users (
-    id INT NOT NULL AUTO_INCREMENT PRIMARY KEY
+    id INT NOT NULL AUTO_INCREMENT PRIMARY KEY,
+    password VARCHAR(255) NOT NULL
 ) ENGINE=InnoDB;
 
 CREATE TABLE newsletters (
@@ -99,6 +100,18 @@ CREATE TABLE user_newsletters (
     user_id INT NOT NULL,
     newsletter_id INT NOT NULL
 ) ENGINE=InnoDB;
+
+CREATE TABLE services (
+    id INT NOT NULL AUTO_INCREMENT PRIMARY KEY,
+    code VARCHAR(255) NOT NULL
+) ENGINE=InnoDB;
+
+CREATE TABLE active_services (
+    id INT NOT NULL AUTO_INCREMENT PRIMARY KEY,
+    user_id INT NOT NULL,
+    serv_id INT NOT NULL
+) ENGINE=InnoDB;
+
 
 CREATE TABLE valuestore (
   `id` INT NOT NULL AUTO_INCREMENT PRIMARY KEY,
