@@ -1,0 +1,18 @@
+before_script:
+  - echo 'extension = "memcache.so"' >> ~/.phpenv/versions/$(phpenv version-name)/etc/php.ini
+  - mysql -e "USE mysql;UPDATE user SET password=PASSWORD('password') WHERE user='root';FLUSH PRIVILEGES;"
+  - mysql -e 'CREATE DATABASE phpar_test;'
+  - psql -c 'CREATE DATABASE phpar_test;' -U postgres
+  - psql -c "ALTER USER postgres WITH PASSWORD 'password';" -U postgres
+
+services:
+  - memcache
+
+env: PHPAR_MYSQL=mysql://root:password@127.0.0.1/phpar_test PHPAR_PGSQL=pgsql://postgres:password@127.0.0.1/phpar_test
+
+language: php
+php:
+  - 5.3
+  - 5.4
+
+script: phpunit -c phpunit.xml test/

@@ -1,5 +1,4 @@
 <?php
-include 'helpers/config.php';
 
 class ActiveRecordTest extends DatabaseTest
 {
@@ -189,7 +188,44 @@ class ActiveRecordTest extends DatabaseTest
 	{
 		$model = new NamespaceTest\Book();
 		$table = ActiveRecord\Table::load(get_class($model));
+
 		$this->assert_equals($table->get_relationship('parent_book')->foreign_key[0], 'book_id');
+		$this->assert_equals($table->get_relationship('parent_book_2')->foreign_key[0], 'book_id');
+		$this->assert_equals($table->get_relationship('parent_book_3')->foreign_key[0], 'book_id');
+	}
+
+	public function test_namespaced_relationship_associates_correctly()
+	{
+		$model = new NamespaceTest\Book();
+		$table = ActiveRecord\Table::load(get_class($model));
+
+		$this->assert_not_null($table->get_relationship('parent_book'));
+		$this->assert_not_null($table->get_relationship('parent_book_2'));
+		$this->assert_not_null($table->get_relationship('parent_book_3'));
+
+		$this->assert_not_null($table->get_relationship('pages'));
+		$this->assert_not_null($table->get_relationship('pages_2'));
+
+		$this->assert_null($table->get_relationship('parent_book_4'));
+		$this->assert_null($table->get_relationship('pages_3'));
+
+		// Should refer to the same class
+		$this->assert_same(
+			ltrim($table->get_relationship('parent_book')->class_name, '\\'),
+			ltrim($table->get_relationship('parent_book_2')->class_name, '\\')
+		);
+
+		// Should refer to different classes
+		$this->assert_not_same(
+			ltrim($table->get_relationship('parent_book_2')->class_name, '\\'),
+			ltrim($table->get_relationship('parent_book_3')->class_name, '\\')
+		);
+
+		// Should refer to the same class
+		$this->assert_same(
+			ltrim($table->get_relationship('pages')->class_name, '\\'),
+			ltrim($table->get_relationship('pages_2')->class_name, '\\')
+		);
 	}
 
 	public function test_should_have_all_column_attributes_when_initializing_with_array()
@@ -266,7 +302,7 @@ class ActiveRecordTest extends DatabaseTest
 
 		try {
 			$book->save();
-			$this-fail('expected exception ActiveRecord\ReadonlyException');
+			$this->fail('expected exception ActiveRecord\ReadonlyException');
 		} catch (ActiveRecord\ReadonlyException $e) {
 		}
 
@@ -474,15 +510,22 @@ class ActiveRecordTest extends DatabaseTest
 		$author->save();
 		$this->assert_false($author->attribute_is_dirty('some_date'));
 	}
-	
-	public function test_flag_dirty_attribute()
+
+	public function test_flag_dirty_attribute_which_does_not_exit()
 	{
 		$author = new Author();
 		$author->flag_dirty('some_inexistant_property');
 		$this->assert_null($author->dirty_attributes());
 		$this->assert_false($author->attribute_is_dirty('some_inexistant_property'));
 	}
-	
+
+	public function test_gh245_dirty_attribute_should_not_raise_php_notice_if_not_dirty()
+	{
+		$event = new Event(array('title' => "Fun"));
+		$this->assert_false($event->attribute_is_dirty('description'));
+		$this->assert_true($event->attribute_is_dirty('title'));
+	}
+
 	public function test_assigning_php_datetime_gets_converted_to_ar_datetime()
 	{
 		$author = new Author();

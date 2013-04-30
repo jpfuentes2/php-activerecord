@@ -13,3 +13,4 @@ SELECT setval('property_amenities_id_seq', max(id)) FROM property_amenities;
 SELECT setval('users_id_seq', max(id)) FROM users;
 SELECT setval('newsletters_id_seq', max(id)) FROM newsletters;
 SELECT setval('user_newsletters_id_seq', max(id)) FROM user_newsletters;
+SELECT setval('valuestore_id_seq', max(id)) FROM valuestore;
