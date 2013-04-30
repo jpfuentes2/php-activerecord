@@ -135,8 +135,8 @@ SQL;
 		);
 	}
 
-    public function boolean_to_string($boolean) {
-        return $boolean ? "1" : "0";
-    }
-
+	public function boolean_to_string($boolean)
+	{
+		return $boolean ? "1" : "0";
+	}
 }
