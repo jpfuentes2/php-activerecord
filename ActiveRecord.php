@@ -13,6 +13,7 @@ require __DIR__.'/lib/Utils.php';
 require __DIR__.'/lib/DateTime.php';
 require __DIR__.'/lib/Model.php';
 require __DIR__.'/lib/Table.php';
+require __DIR__.'/lib/DynamoTable.php';
 require __DIR__.'/lib/ConnectionManager.php';
 require __DIR__.'/lib/Connection.php';
 require __DIR__.'/lib/SQLBuilder.php';
