@@ -1,17 +1,76 @@
 <?php
+
 /**
  * @package ActiveRecord
  */
 namespace ActiveRecord;
 
+require_once __DIR__ . '/../../../vendor/autoload.php';
+
+use Aws\Common\Aws;
+use Aws\DynamoDb\Enum\Type;
+use Aws\DynamoDb\Enum\AttributeAction;
+use Aws\DynamoDb\DynamoDbClient;
+use Aws\Common\Enum\Region;
+use Guzzle\Service\Resource\ResourceIteratorInterface;
 /**
- * Adapter for MySQL.
+ * Adapter for DynamoDB.
  *
  * @package ActiveRecord
  */
 
 class DynamoAdapter 
 {
+
+	/**
+	 * The DB connection object.
+	 * @var mixed
+	 */
+	public $connection;
+	/**
+	 * The last query run.
+	 * @var string
+	 */
+	public $last_query;
+	/**
+	 * Switch for logging.
+	 *
+	 * @var bool
+	 */
+	public $logging = false;
+	/**
+	 * Contains a Logger object that must impelement a log() method.
+	 *
+	 * @var object
+	 */
+	public $logger;
+	/**
+	 * The name of the protocol that is used.
+	 * @var string
+	 */
+	public $protocol;
+	/**
+	 * Database memcached
+	 * @var string
+	 */
+	public $cache;
+	/**
+	 * Database's date format
+	 * @var string
+	 */
+	static $date_format = 'Y-m-d';
+	/**
+	 * Database's datetime format
+	 * @var string
+	 */
+	static $datetime_format = 'Y-m-d H:i:s T';
+
+	public function __construct($info)
+	{
+		$aws = Aws::factory(__DIR__ . '/../../../config.inc.php');
+		$this->connection = $aws->get('dynamodb');
+		$this->tables();
+	}
 	
 	public function quote_name($string)
 	{
@@ -52,8 +111,23 @@ class DynamoAdapter
 		return $sth;
 	}
 
+	public function tables()
+	{
+		$list = $this->connection->listTables()['TableNames'];
+		
+		$tables = array();
+
+		foreach($list as $table)
+		{
+			$tables[] = $table;
+		}
+
+		return $tables;
+	}
+
 	public function columns($table)
 	{
+		//throw new \Exception("columns");
 		$reflect = new \ReflectionClass($table);
 		$constants = $reflect->getConstants();
 		$columns = array();
@@ -79,7 +153,10 @@ class DynamoAdapter
 				}
 				$columns[$name] = $col;
 			}
-			$aliases[$name] = $alias;
+			if($alias !== 'HashKeyType' && $alias !== 'RangeKeyType')
+			{
+				$aliases[$alias] = $name;
+			}
 		}
 
 		$table::$alias_attribute = $aliases;
@@ -102,7 +179,7 @@ class DynamoAdapter
 			$columns[$name] = $col;
 		}
 
-		return array_values($columns);
+		return $columns;
 	}
 
 	/**

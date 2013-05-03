@@ -54,12 +54,13 @@ class Table
 
 	public static function load($model_class_name)
 	{
-		$self = get_called_class();
 		if (!isset(self::$cache[$model_class_name]))
 		{
+			$reflect = Reflections::instance()->add($model_class_name)->get($model_class_name);
+			$t_class = $reflect->getStaticPropertyValue('table_class');
 			/* do not place set_assoc in constructor..it will lead to infinite loop due to
 			   relationships requesting the model's table, but the cache hasn't been set yet */
-			self::$cache[$model_class_name] = new $self($model_class_name);
+			self::$cache[$model_class_name] = new $t_class($model_class_name);
 			self::$cache[$model_class_name]->set_associations();
 		}
 
@@ -462,7 +463,7 @@ class Table
 
 		foreach ($this->class->getStaticProperties() as $name => $definitions)
 		{
-			if (!$definitions)# || !is_array($definitions))
+			if (!$definitions || empty($definitions))# || !is_array($definitions))
 				continue;
 
 			foreach (wrap_strings_in_arrays($definitions) as $definition)
@@ -486,6 +487,8 @@ class Table
 
 					case 'has_and_belongs_to_many':
 						$relationship = new HasAndBelongsToMany($definition);
+						break;
+					default:
 						break;
 				}
 
@@ -551,6 +554,18 @@ class Table
 		if (!empty($getters) || !empty($setters))
 			trigger_error('static::$getters and static::$setters are deprecated. Please define your setters and getters by declaring methods in your model prefixed with get_ or set_. See
 			http://www.phpactiverecord.org/projects/main/wiki/Utilities#attribute-setters and http://www.phpactiverecord.org/projects/main/wiki/Utilities#attribute-getters on how to make use of this option.', E_USER_DEPRECATED);
+	}
+
+	public function create_conditions_from_keys(Model $model, $condition_keys=array(), $value_keys=array())
+	{
+		$condition_string = implode('_and_', $condition_keys);
+		$condition_values = array_values($model->get_values_for($value_keys));
+
+		// return null if all the foreign key values are null so that we don't try to do a query like "id is null"
+		if (all(null,$condition_values))
+			return null;
+
+		return SQLBuilder::create_conditions_from_underscored_string(Table::load(get_class($model))->conn,$condition_string,$condition_values);
 	}
 };
 ?>

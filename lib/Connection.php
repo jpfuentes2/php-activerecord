@@ -362,6 +362,7 @@ abstract class Connection
 	 */
 	public function tables()
 	{
+		throw new \Exception('tables');
 		$tables = array();
 		$sth = $this->query_for_tables();
 

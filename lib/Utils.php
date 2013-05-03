@@ -52,7 +52,7 @@ function array_flatten(array $array)
 
 	while ($i < count($array))
 	{
-		if (is_array($array[$i]))
+		if (array_key_exists($i, $array) && is_array($array[$i]))
 			array_splice($array,$i,1,$array[$i]);
 		else
 			++$i;

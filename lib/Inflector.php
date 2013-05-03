@@ -16,7 +16,7 @@ abstract class Inflector
 	 */
 	public static function instance()
 	{
-		return new StandardInflector();
+		return Config::instance()->get_inflector();
 	}
 
 	/**

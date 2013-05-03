@@ -79,6 +79,8 @@ class Config extends Singleton
 	 */
 	private $date_format = \DateTime::ISO8601;
 
+	private $inflector_class = 'ActiveRecord\\StandardInflector';
+
 	/**
 	 * Allows config initialization using a closure.
 	 *
@@ -299,6 +301,17 @@ class Config extends Singleton
 	public function set_cache($url, $options=array())
 	{
 		Cache::initialize($url,$options);
+	}
+
+	public function set_inflector_class($cls)
+	{
+		$this->inflector_class = $cls;
+	}
+
+	public function get_inflector()
+	{
+		$class = $this->inflector_class;
+		return new $class();
 	}
 };
 ?>

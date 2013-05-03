@@ -286,7 +286,7 @@ abstract class AbstractRelationship implements InterfaceRelationship
 
 	protected function set_class_name($class_name)
 	{
-		if (!has_absolute_namespace($class_name) && isset($this->options['namespace'])) {
+		if (!has_absolute_namespace($class_name) && !empty($this->options['namespace'])) {
 			$class_name = $this->options['namespace'].'\\'.$class_name;
 		}
 		
@@ -300,14 +300,7 @@ abstract class AbstractRelationship implements InterfaceRelationship
 
 	protected function create_conditions_from_keys(Model $model, $condition_keys=array(), $value_keys=array())
 	{
-		$condition_string = implode('_and_', $condition_keys);
-		$condition_values = array_values($model->get_values_for($value_keys));
-
-		// return null if all the foreign key values are null so that we don't try to do a query like "id is null"
-		if (all(null,$condition_values))
-			return null;
-
-		$conditions = SQLBuilder::create_conditions_from_underscored_string(Table::load(get_class($model))->conn,$condition_string,$condition_values);
+		$conditions = Table::load(get_class($model))->create_conditions_from_keys($model,$condition_keys,$value_keys);
 
 		# DO NOT CHANGE THE NEXT TWO LINES. add_condition operates on a reference and will screw options array up
 		if (isset($this->options['conditions']))
@@ -524,6 +517,7 @@ class HasMany extends AbstractRelationship
 
 		$options = $this->unset_non_finder_options($this->options);
 		$options['conditions'] = $conditions;
+
 		return $class_name::find($this->poly_relationship ? 'all' : 'first',$options);
 	}
 
@@ -669,6 +663,7 @@ class BelongsTo extends AbstractRelationship
 		$options = $this->unset_non_finder_options($this->options);
 		$options['conditions'] = $conditions;
 		$class = $this->class_name;
+
 		return $class::first($options);
 	}
 

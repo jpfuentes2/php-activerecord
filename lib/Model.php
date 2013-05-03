@@ -247,6 +247,9 @@ class Model
 	 * @param boolean $new_record Set to true if this should be considered a new record
 	 * @return Model
 	 */
+
+	static $table_class = 'ActiveRecord\\Table';
+
 	public function __construct(array $attributes=array(), $guard_attributes=true, $instantiating_via_find=false, $new_record=true)
 	{
 		$this->__new_record = $new_record;
