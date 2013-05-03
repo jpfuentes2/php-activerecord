@@ -224,6 +224,16 @@ class RelationshipTest extends DatabaseTest
 		$this->assert_not_null($venue->id);
 	}
 
+	public function test_build_association_overwrites_guarded_foreign_keys()
+	{
+		$author = new AuthorAttrAccessible();
+		$author->save();
+
+		$book = $author->build_book();
+
+		$this->assert_not_null($book->author_id);
+	}
+
 	public function test_belongs_to_can_be_self_referential()
 	{
 		Author::$belongs_to = array(array('parent_author', 'class_name' => 'Author', 'foreign_key' => 'parent_author_id'));
