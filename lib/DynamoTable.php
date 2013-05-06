@@ -289,4 +289,46 @@ class DynamoTable extends Table
 
 		return $conditions;
 	}
+
+	   public function CreateTable($readCapacityUnits = 20, $writeCapacityUnits = 5)
+    {
+        $table = $this->get_fully_qualified_table_name();
+        $keySchema = array('HashKeyElement'=>array('AttributeName' => $table::HashKeyElement, 'AttributeType' => $table::HashKeyType));
+
+        if(defined($table.'::RangeKeyElement'))
+        {
+            $keySchema['RangeKeyElement'] = array('AttributeName' => $table::RangeKeyElement, 'AttributeType' => $table::RangeKeyType);
+        }
+
+        $dynamodb = $this->db();
+        $response = $dynamodb->createTable(array(
+            'TableName' => $table,
+            'KeySchema' => $keySchema,
+            'ProvisionedThroughput' => array(
+                'ReadCapacityUnits'  => $readCapacityUnits,
+                'WriteCapacityUnits' => $writeCapacityUnits
+            )
+        ));
+    }
+
+    public function DeleteTable()
+    {
+        $dynamodb = $this->db();
+        $response = $dynamodb->deleteTable(array('TableName' => $this->get_fully_qualified_table_name()));
+        $cache = self::GetCache();
+        if($cache) { $cache->flush(); }
+    }
+
+    public function TableStatus()
+    {
+        $dynamodb = $this->db();
+        $response = $dynamodb->describeTable(array('TableName' => $this->get_fully_qualified_table_name()));
+
+        return (string) $response['Table']['TableStatus'];
+    }
+
+    public function TableExists()
+    {
+        return !is_null($this->TableStatus());
+    }
 }

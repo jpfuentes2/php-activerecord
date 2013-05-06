@@ -19,6 +19,8 @@ require __DIR__.'/lib/Connection.php';
 require __DIR__.'/lib/SQLBuilder.php';
 require __DIR__.'/lib/Reflections.php';
 require __DIR__.'/lib/Inflector.php';
+require __DIR__.'/lib/CasePreservingInflector.php';
+require __DIR__.'/lib/NullInflector.php';
 require __DIR__.'/lib/CallBack.php';
 require __DIR__.'/lib/Exceptions.php';
 require __DIR__.'/lib/Cache.php';
