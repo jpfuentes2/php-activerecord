@@ -464,5 +464,61 @@ class ActiveRecordFindTest extends DatabaseTest
 		$this->assert_not_null(Author::find_by_created_at($now));
 		$this->assert_not_null(Author::find_by_created_at($arnow));
 	}
+	
+	public function testInstantiatingANormalBook()
+	{
+		$book = new InstantiateBook();
+		$book->name = 'NormalBook';
+		$book->save();
+		$normal = InstantiateBook::find($book->id);
+		$this->assertNotInstanceOf('AwesomeBook',$normal);
+	}
+	
+	public function testInstantiatingAnAwesomeBook()
+	{
+		$book = new InstantiateBook();
+		$book->name = 'AwesomeBook';
+		$book->save();
+		$awesome = InstantiateBook::find($book->id);
+		$this->assertInstanceOf('AwesomeBook',$awesome);
+	}
+	
+	/**
+	 * @expectedException ActiveRecord\ActiveRecordException
+	 */
+	public function testInvalidClassThatDoesNotInheritFromParent()
+	{
+		$book = new InstantiateBook();
+		$book->name = 'NotAwesomeBook';
+		$book->save();
+		InstantiateBook::find($book->id);
+	}
+	
+	public function testFindingAllWithInstantiate()
+	{
+		Book::create(array('name'=>'NormalBook'));
+		Book::create(array('name'=>'AwesomeBook'));
+		Book::create(array('name'=>'AnotherBook'));
+		Book::create(array('name'=>'AwesomeBook'));
+		
+		$all_books = InstantiateBook::all();
+		$found_at_least_one_awesome_book = false;
+		$found_at_least_one_not_awesome_book = false;
+		foreach($all_books as $book)
+		{
+			if($book->name === 'AwesomeBook')
+			{
+				$found_at_least_one_awesome_book = true;
+				$this->assertInstanceOf('AwesomeBook',$book);
+			}
+			else
+			{
+				$found_at_least_one_not_awesome_book = true;
+				$this->assertNotInstanceOf('AwesomeBook',$book);
+			}
+		}
+		$this->assert_true($found_at_least_one_awesome_book);
+		$this->assert_true($found_at_least_one_not_awesome_book);
+	}
 };
 ?>

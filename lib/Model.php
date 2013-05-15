@@ -267,6 +267,20 @@ class Model
 
 		$this->invoke_callback('after_construct',false);
 	}
+	
+	/**
+	 * Returns the name of the class to instantiate
+	 * This is called before a model is created to allow for single-table inheritance
+	 * The returned class name has to be a class that extends the base class
+	 * 
+	 * @param array $data Hash containing the loaded database row that will assigned to the model
+	 * @return String the name of the class to instantiate
+	 */
+	public static function instantiate($data)
+	{
+		return get_called_class();
+	}
+	
 
 	/**
 	 * Magic method which delegates to read_attribute(). This handles firing off getter methods,
