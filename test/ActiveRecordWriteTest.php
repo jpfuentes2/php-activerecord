@@ -279,6 +279,11 @@ class ActiveRecordWriteTest extends DatabaseTest
 		$this->assert_not_null($author->created_at);
 	}
 
+	public function test_create_no_attributes() {
+		$author = Author::create();
+		$this->assert_not_null(Author::find($author->id));
+	}
+
 	/**
 	 * @expectedException ActiveRecord\ActiveRecordException
 	 */
