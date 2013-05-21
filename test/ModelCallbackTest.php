@@ -93,5 +93,11 @@ class ModelCallbackTest extends DatabaseTest
 		$this->assert_fires(array('before_destroy','after_destroy'),
 			function($model) { $model->delete(); });
 	}
+	
+	public function test_gh324_callbacks_should_trigger_on_empty_save()
+	{
+		$this->assert_fires(array('after_save'),
+			function($model) { $model = Venue::first(); $model->save(); });
+	}
 }
 ?>
