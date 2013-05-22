@@ -4,6 +4,8 @@
  */
 namespace ActiveRecord;
 
+require_once 'IdentityMap.php';
+
 /**
  * Manages reading and writing to a database table.
  *
@@ -219,13 +221,21 @@ class Table
 
 		while (($row = $sth->fetch()))
 		{
-			$model = new $this->class->name($row,false,true,false);
+			// return the existing model instance if its found in the identity map
+			$pk = $this->get_primary_column()->name;
+			$model = IdentityMap::instance()->get($this->table, $row[$pk]);
+			
+			if (!$model)
+			{
+				$model = new $this->class->name($row,false,true,false);
+				IdentityMap::instance()->store($model);
 
-			if ($readonly)
-				$model->readonly();
+				if ($readonly)
+					$model->readonly();
 
-			if ($collect_attrs_for_includes)
-				$attrs[] = $model->attributes();
+				if ($collect_attrs_for_includes)
+					$attrs[] = $model->attributes();
+			}
 
 			$list[] = $model;
 		}
@@ -425,6 +435,17 @@ class Table
 					$this->pk[] = $c->inflected_name;
 			}
 		}
+	}
+
+	private function get_primary_column()
+	{
+		foreach ($this->columns as $column)
+		{
+			if ($column->pk)
+				return $column;
+		}
+
+		return null;
 	}
 
 	private function set_table_name()
