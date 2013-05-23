@@ -224,7 +224,7 @@ class Table
 			$model = null;
 
 			// return the existing model instance if its found in the identity map
-			$pk = $this->get_primary_column()->name;
+			$pk = $this->get_primary_column()->inflected_name;
 			$has_pk = isset($row[$pk]);
 
 			if ($has_pk)
@@ -243,6 +243,8 @@ class Table
 				if ($collect_attrs_for_includes)
 					$attrs[] = $model->attributes();
 			}
+			else
+				$model->merge_attributes($row);
 
 			$list[] = $model;
 		}

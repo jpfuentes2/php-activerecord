@@ -28,4 +28,22 @@ class IdentityMapTest extends DatabaseTest
 
 		$this->assert_equals($host1->name, $host2->name);
 	}
+
+
+	public function test_fill_in_missing_attributes()
+	{
+		$venue1 = Venue::find(1, array('select' => 'id, name'));
+
+		$this->assert_equals(2, count($venue1->attributes()));
+		$this->assert_contains('id', array_keys($venue1->attributes()));
+		$this->assert_contains('name', array_keys($venue1->attributes()));
+
+		$venue2 = Venue::find(1, array('select' => 'id, state, phone'));
+		
+		$this->assert_equals(4, count($venue1->attributes()));
+		$this->assert_contains('id', array_keys($venue1->attributes()));
+		$this->assert_contains('name', array_keys($venue1->attributes()));
+		$this->assert_contains('state', array_keys($venue1->attributes()));
+		$this->assert_contains('phone', array_keys($venue1->attributes()));
+	}
 }
