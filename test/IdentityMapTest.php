@@ -14,4 +14,18 @@ class IdentityMapTest extends DatabaseTest
 
 		$this->assert_equals($author1->name, $author2->name);
 	}
+
+
+	public function test_same_instance_returned_in_relationships()
+	{
+		$host1 = Host::find(1);
+		$event = $host1->events[0];
+		$host2 = $event->host;
+
+		$this->assert_equals($host1->name, $host2->name);
+
+		$host1->name = "New Host Name";
+
+		$this->assert_equals($host1->name, $host2->name);
+	}
 }
