@@ -221,14 +221,21 @@ class Table
 
 		while (($row = $sth->fetch()))
 		{
+			$model = null;
+
 			// return the existing model instance if its found in the identity map
 			$pk = $this->get_primary_column()->name;
-			$model = IdentityMap::instance()->get($this->table, $row[$pk]);
+			$has_pk = isset($row[$pk]);
+
+			if ($has_pk)
+				$model = IdentityMap::instance()->get($this->table, $row[$pk]);
 			
 			if (!$model)
 			{
 				$model = new $this->class->name($row,false,true,false);
-				IdentityMap::instance()->store($model);
+
+				if ($has_pk)
+					IdentityMap::instance()->store($model);
 
 				if ($readonly)
 					$model->readonly();
