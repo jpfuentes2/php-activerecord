@@ -3,6 +3,19 @@ include 'helpers/config.php';
 
 class IdentityMapTest extends DatabaseTest
 {
+	public function set_up($connection_name = NULL)
+	{
+		parent::set_up($connection_name);
+		ActiveRecord\Config::instance()->set_identity_map(true);
+	}
+
+	public function tear_down()
+	{
+		ActiveRecord\Config::instance()->set_identity_map(false);
+		parent::tear_down();
+	}
+
+
 	public function test_persistence_between_model_instances()
 	{
 		$author1 = Author::find(1);

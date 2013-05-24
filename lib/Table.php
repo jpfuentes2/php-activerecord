@@ -223,18 +223,24 @@ class Table
 		{
 			$model = null;
 
-			// return the existing model instance if its found in the identity map
-			$pk = $this->get_primary_column()->inflected_name;
-			$has_pk = isset($row[$pk]);
+			// the identity map is experimental so it is disabled by default
+			if (Config::instance()->get_identity_map())
+			{
+				// get the primary key if it has been selected
+				$pk = $this->get_primary_column()->inflected_name;
+				$has_pk = isset($row[$pk]);
 
-			if ($has_pk)
-				$model = IdentityMap::instance()->get($this->table, $row[$pk]);
+				// return the existing model instance if its found in the identity map
+				if ($has_pk)
+					$model = IdentityMap::instance()->get($this->table, $row[$pk]);
+			}
 			
+			// create model if identity map is disabled or the record hasnt been retrieved yet
 			if (!$model)
 			{
 				$model = new $this->class->name($row,false,true,false);
 
-				if ($has_pk)
+				if (Config::instance()->get_identity_map() && $has_pk)
 					IdentityMap::instance()->store($model);
 
 				if ($readonly)
@@ -244,7 +250,7 @@ class Table
 					$attrs[] = $model->attributes();
 			}
 			else
-				$model->merge_attributes($row);
+				$model->merge_attributes($row); // update the existing model instance
 
 			$list[] = $model;
 		}
