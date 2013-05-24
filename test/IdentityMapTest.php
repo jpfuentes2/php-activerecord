@@ -59,4 +59,10 @@ class IdentityMapTest extends DatabaseTest
 		$this->assert_contains('state', array_keys($venue1->attributes()));
 		$this->assert_contains('phone', array_keys($venue1->attributes()));
 	}
+
+
+	public function test_relationships_return_existing_instance()
+	{
+		
+	}
 }
