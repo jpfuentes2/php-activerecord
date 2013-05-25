@@ -190,27 +190,36 @@ class Config extends Singleton
 	}
 
 	/**
-	 * Sets the directory where models are located.
-	 *
+	 * Sets directories where models are located.
 	 * @param string $dir Directory path containing your models
 	 * @return void
+         * @author Editted by Dariush Hasanpoor <b.g.dariush@gmail.com>
 	 */
 	public function set_model_directory($dir)
 	{
-		$this->model_directory = $dir;
+            if(!$this->model_directory)
+            {
+                $this->model_directory = $dir;
+                return;
+            }
+            // if it is not already registered, do:
+            if(strpos($this->model_directory, $dir)===false)
+                $this->model_directory = implode(PATH_SEPARATOR, array($this->model_directory, $dir));
 	}
 
 	/**
-	 * Returns the model directory.
+	 * Returns model directories.
 	 *
 	 * @return string
-	 * @throws ConfigException if specified directory was not found
+         * @author Editted by Dariush Hasanpoor <b.g.dariush@gmail.com>
 	 */
 	public function get_model_directory()
 	{
-		if ($this->model_directory && !file_exists($this->model_directory))
+                // we don't realy want to check directory models file existance because it is 
+                // a combined path.
+		if (false && $this->model_directory && !file_exists($this->model_directory))
 			throw new ConfigException('Invalid or non-existent directory: '.$this->model_directory);
-
+                
 		return $this->model_directory;
 	}
 

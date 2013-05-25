@@ -24,17 +24,29 @@ require __DIR__.'/lib/Cache.php';
 
 if (!defined('PHP_ACTIVERECORD_AUTOLOAD_DISABLE'))
 	spl_autoload_register('activerecord_autoload',false,PHP_ACTIVERECORD_AUTOLOAD_PREPEND);
-
+/**
+ * @author Editted by Dariush Hasanpoor <b.g.dariush@gmail.com>
+ */
 function activerecord_autoload($class_name)
 {
-	$path = ActiveRecord\Config::instance()->get_model_directory();
-	$root = realpath(isset($path) ? $path : '.');
-
+        $path = ActiveRecord\Config::instance()->get_model_directory();
+        
+        // this was editted from original version
+        $root = realpath('.');
+        // this is written to handle multi model directory loading
+        foreach (explode(PATH_SEPARATOR, $path) as $key => $value)
+        {
+            if(file_exists("$value/$class_name.php"))
+            {
+                $root = $value;
+                break;
+            }
+        }
+        
 	if (($namespaces = ActiveRecord\get_namespaces($class_name)))
 	{
 		$class_name = array_pop($namespaces);
 		$directories = array();
-
 		foreach ($namespaces as $directory)
 			$directories[] = $directory;
 
