@@ -249,4 +249,3 @@ class CallBack
 			$this->registry[$name][] = $closure_or_method_name;
 	}
 }
-?>

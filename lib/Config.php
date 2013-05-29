@@ -80,6 +80,14 @@ class Config extends Singleton
 	private $date_format = \DateTime::ISO8601;
 
 	/**
+	 * The current timezone to use by default in databases.
+	 * Used for databases that can't store timezone info.(MySQL)
+	 *
+	 * @var DateTimeZone
+	 */
+	private $default_timezone;
+
+	/**
 	 * Allows config initialization using a closure.
 	 *
 	 * This method is just syntatic sugar.
@@ -280,6 +288,26 @@ class Config extends Singleton
 		Serialization::$DATETIME_FORMAT = $format;
 	}
 
+	public function get_default_timezone()
+	{
+		if(!isset($this->default_timezone))
+		{
+			$this->default_timezone = new \DateTimeZone(date_default_timezone_get());
+		}
+		return $this->default_timezone;
+	}
+
+	public function set_default_timezone($timezone)
+	{
+		if($timezone instanceof \DateTimeZone)
+		{
+			$this->default_timezone = $timezone;
+		}
+		else
+		{
+			$this->default_timezone = new \DateTimeZone($timezone);
+		}
+	}
 	/**
 	 * Sets the url for the cache server to enable query caching.
 	 *
@@ -300,5 +328,4 @@ class Config extends Singleton
 	{
 		Cache::initialize($url,$options);
 	}
-};
-?>
+}

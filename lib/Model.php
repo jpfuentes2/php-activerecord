@@ -258,7 +258,7 @@ class Model
 				$this->attributes[$meta->inflected_name] = $meta->default;
 		}
 
-		$this->set_attributes_via_mass_assignment($attributes, $guard_attributes);
+		$this->set_attributes_via_mass_assignment($attributes, $guard_attributes, true);
 
 		// since all attribute assignment now goes thru assign_attributes() we want to reset
 		// dirty if instantiating via find since nothing is really dirty when doing that
@@ -431,18 +431,19 @@ class Model
 	 *
 	 * @param string $name Name of the attribute
 	 * @param mixed &$value Value of the attribute
+	 * @param boolean $db_format If it needs to be casted as a "from database" value
 	 * @return mixed the attribute value
 	 */
-	public function assign_attribute($name, $value)
+	public function assign_attribute($name, $value, $db_format = false)
 	{
 		$table = static::table();
 		if (!is_object($value)) {
 			if (array_key_exists($name, $table->columns)) {
-				$value = $table->columns[$name]->cast($value, static::connection());
+				$value = $table->columns[$name]->cast($value, static::connection(), $db_format);
 			} else {
 				$col = $table->get_column_by_inflected_name($name);
 				if (!is_null($col)){
-					$value = $col->cast($value, static::connection());
+					$value = $col->cast($value, static::connection(), $db_format);
 				}
 			}
 		}
@@ -1155,8 +1156,9 @@ class Model
 	 * @throws ActiveRecord\UndefinedPropertyException
 	 * @param array $attributes An array in the form array(name => value, ...)
 	 * @param boolean $guard_attributes Flag of whether or not protected/non-accessible attributes should be guarded
+	 * @param boolean $db_format Flag of whether to cast value from the database type
 	 */
-	private function set_attributes_via_mass_assignment(array &$attributes, $guard_attributes)
+	private function set_attributes_via_mass_assignment(array &$attributes, $guard_attributes, $db_format = false)
 	{
 		//access uninflected columns since that is what we would have in result set
 		$table = static::table();
@@ -1170,7 +1172,7 @@ class Model
 			// is a normal field on the table
 			if (array_key_exists($name,$table->columns))
 			{
-				$value = $table->columns[$name]->cast($value,$connection);
+				$value = $table->columns[$name]->cast($value,$connection, $db_format);
 				$name = $table->columns[$name]->inflected_name;
 			}
 
@@ -1858,5 +1860,4 @@ class Model
 		}
 		return true;
 	}
-};
-?>
+}
