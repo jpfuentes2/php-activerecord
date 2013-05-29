@@ -473,13 +473,15 @@ abstract class Connection
 	 */
 	public function string_to_datetime($string)
 	{
-		$date = date_create($string);
-		$errors = \DateTime::getLastErrors();
-
-		if ($errors['warning_count'] > 0 || $errors['error_count'] > 0)
-			return null;
-
-		return new DateTime($date->format(static::$datetime_format));
+		try
+		{
+			$datetime = new DateTime($string);
+		}
+		catch(\Exception $e)
+		{
+			$datetime = null;
+		}
+		return $datetime;
 	}
 
 	/**
