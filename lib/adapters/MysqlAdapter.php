@@ -13,6 +13,8 @@ class MysqlAdapter extends Connection
 {
 	static $DEFAULT_PORT = 3306;
 
+	static $datetime_format = 'Y-m-d H:i:s';
+
 	public function limit($sql, $offset, $limit)
 	{
 		$offset = is_null($offset) ? '' : intval($offset) . ',';
@@ -74,6 +76,13 @@ class MysqlAdapter extends Connection
 	{
 		$params = array($charset);
 		$this->query('SET NAMES ?',$params);
+	}
+
+	public function datetime_to_string($datetime)
+	{
+		$newDatetime = clone $datetime;
+		$newDatetime->setTimezone(Config::instance()->get_default_timezone());
+		return parent::datetime_to_string($newDatetime);
 	}
 
 	public function accepts_limit_and_order_for_update_and_delete() { return true; }
