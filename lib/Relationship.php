@@ -673,7 +673,8 @@ class BelongsTo extends AbstractRelationship
 		{
 			// return the existing model instance if its found in the identity map
 			$class = $this->class_name;
-			$pk = $model->get_values_for($keys)[$keys[0]];
+			$table_values = $model->get_values_for($keys);
+			$pk = $table_values[$keys[0]];
 			$ret = IdentityMap::instance()->get($class::table_name(), $pk);
 
 			if ($ret) return $ret;
