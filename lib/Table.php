@@ -250,7 +250,12 @@ class Table
 					$attrs[] = $model->attributes();
 			}
 			else
+			{
 				$model->merge_attributes($row); // update the existing model instance
+				
+				if ($collect_attrs_for_includes)
+					$attrs[] = $model->attributes();
+			}
 
 			$list[] = $model;
 		}
