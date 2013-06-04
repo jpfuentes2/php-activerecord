@@ -80,6 +80,13 @@ class Config extends Singleton
 	private $date_format = \DateTime::ISO8601;
 
 	/**
+	 * Switch for identity map.
+	 *
+	 * @var bool
+	 */
+	private $identity_map = false;
+
+	/**
 	 * Allows config initialization using a closure.
 	 *
 	 * This method is just syntatic sugar.
@@ -299,6 +306,27 @@ class Config extends Singleton
 	public function set_cache($url, $options=array())
 	{
 		Cache::initialize($url,$options);
+	}
+
+	/**
+	 * Turn on/off identity map
+	 *
+	 * @param boolean $bool
+	 * @return void
+	 */
+	public function set_identity_map($bool)
+	{
+		$this->identity_map = (bool)$bool;
+	}
+
+	/**
+	 * Return whether or not identity map is on
+	 *
+	 * @return boolean
+	 */
+	public function get_identity_map()
+	{
+		return $this->identity_map;
 	}
 };
 ?>

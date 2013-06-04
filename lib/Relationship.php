@@ -712,6 +712,18 @@ class BelongsTo extends AbstractRelationship
 		foreach ($this->foreign_key as $key)
 			$keys[] = $inflector->variablize($key);
 
+		// the identity map is experimental so it is disabled by default
+		if (Config::instance()->get_identity_map())
+		{
+			// return the existing model instance if its found in the identity map
+			$class = $this->class_name;
+			$table_values = $model->get_values_for($keys);
+			$pk = $table_values[$keys[0]];
+			$ret = IdentityMap::instance()->get($class::table_name(), $pk);
+
+			if ($ret) return $ret;
+		}
+
 		if (!($conditions = $this->create_conditions_from_keys($model, $this->primary_key, $keys)))
 			return null;
 

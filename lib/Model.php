@@ -1150,6 +1150,20 @@ class Model
 	}
 
 	/**
+	 * Mass update the model with new data from an attributes hash.
+	 *
+	 * Unlike set_attributes() this method will add new attributes if it doesnt already
+	 * exist in the model attribute hash.
+	 *
+	 * @see set_attributes
+	 * @param array $attributes An array containing data to update in the form array(name => value, ...)
+	 */
+	public function merge_attributes(array $attributes)
+	{
+		$this->set_attributes_via_mass_assignment($attributes, false);
+	}
+
+	/**
 	 * Passing $guard_attributes as true will throw an exception if an attribute does not exist.
 	 *
 	 * @throws ActiveRecord\UndefinedPropertyException
@@ -1224,7 +1238,19 @@ class Model
 				if (is_null($model))
 					return $this->__relationships[$name] = array();
 				else
+				{
+					// check to see if the model already exists in the relationship array
+					if (isset($this->__relationships[$name]))
+					{
+						foreach ($this->__relationships[$name] as $existing_model)
+						{
+							if ($existing_model === $model)
+								return;
+						}
+					}
+
 					return $this->__relationships[$name][] = $model;
+				}
 			}
 			else
 				return $this->__relationships[$name] = $model;

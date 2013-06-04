@@ -4,6 +4,8 @@
  */
 namespace ActiveRecord;
 
+require_once 'IdentityMap.php';
+
 /**
  * Manages reading and writing to a database table.
  *
@@ -219,13 +221,41 @@ class Table
 
 		while (($row = $sth->fetch()))
 		{
-			$model = new $this->class->name($row,false,true,false);
+			$model = null;
 
-			if ($readonly)
-				$model->readonly();
+			// the identity map is experimental so it is disabled by default
+			if (Config::instance()->get_identity_map())
+			{
+				// get the primary key if it has been selected
+				$pk = $this->get_primary_column()->inflected_name;
+				$has_pk = isset($row[$pk]);
 
-			if ($collect_attrs_for_includes)
-				$attrs[] = $model->attributes();
+				// return the existing model instance if its found in the identity map
+				if ($has_pk)
+					$model = IdentityMap::instance()->get($this->table, $row[$pk]);
+			}
+			
+			// create model if identity map is disabled or the record hasnt been retrieved yet
+			if (!$model)
+			{
+				$model = new $this->class->name($row,false,true,false);
+
+				if (Config::instance()->get_identity_map() && $has_pk)
+					IdentityMap::instance()->store($model);
+
+				if ($readonly)
+					$model->readonly();
+
+				if ($collect_attrs_for_includes)
+					$attrs[] = $model->attributes();
+			}
+			else
+			{
+				$model->merge_attributes($row); // update the existing model instance
+				
+				if ($collect_attrs_for_includes)
+					$attrs[] = $model->attributes();
+			}
 
 			$list[] = $model;
 		}
@@ -425,6 +455,17 @@ class Table
 					$this->pk[] = $c->inflected_name;
 			}
 		}
+	}
+
+	private function get_primary_column()
+	{
+		foreach ($this->columns as $column)
+		{
+			if ($column->pk)
+				return $column;
+		}
+
+		return null;
 	}
 
 	private function set_table_name()
