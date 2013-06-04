@@ -61,8 +61,42 @@ class IdentityMapTest extends DatabaseTest
 	}
 
 
-	public function test_relationships_return_existing_instance()
+	public function test_relationship_belongs_to()
 	{
-		
+		$author = Author::find(1);
+		$book = Book::find(1);
+
+		$this->assert_same($author, $book->author);
+	}
+
+
+	public function test_relationship_has_many()
+	{
+		$author = Author::find(1);
+		$book = Book::find(1);
+		$books = $author->books;
+
+		$this->assert_equals(1, count($books));
+		$this->assert_same($book, $books[0]);
+	}
+
+
+	public function test_eager_load_belongs_to()
+	{
+		$book = Book::find(1, array('include' => array('author')));
+		$author = Author::find(1);
+
+		$this->assert_same($author, $book->author);
+	}
+
+
+	public function test_eager_load_has_many()
+	{
+		$author1 = Author::find(1, array('include' => array('books')));
+		$author2 = Author::find(1, array('include' => array('books')));
+		$book = Book::find(1);
+
+		$this->assert_equals(1, count($author1->books));
+		$this->assert_same($book, $author1->books[0]);
 	}
 }

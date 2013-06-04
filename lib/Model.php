@@ -1237,7 +1237,19 @@ class Model
 				if (is_null($model))
 					return $this->__relationships[$name] = array();
 				else
+				{
+					// check to see if the model already exists in the relationship array
+					if (isset($this->__relationships[$name]))
+					{
+						foreach ($this->__relationships[$name] as $existing_model)
+						{
+							if ($existing_model === $model)
+								return;
+						}
+					}
+
 					return $this->__relationships[$name][] = $model;
+				}
 			}
 			else
 				return $this->__relationships[$name] = $model;
