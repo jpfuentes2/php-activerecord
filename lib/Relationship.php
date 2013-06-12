@@ -156,19 +156,12 @@ abstract class AbstractRelationship implements InterfaceRelationship
 			$this->set_keys($this->get_table()->class->getName(), true);
 
 			if (!isset($options['class_name'])) {
-				$class = classify($options['through'], true);
-				if (isset($this->options['namespace']) && !class_exists($class))
-					$class = $this->options['namespace'].'\\'.$class;
-
-				$through_table = $class::table();
+				$relation = $table->get_relationship($options['through'], true);
 			} else {
 				$class = $options['class_name'];
 				$relation = $class::table()->get_relationship($options['through']);
-				$through_table = $relation->get_table();
 			}
-			$options['joins'] = $this->construct_inner_join_sql($through_table, true);
-
-			$query_key = $this->primary_key[0];
+			$options['joins'] = $this->construct_inner_join_sql($relation->get_table(), true);
 
 			// reset keys
 			$this->primary_key = $pk;
@@ -181,18 +174,13 @@ abstract class AbstractRelationship implements InterfaceRelationship
 
 		$related_models = $class::find('all', $options);
 		$used_models = array();
-		$model_values_key = $inflector->variablize($model_values_key);
-		$query_key = $inflector->variablize($query_key);
 
 		foreach ($models as $model)
 		{
 			$matches = 0;
-			$key_to_match = $model->$model_values_key;
 
 			foreach ($related_models as $related)
 			{
-				if ($related->$query_key == $key_to_match)
-				{
 					$hash = spl_object_hash($related);
 
 					if (in_array($hash, $used_models))
@@ -202,7 +190,6 @@ abstract class AbstractRelationship implements InterfaceRelationship
 
 					$used_models[] = $hash;
 					$matches++;
-				}
 			}
 
 			if (0 === $matches)
