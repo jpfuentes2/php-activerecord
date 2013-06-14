@@ -101,7 +101,7 @@ SQL;
 
 		$c->map_raw_type();
 
-		if ($column['default'] !== NULL)
+		if (!is_null($column['default']))
 		{
 			preg_match("/^nextval\('(.*)'\)$/",$column['default'],$matches);
 
