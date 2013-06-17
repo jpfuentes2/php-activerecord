@@ -316,12 +316,12 @@ class Config extends Singleton
 	 * $config->set_cache("memcached://localhost",array("expire" => 60));
 	 * </code>
 	 *
-	 * @param string $url Url to your cache server.
+	 * @param array $urls Urls to your cache server cluster
 	 * @param array $options Array of options
 	 */
-	public function set_cache($url, $options=array())
+	public function set_cache($urls, $options=array())
 	{
-		Cache::initialize($url,$options);
+		Cache::initialize($urls,$options);
 	}
 };
 ?>

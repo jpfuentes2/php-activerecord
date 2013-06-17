@@ -347,7 +347,9 @@ class Model
 	 */
 	public function __isset($attribute_name)
 	{
-		return array_key_exists($attribute_name,$this->attributes) || array_key_exists($attribute_name,static::$alias_attribute);
+		return array_key_exists($attribute_name,$this->attributes) ||
+               array_key_exists($attribute_name,static::$alias_attribute) ||
+               method_exists($this,"get_{$attribute_name}");
 	}
 
 	/**
@@ -561,7 +563,7 @@ class Model
 	 */
 	public function attribute_is_dirty($attribute)
 	{
-		return $this->__dirty && isset($this->__dirty[$attribute]) && array_key_exists($attribute, $this->attributes);
+		return $this->__dirty && $this->__dirty[$attribute] && array_key_exists($attribute, $this->attributes);
 	}
 
 	/**
@@ -837,8 +839,8 @@ class Model
 				$this->attributes[$pk] = static::connection()->insert_id($table->sequence);
 		}
 
-		$this->__new_record = false;
 		$this->invoke_callback('after_create',false);
+		$this->__new_record = false;
 		return true;
 	}
 
@@ -1276,7 +1278,7 @@ class Model
 	 *
 	 * @var array
 	 */
-	static $VALID_OPTIONS = array('conditions', 'limit', 'offset', 'order', 'select', 'joins', 'include', 'readonly', 'group', 'from', 'having');
+	static $VALID_OPTIONS = array('conditions', 'limit', 'offset', 'order', 'select', 'joins', 'include', 'readonly', 'group', 'from', 'having','cache');
 
 	/**
 	 * Enables the use of dynamic finders.
@@ -1428,7 +1430,23 @@ class Model
 		$table = static::table();
 		$sql = $table->options_to_sql($options);
 		$values = $sql->get_where_values();
-		return static::connection()->query_and_fetch_one($sql->to_s(),$values);
+		$conn = static::connection();
+		$query_callback = function() use($conn,$sql,$values){
+			return $conn->query_and_fetch_one($sql->to_s(),$values);
+		};
+
+		if(isset($options['cache'])){
+			$cache = Cache::format_options($options['cache']);
+			if($cache !== NULL){
+				// Attempt to pull results from cache
+				$cache_key = isset($cache['key']) ? $cache['key'] : md5(serialize(array($sql->to_s(),$values)));
+				return Cache::get($cache_key, $query_callback, $cache['expire']);  
+			}else{
+				return $query_callback();
+			}
+		}else{
+			return $query_callback();
+		}
 	}
 
 	/**
@@ -1618,11 +1636,12 @@ class Model
 	 *
 	 * @param string $sql The raw SELECT query
 	 * @param array $values An array of values for any parameters that needs to be bound
+     * @param mixed $cache Cache options
 	 * @return array An array of models
 	 */
-	public static function find_by_sql($sql, $values=null)
+	public static function find_by_sql($sql, $values=null, $cache=null)
 	{
-		return static::table()->find_by_sql($sql, $values, true);
+		return static::table()->find_by_sql($sql, $values, true, null, $cache);
 	}
 
 	/**

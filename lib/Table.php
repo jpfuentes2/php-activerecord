@@ -205,33 +205,54 @@ class Table
 		$sql = $this->options_to_sql($options);
 		$readonly = (array_key_exists('readonly',$options) && $options['readonly']) ? true : false;
 		$eager_load = array_key_exists('include',$options) ? $options['include'] : null;
+		$cache = array_key_exists('cache',$options) ? $options['cache'] : null;
 
-		return $this->find_by_sql($sql->to_s(),$sql->get_where_values(), $readonly, $eager_load);
+		return $this->find_by_sql($sql->to_s(),$sql->get_where_values(), $readonly, $eager_load, $cache);
 	}
 
-	public function find_by_sql($sql, $values=null, $readonly=false, $includes=null)
+	public function find_by_sql($sql, $values=null, $readonly=false, $includes=null, $cache=null)
 	{
 		$this->last_sql = $sql;
 
 		$collect_attrs_for_includes = is_null($includes) ? false : true;
-		$list = $attrs = array();
-		$sth = $this->conn->query($sql,$this->process_data($values));
+		$table = $this;
 
-		while (($row = $sth->fetch()))
-		{
-			$model = new $this->class->name($row,false,true,false);
+		// Callback that runs the query on the db
+		$query_callback = function() use($table,$values,$readonly,$collect_attrs_for_includes) {
 
-			if ($readonly)
-				$model->readonly();
+			$list = $attrs = array();
+			$sth = $table->conn->query($table->last_sql,$table->process_data($values));
 
-			if ($collect_attrs_for_includes)
-				$attrs[] = $model->attributes();
+			while (($row = $sth->fetch()))
+			{
+				$model = new $table->class->name($row,false,true,false);
 
-			$list[] = $model;
+				if ($readonly)
+					$model->readonly();
+
+				if ($collect_attrs_for_includes)
+					$attrs[] = $model->attributes();
+
+				$list[] = $model;
+			}
+
+			return array($list,$attrs);
+		
+		}; 
+        
+		$cache = Cache::format_options($cache);
+		if($cache !== NULL){
+			// Attempt to pull results from cache
+			$cache_key = isset($cache['key']) ? $cache['key'] : md5(serialize(array($sql,$values)));
+			list($list,$attrs) = Cache::get($cache_key, $query_callback, $cache['expire']);
+
+		}else{
+			// Fetch results from db
+			list($list,$attrs) = $query_callback();
 		}
 
 		if ($collect_attrs_for_includes && !empty($list))
-			$this->execute_eager_load($list, $attrs, $includes);
+			$this->execute_eager_load($list, $attrs, $includes, $cache);
 
 		return $list;
 	}
@@ -244,7 +265,7 @@ class Table
 	 * @param $includes array eager load directives
 	 * @return void
 	 */
-	private function execute_eager_load($models=array(), $attrs=array(), $includes=array())
+	private function execute_eager_load($models=array(), $attrs=array(), $includes=array(), $cache=null)
 	{
 		if (!is_array($includes))
 			$includes = array($includes);
@@ -261,6 +282,7 @@ class Table
 				$nested_includes = array();
 
 			$rel = $this->get_relationship($name, true);
+			$rel->set_cache_option($cache);
 			$rel->load_eagerly($models, $attrs, $nested_includes, $this);
 		}
 	}
@@ -391,7 +413,7 @@ class Table
 		return $ret;
 	}
 
-	private function &process_data($hash)
+	public function &process_data($hash)
 	{
 		if (!$hash)
 			return $hash;

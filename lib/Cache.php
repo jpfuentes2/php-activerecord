@@ -37,15 +37,24 @@ class Cache
 	 * @param string $url URL to your cache server
 	 * @param array $options Specify additional options
 	 */
-	public static function initialize($url, $options=array())
+	public static function initialize($urls, $options=array())
 	{
-		if ($url)
+		if (is_array($urls) && !empty($urls))
 		{
-			$url = parse_url($url);
-			$file = ucwords(Inflector::instance()->camelize($url['scheme']));
+			$parsed_urls = array();
+			foreach($urls as $url){
+				$parsed_urls[] = parse_url($url);
+			}
+
+			$file = ucwords(Inflector::instance()->camelize($parsed_urls[0]['scheme']));
 			$class = "ActiveRecord\\$file";
 			require_once __DIR__ . "/cache/$file.php";
-			static::$adapter = new $class($url);
+
+			try{
+				static::$adapter = new $class($parsed_urls);
+			} catch (CacheException $e) {
+				static::$adapter = null;
+			}
 		}
 		else
 			static::$adapter = null;
@@ -59,15 +68,17 @@ class Cache
 			static::$adapter->flush();
 	}
 
-	public static function get($key, $closure)
+	public static function get($key, $closure, $expire=null)
 	{
 		$key = static::get_namespace() . $key;
 		
 		if (!static::$adapter)
 			return $closure();
-
-		if (!($value = static::$adapter->read($key)))
-			static::$adapter->write($key,($value = $closure()),static::$options['expire']);
+        
+		if (!($value = static::$adapter->read($key))){
+			$expire = is_null($expire) ? static::$options['expire'] : $expire;
+			static::$adapter->write($key,($value = $closure()),$expire);
+		}
 
 		return $value;
 	}
@@ -75,6 +86,23 @@ class Cache
 	private static function get_namespace()
 	{
 		return (isset(static::$options['namespace']) && strlen(static::$options['namespace']) > 0) ? (static::$options['namespace'] . "::") : "";
+	}
+
+	public static function format_options($options){
+		$rval = null;
+
+		if($options === true){
+			// set default cache options
+			$rval = array('expire' => static::$options['expire']); 
+
+		} elseif (is_array($options)) {
+			$rval = array();
+			if(isset($options['key'])) $rval['key'] = $options['key'];
+			$rval['expire'] = isset($options['expire']) ? intval($options['expire']) : static::$options['expire'];
+
+		}
+
+		return $rval;
 	}
 }
 ?>
