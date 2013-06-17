@@ -134,4 +134,11 @@ class RelationshipException extends ActiveRecordException {};
  * @package ActiveRecord
  */
 class HasManyThroughAssociationException extends RelationshipException {};
+
+/**
+ * Cache adapter exceptions
+ * 
+ * @package ActiveRecord
+ */
+class CacheException extends ActiveRecordException {};
 ?>
