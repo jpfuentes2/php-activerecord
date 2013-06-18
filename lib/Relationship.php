@@ -371,17 +371,6 @@ abstract class AbstractRelationship implements InterfaceRelationship
 		*/
 		
 		$this->set_keys($this->class_name);
-
-		$dest_table_name = $dest_table->get_fully_qualified_table_name();
-		$from_table_name = $from_table->get_fully_qualified_table_name();
-
-		/*
-		print "after set_keys(".$this->class_name."): ".
-			"primary key = ".$this->primary_key[0].", ".
-			"foreign key = ".$this->foreign_key[0]."\n";
-		print "from_table_name = $from_table_name\n";
-		print "dest_table_name = $dest_table_name\n";
-		*/
 		
 		// need to flip the logic when the key is on the other table
 		// In the case of a reverse relationship, we're coming FROM
@@ -391,15 +380,31 @@ abstract class AbstractRelationship implements InterfaceRelationship
 		if (($this instanceof HasMany or $this instanceof HasOne)
 			and (empty($this->options['through']) || $reverse_rel))
 		{
-			$from_table_key = $this->primary_key[0];
+			$this->set_keys($this->class_name);
+			if (!count($this->primary_key))
+				throw new ConfigException($from_table_name.
+					" has no primary key in relationship ".
+					$from_table_name.".".
+					$this->attribute_name);
+			$from_table_key = $this->from_table->pk[0];
+			if (!count($this->foreign_key))
+				throw new ConfigException($dest_table_name.
+					" has no primary key in relationship ".
+					"from ".$this->class_name.".".
+					$from_table_name.".".
+					$this->attribute_name);
 			$dest_table_key = $this->foreign_key[0];
 		}
 		else
 		{
+			$this->set_keys($this->class_name);
 			$from_table_key = $this->foreign_key[0];
 			$dest_table_key = $this->primary_key[0];
 		}
 		
+		$dest_table_name = $dest_table->get_fully_qualified_table_name();
+		$from_table_name = $from_table->get_fully_qualified_table_name();
+
 		if (!is_null($alias))
 		{
 			$aliased_dest_table_name = $alias = $this->get_table()->conn->quote_name($alias);
