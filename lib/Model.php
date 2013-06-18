@@ -609,6 +609,9 @@ class Model
 	public function get_primary_key($first=false)
 	{
 		$pk = static::table()->pk;
+		if (!count($pk))
+			throw new ConfigException($this->table_name().
+				" has no primary keys");
 		return $first ? $pk[0] : $pk;
 	}
 
