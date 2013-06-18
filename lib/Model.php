@@ -671,7 +671,14 @@ class Model
 		foreach ($attributes as $name)
 		{
 			if (array_key_exists($name,$this->attributes))
+			{
 				$ret[$name] = $this->attributes[$name];
+			}
+			else
+			{
+				throw new UndefinedPropertyException(get_called_class(),
+					$name, $this->attributes);
+			}
 		}
 		return $ret;
 	}
