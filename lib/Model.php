@@ -579,8 +579,7 @@ class Model
 	 */
 	public function get_primary_key($first=false)
 	{
-		$pk = static::table()->pk;
-		return $first ? $pk[0] : $pk;
+		return static::table()->get_primary_key($first);
 	}
 
 	/**
@@ -1564,45 +1563,12 @@ class Model
 
 		// anything left in $args is a find by pk
 		if ($num_args > 0 && !isset($options['conditions']))
-			return static::find_by_pk($args, $options);
+			return static::table()->find_by_pk($args, $options);
 
 		$options['mapped_names'] = static::$alias_attribute;
 		$list = static::table()->find($options);
 
 		return $single ? (!empty($list) ? $list[0] : null) : $list;
-	}
-
-	/**
-	 * Finder method which will find by a single or array of primary keys for this model.
-	 *
-	 * @see find
-	 * @param array $values An array containing values for the pk
-	 * @param array $options An options array
-	 * @return Model
-	 * @throws {@link RecordNotFound} if a record could not be found
-	 */
-	public static function find_by_pk($values, $options)
-	{
-		$options['conditions'] = static::pk_conditions($values);
-		$list = static::table()->find($options);
-		$results = count($list);
-
-		if ($results != ($expected = count($values)))
-		{
-			$class = get_called_class();
-
-			if ($expected == 1)
-			{
-				if (!is_array($values))
-					$values = array($values);
-
-				throw new RecordNotFound("Couldn't find $class with ID=" . join(',',$values));
-			}
-
-			$values = join(',',$values);
-			throw new RecordNotFound("Couldn't find all $class with IDs ($values) (found $results, but was looking for $expected)");
-		}
-		return $expected == 1 ? $list[0] : $list;
 	}
 
 	/**

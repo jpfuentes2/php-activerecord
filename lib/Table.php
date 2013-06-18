@@ -351,6 +351,45 @@ class Table
 		return $this->conn->query(($this->last_sql = $sql->to_s()),$values);
 	}
 
+	// Moved from Model because DynamoDB wants a different implementation
+	public function get_primary_key($first=false)
+	{
+		$pk = $this->pk;
+		return $first ? $pk[0] : $pk;
+	}
+
+	/**
+	 * Finder method which will find by a single or array of primary keys for this model.
+	 *
+	 * @see find
+	 * @param array $values An array containing values for the pk
+	 * @param array $options An options array
+	 * @return Model
+	 * @throws {@link RecordNotFound} if a record could not be found
+	 */
+	public function find_by_pk($values, $options)
+	{
+		$class_name = $this->class->name;
+		$options['conditions'] = $class_name::pk_conditions($values);
+		$list = $this->find($options);
+		$results = count($list);
+
+		if ($results != ($expected = count($values)))
+		{
+			if ($expected == 1)
+			{
+				if (!is_array($values))
+					$values = array($values);
+
+				throw new RecordNotFound("Couldn't find $class with ID=" . join(',',$values));
+			}
+
+			$values = join(',',$values);
+			throw new RecordNotFound("Couldn't find all $class_name with IDs ($values) (found $results, but was looking for $expected)");
+		}
+		return $expected == 1 ? $list[0] : $list;
+	}
+
 	/**
 	 * Add a relationship.
 	 *
@@ -428,6 +467,8 @@ class Table
 			}
 		}
 	}
+
+
 
 	private function set_table_name()
 	{

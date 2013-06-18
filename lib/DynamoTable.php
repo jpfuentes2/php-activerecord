@@ -27,6 +27,7 @@ class DynamoTable extends Table
 			throw new \Exception('Wacky class name');
 		}
 		 parent::__construct($class_name);
+		 $this->reset_primary_key();
 	}
 
 	public function get_fully_qualified_table_name($quote_name=true)
@@ -41,20 +42,315 @@ class DynamoTable extends Table
 		return $this->table;
 	}
 
+	public function reset_primary_key($first=false)
+	{
+		$pks = array();
+		foreach($this->pk as $name)
+		{
+			$col = array_key_exists($name, $this->columns) ? $this->columns[$name] : $this->get_column_by_inflected_name($name);
+			if($col->pk === 'HashKeyElement')
+			{
+				$pks[0] = $col->name;
+			}
+			if($col->pk === 'RangeKeyElement')
+			{
+				$pks[1] = $col->name;
+			}
+		}
+		$this->pk = $pks;
+	}
+
+	private function encode_operator($expn)
+	{
+		$expn = strtoupper($expn);
+
+		if(strpos($expn,'BEGINS WITH'))
+		{
+			return 'BEGINS_WITH';
+		}
+		if(strpos($expn,'NOT CONTAINS'))
+		{
+			return 'NOT_CONTAINS';
+		}
+		if(strpos($expn,'CONTAINS'))
+		{
+			return 'CONTAINS';
+		}
+		if(strpos($expn,'NOT NULL'))
+		{
+			return 'NOT_NULL';
+		}
+		if(strpos($expn,'NULL'))
+		{
+			return 'NULL';
+		}
+		if(strpos($expn,'BETWEEN'))
+		{
+			return 'BETWEEN';
+		}
+		if(strpos($expn,'>='))
+		{
+			return 'GE';
+		}
+		if(strpos($expn,'<='))
+		{
+			return 'LE';
+		}
+		if(strpos($expn,'IN'))
+		{
+			return 'IN';
+		}
+		if(strpos($expn,'!=') || strpos($expn,'<>'))
+		{
+			return 'NE';
+		}
+		if(strpos($expn,'<'))
+		{
+			return 'LT';
+		}
+		if(strpos($expn,'>'))
+		{
+			return 'GT';
+		}
+		if(strpos($expn,'='))
+		{
+			return 'EQ';
+		}
+		throw new \Exception('Operator not found in '. $expn);
+		//	EQ, NE, IN, LE, LT, GE, GT, BETWEEN, NOT_NULL, NULL, CONTAINS, NOT_CONTAINS, BEGINS_WITH
+	}
+
+	private function encode_condition($expn,$value)
+	{
+		$expn = preg_replace('/\s+/', ' ',$expn);
+		$parts = explode(' ', $expn);
+		$col = $this->columns[$parts[0]];
+		$parts[0] = ' ';
+		$op = $this->encode_operator(implode(' ', $parts));
+		return array($col->name => array(
+				'AttributeValueList' => array(
+					array($col->type => $value)
+				),
+				'ComparisonOperator' => $op));
+	}
+
+	public function find_by_pk($values, $options)
+	{
+
+		if(!is_array($values))
+		{
+			$values = array($values);
+		}
+
+		// exact key match?
+		if(count($this->pk) === count($values) && empty($options))
+		{
+			$key = array($this->pk[0] => $values[0]);
+
+			if(count($values) === 2)
+			{
+				$key[$this->pk[1]] = $values[1];
+			}
+
+			$keys = $this->make_key($key);
+			$itemKey = $this->makeItemKey($keys);
+			//echo '<hr>pk:' . json_encode($this->pk) . ' : ' . json_encode($keys) . ' : ' . json_encode($itemKey);
+			$get_response = $this->db()->getItem($itemKey);
+
+			if(!is_null($get_response['Item']))
+			{
+				$item = $this->item_to_array($get_response['Item']);
+				$model = new $this->class->name($item,false,true,false);
+
+				return $model;
+			}
+			else 
+			{
+				return null;
+			}
+		}
+		else // prepare a range query
+		{
+			echo '<hr>find_by_pk: ' . print_r(array('values' => $values, 'options' => $options),true) .'<br>';
+			
+			$hash_col = $this->columns[$this->pk[0]];
+			$query = array('TableName' => $this->table, 'HashKeyValue' => array($hash_col->type => $values[0]));
+
+			if(array_key_exists('conditions', $options))
+			{
+				$conditions = $options['conditions'];
+				$query['RangeKeyCondition'] = $this->encode_condition($conditions[0],$conditions[1]);
+			}
+
+			if(array_key_exists('order', $options)) 
+			{
+				$query['ScanIndexForward'] = (strpos(strtolower(' '.$options['order']), 'desc') === false);
+			}
+
+			if(array_key_exists('limit', $options))
+			{
+				$query['Limit'] = intval($options['limit']);
+			}
+
+			if(array_key_exists('consistent',$options))
+			{
+				$query['ConsistentRead'] = $options['consistent'];
+			}
+
+			echo '<hr>Query: ' . print_r($query,true) . '<br>';
+			
+			$results = $this->db()->query($query);
+
+			print_r($results);
+
+			$items = array();
+			foreach($results['Items'] as $idx => $item)
+			{
+				$items[] = new $this->class->name($this->item_to_array($item),false,true,false);
+			}
+
+			return $items;
+
+			print_r($results);
+/*
+			$query = array(
+    		'TableName'     => 'errors',
+    		'KeyConditions' => array(
+        'id' => array(
+            'AttributeValueList' => array(
+                array('N' => '1201')
+            ),
+            'ComparisonOperator' => 'EQ'
+        ),
+        'time' => array(
+            'AttributeValueList' => array(
+                array('N' => strtotime("-15 minutes"))
+            ),
+            'ComparisonOperator' => 'GT'
+        )
+    )
+*/
+			throw new \Exception('Non-primary Key Search');
+		}
+
+
+	
+
+		$class_name = $this->class;
+		$options['conditions'] = $class_name::pk_conditions($values);
+		$list = $this->find($options);
+		$results = count($list);
+
+		if ($results != ($expected = count($values)))
+		{
+			if ($expected == 1)
+			{
+				if (!is_array($values))
+					$values = array($values);
+
+				throw new RecordNotFound("Couldn't find $class with ID=" . join(',',$values));
+			}
+
+			$values = join(',',$values);
+			throw new RecordNotFound("Couldn't find all $class_name with IDs ($values) (found $results, but was looking for $expected)");
+		}
+		return $expected == 1 ? $list[0] : $list;
+	}
+
+	public function get_hash_key_element()
+	{
+		foreach($this->pk as $name)
+		{
+			$col = array_key_exists($name, $this->columns) ? $this->columns[$name] : $this->get_column_by_inflected_name($name);
+			if($col->pk === 'HashKeyElement')
+			{
+				return $name;
+			}
+		}
+		throw new \Exception('No HashKeyElement defined for table: '. $this->table);
+	}
+
+	public function get_range_key_element()
+	{
+		if(count($this->pk) !== 2)
+		{
+			return null;
+		}
+		foreach($this->pk as $name)
+		{
+			$col = array_key_exists($name, $this->columns) ? $this->columns[$name] : $this->get_column_by_inflected_name($name);
+			if($col->pk === 'RangeKeyElement')
+			{
+				return $name;
+			}
+		}
+		return null;		
+	}
+
 	public function insert(&$data, $pk=null, $sequence_name=null)
 	{
-		$data = $this->process_data($data);
-
-		$sql = new SQLBuilder($this->conn,$this->get_fully_qualified_table_name());
-		$sql->insert($data,$pk,$sequence_name);
-
-		$values = array_values($data);
-		return $this->conn->query(($this->last_sql = $sql->to_s()),$values);
+		$put_response = $this->db()->putItem(array(
+        	'TableName' => $this->get_fully_qualified_table_name(),
+           	'Item' => $this->db()->formatAttributes($data)
+           	)
+      	);
 	}
 
 	public function update(&$data, $where)
 	{
+
+		echo '<hr>Data: '.print_r($data,true);
+		echo '<br>Where: '.print_r($where,true);
+		echo '<hr>';
+		throw new \Exception("Not Implemented");
+
 		$data = $this->process_data($data);
+
+        $updates = array();
+        foreach($this->_attributes as $key => $value)
+        {
+            if(!array_key_exists($key,$this->_snapshot) && !is_null($value))
+            {
+                $updates[$key] = array('Action' => AttributeAction::PUT, 'Value' => DynamoItem::Database()->formatValue($value)); 
+            }
+            else if($value != $this->_snapshot[$key] && !is_null($value))
+            {
+                if(false && is_array($value) && is_array($this->_snapshot[$key]))
+                {
+
+                }
+                else
+                {
+                    $updates[$key] = array('Action' => AttributeAction::PUT, 'Value' => DynamoItem::Database()->formatValue($value));
+                }
+            }
+        }
+        foreach($this->_snapshot as $key => $value)
+        {
+            if(!array_key_exists($key,$this->_attributes) || empty($this->_attributes[$key]))
+            {
+                $update[$key] = array('Action' => AttributeAction::DELETE);
+            }
+        }
+        $expected = array();
+        foreach($this->_snapshot as $key => $value)
+        {
+            if($key != $myclass::HashKeyElement && !defined(get_called_class().'::RangeKeyElement') || (defined(get_called_class().'::RangeKeyElement') && $key != $this->_statics['RangeKeyElement']))
+            {
+                $expected[$key] = array('Value' => DynamoItem::Database()->formatValue($value));
+            }
+        }
+        $request = $this->itemKey();
+        $request['AttributeUpdates'] = $updates;
+        $request['Expected'] = $expected;
+        $request['ReturnValues'] = 'ALL_NEW';
+        if(!empty($updates))
+        {
+            $update_response = DynamoItem::Database()->updateItem($request);
+        }
+
+        return;
+
 
 		$sql = new SQLBuilder($this->conn,$this->get_fully_qualified_table_name());
 		$sql->update($data)->where($where);
@@ -94,6 +390,14 @@ class DynamoTable extends Table
 
 	public function find($options)
 	{
+		if(array_key_exists('conditions', $options))
+		{
+			$keys = array_values($options['conditions']);
+			return array($this->find_by_pk($keys,array()));
+		}
+		echo '<hr>Find Options: ' . print_r($options,true) . '<hr>';
+		throw new \Exception('what?');
+
 		return $this->options_to_dynamo($options);
 	}
 
@@ -157,18 +461,21 @@ class DynamoTable extends Table
 		{
 			if ($value instanceof \DateTime)
 			{
-				if (isset($this->columns[$name]) && $this->columns[$name]->type == Column::DATE)
-					$hash[$name] = $this->conn->date_to_string($value);
-				else
-					$hash[$name] = $this->conn->datetime_to_string($value);
+				$hash[$name] = $value->getTimestamp();
+			}
+			else if(is_array($value) && count($value) === 0)
+			{
+				unset($hash[$name]);
 			}
 			else
+			{
 				$hash[$name] = $value;
+			}
 		}
 		return $hash;
 	}
 
-	public function build_match_expression($keys)
+	public function make_key($keys)
 	{
 		$key = array();
 		foreach($keys as $name => $value)
@@ -177,7 +484,7 @@ class DynamoTable extends Table
 
 			if($col->pk)
 			{
-				$key[$col->pk] = $this->db()->formatValue($value);
+				$key[$col->name] = $this->db()->formatValue($value);
 			}
 			else
 			{
@@ -199,7 +506,7 @@ class DynamoTable extends Table
 
 		if(array_key_exists('conditions', $options))
 		{
-			$key = $this->build_match_expression($options['conditions']);
+			$key = $this->make_key($options['conditions']);
 		}
 
 		$get_response = $this->db()->getItem($this->makeItemKey($key));
@@ -315,8 +622,8 @@ class DynamoTable extends Table
     {
         $dynamodb = $this->db();
         $response = $dynamodb->deleteTable(array('TableName' => $this->get_fully_qualified_table_name()));
-        $cache = self::GetCache();
-        if($cache) { $cache->flush(); }
+        //$cache = self::GetCache();
+        //if($cache) { $cache->flush(); }
     }
 
     public function TableStatus()
