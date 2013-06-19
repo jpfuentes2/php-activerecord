@@ -597,25 +597,29 @@ class DynamoTable extends Table
 		return $conditions;
 	}
 
-	   public function CreateTable($readCapacityUnits = 20, $writeCapacityUnits = 5)
+	public function CreateTable($readCapacityUnits = 20, $writeCapacityUnits = 5)
     {
         $table = $this->get_fully_qualified_table_name();
-        $keySchema = array('HashKeyElement'=>array('AttributeName' => $table::HashKeyElement, 'AttributeType' => $table::HashKeyType));
+        $keySchema = array(array('AttributeName' => $table::HashKeyElement, 'KeyType' => 'HASH'));
+        $definitions = array(array('AttributeName' => $table::HashKeyElement, 'AttributeType' => $table::HashKeyType));
 
         if(defined($table.'::RangeKeyElement'))
         {
-            $keySchema['RangeKeyElement'] = array('AttributeName' => $table::RangeKeyElement, 'AttributeType' => $table::RangeKeyType);
+            $keySchema[] = array('AttributeName' => $table::RangeKeyElement, 'KeyType' => 'RANGE');
+            $definitions[] = array('AttributeName' => $table::RangeKeyElement, 'AttributeType' => $table::RangeKeyType);
         }
 
-        $dynamodb = $this->db();
+        $dynamodb = self::Database();
         $response = $dynamodb->createTable(array(
             'TableName' => $table,
+            'AttributeDefinitions' => $definitions,
             'KeySchema' => $keySchema,
             'ProvisionedThroughput' => array(
                 'ReadCapacityUnits'  => $readCapacityUnits,
                 'WriteCapacityUnits' => $writeCapacityUnits
             )
         ));
+
     }
 
     public function DeleteTable()
