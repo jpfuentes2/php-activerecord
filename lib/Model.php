@@ -485,7 +485,9 @@ class Model
 
 		// check relationships if no attribute
 		if (array_key_exists($name,$this->__relationships))
+		{
 			return $this->__relationships[$name];
+		}
 
 		$table = static::table();
 

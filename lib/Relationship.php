@@ -90,7 +90,7 @@ abstract class AbstractRelationship implements InterfaceRelationship
 		elseif (isset($this->options['class_name']))
 			$this->set_class_name($this->options['class_name']);
 
-		$this->attribute_name = strtolower(Inflector::instance()->variablize($this->attribute_name));
+		$this->attribute_name = Inflector::instance()->variablize($this->attribute_name);
 
 		if (!$this->foreign_key && isset($this->options['foreign_key']))
 			$this->foreign_key = is_array($this->options['foreign_key']) ? $this->options['foreign_key'] : array($this->options['foreign_key']);
@@ -162,6 +162,7 @@ abstract class AbstractRelationship implements InterfaceRelationship
 
 				$through_table = $class::table();
 			} else {
+				echo '<hr>'.json_encode($options);
 				$class = $options['class_name'];
 				$relation = $class::table()->get_relationship($options['through']);
 				$through_table = $relation->get_table();
