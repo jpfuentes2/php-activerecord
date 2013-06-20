@@ -15,6 +15,7 @@ require __DIR__.'/lib/Model.php';
 require __DIR__.'/lib/Table.php';
 require __DIR__.'/lib/ConnectionManager.php';
 require __DIR__.'/lib/Connection.php';
+require __DIR__.'/lib/Serialization.php';
 require __DIR__.'/lib/SQLBuilder.php';
 require __DIR__.'/lib/Reflections.php';
 require __DIR__.'/lib/Inflector.php';
