@@ -301,7 +301,7 @@ abstract class Connection
 	 */
 	public function query($sql, &$values=array())
 	{
-		echo '<hr>'.json_encode(array($sql=>$values)).'<hr>';
+		//echo '<hr>'.json_encode(array($sql=>$values)).'<hr>';
 
 		if ($this->logging)
 		{
