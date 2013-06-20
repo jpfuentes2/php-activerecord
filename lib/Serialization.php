@@ -136,10 +136,13 @@ abstract class Serialization
 		{
 			$this->options_to_a('methods');
 
-			foreach ($this->options['methods'] as $method)
+			foreach ($this->options['methods'] as $method => $name)
 			{
+				if (is_numeric($method))
+					$method = $name;
+
 				if (method_exists($this->model, $method))
-					$this->attributes[$method] = $this->model->$method();
+					$this->attributes[$name] = $this->model->$method();
 			}
 		}
 	}
