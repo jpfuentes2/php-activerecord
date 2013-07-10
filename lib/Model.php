@@ -468,8 +468,9 @@ class Model
 		if ($value instanceof DateTime)
 			$value->attribute_of($this,$name);
 
-		$this->attributes[$name] = $value;
-		$this->flag_dirty($name);
+		$flag_dirty = isset($this->attributes[$name]) && ($this->attributes[$name] === $value) ? false : true;
+        $this->attributes[$name] = $value;
+		if ($flag_dirty) $this->flag_dirty($name);
 		return $value;
 	}
 
