@@ -548,11 +548,82 @@ class ActiveRecordTest extends DatabaseTest
 		$this->assert_true($event->attribute_is_dirty('title'));
 	}
 
-    public function test_attribute_is_not_flagged_dirty_if_assigning_same_value() {
-        $event = Event::find(1);
-        $event->type = "Music";
-        $this->assert_false($event->attribute_is_dirty('type'));
-    }
+	public function test_attribute_is_not_flagged_dirty_if_assigning_same_value() {
+		$event = Event::find(1);
+		$event->type = "Music";
+		$this->assert_false($event->attribute_is_dirty('type'));
+	}
+
+	public function test_changed_attributes() {
+		$event = Event::find(1);
+
+		$event->type = "Groovy Music";
+		$changed_attributes = $event->changed_attributes();
+		$this->assert_true(is_array($changed_attributes));
+		$this->assert_equals(1, count($changed_attributes));
+		$this->assert_true(isset($changed_attributes['type']));
+		$this->assert_equals("Music", $changed_attributes['type']);
+
+		$event->type = "Funky Music";
+		$changed_attributes = $event->changed_attributes();
+		$this->assert_true(is_array($changed_attributes));
+		$this->assert_equals(1, count($changed_attributes));
+		$this->assert_true(isset($changed_attributes['type']));
+		$this->assert_equals("Music", $changed_attributes['type']);
+	}
+
+	public function test_changes() {
+		$event = Event::find(1);
+
+		$event->type = "Groovy Music";
+		$changes = $event->changes();
+		$this->assert_true(is_array($changes));
+		$this->assert_equals(1, count($changes));
+		$this->assert_true(isset($changes['type']));
+		$this->assert_true(is_array($changes['type']));
+		$this->assert_equals("Music", $changes['type'][0]);
+		$this->assert_equals("Groovy Music", $changes['type'][1]);
+
+		$event->type = "Funky Music";
+		$changes = $event->changes();
+		$this->assert_true(is_array($changes));
+		$this->assert_equals(1, count($changes));
+		$this->assert_true(isset($changes['type']));
+		$this->assert_true(is_array($changes['type']));
+		$this->assert_equals("Music", $changes['type'][0]);
+		$this->assert_equals("Funky Music", $changes['type'][1]);
+	}
+
+	public function test_attribute_was() {
+		$event = Event::find(1);
+		$event->type = "Funky Music";
+		$this->assert_equals("Music", $event->attribute_was("type"));
+		$event->type = "Groovy Music";
+		$this->assert_equals("Music", $event->attribute_was("type"));
+	}
+
+	public function test_previous_changes() {
+		$event = Event::find(1);
+		$event->type = "Groovy Music";
+		$previous_changes = $event->previous_changes();
+		$this->assert_true(empty($previous_changes));
+		$event->save();
+		$previous_changes = $event->previous_changes();
+		$this->assert_true(is_array($previous_changes));
+		$this->assert_equals(1, count($previous_changes));
+		$this->assert_true(isset($previous_changes['type']));
+		$this->assert_true(is_array($previous_changes['type']));
+		$this->assert_equals("Music", $previous_changes['type'][0]);
+		$this->assert_equals("Groovy Music", $previous_changes['type'][1]);
+	}
+
+	public function test_save_resets_changed_attributes() {
+		$event = Event::find(1);
+		$event->type = "Groovy Music";
+		$event->save();
+		$changed_attributes = $event->changed_attributes();
+		$this->assert_true(empty($changed_attributes));
+	}
 
 	public function test_assigning_php_datetime_gets_converted_to_ar_datetime()
 	{
