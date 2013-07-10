@@ -548,6 +548,12 @@ class ActiveRecordTest extends DatabaseTest
 		$this->assert_true($event->attribute_is_dirty('title'));
 	}
 
+    public function test_attribute_is_not_flagged_dirty_if_assigning_same_value() {
+        $event = Event::find(1);
+        $event->type = "Music";
+        $this->assert_false($event->attribute_is_dirty('type'));
+    }
+
 	public function test_assigning_php_datetime_gets_converted_to_ar_datetime()
 	{
 		$author = new Author();
