@@ -16,21 +16,41 @@ class OptionBinder
 	/**
 	 * Determinates the valid aliases for the model
 	 */
-	private static $builder_scopes = array('where', 'order', 'group', 'limit', 'offset', 'select', 'having', 'include', 'joins', );
-
+	private static $builder_scopes = array('where','joins','order', 'group', 'limit', 'offset', 'select', 'having', 'include');
+	
+	private static $merge_scopes = array('where','joins');
 	public static function get_builder_scopes()
 	{
 		return self::$builder_scopes;
 	}
-
+	public static function get_merge_scopes()
+	{
+		return self::$merge_scopes;
+	}
+	
 	/**
 	 * Sets the normal options
 	 */
 	public function __call($method, $arguments)
 	{
+		if(in_array($method, self::$merge_scopes))
+			return call_user_func_array($method, $arguments);
 		if(in_array($method, self::get_builder_scopes()))
 			return $this->set_option($method, $arguments[0]);
 		throw new ActiveRecordException("The scope \"$method\" does not exists");
+	}
+	
+	public function joins($value)
+	{
+		if(isset($this->options['joins']))
+		{
+			$this->options['joins'] .= ' '.$value;
+		}
+		else
+		{
+			$this->options['joins'] = $value;
+		}
+		return $this;
 	}
 
 	public function set_option($option, $value)
@@ -96,6 +116,10 @@ class OptionBinder
 	 */
 	public function merge($options)
 	{
+		if(is_array($options) && isset($options['joins']) && $options['joins'] == 'LEFT JOIN user_stream_watching on user_stream_watching.chat_id = streams.id LEFT JOIN `stream_broadcasts` on `streams`.id = `stream_broadcasts`.stream')
+		{
+			throw new \Exception();
+		}
 		if($options instanceof OptionBinder)
 		{
 			$options = $options->get_options();
@@ -115,7 +139,16 @@ class OptionBinder
 				$this->where($value);
 				continue;
 			}
-			$this->options[$option] = $value;
+			else if(in_array($option,self::$merge_scopes))
+			{
+				/** Call the specialized function for this particular join type */
+			 	$this->$option($value);
+				continue;
+			}
+			else
+			{
+				$this->options[$option] = $value;
+			}
 		}
 		return $this;
 	}

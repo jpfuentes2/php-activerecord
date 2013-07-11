@@ -196,7 +196,10 @@ class Scopes implements \IteratorAggregate
 				$this->add_scope($options);
 			}
 			$options = $this->get_options();
-			unset($options['conditions']);
+			foreach(OptionBinder::get_merge_scopes() as $merges)
+			{
+				unset($options[$merges]);	
+			}
 		}
 		else
 		{
