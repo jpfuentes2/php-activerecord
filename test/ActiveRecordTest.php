@@ -625,6 +625,16 @@ class ActiveRecordTest extends DatabaseTest
 		$this->assert_true(empty($changed_attributes));
 	}
 
+	public function test_changing_datetime_attribute_tracks_change() {
+		$author = new Author();
+		$author->created_at = $original = new \DateTime("yesterday");
+		$author->created_at = $now = new \DateTime();
+		$changes = $author->changes();
+		$this->assert_true(isset($changes['created_at']));
+		$this->assert_datetime_equals($original, $changes['created_at'][0]);
+		$this->assert_datetime_equals($now, $changes['created_at'][1]);
+	}
+
 	public function test_assigning_php_datetime_gets_converted_to_ar_datetime()
 	{
 		$author = new Author();

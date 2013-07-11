@@ -488,13 +488,8 @@ class Model
 		// only update the attribute if it isn't set or has changed
 		if (!isset($this->attributes[$name]) || ($this->attributes[$name] !== $value)) {
 			// track changes to the attribute
-			if (isset($this->attributes[$name]) && !isset($this->changed_attributes[$name])) {
-				// convert DateTime objects to a string
-				if ($this->attributes[$name] instanceof DateTime)
-					$this->changed_attributes[$name] = strval($this->attributes[$name]);
-				else
-					$this->changed_attributes[$name] = $this->attributes[$name];
-			}
+			if (isset($this->attributes[$name]) && !isset($this->changed_attributes[$name]))
+				$this->changed_attributes[$name] = $this->attributes[$name];
 
 			// set the attribute and flag as dirty
 			$this->attributes[$name] = $value;
@@ -631,10 +626,12 @@ class Model
 	 */
 	public function changes()
 	{
-		return array_merge_recursive(
-			$this->changed_attributes,
-			array_intersect_key($this->attributes, $this->changed_attributes)
-		);
+		$changes = array();
+		$attributes = array_intersect_key($this->attributes, $this->changed_attributes);
+		foreach($attributes as $name => $value) {
+			$changes[$name] = array($this->changed_attributes[$name],$value);
+		}
+		return $changes;
 	}
 
 	/**
