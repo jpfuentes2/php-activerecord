@@ -36,10 +36,22 @@ class IsNotBob extends Author
 	{
 		if($this->scoped_name)
 		{
-			return self::scoped()->where('name = "'.$this->scoped_name.'"');
+			return array('conditions'=>array('name = "'.$this->scoped_name.'"'));
 		}
-		return self::scoped()->where('name != "Uncle Bob"');
+		return array('conditions'=>array('name != "Uncle Bob"'));
 	} 
+	
+	public static function is_tito_join()
+	{
+		return static::scoped()->joins('LEFT JOIN authors a2 on a2.author_id = authors.author_id')
+			->where('a2.name ="tito"');
+	}
+	
+	public static function is_bob_join()
+	{
+		return static::scoped()->joins('LEFT JOIN authors a3 on a3.author_id = authors.author_id')
+			->where('a3.name ="Uncle Bob"');
+	}
     
     public static function is_tito_call()
     {
@@ -75,6 +87,20 @@ class ScopeTest extends DatabaseTest
 	{
 		parent::tear_down();
 	}
+	
+	public function test_join()
+	{
+		$tito = IsNotBobNoDefault::is_tito_join()->all();
+		$this->assertEquals(1,count($tito));
+		$this->assertEquals('Tito', $tito[0]->name);
+	}
+	
+	public function test_double_join()
+	{
+		$impossible_double_join = IsNotBobNoDefault::is_tito_join()->is_bob_join()->all();
+		$this->assertEquals(0,count($impossible_double_join));
+	}
+	
 	
 	public function test_class_with_no_default_scope_also_behaves_correctly()
 	{
