@@ -9,7 +9,7 @@ namespace ActiveRecord;
  *
  */
 require_once(__DIR__.'/OptionBinder.php');
-class Scopes
+class Scopes implements \IteratorAggregate
 {
 	protected $model = null;
 	protected $scopes = null;
@@ -235,4 +235,9 @@ class Scopes
 		$this->remove_scope_from_hash_after_adding_default_scope = true;
 		return call_user_func_array(array($this->model, 'first'), $args);
 	}
+	
+	public function getIterator()
+    {
+    	return new ArrayIterator($this->all());
+    }
 }
