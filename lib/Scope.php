@@ -196,6 +196,9 @@ class Scopes implements \IteratorAggregate
 				$this->add_scope($options);
 			}
 			$options = $this->get_options();
+			/**
+			 * TODO: Find out how necessary this is, all is seems to do is result in duplicate search parameters
+			 */
 			unset($options['conditions']);
 			foreach(OptionBinder::get_merge_scopes() as $merges)
 			{
