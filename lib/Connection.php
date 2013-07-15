@@ -318,8 +318,8 @@ abstract class Connection
 		if ($this->logging)
 		{
 			$method = $this->logger_method;
-            $log_data = array("query" => $sql);
-            if (!empty($values)) $log_data['values'] = $values;
+			$log_data = array("query" => $sql);
+			if (!empty($values)) $log_data['values'] = $values;
 			$this->logger->$method(json_encode($log_data));
 		}
 
