@@ -318,9 +318,9 @@ abstract class Connection
 		if ($this->logging)
 		{
 			$method = $this->logger_method;
-            $log_message = "query:$sql;";
-            if (!empty($values)) $log_message .= "values:" . implode(", ", $values);
-			$this->logger->$method($log_message);
+            $log_data = array("query" => $sql);
+            if (!empty($values)) $log_data['values'] = $values;
+			$this->logger->$method(json_encode($log_data));
 		}
 
 		$this->last_query = $sql;
