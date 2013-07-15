@@ -318,8 +318,8 @@ abstract class Connection
 		if ($this->logging)
 		{
 			$method = $this->logger_method;
-            $log_message = $sql;
-            if (!empty($values)) $log_message .= " => (" . implode(", ", $values) . ")";
+            $log_message = "query:$sql;";
+            if (!empty($values)) $log_message .= "values:" . implode(", ", $values);
 			$this->logger->$method($log_message);
 		}
 
