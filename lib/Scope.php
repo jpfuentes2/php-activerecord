@@ -9,7 +9,7 @@ namespace ActiveRecord;
  *
  */
 require_once(__DIR__.'/OptionBinder.php');
-class Scopes implements \IteratorAggregate
+class Scopes implements \IteratorAggregate, \Countable
 {
 	protected $model = null;
 	protected $scopes = null;
@@ -247,4 +247,5 @@ class Scopes implements \IteratorAggregate
     {
     	return new \ArrayIterator($this->all());
     }
+	
 }
