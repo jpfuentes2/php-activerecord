@@ -245,6 +245,6 @@ class Scopes implements \IteratorAggregate
 	
 	public function getIterator()
     {
-    	return new ArrayIterator($this->all());
+    	return new \ArrayIterator($this->all());
     }
 }
