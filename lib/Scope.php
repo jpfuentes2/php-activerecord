@@ -9,7 +9,7 @@ namespace ActiveRecord;
  *
  */
 require_once(__DIR__.'/OptionBinder.php');
-class Scopes implements \IteratorAggregate, \Countable
+class Scopes implements \IteratorAggregate, \Countable, \ArrayAccess
 {
 	protected $model = null;
 	protected $scopes = null;
@@ -248,4 +248,25 @@ class Scopes implements \IteratorAggregate, \Countable
     	return new \ArrayIterator($this->all());
     }
 	
+	public function offsetExists ($offset)
+	{
+		$array = $this->all();
+		return isset($array[$offset]);
+	}
+	
+	public function offsetGet ($offset)
+	{
+		$array = $this->all();
+		return $array[$offset];
+	}
+	
+	public function offsetSet ($offset ,$value )
+	{
+		throw new \Exception('Cannot use set an array key here');
+	}
+	
+	public function offsetUnset ($offset)
+	{
+		throw new \Exception('Cannot use unset here');
+	}
 }
