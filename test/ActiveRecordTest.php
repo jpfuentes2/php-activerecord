@@ -635,6 +635,15 @@ class ActiveRecordTest extends DatabaseTest
 		$this->assert_datetime_equals($now, $changes['created_at'][1]);
 	}
 
+	public function test_changing_empty_attribute_value_tracks_change() {
+		$event = new Event();
+		$event->description = "The most fun";
+		$changes = $event->changes();
+		$this->assert_true(array_key_exists("description", $changes));
+		$this->assert_equals("", $changes['description'][0]);
+		$this->assert_equals("The most fun", $changes['description'][1]);
+	}
+
 	public function test_assigning_php_datetime_gets_converted_to_ar_datetime()
 	{
 		$author = new Author();
