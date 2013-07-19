@@ -488,7 +488,7 @@ class Model
 		// only update the attribute if it isn't set or has changed
 		if (!isset($this->attributes[$name]) || ($this->attributes[$name] !== $value)) {
 			// track changes to the attribute
-			if (isset($this->attributes[$name]) && !isset($this->changed_attributes[$name]))
+			if (array_key_exists($name, $this->attributes) && !isset($this->changed_attributes[$name]))
 				$this->changed_attributes[$name] = $this->attributes[$name];
 
 			// set the attribute and flag as dirty
