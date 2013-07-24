@@ -57,6 +57,18 @@ class SqliteAdapterTest extends AdapterTest
 		$this->assert_true($columns['id']->auto_increment);
 	}
 
+	public function test_datetime_to_string()
+	{
+		$datetime = '2009-01-01 01:01:01';
+		$this->assert_equals($datetime,$this->conn->datetime_to_string(date_create($datetime)));
+	}
+
+	public function test_date_to_string()
+	{
+		$datetime = '2009-01-01';
+		$this->assert_equals($datetime,$this->conn->date_to_string(date_create($datetime)));
+	}
+
 	// not supported
 	public function test_connect_with_port() {}
 }

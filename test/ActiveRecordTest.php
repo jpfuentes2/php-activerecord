@@ -302,7 +302,7 @@ class ActiveRecordTest extends DatabaseTest
 
 		try {
 			$book->save();
-			$this-fail('expected exception ActiveRecord\ReadonlyException');
+			$this->fail('expected exception ActiveRecord\ReadonlyException');
 		} catch (ActiveRecord\ReadonlyException $e) {
 		}
 

@@ -749,12 +749,13 @@ class Model
 	 *
 	 * @param array $attributes Array of the models attributes
 	 * @param boolean $validate True if the validators should be run
+	 * @param boolean $guard_attributes Set to true to guard protected/non-accessible attributes
 	 * @return Model
 	 */
-	public static function create($attributes, $validate=true)
+	public static function create($attributes, $validate=true, $guard_attributes=true)
 	{
 		$class_name = get_called_class();
-		$model = new $class_name($attributes);
+		$model = new $class_name($attributes, $guard_attributes);
 		$model->save($validate);
 		return $model;
 	}
