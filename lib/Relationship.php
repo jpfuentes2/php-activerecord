@@ -67,6 +67,12 @@ abstract class AbstractRelationship implements InterfaceRelationship
 	static protected $valid_association_options = array('class_name', 'class', 'foreign_key', 'conditions', 'select', 'readonly', 'namespace');
 
 	/**
+	 * The quote character for stuff like column and field names.
+	 * @var string
+	 */
+	static $SHORTCUT_RELATION_KEY = '__ar_relkey';
+
+	/**
 	 * Constructs a relationship.
 	 *
 	 * @param array $options Options for the relationship (see {@link valid_association_options})
@@ -163,8 +169,22 @@ abstract class AbstractRelationship implements InterfaceRelationship
 				$through_table = $class::table();
 			} else {
 				$class = $options['class_name'];
+				if (isset($this->options['namespace']) && !class_exists($class))
+					$class = $this->options['namespace'].'\\'.$class;
 				$relation = $class::table()->get_relationship($options['through']);
 				$through_table = $relation->get_table();
+				if ( count($fk) > 1 ) {
+					throw new RelationshipException('Can not eagerly load many-to-many relationships with composite primary keys.');
+				}
+				else {
+					// Add the shortcut relation key (add value through.foreign_key to relation model)
+					if ( !isset($options['select']) )
+						$options['select'] = Connection::instance()->quote_name($class::table()->table) .'.*';
+					$options['select'] = Connection::instance()->quote_name($through_table->table)
+						.'.'.Connection::instance()->quote_name($fk[0]).' as '
+						.Connection::instance()->quote_name(static::$SHORTCUT_RELATION_KEY).','. $options['select'];
+					$shortcut_relation = true;
+				}
 			}
 			$options['joins'] = $this->construct_inner_join_sql($through_table, true);
 
@@ -174,6 +194,9 @@ abstract class AbstractRelationship implements InterfaceRelationship
 			$this->primary_key = $pk;
 			$this->foreign_key = $fk;
 		}
+		else {
+			$shortcut_relation = false;
+		}
 
 		$options = $this->unset_non_finder_options($options);
 
@@ -182,7 +205,7 @@ abstract class AbstractRelationship implements InterfaceRelationship
 		$related_models = $class::find('all', $options);
 		$used_models = array();
 		$model_values_key = $inflector->variablize($model_values_key);
-		$query_key = $inflector->variablize($query_key);
+		$query_key = $shortcut_relation ? static::$SHORTCUT_RELATION_KEY : $inflector->variablize($query_key);
 
 		foreach ($models as $model)
 		{
