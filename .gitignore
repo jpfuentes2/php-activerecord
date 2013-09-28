@@ -4,3 +4,5 @@
 *.log
 test/*.db
 *.swp
+vendor/*
+composer.lock
