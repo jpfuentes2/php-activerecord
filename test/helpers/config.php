@@ -10,8 +10,7 @@
  */
 
 set_include_path(get_include_path() . PATH_SEPARATOR . './vendor/phpunit/PHPUnit'
-									. PATH_SEPARATOR . './vendor/pear/log'
-									. PATH_SEPARATOR . './lib/adapters/');
+									. PATH_SEPARATOR . './vendor/pear/log');
 
 @include_once 'Log.php';
 @include_once 'Log/file.php';
