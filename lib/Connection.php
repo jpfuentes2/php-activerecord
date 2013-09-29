@@ -301,10 +301,8 @@ abstract class Connection
 	 */
 	public function query($sql, &$values=array())
 	{
-		if ($this->logging)
-		{
-			$this->logger->log($sql);
-			if ( $values ) $this->logger->log($values);
+		if ($this->logging) {
+			$start = microtime(true);
 		}
 
 		$this->last_query = $sql;
@@ -324,6 +322,30 @@ abstract class Connection
 		} catch (PDOException $e) {
 			throw new DatabaseException($e);
 		}
+
+        if ($this->logging) {
+			$time = microtime(true) - $start;
+
+			if ($values) {
+				$values = array_map(function($val) {
+					if (is_null($val)) {
+						return 'NULL';
+					}
+					if (is_string($val)) {
+						return "'" . addslashes($val) . "'";
+					}
+					return $val;
+				}, $values);
+
+				$sql = preg_replace_callback('/\?/', function($matches) use (&$values) {
+					return array_shift($values);
+				}, $sql);
+
+			}
+
+			$this->logger->log(sprintf("%s -- %.3f", $sql, $time));
+		}
+
 		return $sth;
 	}
 
