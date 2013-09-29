@@ -323,7 +323,7 @@ abstract class Connection
 			throw new DatabaseException($e);
 		}
 
-        if ($this->logging) {
+		if ($this->logging) {
 			$time = microtime(true) - $start;
 
 			if ($values) {
