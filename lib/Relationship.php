@@ -683,6 +683,9 @@ class HasAndBelongsToMany extends AbstractRelationship
  */
 class BelongsTo extends AbstractRelationship
 {
+	
+	static protected $valid_association_options = array('primary_key');
+	
 	public function __construct($options=array())
 	{
 		parent::__construct($options);
@@ -693,6 +696,9 @@ class BelongsTo extends AbstractRelationship
 		//infer from class_name
 		if (!$this->foreign_key)
 			$this->foreign_key = array(Inflector::instance()->keyify($this->class_name));
+	
+		if (!isset($this->primary_key) && isset($this->options['primary_key']))
+			$this->primary_key = is_array($this->options['primary_key']) ? $this->options['primary_key'] : array($this->options['primary_key']);
 	}
 
 	public function __get($name)
