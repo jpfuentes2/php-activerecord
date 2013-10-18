@@ -48,11 +48,11 @@ SELECT
         AND a.attnum = ANY (pg_index.indkey)
         AND pg_index.indisprimary = 't'
       ) IS NOT NULL AS pk,      
-      REGEXP_REPLACE(REGEXP_REPLACE(REGEXP_REPLACE((SELECT pg_attrdef.adsrc
+      (SELECT pg_get_expr(pg_attrdef.adbin, pg_attrdef.adrelid)
         FROM pg_attrdef
         WHERE c.oid = pg_attrdef.adrelid
         AND pg_attrdef.adnum=a.attnum
-      ),'::[a-z_ ]+',''),'''$',''),'^''','') AS default
+      ) AS default
 FROM pg_attribute a, pg_class c, pg_type t
 WHERE c.relname = ?
       AND a.attnum > 0
@@ -101,14 +101,24 @@ SQL;
 
 		$c->map_raw_type();
 
-		if ($column['default'])
+		if (!is_null($column['default']))
 		{
-			preg_match("/^nextval\('(.*)'\)$/",$column['default'],$matches);
+            // extract the default value
+            $default = preg_replace("/^'(.*(?=':))'::[a-z_ ]+$/", "$1", $column['default']);
+
+            // check for a sequence
+			preg_match("/^nextval\('(.*)'::[a-z_ ]+\)$/",$default,$matches);
 
 			if (count($matches) == 2)
+            {
 				$c->sequence = $matches[1];
+            }
 			else
-				$c->default = $c->cast($column['default'],$this);
+            {
+                // unescape single quotes in a default value
+                $default = preg_replace("/''/","'", $default);
+				$c->default = $c->cast($default, $this);
+            }
 		}
 		return $c;
 	}
@@ -122,18 +132,26 @@ SQL;
 	{
 		return array(
 			'primary_key' => 'serial primary key',
-			'string' => array('name' => 'character varying', 'length' => 255),
+			'string' => array('name' => 'character varying', 'limit' => 255),
 			'text' => array('name' => 'text'),
 			'integer' => array('name' => 'integer'),
 			'float' => array('name' => 'float'),
-			'datetime' => array('name' => 'datetime'),
+			'decimal' => array('name' => 'decimal'),
+			'datetime' => array('name' => 'timestamp'),
 			'timestamp' => array('name' => 'timestamp'),
 			'time' => array('name' => 'time'),
 			'date' => array('name' => 'date'),
-			'binary' => array('name' => 'binary'),
+			'binary' => array('name' => 'bytea'),
 			'boolean' => array('name' => 'boolean')
 		);
 	}
 
+	public function boolean_to_string($value)
+	{
+		if (!$value || in_array(strtolower($value), array('f','false','n','no','off')))
+			return "0";
+		else
+			return "1";
+	}
 }
 ?>

@@ -88,6 +88,23 @@ class Model
 	private $attributes = array();
 
 	/**
+	 * Contains changes made to model attributes as
+	 * $attribute_name => array($original_value, $current_value)
+	 *
+	 * @var array
+	 * @access private
+	 */
+	private $changed_attributes = array();
+
+	/**
+	 * Contains changes made to model attributes before it was saved
+	 *
+	 * @var array
+	 * @access private
+	 */
+	private $previously_changed = array();
+
+	/**
 	 * Flag whether or not this model's attributes have been modified since it will either be null or an array of column_names that have been modified
 	 *
 	 * @var array
@@ -329,7 +346,13 @@ class Model
 			$value = $this->$name();
 			return $value;
 		}
-
+        // or a method with the same name as the property
+        else if (method_exists($this, $name))
+        {
+            $value = $this->$name();
+            return $value;
+        }
+        // delegete read_attribute()
 		return $this->read_attribute($name);
 	}
 
@@ -341,7 +364,9 @@ class Model
 	 */
 	public function __isset($attribute_name)
 	{
-		return array_key_exists($attribute_name,$this->attributes) || array_key_exists($attribute_name,static::$alias_attribute);
+		return array_key_exists($attribute_name,$this->attributes) ||
+               array_key_exists($attribute_name,static::$alias_attribute) ||
+               method_exists($this,"get_{$attribute_name}");
 	}
 
 	/**
@@ -399,7 +424,7 @@ class Model
 		if (array_key_exists($name, static::$alias_attribute))
 			$name = static::$alias_attribute[$name];
 
-		elseif (method_exists($this,"set_$name"))
+		if (method_exists($this,"set_$name"))
 		{
 			$name = "set_$name";
 			return $this->$name($value);
@@ -456,8 +481,16 @@ class Model
 		if ($value instanceof DateTime)
 			$value->attribute_of($this,$name);
 
-		$this->attributes[$name] = $value;
-		$this->flag_dirty($name);
+		// only update the attribute if it isn't set or has changed
+		if (!isset($this->attributes[$name]) || ($this->attributes[$name] !== $value)) {
+			// track changes to the attribute
+			if (array_key_exists($name, $this->attributes) && !isset($this->changed_attributes[$name]))
+				$this->changed_attributes[$name] = $this->attributes[$name];
+
+			// set the attribute and flag as dirty
+			$this->attributes[$name] = $value;
+			$this->flag_dirty($name);
+		}
 		return $value;
 	}
 
@@ -477,8 +510,10 @@ class Model
 			$name = static::$alias_attribute[$name];
 
 		// check for attribute
-		if (array_key_exists($name,$this->attributes))
-			return $this->attributes[$name];
+		if (array_key_exists($name,$this->attributes)) {
+			$value = $this->attributes[$name];
+			return $value;
+		}
 
 		// check relationships if no attribute
 		if (array_key_exists($name,$this->__relationships))
@@ -566,6 +601,52 @@ class Model
 	public function attributes()
 	{
 		return $this->attributes;
+	}
+
+	/**
+	 * Returns a copy of the model's changed attributes hash with the
+	 * attribute name and the original value.
+	 *
+	 * @return array A copy of the model's changed attribute data
+	 */
+	public function changed_attributes()
+	{
+		return $this->changed_attributes;
+	}
+
+	/**
+	 * Returns a copy of the model's changed attributes as a hash
+	 * in the form $attribute => array($original_value, $current_value)
+	 *
+	 * @return array A copy of the model's attribute changes
+	 */
+	public function changes()
+	{
+		$changes = array();
+		$attributes = array_intersect_key($this->attributes, $this->changed_attributes);
+		foreach($attributes as $name => $value) {
+			$changes[$name] = array($this->changed_attributes[$name],$value);
+		}
+		return $changes;
+	}
+
+	/**
+	 * Returns a copy of the model's changed attributes before it was saved
+	 *
+	 * @return array A copy of the model's changed attribute before a save
+	 */
+	public function previous_changes()
+	{
+		return $this->previously_changed;
+	}
+
+	/**
+	 * Returns the value of an attribute before it was changed
+	 *
+	 * @return string The original value of an attribute
+	 */
+	public function attribute_was($name) {
+		return isset($this->changed_attributes[$name]) ? $this->changed_attributes[$name] : null;
 	}
 
 	/**
@@ -1261,9 +1342,11 @@ class Model
 	 *
 	 * @see dirty_attributes
 	 */
-	public function reset_dirty()
+	public function reset_dirty($model_was_saved=false)
 	{
 		$this->__dirty = null;
+		$this->previously_changed = $model_was_saved ? $this->changes() : array();
+		$this->changed_attributes = array();
 	}
 
 	/**
@@ -1271,7 +1354,7 @@ class Model
 	 *
 	 * @var array
 	 */
-	static $VALID_OPTIONS = array('conditions', 'limit', 'offset', 'order', 'select', 'joins', 'include', 'readonly', 'group', 'from', 'having');
+	static $VALID_OPTIONS = array('conditions', 'limit', 'offset', 'order', 'select', 'joins', 'include', 'readonly', 'group', 'from', 'having','cache');
 
 	/**
 	 * Enables the use of dynamic finders.
@@ -1423,7 +1506,23 @@ class Model
 		$table = static::table();
 		$sql = $table->options_to_sql($options);
 		$values = $sql->get_where_values();
-		return static::connection()->query_and_fetch_one($sql->to_s(),$values);
+		$conn = static::connection();
+		$query_callback = function() use($conn,$sql,$values){
+			return $conn->query_and_fetch_one($sql->to_s(),$values);
+		};
+
+		if(isset($options['cache'])){
+			$cache = Cache::format_options($options['cache']);
+			if($cache !== NULL){
+				// Attempt to pull results from cache
+				$cache_key = isset($cache['key']) ? $cache['key'] : md5(serialize(array($sql->to_s(),$values)));
+				return Cache::get($cache_key, $query_callback, $cache['expire']);  
+			}else{
+				return $query_callback();
+			}
+		}else{
+			return $query_callback();
+		}
 	}
 
 	/**
@@ -1613,11 +1712,12 @@ class Model
 	 *
 	 * @param string $sql The raw SELECT query
 	 * @param array $values An array of values for any parameters that needs to be bound
+     * @param mixed $cache Cache options
 	 * @return array An array of models
 	 */
-	public static function find_by_sql($sql, $values=null)
+	public static function find_by_sql($sql, $values=null, $cache=null)
 	{
-		return static::table()->find_by_sql($sql, $values, true);
+		return static::table()->find_by_sql($sql, $values, true, null, $cache);
 	}
 
 	/**

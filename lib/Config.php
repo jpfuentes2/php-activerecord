@@ -66,11 +66,21 @@ class Config extends Singleton
 	private $logging = false;
 
 	/**
-	 * Contains a Logger object that must impelement a log() method.
+	 * Contains a Logger object that must impelement a logging method.
+     *
+     * The logging method defaults to log() but can be customised by
+     * setting the $logger_method property
 	 *
 	 * @var object
 	 */
 	private $logger;
+
+    /**
+     * Contains the method name in the logger object used for logging
+     *
+     * @var string
+     */
+    private $logger_method;
 
 	/**
 	 * The format to serialize DateTime values into.
@@ -226,20 +236,22 @@ class Config extends Singleton
 	}
 
 	/**
-	 * Sets the logger object for future SQL logging
+	 * Sets the logger object for future SQL logging, and optional method name
 	 *
 	 * @param object $logger
+     * @param string $method
 	 * @return void
 	 * @throws ConfigException if Logger objecct does not implement public log()
 	 */
-	public function set_logger($logger)
+	public function set_logger($logger,$method='log')
 	{
 		$klass = Reflections::instance()->add($logger)->get($logger);
 
-		if (!$klass->getMethod('log') || !$klass->getMethod('log')->isPublic())
+		if (!$klass->getMethod($method) || !$klass->getMethod($method)->isPublic())
 			throw new ConfigException("Logger object must implement a public log method");
 
 		$this->logger = $logger;
+        $this->logger_method = $method;
 	}
 
 	/**
@@ -261,6 +273,17 @@ class Config extends Singleton
 	{
 		return $this->logger;
 	}
+
+    /**
+     * Returns the logger method name
+     *
+     * @access public
+     * @return string
+     */
+    public function get_logger_method()
+    {
+        return $this->logger_method;
+    }
 
 	/**
 	 * @deprecated
@@ -293,12 +316,12 @@ class Config extends Singleton
 	 * $config->set_cache("memcached://localhost",array("expire" => 60));
 	 * </code>
 	 *
-	 * @param string $url Url to your cache server.
+	 * @param array $urls Urls to your cache server cluster
 	 * @param array $options Array of options
 	 */
-	public function set_cache($url, $options=array())
+	public function set_cache($urls, $options=array())
 	{
-		Cache::initialize($url,$options);
+		Cache::initialize($urls,$options);
 	}
 };
 ?>

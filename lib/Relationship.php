@@ -64,7 +64,7 @@ abstract class AbstractRelationship implements InterfaceRelationship
 	 *
 	 * @var array
 	 */
-	static protected $valid_association_options = array('class_name', 'class', 'foreign_key', 'conditions', 'select', 'readonly', 'namespace');
+	static protected $valid_association_options = array('class_name', 'class', 'foreign_key', 'conditions', 'select', 'readonly', 'namespace', 'cache');
 
 	/**
 	 * Constructs a relationship.
@@ -94,6 +94,15 @@ abstract class AbstractRelationship implements InterfaceRelationship
 
 		if (!$this->foreign_key && isset($this->options['foreign_key']))
 			$this->foreign_key = is_array($this->options['foreign_key']) ? $this->options['foreign_key'] : array($this->options['foreign_key']);
+	}
+
+	/**
+	 * Allows cache options from Model finders to be passed in, since
+	 * the Relationship options are set before the find call.
+	 * @param array $cache Cache::format_options value
+	 */
+	public function set_cache_option($cache) {
+		$this->options['cache'] = $cache;
 	}
 
 	protected function get_table()
@@ -439,7 +448,7 @@ class HasMany extends AbstractRelationship
 	 *
 	 * @var array
 	 */
-	static protected $valid_association_options = array('primary_key', 'order', 'group', 'having', 'limit', 'offset', 'through', 'source');
+	static protected $valid_association_options = array('primary_key', 'order', 'group', 'having', 'limit', 'offset', 'through', 'source', 'cache');
 
 	protected $primary_key;
 
@@ -602,7 +611,7 @@ class HasMany extends AbstractRelationship
 	public function load_eagerly($models=array(), $attributes=array(), $includes, Table $table)
 	{
 		$this->set_keys($table->class->name);
-		$this->query_and_attach_related_models_eagerly($table,$models,$attributes,$includes,$this->foreign_key, $table->pk);
+		$this->query_and_attach_related_models_eagerly($table,$models,$attributes,$includes,$this->foreign_key, $this->primary_key);
 	}
 };
 

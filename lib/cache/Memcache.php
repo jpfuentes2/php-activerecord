@@ -10,21 +10,30 @@ class Memcache
 	/**
 	 * Creates a Memcache instance.
 	 *
-	 * Takes an $options array w/ the following parameters:
+	 * Takes a $urls array, each w/ the following parameters:
 	 *
 	 * <ul>
 	 * <li><b>host:</b> host for the memcache server </li>
 	 * <li><b>port:</b> port for the memcache server </li>
 	 * </ul>
-	 * @param array $options
+	 * @param array $urls
 	 */
-	public function __construct($options)
+	public function __construct($urls)
 	{
 		$this->memcache = new \Memcache();
-		$options['port'] = isset($options['port']) ? $options['port'] : self::DEFAULT_PORT;
+       
+        $servers_added = 0; 
+        foreach($urls as $url){
+		    if(!isset($url['port'])) $url['port'] = self::DEFAULT_PORT;
+            if($this->memcache->addServer($url['host'],$url['port'])) 
+                $servers_added++;
+        }
 
-		if (!$this->memcache->connect($options['host'],$options['port']))
-			throw new CacheException("Could not connect to $options[host]:$options[port]");
+        if($servers_added == 0)
+            throw new CacheException("Could not add any servers to pool");
+
+		//if (!$this->memcache->connect($options['host'],$options['port']))
+		//	throw new CacheException("Could not connect to $options[host]:$options[port]");
 	}
 
 	public function flush()
