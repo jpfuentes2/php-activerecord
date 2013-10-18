@@ -132,22 +132,17 @@ SQL;
 	{
 		return array(
 			'primary_key' => 'serial primary key',
-			'string' => array('name' => 'character varying', 'length' => 255),
+			'string' => array('name' => 'character varying', 'limit' => 255),
 			'text' => array('name' => 'text'),
 			'integer' => array('name' => 'integer'),
 			'float' => array('name' => 'float'),
-			'datetime' => array('name' => 'datetime'),
+			'decimal' => array('name' => 'decimal'),
+			'datetime' => array('name' => 'timestamp'),
 			'timestamp' => array('name' => 'timestamp'),
 			'time' => array('name' => 'time'),
 			'date' => array('name' => 'date'),
-			'binary' => array('name' => 'binary'),
-			'boolean' => array('name' => 'boolean'),
-			'bigint' => array('name' => 'integer'),
-			'smallint' => array('name' => 'integer'),
-			'real' => array('name' => 'float'),
-			'double precision' => array('name' => 'float'),
-			'numeric' => array('name' => 'float'),
-			'decimal' => array('name' => 'float')
+			'binary' => array('name' => 'bytea'),
+			'boolean' => array('name' => 'boolean')
 		);
 	}
 

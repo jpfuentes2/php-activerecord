@@ -94,8 +94,8 @@ class SqliteAdapter extends Connection
 	public function native_database_types()
 	{
 		return array(
-			'primary_key' => 'integer not null primary key',
-			'string' => array('name' => 'varchar', 'length' => 255),
+			'primary_key' => 'INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL',
+			'string' => array('name' => 'varchar', 'limit' => 255),
 			'text' => array('name' => 'text'),
 			'integer' => array('name' => 'integer'),
 			'float' => array('name' => 'float'),

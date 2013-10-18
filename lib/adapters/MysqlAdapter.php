@@ -81,17 +81,18 @@ class MysqlAdapter extends Connection
 	public function native_database_types()
 	{
 		return array(
-			'primary_key' => 'int(11) UNSIGNED DEFAULT NULL auto_increment PRIMARY KEY',
-			'string' => array('name' => 'varchar', 'length' => 255),
+			'primary_key' => 'int(11) DEFAULT NULL auto_increment PRIMARY KEY',
+			'string' => array('name' => 'varchar', 'limit' => 255),
 			'text' => array('name' => 'text'),
-			'integer' => array('name' => 'int', 'length' => 11),
+			'integer' => array('name' => 'int', 'limit' => 4),
 			'float' => array('name' => 'float'),
+			'decimal' => array('name' => 'decimal'),
 			'datetime' => array('name' => 'datetime'),
 			'timestamp' => array('name' => 'datetime'),
 			'time' => array('name' => 'time'),
 			'date' => array('name' => 'date'),
 			'binary' => array('name' => 'blob'),
-			'boolean' => array('name' => 'tinyint', 'length' => 1)
+			'boolean' => array('name' => 'tinyint', 'limit' => 1)
 		);
 	}
 

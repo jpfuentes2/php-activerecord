@@ -130,16 +130,17 @@ class OciAdapter extends Connection
 	{
 		return array(
 			'primary_key' => "NUMBER(38) NOT NULL PRIMARY KEY",
-			'string' => array('name' => 'VARCHAR2', 'length' => 255),
+			'string' => array('name' => 'VARCHAR2', 'limit' => 255),
 			'text' => array('name' => 'CLOB'),
-			'integer' => array('name' => 'NUMBER', 'length' => 38),
+			'integer' => array('name' => 'NUMBER', 'limit' => 38),
 			'float' => array('name' => 'NUMBER'),
+			'decimal' => array('name' => 'NUMBER'),
 			'datetime' => array('name' => 'DATE'),
 			'timestamp' => array('name' => 'DATE'),
 			'time' => array('name' => 'DATE'),
 			'date' => array('name' => 'DATE'),
 			'binary' => array('name' => 'BLOB'),
-			'boolean' => array('name' => 'NUMBER', 'length' => 1)
+			'boolean' => array('name' => 'NUMBER', 'limit' => 1)
 		);
 	}
 }
