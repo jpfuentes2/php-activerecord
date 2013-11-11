@@ -373,7 +373,7 @@ class RelationshipTest extends DatabaseTest
 
 		$venue = $this->get_relationship();
 		$this->assert_true(count($venue->hosts) === 1);
-		$this->assert_sql_has("events.title !=",Host::table()->last_sql);
+		$this->assert_sql_has("events.title !=",Host::connection()->last_query);
 	}
 
 	public function test_has_many_through_using_source()
@@ -749,9 +749,6 @@ class RelationshipTest extends DatabaseTest
 
 	public function test_gh_49_arrayobject_relation_with_options()
 	{
-		// clear up the SQL cache
-		Event::table()->last_sql = null;
-
 		$host = Host::find(1);
 		$events = $host->events;
 
@@ -762,19 +759,18 @@ class RelationshipTest extends DatabaseTest
 			'offset' => 1
 		));
 
-		$this->assert_null(Event::table()->last_sql);
 		$this->assert_true($events instanceof Countable);
 		$this->assert_true($events instanceof IteratorAggregate);
 
 		$this->assert_equals(2, count($events));
-		$sql = Event::table()->last_sql;
+		$sql = Event::connection()->last_query;
 		$this->assert_sql_has('SELECT COUNT(*) FROM' , $sql);
 		$this->assert_sql_has('LENGTH(title) > 10' , $sql);
 		$this->assert_sql_has('ORDER BY title ASC' , $sql);
 		$this->assert_sql_doesnt_has('LIMIT 1,2' , $sql);
 
 		$this->assert_equals(2, count($events->getArrayCopy()));
-		$sql = Event::table()->last_sql;
+		$sql = Event::connection()->last_query;
 		$this->assert_sql_has('SELECT * FROM' , $sql);
 		$this->assert_sql_has('LENGTH(title) > 10' , $sql);
 		$this->assert_sql_has('ORDER BY title ASC' , $sql);
