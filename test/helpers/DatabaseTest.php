@@ -55,7 +55,7 @@ class DatabaseTest extends SnakeCase_PHPUnit_Framework_TestCase
 			$message = $e->getMessage();
 		}
 
-		$this->assert_true(strpos($message,$contains) !== false);
+		$this->assertContains($contains, $message);
 	}
 
 	/**
@@ -68,14 +68,14 @@ class DatabaseTest extends SnakeCase_PHPUnit_Framework_TestCase
 	{
 		$needle = str_replace(array('"','`'),'',$needle);
 		$haystack = str_replace(array('"','`'),'',$haystack);
-		return $this->assert_true(strpos($haystack,$needle) !== false);
+		return $this->assertContains($needle, $haystack);
 	}
 
 	public function assert_sql_doesnt_has($needle, $haystack)
 	{
 		$needle = str_replace(array('"','`'),'',$needle);
 		$haystack = str_replace(array('"','`'),'',$haystack);
-		return $this->assert_false(strpos($haystack,$needle) !== false);
+		return $this->assertNotContains($needle, $haystack);
 	}
 }
 ?>
