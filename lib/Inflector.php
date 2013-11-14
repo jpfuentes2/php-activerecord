@@ -4,6 +4,7 @@
  */
 namespace ActiveRecord;
 
+use PDO;
 /**
  * @package ActiveRecord
  */
@@ -16,7 +17,7 @@ abstract class Inflector
 	 */
 	public static function instance()
 	{
-		return new StandardInflector();
+		return Config::instance()->get_inflector();
 	}
 
 	/**
@@ -105,6 +106,17 @@ abstract class Inflector
 	{
 		return strtolower($this->underscorify(denamespace($class_name))) . '_id';
 	}
+
+	public function pdo_options()
+	{
+		return array(
+		PDO::ATTR_CASE => PDO::CASE_LOWER,
+		PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION,
+		PDO::ATTR_ORACLE_NULLS => PDO::NULL_NATURAL,
+		PDO::ATTR_STRINGIFY_FETCHES => false);
+	}
+
+	public function fix_case($x) { return strtolower($x); }
 
 	abstract function variablize($s);
 }

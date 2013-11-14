@@ -62,7 +62,7 @@ abstract class Connection
 	 * @var array
 	 */
 	static $PDO_OPTIONS = array(
-		PDO::ATTR_CASE => PDO::CASE_LOWER,
+//		PDO::ATTR_CASE => PDO::CASE_LOWER,
 		PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION,
 		PDO::ATTR_ORACLE_NULLS => PDO::NULL_NATURAL,
 		PDO::ATTR_STRINGIFY_FETCHES => false);
@@ -246,7 +246,7 @@ abstract class Connection
 			else
 				$host = "unix_socket=$info->host";
 
-			$this->connection = new PDO("$info->protocol:$host;dbname=$info->db", $info->user, $info->pass, static::$PDO_OPTIONS);
+			$this->connection = new PDO("$info->protocol:$host;dbname=$info->db", $info->user, $info->pass, Inflector::instance()->pdo_options());
 		} catch (PDOException $e) {
 			throw new DatabaseException($e);
 		}
@@ -301,6 +301,8 @@ abstract class Connection
 	 */
 	public function query($sql, &$values=array())
 	{
+		//echo '<hr>'.json_encode(array($sql=>$values)).'<hr>';
+
 		if ($this->logging)
 		{
 			$this->logger->log($sql);
@@ -352,7 +354,9 @@ abstract class Connection
 		$sth = $this->query($sql);
 
 		while (($row = $sth->fetch(PDO::FETCH_ASSOC)))
+		{
 			$handler($row);
+		}
 	}
 
 	/**
@@ -362,6 +366,7 @@ abstract class Connection
 	 */
 	public function tables()
 	{
+		throw new \Exception('tables');
 		$tables = array();
 		$sth = $this->query_for_tables();
 

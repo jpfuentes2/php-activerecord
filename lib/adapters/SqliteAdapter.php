@@ -21,7 +21,7 @@ class SqliteAdapter extends Connection
 		if (!file_exists($info->host))
 			throw new DatabaseException("Could not find sqlite db: $info->host");
 
-		$this->connection = new PDO("sqlite:$info->host",null,null,static::$PDO_OPTIONS);
+		$this->connection = new PDO("sqlite:$info->host",null,null,Inflector::instance()->pdo_options());
 	}
 
 	public function limit($sql, $offset, $limit)

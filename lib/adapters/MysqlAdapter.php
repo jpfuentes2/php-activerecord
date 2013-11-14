@@ -32,40 +32,46 @@ class MysqlAdapter extends Connection
 
 	public function create_column(&$column)
 	{
-		$c = new Column();
-		$c->inflected_name	= Inflector::instance()->variablize($column['field']);
-		$c->name			= $column['field'];
-		$c->nullable		= ($column['null'] === 'YES' ? true : false);
-		$c->pk				= ($column['key'] === 'PRI' ? true : false);
-		$c->auto_increment	= ($column['extra'] === 'auto_increment' ? true : false);
+		$fix_case = function($x) { return $x; };
+		if(array_key_exists('field', $column))
+		{	
+			$fix_case = function($x) { return strtolower($x); };
+		}
 
-		if ($column['type'] == 'timestamp' || $column['type'] == 'datetime')
+		$c = new Column();
+		$c->inflected_name	= Inflector::instance()->variablize($column[$fix_case('Field')]);
+		$c->name			= $column[$fix_case('Field')];
+		$c->nullable		= ($column[$fix_case('Null')] === 'YES' ? true : false);
+		$c->pk				= ($column[$fix_case('Key')] === 'PRI' ? true : false);
+		$c->auto_increment	= ($column[$fix_case('Extra')] === 'auto_increment' ? true : false);
+
+		if ($column[$fix_case('Type')] == 'timestamp' || $column[$fix_case('Type')] == 'datetime')
 		{
 			$c->raw_type = 'datetime';
 			$c->length = 19;
 		}
-		elseif ($column['type'] == 'date')
+		elseif ($column[$fix_case('Type')] == 'date')
 		{
 			$c->raw_type = 'date';
 			$c->length = 10;
 		}
-		elseif ($column['type'] == 'time')
+		elseif ($column[$fix_case('Type')] == 'time')
 		{
 			$c->raw_type = 'time';
 			$c->length = 8;
 		}
 		else
 		{
-			preg_match('/^([A-Za-z0-9_]+)(\(([0-9]+(,[0-9]+)?)\))?/',$column['type'],$matches);
+			preg_match('/^([A-Za-z0-9_]+)(\(([0-9]+(,[0-9]+)?)\))?/',$column[$fix_case('Type')],$matches);
 
-			$c->raw_type = (count($matches) > 0 ? $matches[1] : $column['type']);
+			$c->raw_type = (count($matches) > 0 ? $matches[1] : $column[$fix_case('Type')]);
 
 			if (count($matches) >= 4)
 				$c->length = intval($matches[3]);
 		}
 
 		$c->map_raw_type();
-		$c->default = $c->cast($column['default'],$this);
+		$c->default = $c->cast($column[$fix_case('Default')],$this);
 
 		return $c;
 	}

@@ -90,7 +90,7 @@ abstract class AbstractRelationship implements InterfaceRelationship
 		elseif (isset($this->options['class_name']))
 			$this->set_class_name($this->options['class_name']);
 
-		$this->attribute_name = strtolower(Inflector::instance()->variablize($this->attribute_name));
+		$this->attribute_name = Inflector::instance()->variablize($this->attribute_name);
 
 		if (!$this->foreign_key && isset($this->options['foreign_key']))
 			$this->foreign_key = is_array($this->options['foreign_key']) ? $this->options['foreign_key'] : array($this->options['foreign_key']);
@@ -162,6 +162,7 @@ abstract class AbstractRelationship implements InterfaceRelationship
 
 				$through_table = $class::table();
 			} else {
+				echo '<hr>'.json_encode($options);
 				$class = $options['class_name'];
 				$relation = $class::table()->get_relationship($options['through']);
 				$through_table = $relation->get_table();
@@ -286,7 +287,7 @@ abstract class AbstractRelationship implements InterfaceRelationship
 
 	protected function set_class_name($class_name)
 	{
-		if (!has_absolute_namespace($class_name) && isset($this->options['namespace'])) {
+		if (!has_absolute_namespace($class_name) && !empty($this->options['namespace'])) {
 			$class_name = $this->options['namespace'].'\\'.$class_name;
 		}
 		
@@ -300,14 +301,7 @@ abstract class AbstractRelationship implements InterfaceRelationship
 
 	protected function create_conditions_from_keys(Model $model, $condition_keys=array(), $value_keys=array())
 	{
-		$condition_string = implode('_and_', $condition_keys);
-		$condition_values = array_values($model->get_values_for($value_keys));
-
-		// return null if all the foreign key values are null so that we don't try to do a query like "id is null"
-		if (all(null,$condition_values))
-			return null;
-
-		$conditions = SQLBuilder::create_conditions_from_underscored_string(Table::load(get_class($model))->conn,$condition_string,$condition_values);
+		$conditions = Table::load(get_class($model))->create_conditions_from_keys($model,$condition_keys,$value_keys);
 
 		# DO NOT CHANGE THE NEXT TWO LINES. add_condition operates on a reference and will screw options array up
 		if (isset($this->options['conditions']))
@@ -524,6 +518,7 @@ class HasMany extends AbstractRelationship
 
 		$options = $this->unset_non_finder_options($this->options);
 		$options['conditions'] = $conditions;
+
 		return $class_name::find($this->poly_relationship ? 'all' : 'first',$options);
 	}
 
@@ -718,6 +713,7 @@ class BelongsTo extends AbstractRelationship
 		$options = $this->unset_non_finder_options($this->options);
 		$options['conditions'] = $conditions;
 		$class = $this->class_name;
+
 		return $class::first($options);
 	}
 

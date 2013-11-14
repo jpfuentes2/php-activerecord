@@ -187,7 +187,7 @@ abstract class Serialization
 							$serialized = new $serializer_class($a, $options);
 
 							if ($this->includes_with_class_name_element)
-								$includes[strtolower(get_class($a))][] = $serialized->to_a();
+								$includes[Inflector::instance()->fix_case(get_class($a))][] = $serialized->to_a();
 							else
 								$includes[] = $serialized->to_a();
 						}
@@ -250,7 +250,7 @@ class ArraySerializer extends Serialization
 
 	public function to_s()
 	{
-		return self::$include_root ? array(strtolower(get_class($this->model)) => $this->to_a()) : $this->to_a();
+		return self::$include_root ? array(Inflector::instance()->fix_case(get_class($this->model)) => $this->to_a()) : $this->to_a();
 	}
 }
 
@@ -295,7 +295,7 @@ class XmlSerializer extends Serialization
 		$this->writer = new XmlWriter();
 		$this->writer->openMemory();
 		$this->writer->startDocument('1.0', 'UTF-8');
-		$this->writer->startElement(strtolower(denamespace(($this->model))));
+		$this->writer->startElement(Inflector::instance()->fix_case(denamespace(($this->model))));
 		$this->write($this->to_a());
 		$this->writer->endElement();
 		$this->writer->endDocument();
