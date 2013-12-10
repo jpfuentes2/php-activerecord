@@ -47,5 +47,3 @@ class ConnectionManager extends Singleton
 			unset(self::$connections[$name]);
 	}
 }
-
-?>

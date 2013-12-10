@@ -531,6 +531,3 @@ abstract class Connection
 	}
 
 }
-
-;
-?>
