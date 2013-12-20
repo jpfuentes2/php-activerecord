@@ -88,6 +88,9 @@ SQL;
 			$c->raw_type = 'date';
 			$c->length = 10;
 		}
+		elseif (preg_match('/\[\]/',$column['type'])){
+			$c->raw_type = 'text';
+        	}
 		else
 		{
 			preg_match('/^([A-Za-z0-9_]+)(\(([0-9]+(,[0-9]+)?)\))?/',$column['type'],$matches);
