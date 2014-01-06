@@ -11,6 +11,7 @@ use Closure;
  * <code>
  * ActiveRecord::initialize(function($cfg) {
  *   $cfg->set_model_home('models');
+ *   $cfg->set_filename_extension('.your.extension');
  *   $cfg->set_connections(array(
  *     'development' => 'mysql://user:pass@development.com/awesome_development',
  *     'production' => 'mysql://user:pass@production.com/awesome_production'));
@@ -27,6 +28,7 @@ class Config extends Singleton
 	 * <code>
 	 * ActiveRecord\Config::initialize(function($cfg) {
 	 *   $cfg->set_model_directory('/your/app/models');
+	 *   $cfg->set_filename_extension('.your.extension');
 	 *   $cfg->set_connections(array(
 	 *     'development' => 'mysql://user:pass@development.com/awesome_development',
 	 *     'production' => 'mysql://user:pass@production.com/awesome_production'));
@@ -57,6 +59,14 @@ class Config extends Singleton
 	 * @var string
 	 */
 	private $model_directory;
+
+	/**
+	 * File extension for the auto_loading of model classes.
+	 *
+	 * @see activerecord_autoload
+	 * @var string
+	 */
+	private $filename_extension = ".php";
 
 	/**
 	 * Switch for logging.
@@ -208,10 +218,35 @@ class Config extends Singleton
 	 */
 	public function get_model_directory()
 	{
-		if ($this->model_directory && !file_exists($this->model_directory))
+		if ($this->model_directory && !is_dir($this->model_directory))
 			throw new ConfigException('Invalid or non-existent directory: '.$this->model_directory);
 
 		return $this->model_directory;
+	}
+
+	/**
+	 * Sets the filename extension where models are located
+	 *
+	 * @param string $ext Extention of your models files
+	 * @return void
+	 */
+	public function set_filename_extension($ext)
+	{
+		$this->set_filename_extension = $ext;
+	}
+
+	/**
+	 * Returns the file extension.
+	 *
+	 * @return string
+	 * @throws ConfigException if specified extension was invalid (start with a dot, and contains only alphanumeric characters and dot)
+	 */
+	public function get_filename_extension()
+	{
+		if(!preg_match('/^\.([a-z0-9]+|\.)+$/i', $ext) || is_null($ext) || !is_string($ext))
+			throw new ConfigException("Invalid file extension: $ext");
+
+		return $this->filename_extension;
 	}
 
 	/**
