@@ -227,7 +227,7 @@ class Table
 			if ($collect_attrs_for_includes)
 				$attrs[] = $model->attributes();
 
-			$list[] = $model;
+			$list[] = &$model;
 		}
 
 		if ($collect_attrs_for_includes && !empty($list))
