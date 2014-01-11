@@ -1265,8 +1265,9 @@ class Model
 
 	public function __clone()
 	{
-		$this->__relationships = array();
-		$this->reset_dirty();
+        // do not clear relationship on clone!
+		//$this->__relationships = array();
+        $this->reset_dirty();
 		return $this;
 	}
 
