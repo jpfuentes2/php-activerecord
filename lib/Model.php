@@ -1594,7 +1594,7 @@ class Model
 	 * @return Model
 	 * @throws {@link RecordNotFound} if a record could not be found
 	 */
-	public static function find_by_pk($values, $options)
+	public static function find_by_pk($values, $options = array())
 	{
 		$options['conditions'] = static::pk_conditions($values);
 		$list = static::table()->find($options);
