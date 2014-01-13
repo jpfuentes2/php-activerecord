@@ -181,12 +181,13 @@ class Utils
 				$conditions = array_flatten($condition);
 			else
 			{
-				$conditions[0] .= " $conjuction " . array_shift($condition);
+				$conditions[0] = "(" . $conditions[0];
+				$conditions[0] .= ") $conjuction (" . array_shift($condition) . ")";
 				$conditions[] = array_flatten($condition);
 			}
 		}
 		elseif (is_string($condition))
-			$conditions[0] .= " $conjuction $condition";
+			$conditions[0] = "(" . $conditions[0] . ") $conjuction ($condition)";
 
 		return $conditions;
 	}
