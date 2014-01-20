@@ -152,4 +152,3 @@ class Column
 		return $this->type;
 	}
 }
-?>

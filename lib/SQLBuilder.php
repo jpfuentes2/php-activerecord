@@ -420,4 +420,3 @@ class SQLBuilder
 		return $keys;
 	}
 }
-?>

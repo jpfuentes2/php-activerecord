@@ -54,4 +54,3 @@ abstract class Singleton
 		return get_class($backtrace[2]['object']);
 	}
 }
-?>

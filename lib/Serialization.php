@@ -369,4 +369,3 @@ class CsvSerializer extends Serialization
     return $buffer;
   }
 }
-?>
