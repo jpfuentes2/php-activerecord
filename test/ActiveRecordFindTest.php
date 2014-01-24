@@ -79,7 +79,9 @@ class ActiveRecordFindTest extends DatabaseTest
 		$this->assert_equals(1,$authors[0]->author_id);
 	}
 
-
+	/**
+	 * @expectedException ActiveRecord\DatabaseException
+	 */
 	public function test_find_all_with_empty_array_bind_value_throws_exception()
 	{
 		$authors = Author::find('all',array('conditions' => array('author_id IN(?)', array())));
