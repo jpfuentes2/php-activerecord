@@ -88,6 +88,14 @@ class ColumnTest extends SnakeCase_PHPUnit_Framework_TestCase
 		$this->assert_cast(Column::STRING,'bubble tea','bubble tea');
 		$this->assert_cast(Column::INTEGER,4294967295,'4294967295');
 		$this->assert_cast(Column::INTEGER,'18446744073709551615','18446744073709551615');
+
+		// 32 bit
+		if (PHP_INT_SIZE === 4) {
+			$this->assert_cast(Column::INTEGER,'2147483648',(((float) PHP_INT_MAX) + 1));
+		// 64 bit
+		} elseif (PHP_INT_SIZE === 8) {
+			$this->assert_cast(Column::INTEGER,'9223372036854775808',(((float) PHP_INT_MAX) + 1));
+		}
 	}
 
 	public function test_cast_leave_null_alone()
