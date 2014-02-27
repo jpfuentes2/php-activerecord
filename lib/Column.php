@@ -135,7 +135,9 @@ class Column
 		}
 		// If a float was passed and its greater than PHP_INT_MAX
 		// (which could be wrong due to floating point precision)
-		elseif (is_float($value) && $value > PHP_INT_MAX) {
+		// We'll also check for equal to (>=) in case the precision
+		// loss creates an overflow on casting
+		elseif (is_float($value) && $value >= PHP_INT_MAX) {
 			return number_format($value, 0, '', '');
 		}
 
