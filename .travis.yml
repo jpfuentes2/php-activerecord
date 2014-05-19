@@ -1,3 +1,5 @@
+install: composer install --prefer-source --dev
+
 before_script:
   - echo 'extension = "memcache.so"' >> ~/.phpenv/versions/$(phpenv version-name)/etc/php.ini
   - mysql -e 'CREATE DATABASE phpar_test;'
@@ -12,5 +14,6 @@ language: php
 php:
   - 5.3
   - 5.4
+  - 5.5
 
-script: phpunit -c phpunit.xml test/
+script: vendor/bin/phpunit -c phpunit.xml test/
