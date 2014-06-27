@@ -153,7 +153,12 @@ class Model
 	 */
 	static $sequence;
 
-	/**
+    /**
+     * Set this to true to use caching for this model. Note that you must also configure a cache object.
+     */
+    static $cache;
+
+    /**
 	 * Allows you to create aliases for attributes.
 	 *
 	 * <code>
@@ -453,8 +458,9 @@ class Model
 
 		// make sure DateTime values know what model they belong to so
 		// dirty stuff works when calling set methods on the DateTime object
-		if ($value instanceof DateTime)
+		if ($value instanceof DateTime){
 			$value->attribute_of($this,$name);
+        }
 
 		$this->attributes[$name] = $value;
 		$this->flag_dirty($name);
@@ -863,6 +869,10 @@ class Model
 
 			$dirty = $this->dirty_attributes();
 			static::table()->update($dirty,$pk);
+
+            $key = static::Table()->cache_key_for_model($this->attributes());
+            Cache::set($key, $this, 0);
+
 			$this->invoke_callback('after_update',false);
 		}
 
@@ -1561,8 +1571,9 @@ class Model
 			$args = $args[0];
 
 		// anything left in $args is a find by pk
-		if ($num_args > 0 && !isset($options['conditions']))
+		if ($num_args > 0 && !isset($options['conditions'])){
 			return static::find_by_pk($args, $options);
+        }
 
 		$options['mapped_names'] = static::$alias_attribute;
 		$list = static::table()->find($options);
