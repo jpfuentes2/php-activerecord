@@ -230,12 +230,11 @@ class Table
 		$self = $this;
 		while (($row = $sth->fetch()))
 		{
-			$key = $this->cache_key_for_model($row);
-
 			$cb = function() use ($row, $self) {
 				return new $self->class->name($row,false,true,false);
 			};
 			if($this->cacheModel){
+				$key = $this->cache_key_for_model($row);
 				$model = Cache::get($key, $cb );
 			}
 			else{
