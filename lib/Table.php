@@ -43,7 +43,7 @@ class Table
 	/**
 	 * Whether to cache individual models or not (not to be confused with caching of table schemas).
 	 */
-	public $cacheModel;
+	public $cache_model;
 
 	/**
 	 * A instance of CallBack for this model/table
@@ -233,7 +233,7 @@ class Table
 			$cb = function() use ($row, $self) {
 				return new $self->class->name($row,false,true,false);
 			};
-			if($this->cacheModel){
+			if($this->cache_model){
 				$key = $this->cache_key_for_model($row);
 				$model = Cache::get($key, $cb );
 			}
@@ -473,10 +473,10 @@ class Table
 			return;
 
 		try{
-			$this->cacheModel = $this->class->getStaticPropertyValue('cacheModel');
+			$this->cache_model = $this->class->getStaticPropertyValue('cache_model');
 		}
 		catch (\ReflectionException $e){
-			$this->cacheModel = false;
+			$this->cache_model = false;
 		}
 	}
 

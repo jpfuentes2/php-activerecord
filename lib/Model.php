@@ -870,7 +870,7 @@ class Model
 			$dirty = $this->dirty_attributes();
 			static::table()->update($dirty,$pk);
 
-			if($table->cacheModel){
+			if($table->cache_model){
 				$key = static::Table()->cache_key_for_model($this->attributes());
 				Cache::set($key, $this, 0);
             }
