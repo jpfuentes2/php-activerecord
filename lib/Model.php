@@ -858,7 +858,7 @@ class Model
 
 		if ($this->is_dirty())
 		{
-            $table = static::table();
+			$table = static::table();
 			$pk = $this->values_for_pk();
 
 			if (empty($pk))
@@ -870,9 +870,9 @@ class Model
 			$dirty = $this->dirty_attributes();
 			static::table()->update($dirty,$pk);
 
-            if($table->cacheModel){
-                $key = static::Table()->cache_key_for_model($this->attributes());
-                Cache::set($key, $this, 0);
+			if($table->cacheModel){
+				$key = static::Table()->cache_key_for_model($this->attributes());
+				Cache::set($key, $this, 0);
             }
 
 			$this->invoke_callback('after_update',false);

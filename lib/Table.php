@@ -15,7 +15,7 @@ namespace ActiveRecord;
  */
 class Table
 {
-	protected static $cache = array();
+	private static $cache = array();
 
 	public $class;
 	public $conn;
@@ -414,7 +414,7 @@ class Table
 		return $ret;
 	}
 
-	protected function &process_data($hash)
+	private function &process_data($hash)
 	{
 		if (!$hash)
 			return $hash;
@@ -490,7 +490,7 @@ class Table
 			$this->sequence = $this->conn->get_sequence_name($this->table,$this->pk[0]);
 	}
 
-	protected function set_associations()
+	private function set_associations()
 	{
 		require_once 'Relationship.php';
 		$namespace = $this->class->getNamespaceName();
@@ -535,8 +535,8 @@ class Table
 	 * Will end up consisting of array of:
 	 *
 	 * array('delegate' => array('field1','field2',...),
-	 *		 'to'		=> 'delegate_to_relationship',
-	 *		 'prefix'	=> 'prefix')
+	 *       'to'		=> 'delegate_to_relationship',
+	 *       'prefix'	=> 'prefix')
 	 */
 	private function set_delegates()
 	{
