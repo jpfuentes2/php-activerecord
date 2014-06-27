@@ -15,7 +15,7 @@ namespace ActiveRecord;
  */
 class Table
 {
-	private static $cache = array();
+	protected static $cache = array();
 
 	public $class;
 	public $conn;
@@ -39,6 +39,11 @@ class Table
 	 * Name of the sequence for this table (optional). Defaults to {$table}_seq
 	 */
 	public $sequence;
+
+	/**
+	 * Whether to cache individual models or not (not to be confused with caching of table schemas).
+	 */
+	public $cacheModel;
 
 	/**
 	 * A instance of CallBack for this model/table
@@ -83,6 +88,7 @@ class Table
 		$this->set_primary_key();
 		$this->set_sequence_name();
 		$this->set_delegates();
+		$this->set_cache();
 		$this->set_setters_and_getters();
 
 		$this->callback = new CallBack($class_name);
@@ -209,6 +215,10 @@ class Table
 		return $this->find_by_sql($sql->to_s(),$sql->get_where_values(), $readonly, $eager_load);
 	}
 
+	public function cache_key_for_model(array $attributes){
+		return $this->class->name."-".implode("-",array_intersect_key($attributes, array_flip($this->pk)));
+	}
+
 	public function find_by_sql($sql, $values=null, $readonly=false, $includes=null)
 	{
 		$this->last_sql = $sql;
@@ -217,9 +227,20 @@ class Table
 		$list = $attrs = array();
 		$sth = $this->conn->query($sql,$this->process_data($values));
 
+		$self = $this;
 		while (($row = $sth->fetch()))
 		{
-			$model = new $this->class->name($row,false,true,false);
+			$key = $this->cache_key_for_model($row);
+
+			$cb = function() use ($row, $self) {
+				return new $self->class->name($row,false,true,false);
+			};
+			if($this->cacheModel){
+				$model = Cache::get($key, $cb );
+			}
+			else{
+				$model = $cb();
+			}
 
 			if ($readonly)
 				$model->readonly();
@@ -367,7 +388,9 @@ class Table
 
 		$table_name = $this->get_fully_qualified_table_name($quote_name);
 		$conn = $this->conn;
-		$this->columns = Cache::get("get_meta_data-$table_name", function() use ($conn, $table_name) { return $conn->columns($table_name); });
+		$this->columns = Cache::get("get_meta_data-$table_name", function() use ($conn, $table_name) {
+			return $conn->columns($table_name);
+		});
 	}
 
 	/**
@@ -391,7 +414,7 @@ class Table
 		return $ret;
 	}
 
-	private function &process_data($hash)
+	protected function &process_data($hash)
 	{
 		if (!$hash)
 			return $hash;
@@ -445,6 +468,19 @@ class Table
 			$this->db_name = $db;
 	}
 
+	private function set_cache()
+	{
+		if (!Cache::$adapter)
+			return;
+
+		try{
+			$this->cacheModel = $this->class->getStaticPropertyValue('cacheModel');
+		}
+		catch (\ReflectionException $e){
+			$this->cacheModel = false;
+		}
+	}
+
 	private function set_sequence_name()
 	{
 		if (!$this->conn->supports_sequences())
@@ -454,7 +490,7 @@ class Table
 			$this->sequence = $this->conn->get_sequence_name($this->table,$this->pk[0]);
 	}
 
-	private function set_associations()
+	protected function set_associations()
 	{
 		require_once 'Relationship.php';
 		$namespace = $this->class->getNamespaceName();
@@ -499,8 +535,8 @@ class Table
 	 * Will end up consisting of array of:
 	 *
 	 * array('delegate' => array('field1','field2',...),
-	 *       'to'       => 'delegate_to_relationship',
-	 *       'prefix'	=> 'prefix')
+	 *		 'to'		=> 'delegate_to_relationship',
+	 *		 'prefix'	=> 'prefix')
 	 */
 	private function set_delegates()
 	{
