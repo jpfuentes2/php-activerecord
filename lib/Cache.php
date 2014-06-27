@@ -63,14 +63,33 @@ class Cache
 	{
 		$key = static::get_namespace() . $key;
 		
-		if (!static::$adapter)
+		if (!static::$adapter){
 			return $closure();
+        }
 
-		if (!($value = static::$adapter->read($key)))
+		if (!($value = static::$adapter->read($key))){
 			static::$adapter->write($key,($value = $closure()),static::$options['expire']);
+		}
 
 		return $value;
 	}
+
+	public static function set($key, $var, $expire=0){
+		if (!static::$adapter)
+			return;
+
+        $key = static::get_namespace() . $key;
+		return static::$adapter->write($key, $var, $expire);
+	}
+
+    public static function delete($key){
+        if (!static::$adapter)
+            return;
+
+        $key = static::get_namespace() . $key;
+
+        return static::$adapter->delete($key);
+    }
 
 	private static function get_namespace()
 	{
