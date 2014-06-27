@@ -11,52 +11,52 @@ namespace ActiveRecord;
  *
  * <code>
  * CREATE TABLE people(
- *	 id int primary key auto_increment,
- *	 parent_id int,
- *	 first_name varchar(50),
- *	 last_name varchar(50)
+ *   id int primary key auto_increment,
+ *   parent_id int,
+ *   first_name varchar(50),
+ *   last_name varchar(50)
  * );
  *
  * CREATE TABLE orders(
- *	 id int primary key auto_increment,
- *	 person_id int not null,
- *	 cost decimal(10,2),
- *	 total decimal(10,2)
+ *   id int primary key auto_increment,
+ *   person_id int not null,
+ *   cost decimal(10,2),
+ *   total decimal(10,2)
  * );
  * </code>
  *
  * <code>
  * class Person extends ActiveRecord\Model {
- *	 static $belongs_to = array(
- *	   array('parent', 'foreign_key' => 'parent_id', 'class_name' => 'Person')
- *	 );
+ *   static $belongs_to = array(
+ *     array('parent', 'foreign_key' => 'parent_id', 'class_name' => 'Person')
+ *   );
  *
- *	 static $has_many = array(
- *	   array('children', 'foreign_key' => 'parent_id', 'class_name' => 'Person'),
- *	   array('orders')
- *	 );
+ *   static $has_many = array(
+ *     array('children', 'foreign_key' => 'parent_id', 'class_name' => 'Person'),
+ *     array('orders')
+ *   );
  *
- *	 static $validates_length_of = array(
- *	   array('first_name', 'within' => array(1,50)),
- *	   array('last_name', 'within' => array(1,50))
- *	 );
+ *   static $validates_length_of = array(
+ *     array('first_name', 'within' => array(1,50)),
+ *     array('last_name', 'within' => array(1,50))
+ *   );
  * }
  *
  * class Order extends ActiveRecord\Model {
- *	 static $belongs_to = array(
- *	   array('person')
- *	 );
+ *   static $belongs_to = array(
+ *     array('person')
+ *   );
  *
- *	 static $validates_numericality_of = array(
- *	   array('cost', 'greater_than' => 0),
- *	   array('total', 'greater_than' => 0)
- *	 );
+ *   static $validates_numericality_of = array(
+ *     array('cost', 'greater_than' => 0),
+ *     array('total', 'greater_than' => 0)
+ *   );
  *
- *	 static $before_save = array('calculate_total_with_tax');
+ *   static $before_save = array('calculate_total_with_tax');
  *
- *	 public function calculate_total_with_tax() {
- *	   $this->total = $this->cost * 0.045;
- *	 }
+ *   public function calculate_total_with_tax() {
+ *     $this->total = $this->cost * 0.045;
+ *   }
  * }
  * </code>
  *
@@ -154,18 +154,18 @@ class Model
 	static $sequence;
 
 	/**
-	 * Set this to true to use caching for this model. Note that you must also configure a cache object.
-	 */
-	static $cache;
-
+     * Set this to true to use caching for this model. Note that you must also configure a cache object.
+     */
+    static $cache;
+	
 	/**
 	 * Allows you to create aliases for attributes.
 	 *
 	 * <code>
 	 * class Person extends ActiveRecord\Model {
-	 *	 static $alias_attribute = array(
-	 *	   'alias_first_name' => 'first_name',
-	 *	   'alias_last_name' => 'last_name');
+	 *   static $alias_attribute = array(
+	 *     'alias_first_name' => 'first_name',
+	 *     'alias_last_name' => 'last_name');
 	 * }
 	 *
 	 * $person = Person::first();
@@ -184,13 +184,13 @@ class Model
 	 *
 	 * <code>
 	 * class Person extends ActiveRecord\Model {
-	 *	 static $attr_accessible = array('first_name','last_name');
+	 *   static $attr_accessible = array('first_name','last_name');
 	 * }
 	 *
 	 * $person = new Person(array(
-	 *	 'first_name' => 'Tito',
-	 *	 'last_name' => 'the Grief',
-	 *	 'id' => 11111));
+	 *   'first_name' => 'Tito',
+	 *   'last_name' => 'the Grief',
+	 *   'id' => 11111));
 	 *
 	 * echo $person->id; # => null
 	 * </code>
@@ -216,18 +216,18 @@ class Model
 	 *
 	 * <code>
 	 * class Person extends ActiveRecord\Model {
-	 *	 static $belongs_to = array(array('venue'),array('host'));
-	 *	 static $delegate = array(
-	 *	   array('name', 'state', 'to' => 'venue'),
-	 *	   array('name', 'to' => 'host', 'prefix' => 'woot'));
+	 *   static $belongs_to = array(array('venue'),array('host'));
+	 *   static $delegate = array(
+	 *     array('name', 'state', 'to' => 'venue'),
+	 *     array('name', 'to' => 'host', 'prefix' => 'woot'));
 	 * }
 	 * </code>
 	 *
 	 * Can then do:
 	 *
 	 * <code>
-	 * $person->state	  # same as calling $person->venue->state
-	 * $person->name	  # same as calling $person->venue->name
+	 * $person->state     # same as calling $person->venue->state
+	 * $person->name      # same as calling $person->venue->name
 	 * $person->woot_name # same as calling $person->host->name
 	 * </code>
 	 *
@@ -284,15 +284,15 @@ class Model
 	 * <code>
 	 * class User extends ActiveRecord\Model {
 	 *
-	 *	 # define custom getter methods. Note you must
-	 *	 # prepend get_ to your method name:
-	 *	 function get_middle_initial() {
-	 *	   return $this->middle_name{0};
-	 *	 }
+	 *   # define custom getter methods. Note you must
+	 *   # prepend get_ to your method name:
+	 *   function get_middle_initial() {
+	 *     return $this->middle_name{0};
+	 *   }
 	 * }
 	 *
 	 * $user = new User();
-	 * echo $user->middle_name;	 # will call $user->get_middle_name()
+	 * echo $user->middle_name;  # will call $user->get_middle_name()
 	 * </code>
 	 *
 	 * If you define a custom getter with the same name as an attribute then you
@@ -305,14 +305,14 @@ class Model
 	 * <code>
 	 * class User extends ActiveRecord\Model {
 	 *
-	 *	 # INCORRECT way to do it
-	 *	 # function get_name() {
-	 *	 #	 return strtoupper($this->name);
-	 *	 # }
+	 *   # INCORRECT way to do it
+	 *   # function get_name() {
+	 *   #   return strtoupper($this->name);
+	 *   # }
 	 *
-	 *	 function get_name() {
-	 *	   return strtoupper($this->read_attribute('name'));
-	 *	 }
+	 *   function get_name() {
+	 *     return strtoupper($this->read_attribute('name'));
+	 *   }
 	 * }
 	 *
 	 * $user = new User();
@@ -358,11 +358,11 @@ class Model
 	 * <code>
 	 * class User extends ActiveRecord\Model {
 	 *
-	 *	 # define custom setter methods. Note you must
-	 *	 # prepend set_ to your method name:
-	 *	 function set_password($plaintext) {
-	 *	   $this->encrypted_password = md5($plaintext);
-	 *	 }
+	 *   # define custom setter methods. Note you must
+	 *   # prepend set_ to your method name:
+	 *   function set_password($plaintext) {
+	 *     $this->encrypted_password = md5($plaintext);
+	 *   }
 	 * }
 	 *
 	 * $user = new User();
@@ -379,14 +379,14 @@ class Model
 	 * <code>
 	 * class User extends ActiveRecord\Model {
 	 *
-	 *	 # INCORRECT way to do it
-	 *	 # function set_name($name) {
-	 *	 #	 $this->name = strtoupper($name);
-	 *	 # }
+	 *   # INCORRECT way to do it
+	 *   # function set_name($name) {
+	 *   #   $this->name = strtoupper($name);
+	 *   # }
 	 *
-	 *	 function set_name($name) {
-	 *	   $this->assign_attribute('name',strtoupper($name));
-	 *	 }
+	 *   function set_name($name) {
+	 *     $this->assign_attribute('name',strtoupper($name));
+	 *   }
 	 * }
 	 *
 	 * $user = new User();
@@ -609,12 +609,12 @@ class Model
 	 *
 	 * <code>
 	 * array(
-	 *	 'name' => array(
-	 *	   array('validator' => 'validates_presence_of'),
-	 *	   array('validator' => 'validates_inclusion_of', 'in' => array('Bob','Joe','John')),
-	 *	 'password' => array(
-	 *	   array('validator' => 'validates_length_of', 'minimum' => 6))
-	 *	 )
+	 *   'name' => array(
+	 *     array('validator' => 'validates_presence_of'),
+	 *     array('validator' => 'validates_inclusion_of', 'in' => array('Bob','Joe','John')),
+	 *   'password' => array(
+	 *     array('validator' => 'validates_length_of', 'minimum' => 6))
+	 *   )
 	 * );
 	 * </code>
 	 *
@@ -858,6 +858,7 @@ class Model
 
 		if ($this->is_dirty())
 		{
+            $table = static::table();
 			$pk = $this->values_for_pk();
 
 			if (empty($pk))
@@ -869,8 +870,10 @@ class Model
 			$dirty = $this->dirty_attributes();
 			static::table()->update($dirty,$pk);
 
-			$key = static::Table()->cache_key_for_model($this->attributes());
-			Cache::set($key, $this, 0);
+            if($table->cacheModel){
+                $key = static::Table()->cache_key_for_model($this->attributes());
+                Cache::set($key, $this, 0);
+            }
 
 			$this->invoke_callback('after_update',false);
 		}
@@ -1305,7 +1308,7 @@ class Model
 	 *
 	 * # would be the equivalent of
 	 * if (!Person::find_by_name('Tito'))
-	 *	 Person::create(array('Tito'));
+	 *   Person::create(array('Tito'));
 	 * </code>
 	 *
 	 * Some other examples of find_or_create_by:
@@ -1494,7 +1497,7 @@ class Model
 	 *
 	 * <code>
 	 * YourModel::find('first', array('conditions' => array('name=?','Tito'),
-	 *	 'order' => 'name asc'))
+	 *   'order' => 'name asc'))
 	 * YourModel::find('all', array('conditions' => 'amount > 3.14159265'));
 	 * YourModel::find('all', array('conditions' => array('id in(?)', array(1,2,3))));
 	 * </code>
@@ -1524,9 +1527,9 @@ class Model
 	 *
 	 * @throws {@link RecordNotFound} if no options are passed or finding by pk and no records matched
 	 * @return mixed An array of records found if doing a find_all otherwise a
-	 *	 single Model object or null if it wasn't found. NULL is only return when
-	 *	 doing a first/last find. If doing an all find and no records matched this
-	 *	 will return an empty array.
+	 *   single Model object or null if it wasn't found. NULL is only return when
+	 *   doing a first/last find. If doing an all find and no records matched this
+	 *   will return an empty array.
 	 */
 	public static function find(/* $type, $options */)
 	{
@@ -1548,7 +1551,7 @@ class Model
 					$single = false;
 					break;
 
-				case 'last':
+			 	case 'last':
 					if (!array_key_exists('order',$options))
 						$options['order'] = join(' DESC, ',static::table()->pk) . ' DESC';
 					else
@@ -1556,10 +1559,10 @@ class Model
 
 					// fall thru
 
-				case 'first':
-					$options['limit'] = 1;
-					$options['offset'] = 0;
-					break;
+			 	case 'first':
+			 		$options['limit'] = 1;
+			 		$options['offset'] = 0;
+			 		break;
 			}
 
 			$args = array_slice($args,1);
@@ -1570,9 +1573,8 @@ class Model
 			$args = $args[0];
 
 		// anything left in $args is a find by pk
-		if ($num_args > 0 && !isset($options['conditions'])){
+		if ($num_args > 0 && !isset($options['conditions']))
 			return static::find_by_pk($args, $options);
-		}
 
 		$options['mapped_names'] = static::$alias_attribute;
 		$list = static::table()->find($options);
@@ -1762,7 +1764,7 @@ class Model
    */
   public function to_csv(array $options=array())
   {
-	return $this->serialize('Csv', $options);
+    return $this->serialize('Csv', $options);
   }
 
 	/**
@@ -1820,7 +1822,7 @@ class Model
 	 * <code>
 	 * YourModel::transaction(function()
 	 * {
-	 *	 YourModel::create(array("name" => "blah"));
+	 *   YourModel::create(array("name" => "blah"));
 	 * });
 	 * </code>
 	 *
@@ -1831,14 +1833,14 @@ class Model
 	 * <code>
 	 * YourModel::transaction(function()
 	 * {
-	 *	 YourModel::create(array("name" => "blah"));
-	 *	 throw new Exception("rollback!");
+	 *   YourModel::create(array("name" => "blah"));
+	 *   throw new Exception("rollback!");
 	 * });
 	 *
 	 * YourModel::transaction(function()
 	 * {
-	 *	 YourModel::create(array("name" => "blah"));
-	 *	 return false; # rollback!
+	 *   YourModel::create(array("name" => "blah"));
+	 *   return false; # rollback!
 	 * });
 	 * </code>
 	 *
