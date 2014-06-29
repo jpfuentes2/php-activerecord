@@ -154,6 +154,11 @@ class Model
 	static $sequence;
 
 	/**
+     * Set this to true to use caching for this model. Note that you must also configure a cache object.
+     */
+    static $cache;
+	
+	/**
 	 * Allows you to create aliases for attributes.
 	 *
 	 * <code>
@@ -853,6 +858,7 @@ class Model
 
 		if ($this->is_dirty())
 		{
+			$table = static::table();
 			$pk = $this->values_for_pk();
 
 			if (empty($pk))
@@ -863,6 +869,12 @@ class Model
 
 			$dirty = $this->dirty_attributes();
 			static::table()->update($dirty,$pk);
+
+			if($table->cache_model){
+				$key = static::Table()->cache_key_for_model($this->attributes());
+				Cache::set($key, $this, 0);
+            }
+
 			$this->invoke_callback('after_update',false);
 		}
 
