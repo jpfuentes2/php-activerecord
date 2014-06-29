@@ -66,10 +66,18 @@ class Cache
 		if (!static::$adapter)
 			return $closure();
 
-		if (!($value = static::$adapter->read($key)))
+		if (!($value = static::$adapter->read($key))){
 			static::$adapter->write($key,($value = $closure()),static::$options['expire']);
+		}
 
 		return $value;
+	}
+
+	public static function set($key, $var, $expire=0){
+		if (!static::$adapter)
+			return;
+
+		return static::$adapter->write($key, $var, $expire);
 	}
 
 	private static function get_namespace()
