@@ -215,8 +215,11 @@ class Table
 		return $this->find_by_sql($sql->to_s(),$sql->get_where_values(), $readonly, $eager_load);
 	}
 
-	public function cache_key_for_model(array $attributes){
-		return $this->class->name."-".implode("-",array_intersect_key($attributes, array_flip($this->pk)));
+	public function cache_key_for_model($pk){
+        if(!is_array($pk)){
+            $pk = array($pk);
+        }
+		return $this->class->name."-".implode("-",$pk);
 	}
 
 	public function find_by_sql($sql, $values=null, $readonly=false, $includes=null)
@@ -234,7 +237,7 @@ class Table
 				return new $self->class->name($row,false,true,false);
 			};
 			if($this->cache_model){
-				$key = $this->cache_key_for_model($row);
+				$key = $this->cache_key_for_model(array_intersect_key($row, array_flip($this->pk)));
 				$model = Cache::get($key, $cb );
 			}
 			else{

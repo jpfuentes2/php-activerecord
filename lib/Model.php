@@ -858,7 +858,6 @@ class Model
 
 		if ($this->is_dirty())
 		{
-			$table = static::table();
 			$pk = $this->values_for_pk();
 
 			if (empty($pk))
@@ -870,16 +869,25 @@ class Model
 			$dirty = $this->dirty_attributes();
 			static::table()->update($dirty,$pk);
 
-			if($table->cache_model){
-				$key = static::Table()->cache_key_for_model($this->attributes());
-				Cache::set($key, $this, 0);
-            }
+			$this->update_cache();
 
 			$this->invoke_callback('after_update',false);
 		}
 
 		return true;
 	}
+
+    protected function update_cache(){
+        $table = static::table();
+        if($table->cache_model){
+            Cache::set($this->cache_key(), $this, 0);
+        }
+    }
+
+    protected function cache_key(){
+        $table = static::Table();
+        return $table->cache_key_for_model($this->values_for_pk());
+    }
 
 	/**
 	 * Deletes records matching conditions in $options
@@ -936,6 +944,7 @@ class Model
 
 		$values = $sql->bind_values();
 		$ret = $conn->query(($table->last_sql = $sql->to_s()), $values);
+
 		return $ret->rowCount();
 	}
 
@@ -1015,9 +1024,17 @@ class Model
 
 		static::table()->delete($pk);
 		$this->invoke_callback('after_destroy',false);
+        $this->remove_from_cache();
 
 		return true;
 	}
+
+    public function remove_from_cache(){
+        $table = static::table();
+        if($table->cache_model){
+            Cache::delete($this->cache_key());
+        }
+    }
 
 	/**
 	 * Helper that creates an array of values for the primary key(s).
@@ -1252,7 +1269,9 @@ class Model
 	 */
 	public function reload()
 	{
-		$this->__relationships = array();
+        $this->remove_from_cache();
+
+        $this->__relationships = array();
 		$pk = array_values($this->get_values_for($this->get_primary_key()));
 
 		$this->set_attributes_via_mass_assignment($this->find($pk)->attributes, false);
@@ -1573,8 +1592,9 @@ class Model
 			$args = $args[0];
 
 		// anything left in $args is a find by pk
-		if ($num_args > 0 && !isset($options['conditions']))
+		if ($num_args > 0 && !isset($options['conditions'])){
 			return static::find_by_pk($args, $options);
+        }
 
 		$options['mapped_names'] = static::$alias_attribute;
 		$list = static::table()->find($options);
@@ -1593,8 +1613,24 @@ class Model
 	 */
 	public static function find_by_pk($values, $options)
 	{
-		$options['conditions'] = static::pk_conditions($values);
-		$list = static::table()->find($options);
+
+        $table = static::table();
+
+        if($table->cache_model){
+            $pks=is_array($values)?$values:array($values);
+            foreach($pks as $pk){
+                $options['conditions'] = static::pk_conditions($pk);
+                $list[] = Cache::get($table->cache_key_for_model($pk), function() use ($table, $options){
+                    $res = $table->find($options);
+                    return $res?$res[0]:null;
+                });
+            }
+            $list = array_filter($list);
+        }
+        else{
+            $options['conditions'] = static::pk_conditions($values);
+    		$list = $table->find($options);
+        }
 		$results = count($list);
 
 		if ($results != ($expected = count($values)))
