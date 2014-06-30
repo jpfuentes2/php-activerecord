@@ -292,7 +292,7 @@ class Table
 	 * @param $name string name of Relationship
 	 * @param $strict bool
 	 * @throws RelationshipException
-	 * @return Relationship or null
+	 * @return HasOne|HasMany|BelongsTo Relationship or null
 	 */
 	public function get_relationship($name, $strict=false)
 	{
