@@ -219,7 +219,14 @@ class Table
 
 		while (($row = $sth->fetch()))
 		{
-			$model = new $this->class->name($row,false,true,false);
+			$class_name = $this->class->name;
+			$class = $class_name::instantiate($row);
+			$model = new $class($row,false,true,false);
+			/* Make sure the returned class inherits from the base class */
+			if(!($model instanceof $this->class->name)) 
+			{
+				throw new ActiveRecordException('Instantiated model needs to inherit from the base class '.$this->class->name);
+			}
 
 			if ($readonly)
 				$model->readonly();
