@@ -20,6 +20,11 @@ CREATE TABLE books(
 	special NUMERIC(10,2) DEFAULT 0
 );
 
+CREATE TABLE publishers(
+	publisher_id INTEGER NOT NULL PRIMARY KEY,
+	name VARCHAR  (25) NOT NULL DEFAULT default_name -- don't touch those spaces
+);
+
 CREATE TABLE venues (
   Id INTEGER NOT NULL PRIMARY KEY,
   name varchar(50),
