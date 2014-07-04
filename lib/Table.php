@@ -182,6 +182,9 @@ class Table
 			}
 		}
 
+		if (array_key_exists('mysql_calc_found_rows', $options) && $options['mysql_calc_found_rows'] == true)
+      $sql->mysql_calc_found_rows(true);
+
 		if (array_key_exists('order',$options))
 			$sql->order($options['order']);
 
@@ -205,18 +208,20 @@ class Table
 		$sql = $this->options_to_sql($options);
 		$readonly = (array_key_exists('readonly',$options) && $options['readonly']) ? true : false;
 		$eager_load = array_key_exists('include',$options) ? $options['include'] : null;
-
-		return $this->find_by_sql($sql->to_s(),$sql->get_where_values(), $readonly, $eager_load);
+    $mysql_calc_found_rows = (array_key_exists('mysql_calc_found_rows',$options) && $options['mysql_calc_found_rows']) ? true : false;
+		return $this->find_by_sql($sql->to_s(),$sql->get_where_values(), $readonly, $eager_load, $mysql_calc_found_rows);
 	}
 
-	public function find_by_sql($sql, $values=null, $readonly=false, $includes=null)
+	public function find_by_sql($sql, $values=null, $readonly=false, $includes=null, $mysql_calc_found_rows = false)
 	{
 		$this->last_sql = $sql;
 
 		$collect_attrs_for_includes = is_null($includes) ? false : true;
 		$list = $attrs = array();
 		$sth = $this->conn->query($sql,$this->process_data($values));
-
+    if ($mysql_calc_found_rows) {
+      $rows = $this->conn->query_and_fetch_one("SELECT FOUND_ROWS()");
+    }
 		while (($row = $sth->fetch()))
 		{
 			$model = new $this->class->name($row,false,true,false);
@@ -233,7 +238,11 @@ class Table
 		if ($collect_attrs_for_includes && !empty($list))
 			$this->execute_eager_load($list, $attrs, $includes);
 
-		return $list;
+    if ($mysql_calc_found_rows) {
+      return array($rows, $list);
+	  } else {
+			return $list;		
+	  }
 	}
 
 	/**
