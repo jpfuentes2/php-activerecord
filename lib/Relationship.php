@@ -540,7 +540,7 @@ class HasMany extends AbstractRelationship
 		$primary_key = Inflector::instance()->variablize($this->foreign_key[0]);
 
 		return array(
-			$primary_key => $model->id,
+			$primary_key => $model->{$primary_key},
 		);
 	}
 
