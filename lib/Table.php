@@ -119,7 +119,6 @@ class Table
 		if (!is_array($joins))
 			return $joins;
 
-		$self = $this->table;
 		$ret = $space = '';
 
 		$existing_tables = array();
@@ -222,11 +221,11 @@ class Table
 
 	public function cache_key_for_model($pk)
 	{
-		if(!is_array($pk))
+		if (is_array($pk))
 		{
-			$pk = array($pk);
+			$pk = implode('-', $pk);
 		}
-		return $this->class->name."-".implode("-",$pk);
+		return $this->class->name . '-' . $pk;
 	}
 
 	public function find_by_sql($sql, $values=null, $readonly=false, $includes=null)
@@ -242,12 +241,12 @@ class Table
 		{
 			$cb = function() use ($row, $self)
 			{
-				return new $self->class->name($row,false,true,false);
+				return new $self->class->name($row, false, true, false);
 			};
-			if($this->cache_individual_model)
+			if ($this->cache_individual_model)
 			{
 				$key = $this->cache_key_for_model(array_intersect_key($row, array_flip($this->pk)));
-				$model = Cache::get($key, $cb, $this->cache_model_expire );
+				$model = Cache::get($key, $cb, $this->cache_model_expire);
 			}
 			else
 			{
@@ -400,7 +399,7 @@ class Table
 
 		$table_name = $this->get_fully_qualified_table_name($quote_name);
 		$conn = $this->conn;
-		$this->columns = Cache::get("get_meta_data-$table_name", function() use ($conn, $table_name) { return $conn->columns($table_name); }, Cache::$options['expire']);
+		$this->columns = Cache::get("get_meta_data-$table_name", function() use ($conn, $table_name) { return $conn->columns($table_name); });
 	}
 
 	/**
@@ -474,7 +473,7 @@ class Table
 			$this->table = $parts[count($parts)-1];
 		}
 
-		if(($db = $this->class->getStaticPropertyValue('db',null)) || ($db = $this->class->getStaticPropertyValue('db_name',null)))
+		if (($db = $this->class->getStaticPropertyValue('db',null)) || ($db = $this->class->getStaticPropertyValue('db_name',null)))
 			$this->db_name = $db;
 	}
 
@@ -485,7 +484,7 @@ class Table
 
 		$model_class_name = $this->class->name;
 		$this->cache_individual_model = $model_class_name::$cache;
-		if(property_exists($model_class_name, 'cache_expire') && isset($model_class_name::$cache_expire))
+		if (property_exists($model_class_name, 'cache_expire') && isset($model_class_name::$cache_expire))
 		{
 			$this->cache_model_expire =  $model_class_name::$cache_expire;
 		}

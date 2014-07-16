@@ -879,7 +879,7 @@ class Model
 			static::table()->update($dirty,$pk);
 			$this->invoke_callback('after_update',false);
 			$this->update_cache();
-        }
+		}
 
 		return true;
 	}
@@ -894,7 +894,7 @@ class Model
 
 	protected function cache_key()
 	{
-		$table = static::Table();
+		$table = static::table();
 		return $table->cache_key_for_model($this->values_for_pk());
 	}
 
@@ -1589,8 +1589,8 @@ class Model
 					// fall thru
 
 			 	case 'first':
-			 		$options['limit'] = 1;
-			 		$options['offset'] = 0;
+					$options['limit'] = 1;
+					$options['offset'] = 0;
 			 		break;
 			}
 
@@ -1624,11 +1624,11 @@ class Model
 
 		foreach($pks as $pk)
 		{
-			$options =array('conditions'=> static::pk_conditions($pk));
+			$options =array('conditions' => static::pk_conditions($pk));
 			$models[] = Cache::get($table->cache_key_for_model($pk), function() use ($table, $options)
 			{
 				$res = $table->find($options);
-				return $res?$res[0]:null;
+				return $res ? $res[0] : null;
 			}, $table->cache_model_expire);
 		}
 		return array_filter($models);
@@ -1649,7 +1649,7 @@ class Model
 
 		if($table->cache_individual_model)
 		{
-			$pks=is_array($values)?$values:array($values);
+			$pks = is_array($values) ? $values : array($values);
 			$list = static::get_models_from_cache($pks);
 		}
 		else
