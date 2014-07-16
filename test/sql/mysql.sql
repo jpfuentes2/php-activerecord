@@ -21,6 +21,11 @@ CREATE TABLE books(
 	special NUMERIC(10,2) DEFAULT 0
 );
 
+CREATE TABLE publishers(
+	publisher_id INT NOT NULL PRIMARY KEY AUTO_INCREMENT,
+	name VARCHAR(25) NOT NULL DEFAULT 'default_name'
+) ENGINE=InnoDB;
+
 CREATE TABLE venues (
 	Id int NOT NULL AUTO_INCREMENT PRIMARY KEY,
 	name varchar(50),

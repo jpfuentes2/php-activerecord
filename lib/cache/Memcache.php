@@ -41,5 +41,9 @@ class Memcache
 	{
 		$this->memcache->set($key,$value,null,$expire);
 	}
+
+	public function delete($key)
+	{
+		$this->memcache->delete($key);
+	}
 }
-?>
