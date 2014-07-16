@@ -2,7 +2,7 @@
 .buildpath
 .settings
 *.log
-test/*.db
+*.db
 *.swp
 vendor/*
 composer.lock
