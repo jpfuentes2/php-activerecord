@@ -69,7 +69,8 @@ class Cache
 	 */
 	public static function get($key, $closure, $expire=null)
 	{
-		if(is_null($expire)){
+		if (is_null($expire))
+		{
 			$expire = static::$options['expire'];
 		}
 
@@ -89,7 +90,8 @@ class Cache
 		if (!static::$adapter)
 			return;
 
-		if(is_null($expire)){
+		if (is_null($expire))
+		{
 			$expire = static::$options['expire'];
 		}
 
