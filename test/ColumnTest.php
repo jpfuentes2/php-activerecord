@@ -127,4 +127,3 @@ class ColumnTest extends SnakeCase_PHPUnit_Framework_TestCase
 		$this->assert_equals(null,$column->cast('',$this->conn));
 	}
 }
-?>

@@ -41,4 +41,3 @@ class PgsqlAdapterTest extends AdapterTest
 		$this->assert_equals(3,$this->conn->query_column_info("user_newsletters")->rowCount());
 	}
 }
-?>

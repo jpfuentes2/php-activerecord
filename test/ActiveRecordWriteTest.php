@@ -10,7 +10,7 @@ class DirtyAuthor extends ActiveRecord\Model
 	{
 		$this->name = 'i saved';
 	}
-};
+}
 
 class AuthorWithoutSequence extends ActiveRecord\Model
 {
@@ -424,4 +424,4 @@ class ActiveRecordWriteTest extends DatabaseTest
 		$this->assert_equals(1, $num_affected);
 		$this->assert_true(strpos(Author::table()->last_sql, 'ORDER BY name asc LIMIT 1') !== false);
 	}
-};
+}

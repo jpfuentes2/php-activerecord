@@ -241,7 +241,7 @@ abstract class Serialization
 	 * @return string
 	 */
 	abstract public function to_s();
-};
+}
 
 /**
  * Array serializer.

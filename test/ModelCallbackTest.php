@@ -94,4 +94,3 @@ class ModelCallbackTest extends DatabaseTest
 			function($model) { $model->delete(); });
 	}
 }
-?>
