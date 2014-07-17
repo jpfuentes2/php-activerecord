@@ -9,5 +9,5 @@ class BookAttrProtected extends ActiveRecord\Model
 
 	// No attributes should be accessible
 	static $attr_accessible = array(null);
-};
-?>
+}
+

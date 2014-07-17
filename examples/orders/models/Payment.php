@@ -6,4 +6,3 @@ class Payment extends ActiveRecord\Model
 		array('person'),
 		array('order'));
 }
-?>

@@ -473,5 +473,4 @@ class ActiveRecordFindTest extends DatabaseTest
 		$this->assert_not_null(Author::find_by_created_at($now));
 		$this->assert_not_null(Author::find_by_created_at($arnow));
 	}
-};
-?>
+}

@@ -8,5 +8,4 @@ class PropertyAmenity extends ActiveRecord\Model
 		'amenity',
 		'property'
 	);
-};
-?>
+}
