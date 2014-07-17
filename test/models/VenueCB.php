@@ -41,4 +41,3 @@ class VenueCB extends ActiveRecord\Model
 		return false;
 	}
 }
-?>

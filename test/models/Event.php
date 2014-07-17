@@ -10,5 +10,5 @@ class Event extends ActiveRecord\Model
 		array('state', 'address', 'to' => 'venue'),
 		array('name', 'to' => 'host', 'prefix' => 'woot')
 	);
-};
-?>
+}
+

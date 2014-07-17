@@ -408,4 +408,3 @@ class AdapterTest extends DatabaseTest
 		$this->assert_equals($datetime,$this->conn->date_to_string(date_create($datetime)));
 	}
 }
-?>

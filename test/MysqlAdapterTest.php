@@ -34,4 +34,3 @@ class MysqlAdapterTest extends AdapterTest
 		$this->assert_true(strpos($this->conn->last_query, 'LIMIT 1') !== false);
 	}
 }
-?>

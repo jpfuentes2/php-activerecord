@@ -92,4 +92,3 @@ class ConfigTest extends SnakeCase_PHPUnit_Framework_TestCase
 		}
 	}
 }
-?>

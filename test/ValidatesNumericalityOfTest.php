@@ -158,8 +158,7 @@ class ValidatesNumericalityOfTest extends DatabaseTest
 		$book->is_valid();
 		$this->assert_equals(array('Numeric test Hello'),$book->errors->full_messages());
 	}
-};
+}
 
 array_merge(ValidatesNumericalityOfTest::$INTEGERS, ValidatesNumericalityOfTest::$INTEGER_STRINGS);
 array_merge(ValidatesNumericalityOfTest::$FLOATS, ValidatesNumericalityOfTest::$FLOAT_STRINGS);
-?>

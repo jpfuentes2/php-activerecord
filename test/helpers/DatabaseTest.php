@@ -79,4 +79,3 @@ class DatabaseTest extends SnakeCase_PHPUnit_Framework_TestCase
 		return $this->assertNotContains($needle, $haystack);
 	}
 }
-?>
