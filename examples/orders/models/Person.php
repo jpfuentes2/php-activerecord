@@ -10,4 +10,3 @@ class Person extends ActiveRecord\Model
 	static $validates_presence_of = array(
 		array('name'), array('state'));
 }
-?>

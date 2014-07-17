@@ -16,7 +16,7 @@ class AuthorPresence extends ActiveRecord\Model
 	static $validates_presence_of = array(
 		array('some_date')
 	);
-};
+}
 
 class ValidatesPresenceOfTest extends DatabaseTest
 {
@@ -70,5 +70,4 @@ class ValidatesPresenceOfTest extends DatabaseTest
 		$book = new BookPresence(array('name' => 0));
 		$this->assert_true($book->is_valid());
 	}
-};
-?>
+}

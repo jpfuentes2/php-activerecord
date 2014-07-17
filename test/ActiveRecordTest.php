@@ -562,5 +562,4 @@ class ActiveRecordTest extends DatabaseTest
 		$row = Author::query('SELECT COUNT(*) AS n FROM authors WHERE name=?',array('Tito'))->fetch();
 		$this->assert_equals(array('n' => 1), $row);
 	}
-};
-?>
+}

@@ -23,6 +23,3 @@ class UserNewsletter extends \ActiveRecord\Model {
 		array('newsletter'),
 	);
 }
-
-# vim: ts=4 noet nobinary
-?>

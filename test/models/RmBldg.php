@@ -30,4 +30,3 @@ class RmBldg extends ActiveRecord\Model
 		array('rm_id', 'less_than' => 10, 'odd' => null)
 	);
 }
-?>

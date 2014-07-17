@@ -178,5 +178,5 @@ class ValidationsTest extends DatabaseTest
 		$this->assert_true($book->errors->is_invalid('name'));
 		$this->assert_equals(BookValidations::$custom_validator_error_msg, $book->errors->on('name'));
 	}
-};
-?>
+}
+
