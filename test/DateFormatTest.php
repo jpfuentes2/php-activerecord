@@ -14,5 +14,4 @@ class DateFormatTest extends DatabaseTest
 		$this->assert_is_a("ActiveRecord\\DateTime",$author->some_date);
 	}
 
-};
-?>
+}

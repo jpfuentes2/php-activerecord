@@ -32,5 +32,4 @@ class Book extends ActiveRecord\Model
 	{
 		return strtolower($this->name);
 	}
-};
-?>
+}

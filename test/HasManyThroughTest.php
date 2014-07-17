@@ -56,5 +56,3 @@ class HasManyThroughTest extends DatabaseTest
 		$this->assert_equals(1, $user->newsletters[0]->id);
 	}
 }
-# vim: noet ts=4 nobinary
-?>

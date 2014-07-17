@@ -127,4 +127,3 @@ class DatabaseLoader
 		return $this->db->quote_name($name);
 	}
 }
-?>

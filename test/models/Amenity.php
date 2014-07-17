@@ -7,5 +7,4 @@ class Amenity extends ActiveRecord\Model
 	static $has_many = array(
 		'property_amenities'
 	);
-};
-?>
+}
