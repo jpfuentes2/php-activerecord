@@ -801,7 +801,7 @@ class Model
 	{
 		$this->verify_not_readonly('insert');
 
-		if (($validate && !$this->_validate() || !$this->invoke_callback('before_create',false)))
+		if (($validate && !$this->_validate()) || !$this->invoke_callback('before_create',false))
 			return false;
 
 		$table = static::table();
@@ -1082,7 +1082,9 @@ class Model
 		require_once 'Validations.php';
 
 		$validator = new Validations($this);
-		$validation_on = 'validation_on_' . ($this->is_new_record() ? 'create' : 'update');
+		$validation_mode = $this->is_new_record() ? 'create' : 'update';
+		$validation_on = 'validation_on_' . $validation_mode;
+		$validator->set_validation_mode($validation_mode);
 
 		foreach (array('before_validation', "before_$validation_on") as $callback)
 		{
