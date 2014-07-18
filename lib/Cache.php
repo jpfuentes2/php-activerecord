@@ -69,15 +69,15 @@ class Cache
 	 */
 	public static function get($key, $closure, $expire=null)
 	{
+		if (!static::$adapter)
+			return $closure();
+
 		if (is_null($expire))
 		{
 			$expire = static::$options['expire'];
 		}
 
 		$key = static::get_namespace() . $key;
-
-		if (!static::$adapter)
-			return $closure();
 
 		if (!($value = static::$adapter->read($key)))
 			static::$adapter->write($key, ($value = $closure()), $expire);
