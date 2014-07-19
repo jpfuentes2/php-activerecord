@@ -169,7 +169,7 @@ class Column
 					return $value;
 
 				if ($value instanceof \DateTime)
-					return new DateTime($value->format('Y-m-d H:i:s T'));
+					return new DateTime($value->format($connection::$datetime_format));
 
 				return $connection->string_to_datetime($value);
 		}
