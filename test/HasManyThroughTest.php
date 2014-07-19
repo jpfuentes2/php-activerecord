@@ -55,4 +55,41 @@ class HasManyThroughTest extends DatabaseTest
 		$this->assert_equals(1, $user->id);
 		$this->assert_equals(1, $user->newsletters[0]->id);
 	}
+
+	public function test_gh68_has_many_through_with_missing_associations()
+	{
+		Property::$has_many = array(
+			array('amenities', 'through' => 'property_amenities')
+		);
+		Amenity::$has_many = array(
+			array('properties', 'through' => 'property_amenities')
+		);
+
+		$property = Property::find('first');
+		try{
+			$property->amenities;
+			$this->fail('Should trigger exception');
+		}catch(ActiveRecord\HasManyThroughAssociationException $e){
+			$this->assertEquals('Could not find the association property_amenities in model Property', $e->getMessage());
+		}
+	}
+
+	public function test_gh68_has_many_through_with_missing_association()
+	{
+		Property::$has_many = array(
+			'property_amenities',
+			array('amenities', 'through' => 'property_amenities')
+		);
+		Amenity::$has_many = array(
+			array('properties', 'through' => 'property_amenities')
+		);
+
+		$amenity = Amenity::find('first');
+		try{
+			$amenity->properties;
+			$this->fail('Should trigger exception');
+		}catch(ActiveRecord\HasManyThroughAssociationException $e){
+			$this->assertEquals('Could not find the association property_amenities in model Amenity', $e->getMessage());
+		}
+	}
 }

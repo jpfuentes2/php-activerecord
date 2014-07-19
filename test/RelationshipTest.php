@@ -341,6 +341,14 @@ class RelationshipTest extends DatabaseTest
 
 	public function test_gh27_has_many_through_with_explicit_keys()
 	{
+		Property::$has_many = array(
+			'property_amenities',
+			array('amenities', 'through' => 'property_amenities')
+		);
+		Amenity::$has_many = array(
+			'property_amenities'
+		);
+		
 		$property = Property::first();
 
 		$this->assert_equals(1, $property->amenities[0]->amenity_id);
