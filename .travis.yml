@@ -16,4 +16,4 @@ php:
   - 5.4
   - 5.5
 
-script: vendor/bin/phpunit -c phpunit.xml test/
+script: ./vendor/bin/phpunit

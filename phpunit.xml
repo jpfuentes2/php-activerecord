@@ -1,2 +1,0 @@
-<phpunit bootstrap="test/helpers/config.php">
-</phpunit>
