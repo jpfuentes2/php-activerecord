@@ -123,30 +123,30 @@ class SerializationTest extends DatabaseTest
 		$this->assert_equals($book->attributes(),get_object_vars(new SimpleXMLElement($book->to_xml())));
 	}
 
-  public function test_to_array()
-  {
- 		$book = Book::find(1);
+	public function test_to_array()
+	{
+		$book = Book::find(1);
 		$array = $book->to_array();
 		$this->assert_equals($book->attributes(), $array);
-  }
+	}
 
-  public function test_to_array_include_root()
-  {
+	public function test_to_array_include_root()
+	{
 		ActiveRecord\ArraySerializer::$include_root = true;
- 		$book = Book::find(1);
+		$book = Book::find(1);
 		$array = $book->to_array();
-    $book_attributes = array('book' => $book->attributes());
+		$book_attributes = array('book' => $book->attributes());
 		$this->assert_equals($book_attributes, $array);
-  }
+	}
 
-  public function test_to_array_except()
-  {
- 		$book = Book::find(1);
+	public function test_to_array_except()
+	{
+		$book = Book::find(1);
 		$array = $book->to_array(array('except' => array('special')));
 		$book_attributes = $book->attributes();
 		unset($book_attributes['special']);
 		$this->assert_equals($book_attributes, $array);
-  }
+	}
 
 	public function test_works_with_datetime()
 	{
@@ -166,49 +166,49 @@ class SerializationTest extends DatabaseTest
 		$this->assert_contains('<sharks>lasers</sharks>', Author::first()->to_xml(array('only_method' => 'return_something')));
 	}
 
-  public function test_to_csv()
-  {
-    $book = Book::find(1);
-    $this->assert_equals('1,1,2,"Ancient Art of Main Tanking",0,0',$book->to_csv());
-  }
+	public function test_to_csv()
+	{
+		$book = Book::find(1);
+		$this->assert_equals('1,1,2,"Ancient Art of Main Tanking",0,0',$book->to_csv());
+	}
 
-  public function test_to_csv_only_header()
-  {
-    $book = Book::find(1);
-    $this->assert_equals('book_id,author_id,secondary_author_id,name,numeric_test,special',
-                         $book->to_csv(array('only_header'=>true))
-                         );
-  }
+	public function test_to_csv_only_header()
+	{
+		$book = Book::find(1);
+		$this->assert_equals('book_id,author_id,secondary_author_id,name,numeric_test,special',
+			$book->to_csv(array('only_header'=>true))
+		);
+	}
 
-  public function test_to_csv_only_method()
-  {
-    $book = Book::find(1);
-    $this->assert_equals('2,"Ancient Art of Main Tanking"',
-                         $book->to_csv(array('only'=>array('name','secondary_author_id')))
-                         );
-  }
+	public function test_to_csv_only_method()
+	{
+		$book = Book::find(1);
+		$this->assert_equals('2,"Ancient Art of Main Tanking"',
+			$book->to_csv(array('only'=>array('name','secondary_author_id')))
+		);
+	}
 
-  public function test_to_csv_only_method_on_header()
-  {
-    $book = Book::find(1);
-    $this->assert_equals('secondary_author_id,name',
-                         $book->to_csv(array('only'=>array('secondary_author_id','name'),
-                                             'only_header'=>true))
-                         );
-  }
+	public function test_to_csv_only_method_on_header()
+	{
+		$book = Book::find(1);
+		$this->assert_equals('secondary_author_id,name',
+		$book->to_csv(array('only'=>array('secondary_author_id','name'),
+			'only_header'=>true))
+		);
+	}
 
-  public function test_to_csv_with_custom_delimiter()
-  {
-    $book = Book::find(1);
-    ActiveRecord\CsvSerializer::$delimiter=';';
-    $this->assert_equals('1;1;2;"Ancient Art of Main Tanking";0;0',$book->to_csv());
-  }
+	public function test_to_csv_with_custom_delimiter()
+	{
+		$book = Book::find(1);
+		ActiveRecord\CsvSerializer::$delimiter=';';
+		$this->assert_equals('1;1;2;"Ancient Art of Main Tanking";0;0',$book->to_csv());
+	}
 
-  public function test_to_csv_with_custom_enclosure()
-  {
-    $book = Book::find(1);
-    ActiveRecord\CsvSerializer::$delimiter=',';
-    ActiveRecord\CsvSerializer::$enclosure="'";
-    $this->assert_equals("1,1,2,'Ancient Art of Main Tanking',0,0",$book->to_csv());
-  }
+	public function test_to_csv_with_custom_enclosure()
+	{
+		$book = Book::find(1);
+		ActiveRecord\CsvSerializer::$delimiter=',';
+		ActiveRecord\CsvSerializer::$enclosure="'";
+		$this->assert_equals("1,1,2,'Ancient Art of Main Tanking',0,0",$book->to_csv());
+	}
 }
