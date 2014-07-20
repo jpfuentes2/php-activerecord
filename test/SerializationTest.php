@@ -64,12 +64,19 @@ class SerializationTest extends DatabaseTest
 		$this->assert_equals('ANCIENT ART OF MAIN TANKING', $a['upper_name']);
 	}
 
-	// methods added last should we shuld have value of the method in our json
-	// rather than the regular attribute value
+	// methods should take precedence over attributes
 	public function test_methods_method_same_as_attribute()
 	{
 		$a = $this->_a(array('methods' => 'name'));
 		$this->assert_equals('ancient art of main tanking', $a['name']);
+	}
+
+	public function test_methods_method_alias()
+	{
+		$a = $this->_a(array('methods' => array('name' => 'alias_name')));
+		$this->assert_equals('ancient art of main tanking', $a['alias_name']);
+		$a = $this->_a(array('methods' => array('upper_name' => 'name')));
+		$this->assert_equals('ANCIENT ART OF MAIN TANKING', $a['name']);
 	}
 
 	public function test_include()
