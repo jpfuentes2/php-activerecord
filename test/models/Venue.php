@@ -6,7 +6,7 @@ class Venue extends ActiveRecord\Model
 	
 	
 	static $has_many = array(
-		'events',
+		array('events'),
 		array('hosts', 'through' => 'events')
 	);
 

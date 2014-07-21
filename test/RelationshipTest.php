@@ -785,4 +785,11 @@ class RelationshipTest extends DatabaseTest
 		$this->assert_null($event->venue);
 		$this->assert_null($event->venue_id);
 	}
+	
+	public function test_gh_125_add_model_to_has_many_relation()
+	{
+		$venue = Venue::find('first');
+		$venue->events = null;
+		// $venue->events = array(new Event());
+	}
 }
