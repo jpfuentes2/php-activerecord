@@ -42,6 +42,12 @@ abstract class Connection
 	 * @var object
 	 */
 	private $logger;
+    /**
+     * Switch for database timestamps management.
+     *
+     * @var bool
+     */
+    private $timestamps_management = true;
 	/**
 	 * The name of the protocol that is used.
 	 * @var string
@@ -112,6 +118,7 @@ abstract class Connection
 			$connection->protocol = $info->protocol;
 			$connection->logging = $config->get_logging();
 			$connection->logger = $connection->logging ? $config->get_logger() : null;
+            $connection->timestamps_management = $config->get_timestamps_management();
 
 			if (isset($info->charset))
 				$connection->set_encoding($info->charset);
@@ -120,6 +127,16 @@ abstract class Connection
 		}
 		return $connection;
 	}
+
+    /**
+     * Return whether or not PhpActiveRecord timestamps management is on
+     *
+     * @return object
+     */
+    public function get_timestamps_management()
+    {
+        return $this->timestamps_management;
+    }
 
 	/**
 	 * Loads the specified class for an adapter.

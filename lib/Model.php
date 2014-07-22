@@ -845,6 +845,8 @@ class Model
 		}
 
 		$this->__new_record = false;
+        if (!static::connection()->get_timestamps_management())
+            $this->reload(true);
 		$this->invoke_callback('after_create',false);
 
 		$this->update_cache();
@@ -879,6 +881,9 @@ class Model
 			static::table()->update($dirty,$pk);
 			$this->invoke_callback('after_update',false);
 			$this->update_cache();
+
+            if (!static::connection()->get_timestamps_management())
+                $this->reload(true);
 		}
 
 		return true;
@@ -1275,16 +1280,50 @@ class Model
 	/**
 	 * Reloads the attributes and relationships of this object from the database.
 	 *
+     * @param bool $only_timestamps
 	 * @return Model
 	 */
-	public function reload()
+	public function reload($only_timestamps=false)
 	{
 		$this->remove_from_cache();
 
 		$this->__relationships = array();
 		$pk = array_values($this->get_values_for($this->get_primary_key()));
 
-		$this->set_attributes_via_mass_assignment($this->find($pk)->attributes, false);
+        if ($only_timestamps)
+        {
+
+            $created_at_name = $this->get_real_attribute_name('created_at');
+            $updated_at_name = $this->get_real_attribute_name('updated_at');
+
+            if (is_null($created_at_name) && is_null($updated_at_name))
+                return $this;
+
+            $fields[] = implode(',',$this->get_primary_key());
+
+            if (!is_null($created_at_name))
+            {
+                $fields[] = $created_at_name;
+            }
+
+            if (!is_null($updated_at_name))
+            {
+                $fields[] = $updated_at_name;
+            }
+
+            $this->set_attributes_via_mass_assignment($this->find(array(
+                'conditions' => $this->get_values_for($this->get_primary_key()),
+                'select' => implode(',',$fields)
+            ))->attributes, false);
+
+        }
+        else
+        {
+            $pk = array_values($this->get_values_for($this->get_primary_key()));
+
+            $this->set_attributes_via_mass_assignment($this->find($pk)->attributes, false);
+        }
+
 		$this->reset_dirty();
 
 		return $this;

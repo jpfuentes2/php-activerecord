@@ -79,6 +79,13 @@ class Config extends Singleton
 	 */
 	private $date_format = \DateTime::ISO8601;
 
+    /**
+     * Switch for turn of PhpActiveRecord timestamps management.
+     *
+     * @var bool
+     */
+    private $timestamps_management = true;
+
 	/**
 	 * Allows config initialization using a closure.
 	 *
@@ -300,4 +307,28 @@ class Config extends Singleton
 	{
 		Cache::initialize($url,$options);
 	}
+
+    /**
+     * Turn on/off timestamps management
+     *
+     * You can manage timestamps (created_at, updated_at) in database when management is turned off
+     *
+     * @param boolean $timestamps_management
+     * @return void
+     */
+    public function set_timestamps_management($timestamps_management = true)
+    {
+        $this->timestamps_management = (bool)$timestamps_management;
+    }
+
+    /**
+     * Return whether or not PhpActiveRecord timestamps management is on
+     *
+     * @return object
+     */
+    public function get_timestamps_management()
+    {
+        return $this->timestamps_management;
+    }
+
 }
