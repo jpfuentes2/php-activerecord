@@ -233,6 +233,54 @@ class ActiveRecordWriteTest extends DatabaseTest
 		$this->assert_equals(null,$book->dirty_attributes());
 	}
 
+    public function test_attributes_after_reloading()
+    {
+        $author = Author::first();
+        $authorName = $author->name;
+        $updated_at = $author->updated_at;
+        $clonedAuthor = Author::first();
+
+        sleep(1);
+        $clonedAuthor->update_attributes(array('name' => 'test book'));
+        $author->reload();
+
+        $this->assert_equals($clonedAuthor->name,$author->name);
+        $this->assert_not_equals($authorName,$author->name);
+        $this->assert_not_equals($updated_at,$author->updated_at);
+    }
+
+    public function test_attributes_after_timestamps_reloading()
+    {
+        $author = Author::first();
+        $authorName = $author->name;
+        $updated_at = $author->updated_at;
+        $clonedAuthor = Author::first();
+
+        sleep(1);
+        $clonedAuthor->update_attributes(array('name' => 'test author'));
+        $author->reload(true);
+
+        $this->assert_not_equals($clonedAuthor->name,$author->name);
+        $this->assert_equals($authorName,$author->name);
+        $this->assert_not_equals($updated_at,$author->updated_at);
+    }
+
+    public function test_attributes_after_timestamps_aliases_reloading()
+    {
+        $unit = Unit::first();
+        $unitName = $unit->name;
+        $updated_at = $unit->updated_at;
+        $clonedUnit = Unit::first();
+
+        sleep(1);
+        $clonedUnit->update_attributes(array('name' => 'test book'));
+        $unit->reload(true);
+
+        $this->assert_not_equals($clonedUnit->name,$unit->name);
+        $this->assert_equals($unitName,$unit->name);
+        $this->assert_not_equals($updated_at,$unit->updated_at);
+    }
+
 	public function test_dirty_attributes_with_mass_assignment()
 	{
 		$book = Book::first();
@@ -249,6 +297,16 @@ class ActiveRecordWriteTest extends DatabaseTest
 		$author->reload();
 		$this->assert_not_null($author->created_at, $author->updated_at);
 	}
+
+    public function test_timestamps_aliases_set_before_save()
+    {
+        $book = new Unit();
+        $book->save();
+        $this->assert_not_null($book->created_at, $book->updated_at);
+
+        $book->reload();
+        $this->assert_not_null($book->created_at, $book->updated_at);
+    }
 
 	public function test_timestamps_updated_at_only_set_before_update()
 	{

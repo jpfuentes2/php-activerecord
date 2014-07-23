@@ -76,5 +76,20 @@ class ConnectionTest extends SnakeCase_PHPUnit_Framework_TestCase
 		$info = ActiveRecord\Connection::parse_connection_url('mysql://test:test@127.0.0.1/test?charset=utf8');
 		$this->assert_equals('utf8', $info->charset);
 	}
+
+    public function test_get_timestamps_management() {
+        $config = ActiveRecord\Config::instance();
+
+        $connection = ActiveRecord\Connection::instance();
+        $this->assert_equals(true, $connection->get_timestamps_management());
+
+        $config->set_timestamps_management(true);
+        $connection = ActiveRecord\Connection::instance();
+        $this->assert_equals(true, $connection->get_timestamps_management());
+
+        $config->set_timestamps_management(false);
+        $connection = ActiveRecord\Connection::instance();
+        $this->assert_equals(false, $connection->get_timestamps_management());
+    }
 }
 ?>

@@ -101,3 +101,10 @@ CREATE TABLE valuestore(
  `key` varchar(20) NOT NULL DEFAULT '',
  `value` varchar(255) NOT NULL DEFAULT ''
 );
+
+CREATE SEQUENCE units_seq;
+CREATE TABLE units(
+	id INT NOT NULL PRIMARY KEY,
+	name VARCHAR(50),
+	updated_time timestamp,
+	created_time timestamp);
