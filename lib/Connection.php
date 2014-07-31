@@ -302,10 +302,7 @@ abstract class Connection
 	public function query($sql, &$values=array())
 	{
 		if ($this->logging)
-		{
-			$this->logger->log($sql);
-			if ( $values ) $this->logger->log($values);
-		}
+			$start = microtime(true);
 
 		$this->last_query = $sql;
 
@@ -324,9 +321,45 @@ abstract class Connection
 		} catch (PDOException $e) {
 			throw new DatabaseException($e);
 		}
+
+		if ($this->logging)
+		{
+			$time = microtime(true) - $start;
+			$query = $this->expand_prepared_sql($sql, $values);
+			
+			$this->logger->log(sprintf("%.3fs -- %s", $time, $query));
+		}
+
 		return $sth;
 	}
+	
+	/**
+	 * Substitute the specified values into a prepared SQL statement
+	 * for logging purposes.
+	 *
+	 * @param string $sql SQL string containing placeholders for values.
+	 * @param array &$values Optional array of values to substitute into $sql.
+	 * @return string A copy of $sql with &$values substituted for placeholders.
+	 */
+	private function expand_prepared_sql($sql, &$values=array()) {
+		if ($values)
+		{
+			$values = array_map(function($val)
+			{
+				if (is_null($val))
+					return 'NULL';
+				else if (is_string($val))
+					return "'" . addslashes($val) . "'";
+				else
+					return $val;
+			}, $values);
 
+			$sql = preg_replace_callback('/\?/', function($matches) use (&$values) { return array_shift($values);	}, $sql);
+		}
+
+		return $sql;
+	}
+	
 	/**
 	 * Execute a query that returns maximum of one row with one field and return it.
 	 *
