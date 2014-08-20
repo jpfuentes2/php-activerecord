@@ -1436,7 +1436,7 @@ class Model
 
 		throw new ActiveRecordException("Call to undefined method: $method");
 	}
-	
+
 	/**
 	 * Convert a camelCase method name to a snake_case method name 
 	 * 
@@ -1447,7 +1447,7 @@ class Model
 	{
 		return strtolower(preg_replace('/([a-z0-9])([A-Z])/', '$1_$2', $method));
 	}
-	
+
 	/**
 	 * Alias for self::find('all').
 	 *
