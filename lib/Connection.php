@@ -226,14 +226,12 @@ abstract class Connection
 		return $info;
 	}
 
-	/**
-	 * Class Connection is a singleton. Access it via instance().
-	 *
-	 * @param array $info Array containing URL parts
-	 * @return Connection
-	 */
-	protected function __construct($info)
+	 
+	public $info = null;
+	
+	protected function do_connect()
 	{
+		$info = $this->info;
 		try {
 			// unix sockets start with a /
 			if ($info->host[0] != '/')
@@ -250,6 +248,18 @@ abstract class Connection
 		} catch (PDOException $e) {
 			throw new DatabaseException($e);
 		}
+	}
+
+	/**
+	 * Class Connection is a singleton. Access it via instance().
+	 *
+	 * @param array $info Array containing URL parts
+	 * @return Connection
+	 */
+	protected function __construct($info)
+	{
+		$this->info = $info;
+		$this->do_connect();
 	}
 
 	/**
@@ -309,21 +319,33 @@ abstract class Connection
 
 		$this->last_query = $sql;
 
-		try {
-			if (!($sth = $this->connection->prepare($sql)))
-				throw new DatabaseException($this);
-		} catch (PDOException $e) {
-			throw new DatabaseException($this);
+		foreach(array(1,2,3) as $step) {
+			try {
+				if (!($sth = $this->connection->prepare($sql)))
+					throw new DatabaseException($this);
+			} catch (PDOException $e) {
+				if ($step < 3) {
+					$this->do_connect();
+				} else {
+					throw new DatabaseException($e);
+				}
+			}
+			
+			$sth->setFetchMode(PDO::FETCH_ASSOC);
+		
+			try {
+				if (!$sth->execute($values))
+					throw new DatabaseException($this);
+				break;
+			} catch (PDOException $e) {
+				if ($step < 3) {
+					$this->do_connect();
+				} else {
+					throw new DatabaseException($e);
+				}
+			}
 		}
-
-		$sth->setFetchMode(PDO::FETCH_ASSOC);
-
-		try {
-			if (!$sth->execute($values))
-				throw new DatabaseException($this);
-		} catch (PDOException $e) {
-			throw new DatabaseException($e);
-		}
+		
 		return $sth;
 	}
 
