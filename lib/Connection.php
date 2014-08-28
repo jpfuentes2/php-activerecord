@@ -324,7 +324,7 @@ abstract class Connection
 				if (!($sth = $this->connection->prepare($sql)))
 					throw new DatabaseException($this);
 			} catch (PDOException $e) {
-				if ($step < 3) {
+				if (($step < 3) && ($e->getCode() == 'HY000')) {
 					$this->do_connect();
 				} else {
 					throw new DatabaseException($e);
@@ -338,7 +338,7 @@ abstract class Connection
 					throw new DatabaseException($this);
 				break;
 			} catch (PDOException $e) {
-				if ($step < 3) {
+				if (($step < 3) && ($e->getCode() == 'HY000')) {
 					$this->do_connect();
 				} else {
 					throw new DatabaseException($e);
