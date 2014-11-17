@@ -483,6 +483,22 @@ abstract class Connection
 	}
 
 	/**
+	 * Converts a boolean value to a string representation.
+	 *
+	 * The converted string representation should be in a format acceptable by the
+	 * underlying database connection.
+	 *
+	 * @param mixed $value
+	 * @access public
+	 * @return string
+	 */
+	public function boolean_to_string($value)
+	{
+		$boolean = (boolean)$value;
+		return (string)$boolean;
+	}
+
+	/**
 	 * Adds a limit clause to the SQL query.
 	 *
 	 * @param string $sql The SQL statement.

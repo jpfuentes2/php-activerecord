@@ -124,4 +124,3 @@ class DateTimeTest extends SnakeCase_PHPUnit_Framework_TestCase
 		$this->assert_equals(date(DateTime::get_format()), "" . $this->date);
 	}
 }
-?>

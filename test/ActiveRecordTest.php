@@ -167,8 +167,19 @@ class ActiveRecordTest extends DatabaseTest
 	public function test_active_record_model_home_not_set()
 	{
 		$home = ActiveRecord\Config::instance()->get_model_directory();
-		ActiveRecord\Config::instance()->set_model_directory(__FILE__);
+		ActiveRecord\Config::instance()->set_model_directory(__DIR__);
 		$this->assert_equals(false,class_exists('TestAutoload'));
+
+		ActiveRecord\Config::instance()->set_model_directory($home);
+	}
+
+	public function test_auto_load_with_model_in_secondary_model_directory(){
+		$home = ActiveRecord\Config::instance()->get_model_directory();
+		ActiveRecord\Config::instance()->set_model_directories(array(
+			realpath(__DIR__ . '/models'),
+			realpath(__DIR__ . '/backup-models'),
+		));
+		$this->assert_true(class_exists('Backup'));
 
 		ActiveRecord\Config::instance()->set_model_directory($home);
 	}
@@ -176,6 +187,17 @@ class ActiveRecordTest extends DatabaseTest
 	public function test_auto_load_with_namespaced_model()
 	{
 		$this->assert_true(class_exists('NamespaceTest\Book'));
+	}
+
+	public function test_auto_load_with_namespaced_model_in_secondary_model_directory(){
+		$home = ActiveRecord\Config::instance()->get_model_directory();
+		ActiveRecord\Config::instance()->set_model_directories(array(
+			realpath(__DIR__ . '/models'),
+			realpath(__DIR__ . '/backup-models'),
+		));
+		$this->assert_true(class_exists('NamespaceTest\Backup'));
+
+		ActiveRecord\Config::instance()->set_model_directory($home);
 	}
 
 	public function test_namespace_gets_stripped_from_table_name()
@@ -526,6 +548,102 @@ class ActiveRecordTest extends DatabaseTest
 		$this->assert_true($event->attribute_is_dirty('title'));
 	}
 
+	public function test_attribute_is_not_flagged_dirty_if_assigning_same_value() {
+		$event = Event::find(1);
+		$event->type = "Music";
+		$this->assert_false($event->attribute_is_dirty('type'));
+	}
+
+	public function test_changed_attributes() {
+		$event = Event::find(1);
+
+		$event->type = "Groovy Music";
+		$changed_attributes = $event->changed_attributes();
+		$this->assert_true(is_array($changed_attributes));
+		$this->assert_equals(1, count($changed_attributes));
+		$this->assert_true(isset($changed_attributes['type']));
+		$this->assert_equals("Music", $changed_attributes['type']);
+
+		$event->type = "Funky Music";
+		$changed_attributes = $event->changed_attributes();
+		$this->assert_true(is_array($changed_attributes));
+		$this->assert_equals(1, count($changed_attributes));
+		$this->assert_true(isset($changed_attributes['type']));
+		$this->assert_equals("Music", $changed_attributes['type']);
+	}
+
+	public function test_changes() {
+		$event = Event::find(1);
+
+		$event->type = "Groovy Music";
+		$changes = $event->changes();
+		$this->assert_true(is_array($changes));
+		$this->assert_equals(1, count($changes));
+		$this->assert_true(isset($changes['type']));
+		$this->assert_true(is_array($changes['type']));
+		$this->assert_equals("Music", $changes['type'][0]);
+		$this->assert_equals("Groovy Music", $changes['type'][1]);
+
+		$event->type = "Funky Music";
+		$changes = $event->changes();
+		$this->assert_true(is_array($changes));
+		$this->assert_equals(1, count($changes));
+		$this->assert_true(isset($changes['type']));
+		$this->assert_true(is_array($changes['type']));
+		$this->assert_equals("Music", $changes['type'][0]);
+		$this->assert_equals("Funky Music", $changes['type'][1]);
+	}
+
+	public function test_attribute_was() {
+		$event = Event::find(1);
+		$event->type = "Funky Music";
+		$this->assert_equals("Music", $event->attribute_was("type"));
+		$event->type = "Groovy Music";
+		$this->assert_equals("Music", $event->attribute_was("type"));
+	}
+
+	public function test_previous_changes() {
+		$event = Event::find(1);
+		$event->type = "Groovy Music";
+		$previous_changes = $event->previous_changes();
+		$this->assert_true(empty($previous_changes));
+		$event->save();
+		$previous_changes = $event->previous_changes();
+		$this->assert_true(is_array($previous_changes));
+		$this->assert_equals(1, count($previous_changes));
+		$this->assert_true(isset($previous_changes['type']));
+		$this->assert_true(is_array($previous_changes['type']));
+		$this->assert_equals("Music", $previous_changes['type'][0]);
+		$this->assert_equals("Groovy Music", $previous_changes['type'][1]);
+	}
+
+	public function test_save_resets_changed_attributes() {
+		$event = Event::find(1);
+		$event->type = "Groovy Music";
+		$event->save();
+		$changed_attributes = $event->changed_attributes();
+		$this->assert_true(empty($changed_attributes));
+	}
+
+	public function test_changing_datetime_attribute_tracks_change() {
+		$author = new Author();
+		$author->created_at = $original = new \DateTime("yesterday");
+		$author->created_at = $now = new \DateTime();
+		$changes = $author->changes();
+		$this->assert_true(isset($changes['created_at']));
+		$this->assert_datetime_equals($original, $changes['created_at'][0]);
+		$this->assert_datetime_equals($now, $changes['created_at'][1]);
+	}
+
+	public function test_changing_empty_attribute_value_tracks_change() {
+		$event = new Event();
+		$event->description = "The most fun";
+		$changes = $event->changes();
+		$this->assert_true(array_key_exists("description", $changes));
+		$this->assert_equals("", $changes['description'][0]);
+		$this->assert_equals("The most fun", $changes['description'][1]);
+	}
+
 	public function test_assigning_php_datetime_gets_converted_to_ar_datetime()
 	{
 		$author = new Author();
@@ -562,5 +680,4 @@ class ActiveRecordTest extends DatabaseTest
 		$row = Author::query('SELECT COUNT(*) AS n FROM authors WHERE name=?',array('Tito'))->fetch();
 		$this->assert_equals(array('n' => 1), $row);
 	}
-};
-?>
+}

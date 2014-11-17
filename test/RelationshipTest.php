@@ -1,6 +1,6 @@
 <?php
 
-class NotModel {};
+class NotModel {}
 
 class AuthorWithNonModelRelationship extends ActiveRecord\Model
 {
@@ -726,5 +726,4 @@ class RelationshipTest extends DatabaseTest
 	{
 		Author::find(999999, array('include' => array('books')));
 	}
-};
-?>
+}

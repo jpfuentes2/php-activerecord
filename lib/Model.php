@@ -88,6 +88,23 @@ class Model
 	private $attributes = array();
 
 	/**
+	 * Contains changes made to model attributes as
+	 * $attribute_name => array($original_value, $current_value)
+	 *
+	 * @var array
+	 * @access private
+	 */
+	private $changed_attributes = array();
+
+	/**
+	 * Contains changes made to model attributes before it was saved
+	 *
+	 * @var array
+	 * @access private
+	 */
+	private $previously_changed = array();
+
+	/**
 	 * Flag whether or not this model's attributes have been modified since it will either be null or an array of column_names that have been modified
 	 *
 	 * @var array
@@ -341,7 +358,13 @@ class Model
 			$value = $this->$name();
 			return $value;
 		}
-
+		// or a method with the same name as the property
+		else if (method_exists($this, $name))
+		{
+			$value = $this->$name();
+			return $value;
+		}
+		// delegete read_attribute()
 		return $this->read_attribute($name);
 	}
 
@@ -468,8 +491,16 @@ class Model
 		if ($value instanceof DateTime)
 			$value->attribute_of($this,$name);
 
-		$this->attributes[$name] = $value;
-		$this->flag_dirty($name);
+		// only update the attribute if it isn't set or has changed
+		if (!isset($this->attributes[$name]) || ($this->attributes[$name] !== $value)) {
+			// track changes to the attribute
+			if (array_key_exists($name, $this->attributes) && !isset($this->changed_attributes[$name]))
+				$this->changed_attributes[$name] = $this->attributes[$name];
+
+			// set the attribute and flag as dirty
+			$this->attributes[$name] = $value;
+			$this->flag_dirty($name);
+		}
 		return $value;
 	}
 
@@ -489,8 +520,10 @@ class Model
 			$name = static::$alias_attribute[$name];
 
 		// check for attribute
-		if (array_key_exists($name,$this->attributes))
-			return $this->attributes[$name];
+		if (array_key_exists($name,$this->attributes)) {
+			$value = $this->attributes[$name];
+			return $value;
+		}
 
 		// check relationships if no attribute
 		if (array_key_exists($name,$this->__relationships))
@@ -578,6 +611,52 @@ class Model
 	public function attributes()
 	{
 		return $this->attributes;
+	}
+
+	/**
+	 * Returns a copy of the model's changed attributes hash with the
+	 * attribute name and the original value.
+	 *
+	 * @return array A copy of the model's changed attribute data
+	 */
+	public function changed_attributes()
+	{
+		return $this->changed_attributes;
+	}
+
+	/**
+	 * Returns a copy of the model's changed attributes as a hash
+	 * in the form $attribute => array($original_value, $current_value)
+	 *
+	 * @return array A copy of the model's attribute changes
+	 */
+	public function changes()
+	{
+		$changes = array();
+		$attributes = array_intersect_key($this->attributes, $this->changed_attributes);
+		foreach($attributes as $name => $value) {
+			$changes[$name] = array($this->changed_attributes[$name],$value);
+		}
+		return $changes;
+	}
+
+	/**
+	 * Returns a copy of the model's changed attributes before it was saved
+	 *
+	 * @return array A copy of the model's changed attribute before a save
+	 */
+	public function previous_changes()
+	{
+		return $this->previously_changed;
+	}
+
+	/**
+	 * Returns the value of an attribute before it was changed
+	 *
+	 * @return string The original value of an attribute
+	 */
+	public function attribute_was($name) {
+		return isset($this->changed_attributes[$name]) ? $this->changed_attributes[$name] : null;
 	}
 
 	/**
@@ -801,7 +880,7 @@ class Model
 	{
 		$this->verify_not_readonly('insert');
 
-		if (($validate && !$this->_validate() || !$this->invoke_callback('before_create',false)))
+		if (($validate && !$this->_validate()) || !$this->invoke_callback('before_create',false))
 			return false;
 
 		$table = static::table();
@@ -1082,7 +1161,9 @@ class Model
 		require_once 'Validations.php';
 
 		$validator = new Validations($this);
-		$validation_on = 'validation_on_' . ($this->is_new_record() ? 'create' : 'update');
+		$validation_mode = $this->is_new_record() ? 'create' : 'update';
+		$validation_on = 'validation_on_' . $validation_mode;
+		$validator->set_validation_mode($validation_mode);
 
 		foreach (array('before_validation', "before_$validation_on") as $callback)
 		{
@@ -1302,9 +1383,11 @@ class Model
 	 *
 	 * @see dirty_attributes
 	 */
-	public function reset_dirty()
+	public function reset_dirty($model_was_saved=false)
 	{
 		$this->__dirty = null;
+		$this->previously_changed = $model_was_saved ? $this->changes() : array();
+		$this->changed_attributes = array();
 	}
 
 	/**

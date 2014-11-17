@@ -76,4 +76,4 @@ echo "Order #$order->id for $order->item_name ($$order->price + $$order->tax tax
 
 foreach ($order->people as $person)
 	echo "  payment of $$person->amount by " . $person->name . "\n";
-?>
+
