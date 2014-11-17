@@ -314,7 +314,7 @@ class RelationshipTest extends DatabaseTest
 			'group'  => 'type',
 			'limit'  => 2,
 			'offset' => 1);
-		Venue::first()->events;
+		Venue::first()->events[0]; // accessing the first element triggers the query
 		$this->assert_sql_has($this->conn->limit("SELECT type FROM events WHERE venue_id=? GROUP BY type",1,2),Event::table()->last_sql);
 	}
 
@@ -373,7 +373,7 @@ class RelationshipTest extends DatabaseTest
 
 		$venue = $this->get_relationship();
 		$this->assert_true(count($venue->hosts) === 1);
-		$this->assert_sql_has("events.title !=",ActiveRecord\Table::load('Host')->last_sql);
+		$this->assert_sql_has("events.title !=",Host::connection()->last_query);
 	}
 
 	public function test_has_many_through_using_source()
@@ -536,7 +536,7 @@ class RelationshipTest extends DatabaseTest
 
 		$this->assert_sql_has("WHERE length(title) = ? AND venue_id IN(?,?) ORDER BY id asc",ActiveRecord\Table::load('Event')->last_sql);
 		$this->assert_equals(1, count($venues[0]->events));
-    }
+	}
 
 	public function test_eager_loading_has_many_x()
 	{
@@ -725,5 +725,55 @@ class RelationshipTest extends DatabaseTest
 	public function test_dont_attempt_eager_load_when_record_does_not_exist()
 	{
 		Author::find(999999, array('include' => array('books')));
+	}
+
+	public function test_gh_49_arrayobject_relation()
+	{
+		$host = Host::find(1);
+		$this->assert_true($host->events instanceof Countable);
+		$this->assert_true($host->events instanceof IteratorAggregate);
+		$this->assert_equals(1, count($host->events));
+		foreach($host->events as $event) {
+			$this->assert_equals(1, $event->host_id);
+		}
+		$this->assert_equals(1, $host->events[0]->id);
+	}
+
+	public function test_gh_49_arrayobject_relation_new_record()
+	{
+		$host = new Host();
+		$this->assert_true($host->events instanceof Countable);
+		$this->assert_true($host->events instanceof IteratorAggregate);
+		$this->assert_equals(0, count($host->events));
+	}
+
+	public function test_gh_49_arrayobject_relation_with_options()
+	{
+		$host = Host::find(1);
+		$events = $host->events;
+
+		$events = $events(array(
+			'conditions' => array('LENGTH(title) > 10'),
+			'order' => 'title ASC',
+			'limit' => 2,
+			'offset' => 1
+		));
+
+		$this->assert_true($events instanceof Countable);
+		$this->assert_true($events instanceof IteratorAggregate);
+
+		$this->assert_equals(2, count($events));
+		$sql = Event::connection()->last_query;
+		$this->assert_sql_has('SELECT COUNT(*) FROM' , $sql);
+		$this->assert_sql_has('LENGTH(title) > 10' , $sql);
+		$this->assert_sql_has('ORDER BY title ASC' , $sql);
+		$this->assert_sql_doesnt_has('LIMIT 1,2' , $sql);
+
+		$this->assert_equals(2, count($events->getArrayCopy()));
+		$sql = Event::connection()->last_query;
+		$this->assert_sql_has('SELECT * FROM' , $sql);
+		$this->assert_sql_has('LENGTH(title) > 10' , $sql);
+		$this->assert_sql_has('ORDER BY title ASC' , $sql);
+		$this->assert_sql_has('LIMIT 1,2' , $sql);
 	}
 }
