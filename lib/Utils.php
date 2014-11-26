@@ -65,7 +65,7 @@ function array_flatten(array $array)
  */
 function is_hash(&$array)
 {
-	if (!is_array($array))
+	if (!is_array($array) || empty($array))
 		return false;
 
 	$keys = array_keys($array);
