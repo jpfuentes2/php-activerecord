@@ -59,17 +59,18 @@ class CacheModelTest extends DatabaseTest
 	public function test_model_cache_new()
 	{
 		$publisher = new Publisher(array(
-		   "name"=>"HarperCollins"
+			"name" => "HarperCollins"
 		));
 		$publisher->save();
 
 		$method = $this->set_method_public('Publisher', 'cache_key');
 		$cache_key = $method->invokeArgs($publisher, array());
 
-		$publisherDirectlyFromCache = Cache::$adapter->read($cache_key);
+		// Model is cached on first find
+		$actual = Publisher::find($publisher->id);
+		$from_cache = Cache::$adapter->read($cache_key);
 
-		$this->assertTrue(is_object($publisherDirectlyFromCache));
-		$this->assertEquals($publisher->name, $publisherDirectlyFromCache->name);
+		$this->assertEquals($actual, $from_cache);
 	}
 
 	public function test_model_cache_find()
@@ -121,7 +122,9 @@ class CacheModelTest extends DatabaseTest
 		$publisher->name = "Puppy Publishing";
 		$publisher->save();
 
-		$publisherDirectlyFromCache = Cache::$adapter->read($cache_key);
-		$this->assertEquals("Puppy Publishing", $publisherDirectlyFromCache->name);
+		$actual = Publisher::find($publisher->id);
+		$from_cache = Cache::$adapter->read($cache_key);
+
+		$this->assertEquals("Puppy Publishing", $from_cache->name);
 	}
 }
