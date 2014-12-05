@@ -36,6 +36,8 @@ CREATE TABLE venues (
 	UNIQUE(name,address)
 );
 
+
+
 CREATE TABLE events (
 	id int NOT NULL auto_increment PRIMARY KEY,
 	venue_id int NOT NULL,
