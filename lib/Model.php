@@ -848,7 +848,6 @@ class Model
 
 		$this->__new_record = false;
 		$this->invoke_callback('after_create',false);
-
 		$this->expire_cache();
 		return true;
 	}
@@ -1276,9 +1275,9 @@ class Model
 		$this->__relationships = array();
 		$pk = array_values($this->get_values_for($this->get_primary_key()));
 
+		$this->expire_cache();
 		$this->set_attributes_via_mass_assignment($this->find($pk)->attributes, false);
 		$this->reset_dirty();
-		$this->expire_cache();
 
 		return $this;
 	}
@@ -1607,7 +1606,7 @@ class Model
 	/**
 	 * Will look up a list of primary keys from cache
 	 *
-	 * @param array $pks An array of primary keys
+	 * @param mixed $pks primary keys
 	 * @return array
 	 */
 	protected static function get_models_from_cache($pks)
