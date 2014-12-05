@@ -261,9 +261,13 @@ abstract class Connection
 	public function columns($table)
 	{
 		$columns = array();
-		$sth = $this->query_column_info($table);
+		$self = $this;
+		$rows = Cache::get("get_meta_data-$table-rows", function() use ($table, $self) {
+			$sth = $self->query_column_info($table);
+			return $sth->fetchAll();
+		});
 
-		while (($row = $sth->fetch())) {
+		foreach($rows as $row){
 			$c = $this->create_column($row);
 			$columns[$c->name] = $c;
 		}

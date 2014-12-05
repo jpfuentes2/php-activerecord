@@ -65,7 +65,21 @@ class MysqlAdapter extends Connection
 		}
 
 		$c->map_raw_type();
-		$c->default = $c->cast($column['default'],$this);
+		if($column['default']=="CURRENT_TIMESTAMP")
+		{
+			static $current_time = null;
+			if(is_null($current_time))
+			{
+				$current_time = isset($_SERVER) && isset($_SERVER['REQUEST_TIME'])?$_SERVER['REQUEST_TIME']:time();
+			}
+			$date = new DateTime();
+			$date->setTimestamp($current_time);
+			$c->default = $date;
+		}
+		else
+		{
+			$c->default = $c->cast($column['default'], $this);
+		}
 
 		return $c;
 	}
