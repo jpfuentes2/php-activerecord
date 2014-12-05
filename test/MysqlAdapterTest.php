@@ -33,4 +33,11 @@ class MysqlAdapterTest extends AdapterTest
 
 		$this->assert_true(strpos($this->conn->last_query, 'LIMIT 1') !== false);
 	}
+
+	public function test_datetime_to_string()
+	{
+		$datetime = new DateTime('2009-01-01 01:01:01 EST');
+		$roundtrip = $this->conn->string_to_datetime($this->conn->datetime_to_string($datetime));
+		$this->assert_equals($datetime->getTimestamp(), $roundtrip->getTimestamp());
+	}
 }
