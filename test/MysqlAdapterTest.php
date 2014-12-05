@@ -36,8 +36,8 @@ class MysqlAdapterTest extends AdapterTest
 
 	public function test_construction_of_current_timestamp()
 	{
-		$event = new Event();
-		$this->assertNotEmpty($event->start_date);
+		$publisher = new Publisher();
+		$this->assertNotEmpty($publisher->start_date);
 	}
 }
 ?>

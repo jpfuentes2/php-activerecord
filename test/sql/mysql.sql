@@ -23,7 +23,8 @@ CREATE TABLE books(
 
 CREATE TABLE publishers(
 	publisher_id INT NOT NULL PRIMARY KEY AUTO_INCREMENT,
-	name VARCHAR(25) NOT NULL DEFAULT 'default_name'
+	name VARCHAR(25) NOT NULL DEFAULT 'default_name',
+	start_date timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP
 ) ENGINE=InnoDB;
 
 CREATE TABLE venues (
@@ -42,8 +43,7 @@ CREATE TABLE events (
 	host_id int NOT NULL,
 	title varchar(60) NOT NULL,
 	description varchar(50),
-	type varchar(15) default NULL,
-	start_date timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP
+	type varchar(15) default NULL
 );
 
 CREATE TABLE hosts(
