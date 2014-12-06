@@ -88,11 +88,6 @@ class Model
 	private $attributes = array();
 
 	/**
-	 * Flag wheter or not this model has been validated
-	 */
-	private $_flag_validated = false;
-
-	/**
 	 * Contains changes made to model attributes as
 	 * $attribute_name => array($original_value, $current_value)
 	 *
@@ -136,6 +131,11 @@ class Model
 	 * @var boolean
 	 */
 	private $__new_record = true;
+
+	/**
+	 * Flag whether or not this model has been validated
+	 */
+	private $__validated = false;
 
 	/**
 	 * Set to the name of the connection this {@link Model} should use.
@@ -508,7 +508,7 @@ class Model
 			// set the attribute and flag as dirty
 			$this->attributes[$name] = $value;
 			$this->flag_dirty($name);
-			$this->nullify_validation();
+			$this->reset_validated();
 		}
 		return $value;
 	}
@@ -1160,7 +1160,7 @@ class Model
 	{
 		require_once 'Validations.php';
 
-		$this->validated();
+		$this->flag_validated();
 
 		$validator = new Validations($this);
 		$validation_mode = $this->is_new_record() ? 'create' : 'update';
@@ -1186,19 +1186,34 @@ class Model
 		return true;
 	}
 
+	/**
+	 * Returns true if the model has been validated.
+	 *
+	 * @return boolean true if validated
+	 */
 	private function is_validated()
 	{
-		return $this->_flag_validated;
+		return $this->__validated;
 	}
 
-	private function validated()
+	/**
+	 * Flag model as validated
+	 *
+	 * @return void
+	 */
+	private function flag_validated()
 	{
-		$this->_flag_validated = true;
+		$this->__validated = true;
 	}
 
-	private function nullify_validation()
+	/**
+	 * Resets the validated flag.
+	 *
+	 * @return void
+	 */
+	private function reset_validated()
 	{
-		$this->_flag_validated = false;
+		$this->__validated = false;
 	}
 
 	/**
@@ -1401,7 +1416,7 @@ class Model
 		$this->expire_cache();
 		$this->set_attributes_via_mass_assignment($this->find($pk)->attributes, false);
 		$this->reset_dirty();
-		$this->nullify_validation();
+		$this->reset_validated();
 
 		return $this;
 	}
@@ -1410,7 +1425,7 @@ class Model
 	{
 		$this->__relationships = array();
 		$this->reset_dirty();
-		$this->nullify_validation();
+		$this->reset_validated();
 		return $this;
 	}
 
