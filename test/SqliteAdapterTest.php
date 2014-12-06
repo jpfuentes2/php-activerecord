@@ -15,14 +15,6 @@ class SqliteAdapterTest extends AdapterTest
 		@unlink(self::InvalidDb);
 	}
 
-
-	public static function _tearDownAfterClass()
-	{
-		parent::tearDownAfterClass();
-
-		@unlink($this->db);
-	}
-
 	public function testConnectToInvalidDatabaseShouldNotCreateDbFile()
 	{
 		try
