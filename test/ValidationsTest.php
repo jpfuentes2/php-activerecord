@@ -20,7 +20,7 @@ class BookValidations extends ActiveRecord\Model
 
 class UserValidations extends AR\Model
 {
-	static $table_name = 'user';
+	static $table_name = 'users';
 
 	public $password_confirm;
 
@@ -103,7 +103,6 @@ class ValidationsTest extends DatabaseTest
 		);
 
 		$user = new UserValidations($attrs);
-		$invalid = !( $valid = $user->is_valid() );
 		/**
 		 * The `is_valid()` method will validate the User. In this test it will
 		 * be valid.
@@ -111,8 +110,8 @@ class ValidationsTest extends DatabaseTest
 		 * rehashed, becoming different from `password` and then the result
 		 * would be different from precedent (and also a bug).
 		 */
-		$this->assert_equals($valid, $user->is_valid());
-		$this->assert_equals($invalid, $user->is_invalid());
+		$this->assert_true($user->is_valid());
+		$this->assert_equals(!$user->is_valid(), $user->is_invalid());
 	}
 
 	public function test_is_valid_will_revalidate_if_attribute_changes()
@@ -126,11 +125,12 @@ class ValidationsTest extends DatabaseTest
 		$this->assert_false($user->is_valid());
 
 		$user->password = 'secret';
-		// because custom validation is codeded bad (on purpose), we have to
+		// because custom validation is coded bad (on purpose), we have to
 		// reset password_confirm
 		$user->password_confirm = 'secret';
 		$this->assert_true($user->is_valid());
 	}
+
 	public function test_is_invalid_will_revalidate_if_attribute_changes()
 	{
 		$attrs = array(
@@ -142,7 +142,7 @@ class ValidationsTest extends DatabaseTest
 		$this->assert_true($user->is_invalid());
 
 		$user->password = 'secret';
-		// because custom validation is codeded bad (on purpose), we have to
+		// because custom validation is coded bad (on purpose), we have to
 		// reset password_confirm
 		$user->password_confirm = 'secret';
 		$this->assert_false($user->is_invalid());
@@ -160,11 +160,11 @@ class ValidationsTest extends DatabaseTest
 
 		$user->password_confirm = 'secret';
 		// Actually we check only attribute set by `__set` magic method.
-		$this->assert_false( $user->is_valid() );
+		$this->assert_false($user->is_valid());
 
 		// Passing `true` will force the validation of `user`, giving the
 		// right result.
-		$this->assert_true( $user->is_valid(true) );
+		$this->assert_true($user->is_valid(true));
 	}
 
 	public function test_is_iterable()
