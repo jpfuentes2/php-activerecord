@@ -66,7 +66,7 @@ class MysqlAdapter extends Connection
 
 		$c->map_raw_type();
 		switch($column['default']){
-			case "CURRENT_TIMESTAMP":
+			case 'CURRENT_TIMESTAMP':
 				static $current_time = null;
 				if(is_null($current_time))
 				{
