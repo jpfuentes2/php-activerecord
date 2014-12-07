@@ -85,7 +85,7 @@ class Config extends Singleton
 	private $current_time;
 
 
-	protected function __construct(){
+	public function __construct(){
 		$this->current_time = new DateTime();
 	}
 
