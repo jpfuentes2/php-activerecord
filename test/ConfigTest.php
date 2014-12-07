@@ -12,7 +12,7 @@ class ConfigTest extends SnakeCase_PHPUnit_Framework_TestCase
 {
 	public function set_up()
 	{
-		$this->config = new Config();
+		$this->config = Config::instance();
 		$this->connections = array('development' => 'mysql://blah/development', 'test' => 'mysql://blah/test');
 		$this->config->set_connections($this->connections);
 	}
