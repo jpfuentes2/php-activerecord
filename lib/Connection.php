@@ -262,7 +262,7 @@ abstract class Connection
 	{
 		$columns = array();
 		$self = $this;
-		$rows = Cache::get("get_meta_data-$table-rows", function() use ($table, $self) {
+		$rows = Cache::get("get_meta_data-".$this->protocol."-$table-rows", function() use ($table, $self) {
 			$sth = $self->query_column_info($table);
 			return $sth->fetchAll();
 		});
