@@ -79,6 +79,16 @@ class Config extends Singleton
 	 */
 	private $date_format = \DateTime::ISO8601;
 
+	/*
+	 * @var DateTime
+	 */
+	private $current_time;
+
+
+	protected function __construct(){
+		$this->current_time = new DateTime();
+	}
+
 	/**
 	 * Allows config initialization using a closure.
 	 *
@@ -107,6 +117,20 @@ class Config extends Singleton
 	public static function initialize(Closure $initializer)
 	{
 		$initializer(parent::instance());
+	}
+
+	public function set_current_time(DateTime $date){
+		$this->current_time = $date;
+	}
+
+	/**
+	 * Returns the connection strings array.
+	 *
+	 * @return array
+	 */
+	public function get_current_time()
+	{
+		return $this->current_time;
 	}
 
 	/**

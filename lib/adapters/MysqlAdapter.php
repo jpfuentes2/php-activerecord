@@ -67,14 +67,7 @@ class MysqlAdapter extends Connection
 		$c->map_raw_type();
 		switch($column['default']){
 			case 'CURRENT_TIMESTAMP':
-				static $current_time = null;
-				if(is_null($current_time))
-				{
-					$current_time = isset($_SERVER) && isset($_SERVER['REQUEST_TIME'])?$_SERVER['REQUEST_TIME']:time();
-				}
-				$date = new DateTime();
-				$date->setTimestamp($current_time);
-				$c->default = $date;
+				$c->default = Config::instance()->get_current_time();
 				break;
 
 			default:
