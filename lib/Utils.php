@@ -173,7 +173,7 @@ class Utils
 		return is_array(end($options)) ? end($options) : array();
 	}
 
-	public static function add_condition(&$conditions=array(), $condition, $conjuction='AND')
+	public static function add_condition(&$conditions=array(), $condition, $conjunction='AND')
 	{
 		if (is_array($condition))
 		{
@@ -181,13 +181,12 @@ class Utils
 				$conditions = array_flatten($condition);
 			else
 			{
-				$conditions[0] = "(" . $conditions[0];
-				$conditions[0] .= ") $conjuction (" . array_shift($condition) . ")";
+				$conditions[0] = "({$conditions[0]}) $conjunction (" . array_shift($condition) . ")";
 				$conditions[] = array_flatten($condition);
 			}
 		}
 		elseif (is_string($condition))
-			$conditions[0] = "(" . $conditions[0] . ") $conjuction ($condition)";
+			$conditions[0] = "({$conditions[0]}) {$conjunction} ($condition)";
 
 		return $conditions;
 	}
