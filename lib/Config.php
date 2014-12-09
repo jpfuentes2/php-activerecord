@@ -98,7 +98,7 @@ class Config extends Singleton
 	 * $cfg = ActiveRecord\Config::instance();
 	 * $cfg->set_model_directory('/path/to/your/model_directory');
 	 * $cfg->set_connections(array('development' =>
-  	 *   'mysql://username:password@localhost/database_name'));
+	 *   'mysql://username:password@localhost/database_name'));
 	 * </code>
 	 *
 	 * @param Closure $initializer A closure
@@ -164,7 +164,7 @@ class Config extends Singleton
 	 */
 	public function get_default_connection_string()
 	{
-		return array_key_exists($this->default_connection,$this->connections) ?
+		return array_key_exists($this->default_connection, $this->connections) ?
 			$this->connections[$this->default_connection] : null;
 	}
 
@@ -267,7 +267,8 @@ class Config extends Singleton
 	 */
 	public function get_date_format()
 	{
-		trigger_error('Use ActiveRecord\Serialization::$DATETIME_FORMAT. Config::get_date_format() has been deprecated.', E_USER_DEPRECATED);
+		trigger_error('Use ActiveRecord\Serialization::$DATETIME_FORMAT.
+			Config::get_date_format() has been deprecated.', E_USER_DEPRECATED);
 		return Serialization::$DATETIME_FORMAT;
 	}
 
@@ -276,7 +277,8 @@ class Config extends Singleton
 	 */
 	public function set_date_format($format)
 	{
-		trigger_error('Use ActiveRecord\Serialization::$DATETIME_FORMAT. Config::set_date_format() has been deprecated.', E_USER_DEPRECATED);
+		trigger_error('Use ActiveRecord\Serialization::$DATETIME_FORMAT.
+			Config::set_date_format() has been deprecated.', E_USER_DEPRECATED);
 		Serialization::$DATETIME_FORMAT = $format;
 	}
 
@@ -298,6 +300,6 @@ class Config extends Singleton
 	 */
 	public function set_cache($url, $options=array())
 	{
-		Cache::initialize($url,$options);
+		Cache::initialize($url, $options);
 	}
 }

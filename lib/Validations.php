@@ -122,7 +122,7 @@ class Validations
 
 				$attr['validator'] = $validate;
 				unset($attr[0]);
-				array_push($data[$field],$attr);
+				array_push($data[$field], $attr);
 			}
 		}
 		return $data;
@@ -174,7 +174,10 @@ class Validations
 	 */
 	public function validates_presence_of($attrs)
 	{
-		$configuration = array_merge(self::$DEFAULT_VALIDATION_OPTIONS, array('message' => Errors::$DEFAULT_ERROR_MESSAGES['blank'], 'on' => 'save'));
+		$configuration = array_merge(self::$DEFAULT_VALIDATION_OPTIONS, array(
+			'message' => Errors::$DEFAULT_ERROR_MESSAGES['blank'],
+			'on' => 'save'
+		));
 
 		foreach ($attrs as $attr)
 		{
@@ -249,7 +252,10 @@ class Validations
 	 */
 	public function validates_inclusion_or_exclusion_of($type, $attrs)
 	{
-		$configuration = array_merge(self::$DEFAULT_VALIDATION_OPTIONS, array('message' => Errors::$DEFAULT_ERROR_MESSAGES[$type], 'on' => 'save'));
+		$configuration = array_merge(self::$DEFAULT_VALIDATION_OPTIONS, array(
+			'message' => Errors::$DEFAULT_ERROR_MESSAGES[$type],
+			'on' => 'save'
+		));
 
 		foreach ($attrs as $attr)
 		{
@@ -414,7 +420,11 @@ class Validations
 	 */
 	public function validates_format_of($attrs)
 	{
-		$configuration = array_merge(self::$DEFAULT_VALIDATION_OPTIONS, array('message' => Errors::$DEFAULT_ERROR_MESSAGES['invalid'], 'on' => 'save', 'with' => null));
+		$configuration = array_merge(self::$DEFAULT_VALIDATION_OPTIONS, array(
+			'message' => Errors::$DEFAULT_ERROR_MESSAGES['invalid'],
+			'on' => 'save',
+			'with' => null
+		));
 
 		foreach ($attrs as $attr)
 		{
@@ -431,7 +441,7 @@ class Validations
 				continue;
 
 			if (!@preg_match($expression, $var))
-			$this->record->add($attribute, $options['message']);
+				$this->record->add($attribute, $options['message']);
 		}
 	}
 
@@ -454,7 +464,8 @@ class Validations
 	 * <li><b>maximum/minimum:</b> attribute should not be above/below respectively</li>
 	 * <li><b>message:</b> custome error message</li>
 	 * <li><b>allow_blank:</b> allow blank strings</li>
-	 * <li><b>allow_null:</b> allow null strings. (Even if this is set to false, a null string is always shorter than a maximum value.)</li>
+	 * <li><b>allow_null:</b> allow null strings. (Even if this is set to false,
+	 *  a null string is always shorter than a maximum value.)</li>
 	 * </ul>
 	 *
 	 * @param array $attrs Validation definition
@@ -473,7 +484,7 @@ class Validations
 			$range_options = array_intersect(array_keys(self::$ALL_RANGE_OPTIONS), array_keys($attr));
 			sort($range_options);
 
-			switch (sizeof($range_options))
+			switch (count($range_options))
 			{
 				case 0:
 					throw new  ValidationsArgumentError('Range unspecified.  Specify the [within], [maximum], or [is] option.');
@@ -494,7 +505,8 @@ class Validations
 				$range = $options[$range_options[0]];
 
 				if (!(Utils::is_a('range', $range)))
-					throw new  ValidationsArgumentError("$range_options[0] must be an array composing a range of numbers with key [0] being less than key [1]");
+					throw new ValidationsArgumentError($range_options[0] .
+						" must be an array composing a range of numbers with key [0] being less than key [1]");
 				$range_options = array('minimum', 'maximum');
 				$attr['minimum'] = $range[0];
 				$attr['maximum'] = $range[1];
@@ -593,7 +605,7 @@ class Validations
 			else
 			{
 				$sql = "{$pk_quoted} != ?";
-				array_push($conditions,$pk_value);
+				array_push($conditions, $pk_value);
 			}
 
 			foreach ($fields as $field)
@@ -601,7 +613,7 @@ class Validations
 				$field = $this->model->get_real_attribute_name($field);
 				$quoted_field = $connection->quote_name($field);
 				$sql .= " AND {$quoted_field}=?";
-				array_push($conditions,$this->model->$field);
+				array_push($conditions, $this->model->$field);
 			}
 
 			$conditions[0] = $sql;

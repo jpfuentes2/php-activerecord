@@ -16,7 +16,7 @@ namespace ActiveRecord;
  */
 class Expressions
 {
-	const ParameterMarker = '?';
+	const PARAMETER_MARKER = '?';
 
 	private $expressions;
 	private $values = array();
@@ -30,13 +30,13 @@ class Expressions
 		if (is_array($expressions))
 		{
 			$glue = func_num_args() > 2 ? func_get_arg(2) : ' AND ';
-			list($expressions,$values) = $this->build_sql_from_hash($expressions,$glue);
+			list($expressions,$values) = $this->build_sql_from_hash($expressions, $glue);
 		}
 
 		if ($expressions != '')
 		{
 			if (!$values)
-				$values = array_slice(func_get_args(),2);
+				$values = array_slice(func_get_args(), 2);
 
 			$this->values = $values;
 			$this->expressions = $expressions;
@@ -91,7 +91,7 @@ class Expressions
 	{
 		if (!$options) $options = array();
 		
-		$values = array_key_exists('values',$options) ? $options['values'] : $this->values;
+		$values = array_key_exists('values', $options) ? $options['values'] : $this->values;
 
 		$ret = "";
 		$replace = array();
@@ -103,14 +103,14 @@ class Expressions
 		{
 			$ch = $this->expressions[$i];
 
-			if ($ch == self::ParameterMarker)
+			if ($ch == self::PARAMETER_MARKER)
 			{
 				if ($quotes % 2 == 0)
 				{
 					if ($j > $num_values-1)
 						throw new ExpressionsException("No bound parameter for index $j");
 
-					$ch = $this->substitute($values,$substitute,$i,$j++);
+					$ch = $this->substitute($values, $substitute, $i, $j++);
 				}
 			}
 			elseif ($ch == '\'' && $i > 0 && $this->expressions[$i-1] != '\\')
@@ -154,7 +154,7 @@ class Expressions
 				if ($substitute)
 					return 'NULL';
 				else
-					return self::ParameterMarker;
+					return self::PARAMETER_MARKER;
 
 			if ($substitute)
 			{
@@ -165,7 +165,7 @@ class Expressions
 
 				return $ret;
 			}
-			return join(',',array_fill(0,$value_count,self::ParameterMarker));
+			return join(',', array_fill(0, $value_count, self::PARAMETER_MARKER));
 		}
 
 		if ($substitute)
@@ -187,6 +187,6 @@ class Expressions
 		if ($this->connection)
 			return $this->connection->escape($value);
 
-		return "'" . str_replace("'","''",$value) . "'";
+		return "'" . str_replace("'", "''", $value) . "'";
 	}
 }

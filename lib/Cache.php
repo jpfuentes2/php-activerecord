@@ -50,7 +50,7 @@ class Cache
 		else
 			static::$adapter = null;
 
-		static::$options = array_merge(array('expire' => 30, 'namespace' => ''),$options);
+		static::$options = array_merge(array('expire' => 30, 'namespace' => ''), $options);
 	}
 
 	public static function flush()
@@ -110,6 +110,7 @@ class Cache
 
 	private static function get_namespace()
 	{
-		return (isset(static::$options['namespace']) && strlen(static::$options['namespace']) > 0) ? (static::$options['namespace'] . "::") : "";
+		return (isset(static::$options['namespace']) && strlen(static::$options['namespace']) > 0)
+			? (static::$options['namespace'] . '::') : '';
 	}
 }

@@ -26,7 +26,7 @@ class PgsqlAdapter extends Connection
 
 	public function next_sequence_value($sequence_name)
 	{
-		return "nextval('" . str_replace("'","\\'",$sequence_name) . "')";
+		return "nextval('" . str_replace("'", "\\'", $sequence_name) . "')";
 	}
 
 	public function limit($sql, $offset, $limit)
@@ -61,7 +61,7 @@ WHERE c.relname = ?
 ORDER BY a.attnum
 SQL;
 		$values = array($table);
-		return $this->query($sql,$values);
+		return $this->query($sql, $values);
 	}
 
 	public function query_for_tables()
@@ -78,7 +78,7 @@ SQL;
 		$c->pk				= ($column['pk'] ? true : false);
 		$c->auto_increment	= false;
 
-		if (substr($column['type'],0,9) == 'timestamp')
+		if (substr($column['type'], 0, 9) == 'timestamp')
 		{
 			$c->raw_type = 'datetime';
 			$c->length = 19;
@@ -90,7 +90,7 @@ SQL;
 		}
 		else
 		{
-			preg_match('/^([A-Za-z0-9_]+)(\(([0-9]+(,[0-9]+)?)\))?/',$column['type'],$matches);
+			preg_match('/^([A-Za-z0-9_]+)(\(([0-9]+(,[0-9]+)?)\))?/', $column['type'], $matches);
 
 			$c->raw_type = (count($matches) > 0 ? $matches[1] : $column['type']);
 			$c->length = count($matches) >= 4 ? intval($matches[3]) : intval($column['attlen']);
@@ -103,12 +103,12 @@ SQL;
 
 		if ($column['default'])
 		{
-			preg_match("/^nextval\('(.*)'\)$/",$column['default'],$matches);
+			preg_match("/^nextval\('(.*)'\)$/", $column['default'], $matches);
 
 			if (count($matches) == 2)
 				$c->sequence = $matches[1];
 			else
-				$c->default = $c->cast($column['default'],$this);
+				$c->default = $c->cast($column['default'], $this);
 		}
 		return $c;
 	}
