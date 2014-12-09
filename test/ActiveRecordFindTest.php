@@ -445,6 +445,14 @@ class ActiveRecordFindTest extends DatabaseTest
 		Author::find(0);
 	}
 
+	/**
+	 * @expectedException ActiveRecord\RecordNotFound
+	 */
+	public function test_find_by_null()
+	{
+		Author::find(null);
+	}
+
 	public function test_count_by()
 	{
 		$this->assert_equals(2,Venue::count_by_state('VA'));
