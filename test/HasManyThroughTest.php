@@ -42,6 +42,13 @@ class HasManyThroughTest extends DatabaseTest
 
 		$venue = Venue::find(1, array('include' => array('hosts')));
 		$this->assert_equals(1, $venue->hosts[0]->id);
+    }
+
+    public function test_gh229_fix_many_to_many_through_association_using_include()
+    {
+        $venue = Venue::find(2, array('include' => array('hosts')));
+        $this->assert_equals(2, $venue->hosts[0]->id);
+        $this->assert_equals(2, count($venue->hosts));
 	}
 
 	public function test_gh107_has_many_though_include_eager_with_namespace()

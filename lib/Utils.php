@@ -143,6 +143,21 @@ function collect(&$enumerable, $name_or_closure)
 	return $ret;
 }
 
+function group_collect(&$enumerable, $group_by, $name_or_closure)
+{
+  $ret = array();
+
+  foreach ($enumerable as $value)
+  {
+    $key = is_array($value) ? $value[$group_by] : $value->$group_by;
+    if (is_string($name_or_closure))
+      $ret[$key][] = is_array($value) ? $value[$name_or_closure] : $value->$name_or_closure;
+    elseif ($name_or_closure instanceof Closure)
+      $ret[$key][] = $name_or_closure($value);
+  }
+  return $ret;
+}
+
 /**
  * Wrap string definitions (if any) into arrays.
  */
@@ -150,7 +165,7 @@ function wrap_strings_in_arrays(&$strings)
 {
 	if (!is_array($strings))
 		$strings = array(array($strings));
-	else 
+	else
 	{
 		foreach ($strings as &$str)
 		{

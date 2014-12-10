@@ -166,6 +166,15 @@ abstract class AbstractRelationship implements InterfaceRelationship
 				$relation = $class::table()->get_relationship($options['through']);
 				$through_table = $relation->get_table();
 			}
+
+      $through_options = $this->unset_non_finder_options($options);
+      $through_models = $class::find('all', $through_options);
+      $through_models = group_collect($through_models, $query_key, $this->foreign_key[0]);
+
+      $linking_table = $this->class_name;
+      $linking_table = $linking_table::table();
+
+      $options['select'] = 'DISTINCT `' . $linking_table->table . '`.*';
 			$options['joins'] = $this->construct_inner_join_sql($through_table, true);
 
 			$query_key = $this->primary_key[0];
@@ -191,7 +200,7 @@ abstract class AbstractRelationship implements InterfaceRelationship
 
 			foreach ($related_models as $related)
 			{
-				if ($related->$query_key == $key_to_match)
+        if ($related->$query_key == $key_to_match || (isset($through_models) && in_array($related->$query_key, $through_models[$key_to_match])))
 				{
 					$hash = spl_object_hash($related);
 
@@ -505,7 +514,7 @@ class HasMany extends AbstractRelationship
 				$fk = $this->foreign_key;
 
 				$this->set_keys($this->get_table()->class->getName(), true);
-				
+
 				$class = $this->class_name;
 				$relation = $class::table()->get_relationship($this->through);
 				$through_table = $relation->get_table();
