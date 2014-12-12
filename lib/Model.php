@@ -253,13 +253,14 @@ class Model
 	 * new Person(array('first_name' => 'Tito', 'last_name' => 'the Grief'));
 	 * </code>
 	 *
-	 * @param array $attributes Hash containing names and values to mass assign to the model
+	 * @param array $attributes Hash containing names and values to mass assign to the model or
+	 *  StrongParameters object
 	 * @param boolean $guard_attributes Set to true to guard protected/non-accessible attributes
 	 * @param boolean $instantiating_via_find Set to true if this model is being created from a find call
 	 * @param boolean $new_record Set to true if this should be considered a new record
 	 * @return Model
 	 */
-	public function __construct(array $attributes=array(), $guard_attributes=true, $instantiating_via_find=false, $new_record=true)
+	public function __construct($attributes=null, $guard_attributes=true, $instantiating_via_find=false, $new_record=true)
 	{
 		$this->__new_record = $new_record;
 
@@ -1150,9 +1151,10 @@ class Model
 	}
 
 	/**
-	 * Mass update the model with an array of attribute data and saves to the database.
+	 * Mass update the model with attribute data and saves to the database.
 	 *
-	 * @param array $attributes An attribute data array in the form array(name => value, ...)
+	 * @param StrongParameters|array $attributes An StrongParameters object or array
+	 *  containing data to update in the form array(name => value, ...)
 	 * @return boolean True if successfully updated and saved otherwise false
 	 */
 	public function update_attributes($attributes)
@@ -1175,15 +1177,16 @@ class Model
 	}
 
 	/**
-	 * Mass update the model with data from an attributes hash.
+	 * Mass update the model with data from an attributes hash or object.
 	 *
 	 * Unlike update_attributes() this method only updates the model's data
 	 * but DOES NOT save it to the database.
 	 *
 	 * @see update_attributes
-	 * @param array $attributes An array containing data to update in the form array(name => value, ...)
+	 * @param StrongParameters|array $attributes An StrongParameters object or array
+	 *  containing data to update in the form array(name => value, ...)
 	 */
-	public function set_attributes(array $attributes)
+	public function set_attributes($attributes)
 	{
 		$this->set_attributes_via_mass_assignment($attributes, true);
 	}
@@ -1192,35 +1195,48 @@ class Model
 	 * Passing $guard_attributes as true will throw an exception if an attribute does not exist.
 	 *
 	 * @throws \ActiveRecord\UndefinedPropertyException
-	 * @param array $attributes An array in the form array(name => value, ...)
+	 * @param StrongParameters|array $attributes An StrongParameters object or array
+	 *  containing data to update in the form array(name => value, ...)
 	 * @param boolean $guard_attributes Flag of whether or not protected/non-accessible attributes should be guarded
 	 */
-	private function set_attributes_via_mass_assignment(array &$attributes, $guard_attributes)
+	private function set_attributes_via_mass_assignment(&$attributes, $guard_attributes)
 	{
-		//access uninflected columns since that is what we would have in result set
+		// return fast when no attributes are given
+		if(empty($attributes)) return;
+
+		$require_strong_parameters = Config::instance()->get_require_strong_parameters();
+		if($guard_attributes && $require_strong_parameters && !($attributes instanceof StrongParameters))
+		{
+			throw new UnsafeParametersException();
+		}
+
+		// Legacy support for attr_accessible/attr_protected
+		// Recommended way of protecting attributes is by using StrongParameters
+		if($guard_attributes && !($attributes instanceof StrongParameters))
+		{
+			if (!empty(static::$attr_accessible))
+				$attributes = array_intersect_key($attributes, array_flip(static::$attr_accessible));
+
+			if (!empty(static::$attr_protected))
+				$attributes = array_diff_key($attributes, array_flip(static::$attr_protected));
+		}
+
 		$table = static::table();
 		$exceptions = array();
-		$use_attr_accessible = !empty(static::$attr_accessible);
-		$use_attr_protected = !empty(static::$attr_protected);
 		$connection = static::connection();
 
+		// access uninflected columns since that is what we would have in result set
 		foreach ($attributes as $name => $value)
 		{
 			// is a normal field on the table
-			if (array_key_exists($name,$table->columns))
+			if (array_key_exists($name, $table->columns))
 			{
-				$value = $table->columns[$name]->cast($value,$connection);
+				$value = $table->columns[$name]->cast($value, $connection);
 				$name = $table->columns[$name]->inflected_name;
 			}
 
 			if ($guard_attributes)
 			{
-				if ($use_attr_accessible && !in_array($name,static::$attr_accessible))
-					continue;
-
-				if ($use_attr_protected && in_array($name,static::$attr_protected))
-					continue;
-
 				// set valid table data
 				try {
 					$this->$name = $value;
@@ -1235,7 +1251,7 @@ class Model
 					continue;
 
 				// set arbitrary data
-				$this->assign_attribute($name,$value);
+				$this->assign_attribute($name, $value);
 			}
 		}
 
