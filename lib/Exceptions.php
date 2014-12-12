@@ -141,3 +141,10 @@ class RelationshipException extends ActiveRecordException {}
  * @package ActiveRecord
  */
 class HasManyThroughAssociationException extends RelationshipException {}
+
+/**
+ * Thrown for unsafe in attributes in mass assignment
+ *
+ * @package ActiveRecord
+ */
+class UnsafeParametersException extends ActiveRecordException {}
