@@ -135,7 +135,7 @@ class RelationshipTest extends DatabaseTest
 
 	public function test_belongs_to_returns_null_when_foreign_key_is_null()
 	{
-		$event = Event::find(8);
+		$event = Event::create(array('title' => 'venueless event'));
 		$this->assert_null($event->venue);
 	}
 
