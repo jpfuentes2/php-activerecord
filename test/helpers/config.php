@@ -39,7 +39,7 @@ ActiveRecord\Config::initialize(function($cfg)
 		'oci'    => getenv('PHPAR_OCI')    ?: 'oci://test:test@127.0.0.1/dev',
 		'sqlite' => getenv('PHPAR_SQLITE') ?: 'sqlite://test.db'));
 
-	$cfg->set_default_connection('sqlite');
+	$cfg->set_default_connection('mysql');
 
 	for ($i=0; $i<count($GLOBALS['argv']); ++$i)
 	{
