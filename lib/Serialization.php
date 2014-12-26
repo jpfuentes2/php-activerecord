@@ -173,7 +173,7 @@ abstract class Serialization
 				try {
 					$assoc = $this->model->$association;
 
-					if (is_null($assoc))
+					if ($assoc === null)
 					{
 						$this->attributes[$association] = null;
 					}
