@@ -80,6 +80,13 @@ class Config extends Singleton
 	private $date_format = \DateTime::ISO8601;
 
 	/**
+	 * Switch for use of StrongParameters
+	 *
+	 * @var bool
+	 */
+	private $require_strong_parameters = false;
+
+	/**
 	 * Allows config initialization using a closure.
 	 *
 	 * This method is just syntatic sugar.
@@ -300,4 +307,26 @@ class Config extends Singleton
 	{
 		Cache::initialize($url,$options);
 	}
+
+	/**
+	 * Enable or disable use of StrongParameters
+	 *
+	 * @param bool $flag
+	 * @return void
+	 */
+	public function set_require_strong_parameters($flag)
+	{
+		$this->require_strong_parameters = $flag;
+	}
+
+	/**
+	 * Returns whether or not to require StrongParameters
+	 *
+	 * @return bool
+	 */
+	public function get_require_strong_parameters()
+	{
+		return $this->require_strong_parameters;
+	}
+
 }
