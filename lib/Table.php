@@ -66,8 +66,10 @@ class Table
 	{
 		if (!isset(self::$cache[$model_class_name]))
 		{
-			/* do not place set_assoc in constructor..it will lead to infinite loop due to
-			   relationships requesting the model's table, but the cache hasn't been set yet */
+			/**
+			 * do not place set_assoc in constructor..it will lead to infinite loop due to
+			 * relationships requesting the model's table, but the cache hasn't been set yet
+			 */
 			self::$cache[$model_class_name] = new Table($model_class_name);
 			self::$cache[$model_class_name]->set_associations();
 		}
@@ -77,7 +79,7 @@ class Table
 
 	public static function clear_cache($model_class_name=null)
 	{
-		if ($model_class_name && array_key_exists($model_class_name,self::$cache))
+		if ($model_class_name && array_key_exists($model_class_name, self::$cache))
 			unset(self::$cache[$model_class_name]);
 		else
 			self::$cache = array();
@@ -97,14 +99,20 @@ class Table
 		$this->set_setters_and_getters();
 
 		$this->callback = new CallBack($class_name);
-		$this->callback->register('before_save', function(Model $model) { $model->set_timestamps(); }, array('prepend' => true));
-		$this->callback->register('after_save', function(Model $model) { $model->reset_dirty(); }, array('prepend' => true));
+		$this->callback->register('before_save', function(Model $model)
+		{
+			$model->set_timestamps();
+		}, array('prepend' => true));
+		$this->callback->register('after_save', function(Model $model)
+		{
+			$model->reset_dirty();
+		}, array('prepend' => true));
 	}
 
 	public function reestablish_connection($close=true)
 	{
 		// if connection name property is null the connection manager will use the default connection
-		$connection = $this->class->getStaticPropertyValue('connection',null);
+		$connection = $this->class->getStaticPropertyValue('connection', null);
 
 		if ($close)
 		{
@@ -126,7 +134,7 @@ class Table
 		{
 			$ret .= $space;
 
-			if (stripos($value,'JOIN ') === false)
+			if (stripos($value, 'JOIN ') === false)
 			{
 				if (array_key_exists($value, $this->relationships))
 				{
@@ -162,7 +170,7 @@ class Table
 		$table = array_key_exists('from', $options) ? $options['from'] : $this->get_fully_qualified_table_name();
 		$sql = new SQLBuilder($this->conn, $table);
 
-		if (array_key_exists('joins',$options))
+		if (array_key_exists('joins', $options))
 		{
 			$sql->joins($this->create_joins($options['joins']));
 
@@ -171,40 +179,40 @@ class Table
 				$options['select'] = $this->get_fully_qualified_table_name() . '.*';
 		}
 
-		if (array_key_exists('select',$options))
+		if (array_key_exists('select', $options))
 			$sql->select($options['select']);
 
-		if (array_key_exists('conditions',$options))
+		if (array_key_exists('conditions', $options))
 		{
 			if (!is_hash($options['conditions']))
 			{
 				if (is_string($options['conditions']))
 					$options['conditions'] = array($options['conditions']);
 
-				call_user_func_array(array($sql,'where'),$options['conditions']);
+				call_user_func_array(array($sql,'where'), $options['conditions']);
 			}
 			else
 			{
 				if (!empty($options['mapped_names']))
-					$options['conditions'] = $this->map_names($options['conditions'],$options['mapped_names']);
+					$options['conditions'] = $this->map_names($options['conditions'], $options['mapped_names']);
 
 				$sql->where($options['conditions']);
 			}
 		}
 
-		if (array_key_exists('order',$options))
+		if (array_key_exists('order', $options))
 			$sql->order($options['order']);
 
-		if (array_key_exists('limit',$options))
+		if (array_key_exists('limit', $options))
 			$sql->limit($options['limit']);
 
-		if (array_key_exists('offset',$options))
+		if (array_key_exists('offset', $options))
 			$sql->offset($options['offset']);
 
-		if (array_key_exists('group',$options))
+		if (array_key_exists('group', $options))
 			$sql->group($options['group']);
 
-		if (array_key_exists('having',$options))
+		if (array_key_exists('having', $options))
 			$sql->having($options['having']);
 
 		return $sql;
@@ -213,10 +221,10 @@ class Table
 	public function find($options)
 	{
 		$sql = $this->options_to_sql($options);
-		$readonly = (array_key_exists('readonly',$options) && $options['readonly']) ? true : false;
-		$eager_load = array_key_exists('include',$options) ? $options['include'] : null;
+		$readonly = (array_key_exists('readonly', $options) && $options['readonly']) ? true : false;
+		$eager_load = array_key_exists('include', $options) ? $options['include'] : null;
 
-		return $this->find_by_sql($sql->to_s(),$sql->get_where_values(), $readonly, $eager_load);
+		return $this->find_by_sql($sql->to_s(), $sql->get_where_values(), $readonly, $eager_load);
 	}
 
 	public function cache_key_for_model($pk)
@@ -234,7 +242,7 @@ class Table
 
 		$collect_attrs_for_includes = is_null($includes) ? false : true;
 		$list = $attrs = array();
-		$sth = $this->conn->query($sql,$this->process_data($values));
+		$sth = $this->conn->query($sql, $this->process_data($values));
 
 		$self = $this;
 		while (($row = $sth->fetch()))
@@ -352,33 +360,33 @@ class Table
 	{
 		$data = $this->process_data($data);
 
-		$sql = new SQLBuilder($this->conn,$this->get_fully_qualified_table_name());
-		$sql->insert($data,$pk,$sequence_name);
+		$sql = new SQLBuilder($this->conn, $this->get_fully_qualified_table_name());
+		$sql->insert($data, $pk, $sequence_name);
 
 		$values = array_values($data);
-		return $this->conn->query(($this->last_sql = $sql->to_s()),$values);
+		return $this->conn->query(($this->last_sql = $sql->to_s()), $values);
 	}
 
 	public function update(&$data, $where)
 	{
 		$data = $this->process_data($data);
 
-		$sql = new SQLBuilder($this->conn,$this->get_fully_qualified_table_name());
+		$sql = new SQLBuilder($this->conn, $this->get_fully_qualified_table_name());
 		$sql->update($data)->where($where);
 
 		$values = $sql->bind_values();
-		return $this->conn->query(($this->last_sql = $sql->to_s()),$values);
+		return $this->conn->query(($this->last_sql = $sql->to_s()), $values);
 	}
 
 	public function delete($data)
 	{
 		$data = $this->process_data($data);
 
-		$sql = new SQLBuilder($this->conn,$this->get_fully_qualified_table_name());
+		$sql = new SQLBuilder($this->conn, $this->get_fully_qualified_table_name());
 		$sql->delete($data);
 
 		$values = $sql->bind_values();
-		return $this->conn->query(($this->last_sql = $sql->to_s()),$values);
+		return $this->conn->query(($this->last_sql = $sql->to_s()), $values);
 	}
 
 	/**
@@ -399,7 +407,10 @@ class Table
 
 		$table_name = $this->get_fully_qualified_table_name($quote_name);
 		$conn = $this->conn;
-		$this->columns = Cache::get("get_meta_data-$table_name", function() use ($conn, $table_name) { return $conn->columns($table_name); });
+		$this->columns = Cache::get("get_meta_data-$table_name", function() use ($conn, $table_name)
+		{
+			return $conn->columns($table_name);
+		});
 	}
 
 	/**
@@ -415,7 +426,7 @@ class Table
 
 		foreach ($hash as $name => &$value)
 		{
-			if (array_key_exists($name,$map))
+			if (array_key_exists($name, $map))
 				$name = $map[$name];
 
 			$ret[$name] = $value;
@@ -445,7 +456,8 @@ class Table
 
 	private function set_primary_key()
 	{
-		if (($pk = $this->class->getStaticPropertyValue('pk',null)) || ($pk = $this->class->getStaticPropertyValue('primary_key',null)))
+		if (($pk = $this->class->getStaticPropertyValue('pk', null))
+		|| ($pk = $this->class->getStaticPropertyValue('primary_key', null)))
 			$this->pk = is_array($pk) ? $pk : array($pk);
 		else
 		{
@@ -461,7 +473,8 @@ class Table
 
 	private function set_table_name()
 	{
-		if (($table = $this->class->getStaticPropertyValue('table',null)) || ($table = $this->class->getStaticPropertyValue('table_name',null)))
+		if (($table = $this->class->getStaticPropertyValue('table', null))
+		|| ($table = $this->class->getStaticPropertyValue('table_name', null)))
 			$this->table = $table;
 		else
 		{
@@ -469,11 +482,11 @@ class Table
 			$this->table = Inflector::instance()->tableize($this->class->getName());
 
 			// strip namespaces from the table name if any
-			$parts = explode('\\',$this->table);
+			$parts = explode('\\', $this->table);
 			$this->table = $parts[count($parts)-1];
 		}
 
-		if (($db = $this->class->getStaticPropertyValue('db',null)) || ($db = $this->class->getStaticPropertyValue('db_name',null)))
+		if (($db = $this->class->getStaticPropertyValue('db', null)) || ($db = $this->class->getStaticPropertyValue('db_name', null)))
 			$this->db_name = $db;
 	}
 
@@ -500,7 +513,7 @@ class Table
 			return;
 
 		if (!($this->sequence = $this->class->getStaticPropertyValue('sequence')))
-			$this->sequence = $this->conn->get_sequence_name($this->table,$this->pk[0]);
+			$this->sequence = $this->conn->get_sequence_name($this->table, $this->pk[0]);
 	}
 
 	private function set_associations()
@@ -553,7 +566,7 @@ class Table
 	 */
 	private function set_delegates()
 	{
-		$delegates = $this->class->getStaticPropertyValue('delegate',array());
+		$delegates = $this->class->getStaticPropertyValue('delegate', array());
 		$new = array();
 
 		if (!array_key_exists('processed', $delegates))
@@ -584,7 +597,7 @@ class Table
 			}
 
 			$new['processed'] = true;
-			$this->class->setStaticPropertyValue('delegate',$new);
+			$this->class->setStaticPropertyValue('delegate', $new);
 		}
 	}
 
@@ -597,7 +610,14 @@ class Table
 		$setters = $this->class->getStaticPropertyValue('setters', array());
 
 		if (!empty($getters) || !empty($setters))
-			trigger_error('static::$getters and static::$setters are deprecated. Please define your setters and getters by declaring methods in your model prefixed with get_ or set_. See
-			http://www.phpactiverecord.org/projects/main/wiki/Utilities#attribute-setters and http://www.phpactiverecord.org/projects/main/wiki/Utilities#attribute-getters on how to make use of this option.', E_USER_DEPRECATED);
+		{
+			$message = <<<DOC
+static::\$getters and static::\$setters are deprecated.
+Please define your setters and getters by declaring methods in your model prefixed with get_ or set_.
+See http://www.phpactiverecord.org/projects/main/wiki/Utilities#attribute-setters and
+ http://www.phpactiverecord.org/projects/main/wiki/Utilities#attribute-getters on how to make use of this option.
+DOC;
+			trigger_error($message, E_USER_DEPRECATED);
+		}
 	}
 }

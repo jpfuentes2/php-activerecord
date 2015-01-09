@@ -16,4 +16,6 @@ php:
   - 5.4
   - 5.5
 
-script: ./vendor/bin/phpunit
+script:
+  - ./vendor/bin/phpcs --standard=ruleset.xml --warning-severity=6 ./
+  - ./vendor/bin/phpunit

@@ -83,7 +83,7 @@ class SQLBuilder
 			$ret = array_values($this->data);
 
 		if ($this->get_where_values())
-			$ret = array_merge($ret,$this->get_where_values());
+			$ret = array_merge($ret, $this->get_where_values());
 
 		return array_flatten($ret);
 	}
@@ -185,20 +185,20 @@ class SQLBuilder
 		if (!trim($order))
 			return $order;
 
-		$parts = explode(',',$order);
+		$parts = explode(',', $order);
 
 		for ($i=0,$n=count($parts); $i<$n; ++$i)
 		{
 			$v = strtolower($parts[$i]);
 
-			if (strpos($v,' asc') !== false)
-				$parts[$i] = preg_replace('/asc/i','DESC',$parts[$i]);
-			elseif (strpos($v,' desc') !== false)
-				$parts[$i] = preg_replace('/desc/i','ASC',$parts[$i]);
+			if (strpos($v, ' asc') !== false)
+				$parts[$i] = preg_replace('/asc/i', 'DESC', $parts[$i]);
+			elseif (strpos($v, ' desc') !== false)
+				$parts[$i] = preg_replace('/desc/i', 'ASC', $parts[$i]);
 			else
 				$parts[$i] .= ' DESC';
 		}
-		return join(',',$parts);
+		return join(',', $parts);
 	}
 
 	/**
@@ -216,14 +216,14 @@ class SQLBuilder
 		if (!$name)
 			return null;
 
-		$parts = preg_split('/(_and_|_or_)/i',$name,-1,PREG_SPLIT_DELIM_CAPTURE);
+		$parts = preg_split('/(_and_|_or_)/i', $name, -1, PREG_SPLIT_DELIM_CAPTURE);
 		$num_values = count($values);
 		$conditions = array('');
 
 		for ($i=0,$j=0,$n=count($parts); $i<$n; $i+=2,++$j)
 		{
 			if ($i >= 2)
-				$conditions[0] .= preg_replace(array('/_and_/i','/_or_/i'),array(' AND ',' OR '),$parts[$i-1]);
+				$conditions[0] .= preg_replace(array('/_and_/i','/_or_/i'), array(' AND ',' OR '), $parts[$i-1]);
 
 			if ($j < $num_values)
 			{
@@ -256,7 +256,7 @@ class SQLBuilder
 	 */
 	public static function create_hash_from_underscored_string($name, &$values=array(), &$map=null)
 	{
-		$parts = preg_split('/(_and_|_or_)/i',$name);
+		$parts = preg_split('/(_and_|_or_)/i', $name);
 		$hash = array();
 
 		for ($i=0,$n=count($parts); $i<$n; ++$i)
@@ -297,20 +297,20 @@ class SQLBuilder
 		if ($num_args == 1 && is_hash($args[0]))
 		{
 			$hash = is_null($this->joins) ? $args[0] : $this->prepend_table_name_to_fields($args[0]);
-			$e = new Expressions($this->connection,$hash);
+			$e = new Expressions($this->connection, $hash);
 			$this->where = $e->to_s();
 			$this->where_values = array_flatten($e->values());
 		}
 		elseif ($num_args > 0)
 		{
 			// if the values has a nested array then we'll need to use Expressions to expand the bind marker for us
-			$values = array_slice($args,1);
+			$values = array_slice($args, 1);
 
 			foreach ($values as $name => &$value)
 			{
 				if (is_array($value))
 				{
-					$e = new Expressions($this->connection,$args[0]);
+					$e = new Expressions($this->connection, $args[0]);
 					$e->bind_values($values);
 					$this->where = $e->to_s();
 					$this->where_values = array_flatten($e->values());
@@ -337,7 +337,7 @@ class SQLBuilder
 				$sql .= " ORDER BY $this->order";
 
 			if ($this->limit)
-				$sql = $this->connection->limit($sql,null,$this->limit);
+				$sql = $this->connection->limit($sql, null, $this->limit);
 		}
 
 		return $sql;
@@ -346,7 +346,7 @@ class SQLBuilder
 	private function build_insert()
 	{
 		require_once 'Expressions.php';
-		$keys = join(',',$this->quoted_key_names());
+		$keys = join(',', $this->quoted_key_names());
 
 		if ($this->sequence)
 		{
@@ -357,7 +357,7 @@ class SQLBuilder
 		else
 			$sql = "INSERT INTO $this->table($keys) VALUES(?)";
 
-		$e = new Expressions($this->connection,$sql,array_values($this->data));
+		$e = new Expressions($this->connection, $sql, array_values($this->data));
 		return $e->to_s();
 	}
 
@@ -381,7 +381,7 @@ class SQLBuilder
 			$sql .= " ORDER BY $this->order";
 
 		if ($this->limit || $this->offset)
-			$sql = $this->connection->limit($sql,$this->offset,$this->limit);
+			$sql = $this->connection->limit($sql, $this->offset, $this->limit);
 
 		return $sql;
 	}
@@ -404,7 +404,7 @@ class SQLBuilder
 				$sql .= " ORDER BY $this->order";
 
 			if ($this->limit)
-				$sql = $this->connection->limit($sql,null,$this->limit);
+				$sql = $this->connection->limit($sql, null, $this->limit);
 		}
 
 		return $sql;

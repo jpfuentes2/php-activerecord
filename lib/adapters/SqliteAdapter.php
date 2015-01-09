@@ -21,7 +21,7 @@ class SqliteAdapter extends Connection
 		if (!file_exists($info->host))
 			throw new DatabaseException("Could not find sqlite db: $info->host");
 
-		$this->connection = new PDO("sqlite:$info->host",null,null,static::$PDO_OPTIONS);
+		$this->connection = new PDO("sqlite:$info->host", null, null, static::$PDO_OPTIONS);
 	}
 
 	public function limit($sql, $offset, $limit)
@@ -53,10 +53,10 @@ class SqliteAdapter extends Connection
 				array('INT', 'INTEGER')
 			) && $c->pk;
 
-		$column['type'] = preg_replace('/ +/',' ',$column['type']);
-		$column['type'] = str_replace(array('(',')'),' ',$column['type']);
-		$column['type'] = Utils::squeeze(' ',$column['type']);
-		$matches = explode(' ',$column['type']);
+		$column['type'] = preg_replace('/ +/', ' ', $column['type']);
+		$column['type'] = str_replace(array('(',')'), ' ', $column['type']);
+		$column['type'] = Utils::squeeze(' ', $column['type']);
+		$matches = explode(' ', $column['type']);
 
 		if (!empty($matches))
 		{
@@ -79,7 +79,7 @@ class SqliteAdapter extends Connection
 		if ($c->type == Column::INTEGER && !$c->length)
 			$c->length = 8;
 
-		$c->default = $c->cast($column['dflt_value'],$this);
+		$c->default = $c->cast($column['dflt_value'], $this);
 
 		return $c;
 	}
@@ -89,7 +89,10 @@ class SqliteAdapter extends Connection
 		throw new ActiveRecordException("SqliteAdapter::set_charset not supported.");
 	}
 
-	public function accepts_limit_and_order_for_update_and_delete() { return true; }
+	public function accepts_limit_and_order_for_update_and_delete()
+	{
+		return true;
+	}
 
 	public function native_database_types()
 	{

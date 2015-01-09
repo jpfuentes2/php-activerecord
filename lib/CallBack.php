@@ -114,20 +114,20 @@ class CallBack
 		foreach (static::$VALID_CALLBACKS as $name)
 		{
 			// look for explicitly defined static callback
-			if (($definition = $this->klass->getStaticPropertyValue($name,null)))
+			if (($definition = $this->klass->getStaticPropertyValue($name, null)))
 			{
 				if (!is_array($definition))
 					$definition = array($definition);
 
 				foreach ($definition as $method_name)
-					$this->register($name,$method_name);
+					$this->register($name, $method_name);
 			}
 
 			// implicit callbacks that don't need to have a static definition
 			// simply define a method named the same as something in $VALID_CALLBACKS
 			// and the callback is auto-registered
 			elseif ($this->klass->hasMethod($name))
-				$this->register($name,$name);
+				$this->register($name, $name);
 		}
 	}
 
@@ -168,10 +168,11 @@ class CallBack
 		else
 			$registry = $this->registry[$name];
 
-		$first = substr($name,0,6);
+		$first = substr($name, 0, 6);
 
 		// starts with /(after|before)_(create|update)/
-		if (($first == 'after_' || $first == 'before') && (($second = substr($name,7,5)) == 'creat' || $second == 'updat' || $second == 'reate' || $second == 'pdate'))
+		if (($first == 'after_' || $first == 'before')
+		&& (($second = substr($name, 7, 5)) == 'creat' || $second == 'updat' || $second == 'reate' || $second == 'pdate'))
 		{
 			$temporal_save = str_replace(array('create', 'update'), 'save', $name);
 
@@ -215,7 +216,7 @@ class CallBack
 		if (!$closure_or_method_name)
 			$closure_or_method_name = $name;
 
-		if (!in_array($name,self::$VALID_CALLBACKS))
+		if (!in_array($name, self::$VALID_CALLBACKS))
 			throw new ActiveRecordException("Invalid callback: $name");
 
 		if (!($closure_or_method_name instanceof Closure))
@@ -228,8 +229,8 @@ class CallBack
 				if ($this->klass->hasMethod($closure_or_method_name))
 				{
 					// Method is private or protected
-					throw new ActiveRecordException("Callback methods need to be public (or anonymous closures). " .
-						"Please change the visibility of " . $this->klass->getName() . "->" . $closure_or_method_name . "()");
+					throw new ActiveRecordException("Callback methods need to be public (or anonymous closures).
+						Please change the visibility of {$this->klass->getName()}->{$closure_or_method_name}()");
 				}
 				else
 				{

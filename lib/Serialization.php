@@ -13,8 +13,9 @@ use XmlWriter;
  * <ul>
  * <li><b>only:</b> a string or array of attributes to be included.</li>
  * <li><b>except:</b> a string or array of attributes to be excluded.</li>
- * <li><b>methods:</b> a string or array of methods to invoke. The method's name will be used as a key for the final attributes array
- * along with the method's returned value</li>
+ * <li><b>methods:</b> a string or array of methods to invoke.
+ *  The method's name will be used as a key for the final attributes array
+ *  along with the method's returned value</li>
  * <li><b>include:</b> a string or array of associated models to include in the final serialized product.</li>
  * <li><b>only_method:</b> a method that's called and only the resulting array is serialized
  * <li><b>skip_instruct:</b> set to true to skip the <?xml ...?> declaration.</li>
@@ -116,8 +117,8 @@ abstract class Serialization
 		{
 			$this->options_to_a('only');
 
-			$exclude = array_diff(array_keys($this->attributes),$this->options['only']);
-			$this->attributes = array_diff_key($this->attributes,array_flip($exclude));
+			$exclude = array_diff(array_keys($this->attributes), $this->options['only']);
+			$this->attributes = array_diff_key($this->attributes, array_flip($exclude));
 		}
 	}
 
@@ -126,7 +127,7 @@ abstract class Serialization
 		if (isset($this->options['except']) && !isset($this->options['only']))
 		{
 			$this->options_to_a('except');
-			$this->attributes = array_diff_key($this->attributes,array_flip($this->options['except']));
+			$this->attributes = array_diff_key($this->attributes, array_flip($this->options['except']));
 		}
 	}
 
@@ -180,7 +181,7 @@ abstract class Serialization
 					elseif (!is_array($assoc))
 					{
 						$serialized = new $serializer_class($assoc, $options);
-						$this->attributes[$association] = $serialized->to_a();;
+						$this->attributes[$association] = $serialized->to_a();
 					}
 					else
 					{
@@ -286,7 +287,7 @@ class XmlSerializer extends Serialization
 	public function __construct(Model $model, &$options)
 	{
 		$this->includes_with_class_name_element = true;
-		parent::__construct($model,$options);
+		parent::__construct($model, $options);
 	}
 
 	public function to_s()
@@ -305,8 +306,8 @@ class XmlSerializer extends Serialization
 		$this->writer->endDocument();
 		$xml = $this->writer->outputMemory(true);
 
-		if (@$this->options['skip_instruct'] == true)
-			$xml = preg_replace('/<\?xml version.*?\?>/','',$xml);
+		if (isset($this->options['skip_instruct']) && $this->options['skip_instruct'])
+			$xml = preg_replace('/<\?xml version.*?\?>/', '', $xml);
 
 		return $xml;
 	}
@@ -344,32 +345,33 @@ class XmlSerializer extends Serialization
  */
 class CsvSerializer extends Serialization
 {
-  public static $delimiter = ',';
-  public static $enclosure = '"';
+	public static $delimiter = ',';
+	public static $enclosure = '"';
 
-  public function to_s()
-  {
-    if (@$this->options['only_header'] == true) return $this->header();
-    return $this->row();
-  }
+	public function to_s()
+	{
+		if (isset($this->options['only_header']) && $this->options['only_header'])
+			return $this->header();
+		return $this->row();
+	}
 
-  private function header()
-  {
-    return $this->to_csv(array_keys($this->to_a()));
-  }
+	private function header()
+	{
+		return $this->to_csv(array_keys($this->to_a()));
+	}
 
-  private function row()
-  {
-    return $this->to_csv($this->to_a());
-  }
+	private function row()
+	{
+		return $this->to_csv($this->to_a());
+	}
 
-  private function to_csv($arr)
-  {
-    $outstream = fopen('php://temp', 'w');
-    fputcsv($outstream, $arr, self::$delimiter, self::$enclosure);
-    rewind($outstream);
-    $buffer = trim(stream_get_contents($outstream));
-    fclose($outstream);
-    return $buffer;
-  }
+	private function to_csv($arr)
+	{
+		$outstream = fopen('php://temp', 'w');
+		fputcsv($outstream, $arr, self::$delimiter, self::$enclosure);
+		rewind($outstream);
+		$buffer = trim(stream_get_contents($outstream));
+		fclose($outstream);
+		return $buffer;
+	}
 }

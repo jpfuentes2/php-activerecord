@@ -56,7 +56,7 @@ class MysqlAdapter extends Connection
 		}
 		else
 		{
-			preg_match('/^([A-Za-z0-9_]+)(\(([0-9]+(,[0-9]+)?)\))?/',$column['type'],$matches);
+			preg_match('/^([A-Za-z0-9_]+)(\(([0-9]+(,[0-9]+)?)\))?/', $column['type'], $matches);
 
 			$c->raw_type = (count($matches) > 0 ? $matches[1] : $column['type']);
 
@@ -65,7 +65,7 @@ class MysqlAdapter extends Connection
 		}
 
 		$c->map_raw_type();
-		$c->default = $c->cast($column['default'],$this);
+		$c->default = $c->cast($column['default'], $this);
 
 		return $c;
 	}
@@ -73,10 +73,13 @@ class MysqlAdapter extends Connection
 	public function set_encoding($charset)
 	{
 		$params = array($charset);
-		$this->query('SET NAMES ?',$params);
+		$this->query('SET NAMES ?', $params);
 	}
 
-	public function accepts_limit_and_order_for_update_and_delete() { return true; }
+	public function accepts_limit_and_order_for_update_and_delete()
+	{
+		return true;
+	}
 
 	public function native_database_types()
 	{

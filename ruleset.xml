@@ -1,0 +1,46 @@
+<?xml version="1.0"?>
+<ruleset name="PHP ActiveRecord Standard">
+
+  <description>PHP ActiveRecord coding standard</description>
+
+  <exclude-pattern type="relative">examples/*</exclude-pattern>
+  <exclude-pattern type="relative">test/*</exclude-pattern>
+  <exclude-pattern type="relative">vendor/*</exclude-pattern>
+
+  <rule ref="Generic.Classes.DuplicateClassName"/>
+  <rule ref="Generic.CodeAnalysis.EmptyStatement"/>
+  <rule ref="Generic.CodeAnalysis.JumbledIncrementer"/>
+  <rule ref="Generic.CodeAnalysis.UnconditionalIfStatement"/>
+  <rule ref="Generic.CodeAnalysis.UnnecessaryFinalModifier"/>
+  <rule ref="Generic.CodeAnalysis.UnusedFunctionParameter"/>
+  <rule ref="Generic.CodeAnalysis.UselessOverridingMethod"/>
+  <!-- <rule ref="Generic.ControlStructures.InlineControlStructure"/> -->
+  <rule ref="Generic.Files.ByteOrderMark"/>
+  <rule ref="Generic.Files.LineEndings"/>
+  <rule ref="Generic.Files.LineLength">
+    <properties>
+      <property name="absoluteLineLimit" value="130"/>
+    </properties>
+  </rule>
+  <rule ref="Generic.Formatting.DisallowMultipleStatements"/>
+
+  <rule ref="Generic.Formatting.NoSpaceAfterCast"/>
+  <!-- <rule ref="Generic.Formatting.SpaceAfterCast"/> -->
+  <rule ref="Squiz.WhiteSpace.CastSpacing"/>
+
+  <rule ref="Generic.Functions.CallTimePassByReference"/>
+  <rule ref="Generic.Functions.FunctionCallArgumentSpacing"/>
+  <rule ref="Generic.Functions.OpeningFunctionBraceBsdAllman"/>
+  <!-- <rule ref="Generic.Functions.OpeningFunctionBraceKernighanRitchie"/> -->
+  <rule ref="Generic.Metrics.NestingLevel"/>
+  <rule ref="Generic.NamingConventions.ConstructorName"/>
+  <rule ref="Generic.NamingConventions.UpperCaseConstantName"/>
+  <rule ref="Generic.PHP.DeprecatedFunctions"/>
+  <rule ref="Generic.PHP.DisallowShortOpenTag"/>
+  <rule ref="Generic.PHP.ForbiddenFunctions"/>
+  <rule ref="Generic.PHP.LowerCaseConstant"/>
+  <rule ref="Generic.PHP.NoSilencedErrors"/>
+  <rule ref="Generic.Strings.UnnecessaryStringConcat"/>
+  <rule ref="Generic.WhiteSpace.DisallowSpaceIndent"/>
+
+</ruleset>

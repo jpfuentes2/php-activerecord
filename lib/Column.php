@@ -126,12 +126,12 @@ class Column
 
 		// Its just a decimal number
 		elseif (is_numeric($value) && floor($value) != $value)
-			return (int) $value;
+			return (int)$value;
 
 		// If adding 0 to a string causes a float conversion,
 		// we have a number over PHP_INT_MAX
 		elseif (is_string($value) && is_float($value + 0))
-			return (string) $value;
+			return (string)$value;
 
 		// If a float was passed and its greater than PHP_INT_MAX
 		// (which could be wrong due to floating point precision)
@@ -140,7 +140,7 @@ class Column
 		elseif (is_float($value) && $value >= PHP_INT_MAX)
 			return number_format($value, 0, '', '');
 
-		return (int) $value;
+		return (int)$value;
 	}
 
 	/**
@@ -185,7 +185,7 @@ class Column
 		if ($this->raw_type == 'integer')
 			$this->raw_type = 'int';
 
-		if (array_key_exists($this->raw_type,self::$TYPE_MAPPING))
+		if (array_key_exists($this->raw_type, self::$TYPE_MAPPING))
 			$this->type = self::$TYPE_MAPPING[$this->raw_type];
 		else
 			$this->type = self::STRING;
