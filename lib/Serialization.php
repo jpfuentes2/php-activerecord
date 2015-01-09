@@ -173,7 +173,11 @@ abstract class Serialization
 				try {
 					$assoc = $this->model->$association;
 
-					if (!is_array($assoc))
+					if ($assoc === null)
+					{
+						$this->attributes[$association] = null;
+					}
+					elseif (!is_array($assoc))
 					{
 						$serialized = new $serializer_class($assoc, $options);
 						$this->attributes[$association] = $serialized->to_a();;
