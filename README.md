@@ -55,8 +55,9 @@ Of course, there are some differences which will be obvious to the user if they 
 Setup is very easy and straight-forward. There are essentially only three configuration points you must concern yourself with:
 
 1. Setting the model auto_load directory.
-2. Configuring your database connections.
-3. Setting the database connection to use for your environment.
+2. Setting the filename extension of your models class files (default : .php)
+3. Configuring your database connections.
+4. Setting the database connection to use for your environment.
 
 Example:
 
@@ -64,6 +65,7 @@ Example:
 ActiveRecord\Config::initialize(function($cfg)
 {
    $cfg->set_model_directory('/path/to/your/model_directory');
+   // $cfg->set_filename_extension('.your.extension');
    $cfg->set_connections(
      array(
        'development' => 'mysql://username:password@localhost/development_database_name',
@@ -79,6 +81,7 @@ Alternatively (w/o the 5.3 closure):
 ```php
 $cfg = ActiveRecord\Config::instance();
 $cfg->set_model_directory('/path/to/your/model_directory');
+// $cfg->set_filename_extension('.your.extension');
 $cfg->set_connections(
   array(
     'development' => 'mysql://username:password@localhost/development_database_name',
