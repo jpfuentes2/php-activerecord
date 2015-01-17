@@ -37,7 +37,7 @@ Of course, there are some differences which will be obvious to the user if they 
 - PostgreSQL
 - Oracle
 
-# Features ##
+## Features ##
 
 - Finder methods
 - Dynamic finder methods
@@ -50,11 +50,11 @@ Of course, there are some differences which will be obvious to the user if they 
 - Support for multiple adapters
 - Miscellaneous options such as: aliased/protected/accessible attributes
 
-### Installation ##
+## Installation ##
 
 Setup is very easy and straight-forward. There are essentially only three configuration points you must concern yourself with:
 
-1. Setting the model auto_load directory.
+1. Setting the model autoload directory.
 2. Configuring your database connections.
 3. Setting the database connection to use for your environment.
 
@@ -164,3 +164,7 @@ $post->delete();
 # DELETE FROM `posts` WHERE id=1
 echo $post->title; # 'New real title'
 ```
+
+## Contributing ##
+
+Please refer to [CONTRIBUTING.md](https://github.com/jpfuentes2/php-activerecord/blob/master/CONTRIBUTING.md) for information on how to contribute to PHP ActiveRecord.

@@ -10,8 +10,8 @@
     },
     "require-dev": {
         "phpunit/phpunit": "3.7.*",
-        "pear/pear_exception": "1.0.*@dev",
-        "pear/Log": "dev-master"
+        "pear/pear_exception": "1.0-beta1",
+        "pear/log": "~1.12"
     },
     "autoload": {
         "files": [ "ActiveRecord.php" ]
