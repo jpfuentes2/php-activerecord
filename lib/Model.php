@@ -428,7 +428,7 @@ class Model
 		if (array_key_exists($name, static::$alias_attribute))
 			$name = static::$alias_attribute[$name];
 
-		elseif (method_exists($this,"set_$name"))
+		if (method_exists($this,"set_$name"))
 		{
 			$name = "set_$name";
 			return $this->$name($value);
