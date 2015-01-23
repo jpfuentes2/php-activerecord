@@ -1464,7 +1464,9 @@ class Model
 		$table = static::table();
 		$sql = $table->options_to_sql($options);
 		$values = $sql->get_where_values();
-		return static::connection()->query_and_fetch_one($sql->to_s(),$values);
+		$count = static::connection()->query_and_fetch_one($sql->to_s(),$values);
+		return (int) $count;
+		return $count;
 	}
 
 	/**
