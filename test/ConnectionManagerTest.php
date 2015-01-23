@@ -24,16 +24,15 @@ class ConnectionManagerTest extends DatabaseTest
 		$this->assert_same($a,ConnectionManager::get_connection('mysql'));
 	}
 
-    public function test_gh_91_get_connection_with_null_connection_is_always_default()
-    {
-        $conn_one = ConnectionManager::get_connection('mysql');
-        $conn_two = ConnectionManager::get_connection();
-        $conn_three = ConnectionManager::get_connection('mysql');
-        $conn_four = ConnectionManager::get_connection();
+	public function test_gh_91_get_connection_with_null_connection_is_always_default()
+	{
+		$conn_one = ConnectionManager::get_connection('mysql');
+		$conn_two = ConnectionManager::get_connection();
+		$conn_three = ConnectionManager::get_connection('mysql');
+		$conn_four = ConnectionManager::get_connection();
 
-        $this->assert_same($conn_one, $conn_three);
-        $this->assert_same($conn_two, $conn_three);
-        $this->assert_same($conn_four, $conn_three);
-    }
+		$this->assert_same($conn_one, $conn_three);
+		$this->assert_same($conn_two, $conn_three);
+		$this->assert_same($conn_four, $conn_three);
+	}
 }
-?>

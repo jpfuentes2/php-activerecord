@@ -77,4 +77,3 @@ class ConnectionTest extends SnakeCase_PHPUnit_Framework_TestCase
 		$this->assert_equals('utf8', $info->charset);
 	}
 }
-?>

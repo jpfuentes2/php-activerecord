@@ -33,5 +33,4 @@ class Venue extends ActiveRecord\Model
 			return $this->assign_attribute('state', $value);
 	}
 	
-};
-?>
+}

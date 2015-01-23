@@ -1,6 +1,6 @@
 <?php
 
-class NotModel {};
+class NotModel {}
 
 class AuthorWithNonModelRelationship extends ActiveRecord\Model
 {
@@ -540,7 +540,7 @@ class RelationshipTest extends DatabaseTest
 		Venue::$has_many = array(array('events', 'class_name' => 'Event', 'order' => 'id asc', 'conditions' => array('length(title) = ?', 14)));
 		$venues = Venue::find(array(2, 6), array('include' => 'events'));
 
-		$this->assert_sql_has("WHERE length(title) = ? AND venue_id IN(?,?) ORDER BY id asc",ActiveRecord\Table::load('Event')->last_sql);
+		$this->assert_sql_has("WHERE (length(title) = ?) AND (venue_id IN(?,?)) ORDER BY id asc",ActiveRecord\Table::load('Event')->last_sql);
 		$this->assert_equals(1, count($venues[0]->events));
     }
 
@@ -732,5 +732,4 @@ class RelationshipTest extends DatabaseTest
 	{
 		Author::find(999999, array('include' => array('books')));
 	}
-};
-?>
+}

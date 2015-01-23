@@ -29,4 +29,3 @@ ActiveRecord\Config::initialize(function($cfg) use ($connections)
 });
 
 print_r(Book::first()->attributes());
-?>

@@ -1,5 +1,4 @@
 <?php
-require_once __DIR__ . '/../lib/Expressions.php';
 
 use ActiveRecord\Expressions;
 use ActiveRecord\ConnectionManager;
@@ -205,4 +204,3 @@ class ExpressionsTest extends SnakeCase_PHPUnit_Framework_TestCase
 		$this->assert_equals('id=? AND name IN(?,?)',$a->to_s());
 	}
 }
-?>

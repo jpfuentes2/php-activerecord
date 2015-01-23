@@ -6,7 +6,7 @@ class BookExclusion extends ActiveRecord\Model
 	public static $validates_exclusion_of = array(
 		array('name', 'in' => array('blah', 'alpha', 'bravo'))
 	);
-};
+}
 
 class BookInclusion extends ActiveRecord\Model
 {
@@ -14,7 +14,7 @@ class BookInclusion extends ActiveRecord\Model
 	public static $validates_inclusion_of = array(
 		array('name', 'in' => array('blah', 'tanker', 'shark'))
 	);
-};
+}
 
 class ValidatesInclusionAndExclusionOfTest extends DatabaseTest
 {
@@ -153,5 +153,4 @@ class ValidatesInclusionAndExclusionOfTest extends DatabaseTest
 		$this->assert_equals('is using a custom message.', $book->errors->on('name'));
 	}
 
-};
-?>
+}

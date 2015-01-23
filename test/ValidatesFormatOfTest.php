@@ -6,7 +6,7 @@ class BookFormat extends ActiveRecord\Model
 	static $validates_format_of = array(
 		array('name')
 	);
-};
+}
 
 class ValidatesFormatOfTest extends DatabaseTest
 {
@@ -107,5 +107,4 @@ class ValidatesFormatOfTest extends DatabaseTest
 		$book->save();
 		$this->assert_equals('is using a custom message.', $book->errors->on('name'));
 	}
-};
-?>
+}

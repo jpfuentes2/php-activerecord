@@ -51,12 +51,12 @@ class Config extends Singleton
 	private $connections = array();
 
 	/**
-	 * Directory for the auto_loading of model classes.
+	 * Array of directories for the auto_loading of model classes.
 	 *
 	 * @see activerecord_autoload
-	 * @var string
+	 * @var array
 	 */
-	private $model_directory;
+	private $model_directories = array();
 
 	/**
 	 * Switch for logging.
@@ -192,26 +192,53 @@ class Config extends Singleton
 	/**
 	 * Sets the directory where models are located.
 	 *
-	 * @param string $dir Directory path containing your models
+	 * @param string $directory Directory path containing your models
 	 * @return void
 	 */
-	public function set_model_directory($dir)
+	public function set_model_directory($directory)
 	{
-		$this->model_directory = $dir;
+		$this->set_model_directories(array($directory));
 	}
-
+	
 	/**
-	 * Returns the model directory.
+	 * Returns the first model directory.
 	 *
 	 * @return string
-	 * @throws ConfigException if specified directory was not found
 	 */
 	public function get_model_directory()
 	{
-		if ($this->model_directory && !file_exists($this->model_directory))
-			throw new ConfigException('Invalid or non-existent directory: '.$this->model_directory);
+		$model_directories = $this->get_model_directories();
+		return array_shift($model_directories);
+	}
+	
+	/**
+	 * Sets the directories where models are located.
+	 *
+	 * @param array $directories Array with directory paths containing your models
+	 * @return void
+	 * @throws ConfigException if one of the model directories was not found
+	 */
+	public function set_model_directories($directories)
+	{
+		if (!is_array($directories))
+			throw new ConfigException("Directories must be an array");
+		
+		foreach($directories as $directory)
+		{
+			if(!file_exists($directory) || !is_dir($directory))
+				throw new ConfigException('Invalid or non-existent directory: '. $directory);
+		}
+		$this->model_directories = $directories;
+	}
 
-		return $this->model_directory;
+	/**
+	 * Returns the array of model directories.
+	 *
+	 * @return array
+	 */
+	public function get_model_directories()
+	{
+		return $this->model_directories;
 	}
 
 	/**

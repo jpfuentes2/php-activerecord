@@ -98,7 +98,7 @@ class Table
 
 		$this->callback = new CallBack($class_name);
 		$this->callback->register('before_save', function(Model $model) { $model->set_timestamps(); }, array('prepend' => true));
-		$this->callback->register('after_save', function(Model $model) { $model->reset_dirty(); }, array('prepend' => true));
+		$this->callback->register('after_save', function(Model $model) { $model->reset_dirty(true); }, array('prepend' => true));
 	}
 
 	public function reestablish_connection($close=true)
@@ -457,6 +457,8 @@ class Table
 					$this->pk[] = $c->inflected_name;
 			}
 		}
+		// make sure the primary key is stored in lowercase
+		$this->pk = array_map('strtolower', $this->pk);
 	}
 
 	private function set_table_name()
