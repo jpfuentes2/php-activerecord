@@ -3,89 +3,89 @@ SET SESSION sql_mode = 'NO_ENGINE_SUBSTITUTION,STRICT_TRANS_TABLES'
 
 
 CREATE TABLE `authors` (
-  author_id INT NOT NULL AUTO_INCREMENT,
-  parent_author_id INT,
-  name VARCHAR(25) NOT NULL DEFAULT 'default_name',
-  updated_at datetime,
-  created_at datetime,
+  `author_id` int NOT NULL AUTO_INCREMENT,
+  `parent_author_id` int,
+  `name` varchar(25) NOT NULL DEFAULT 'default_name',
+  `updated_at` datetime,
+  `created_at` datetime,
   some_Date date,
-  some_time time,
-  some_text text,
-  some_enum enum('a','b','c'),
-  encrypted_password varchar(50),
-  mixedCaseField varchar(50),
+  `some_time` time,
+  `some_text` text,
+  `some_enum` enum('a','b','c'),
+  `encrypted_password` varchar(50),
+  `mixedCaseField` varchar(50),
   PRIMARY KEY (`author_id`)
 ) ENGINE=InnoDB;
 
 CREATE TABLE `books` (
-  book_id INT NOT NULL AUTO_INCREMENT,
-  Author_Id INT,
-  secondary_author_id INT,
-  name VARCHAR(50),
-  numeric_test VARCHAR(10) DEFAULT '0',
-  special NUMERIC(10,2) DEFAULT 0,
+  `book_id` int NOT NULL AUTO_INCREMENT,
+  `author_id` int,
+  `secondary_author_id` int,
+  `name` varchar(50),
+  `numeric_test` varchar(10) DEFAULT '0',
+  `special` numeric(10,2) DEFAULT 0,
   PRIMARY KEY (`book_id`)
 );
 
 CREATE TABLE `publishers` (
-  publisher_id INT NOT NULL AUTO_INCREMENT,
-  name VARCHAR(25) NOT NULL DEFAULT 'default_name',
+  `publisher_id` int NOT NULL AUTO_INCREMENT,
+  `name` varchar(25) NOT NULL DEFAULT 'default_name',
   PRIMARY KEY (`publisher_id`)
 ) ENGINE=InnoDB;
 
 CREATE TABLE `venues` (
-  id int NOT NULL AUTO_INCREMENT,
-  name varchar(50),
-  city varchar(60),
-  state char(2),
-  address varchar(50),
-  phone varchar(10) default NULL,
+  `id` int NOT NULL AUTO_INCREMENT,
+  `name` varchar(50),
+  `city` varchar(60),
+  `state` char(2),
+  `address` varchar(50),
+  `phone` varchar(10) default NULL,
   PRIMARY KEY (`id`),
   UNIQUE(name,address)
 );
 
 CREATE TABLE `events` (
-  id int NOT NULL auto_increment,
-  venue_id int NULL,
-  host_id int NOT NULL,
-  title varchar(60) NOT NULL,
-  description varchar(50),
+  `id` int NOT NULL AUTO_INCREMENT,
+  `venue_id` int NULL,
+  `host_id` int NOT NULL,
+  `title` varchar(60) NOT NULL,
+  `description` varchar(50),
   PRIMARY KEY (`id`),
-  type varchar(15) default NULL
+  `type` varchar(15) default NULL
 );
 
 CREATE TABLE `hosts` (
-  id INT NOT NULL AUTO_INCREMENT,
-  name VARCHAR(25),
+  `id` int NOT NULL AUTO_INCREMENT,
+  `name` varchar(25),
   PRIMARY KEY (`id`)
 );
 
 CREATE TABLE `employees` (
-  id INT NOT NULL AUTO_INCREMENT,
-  first_name VARCHAR(255) NOT NULL,
-  last_name VARCHAR(255) NOT NULL,
-  nick_name VARCHAR(255) NOT NULL,
+  `id` int NOT NULL AUTO_INCREMENT,
+  `first_name` varchar(255) NOT NULL,
+  `last_name` varchar(255) NOT NULL,
+  `nick_name` varchar(255) NOT NULL,
   PRIMARY KEY (`id`)
 );
 
 CREATE TABLE `positions` (
-  id int NOT NULL AUTO_INCREMENT,
-  employee_id int NOT NULL,
-  title VARCHAR(255) NOT NULL,
-  active SMALLINT NOT NULL,
+  `id` int NOT NULL AUTO_INCREMENT,
+  `employee_id` int NOT NULL,
+  `title` varchar(255) NOT NULL,
+  `active` smallint NOT NULL,
   PRIMARY KEY (`id`)
 );
 
 CREATE TABLE `rm-bldg`(
-  `rm-id` INT NOT NULL,
-  `rm-name` VARCHAR(10) NOT NULL,
-  `space out` VARCHAR(1) NOT NULL
+  `rm-id` int NOT NULL,
+  `rm-name` varchar(10) NOT NULL,
+  `space out` varchar(1) NOT NULL
 );
 
 CREATE TABLE `awesome_people` (
-  id int not null auto_increment,
-  author_id int,
-  is_awesome int default 1,
+  `id` int NOT NULL AUTO_INCREMENT,
+  `author_id` int,
+  `is_awesome` int default 1,
   PRIMARY KEY (`id`)
 );
 
@@ -108,24 +108,24 @@ CREATE TABLE `property_amenities` (
 );
 
 CREATE TABLE `users` (
-  id INT NOT NULL AUTO_INCREMENT,
+  `id` int NOT NULL AUTO_INCREMENT,
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB;
 
 CREATE TABLE `newsletters` (
-  id INT NOT NULL AUTO_INCREMENT,
+  `id` int NOT NULL AUTO_INCREMENT,
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB;
 
 CREATE TABLE `user_newsletters` (
-  id INT NOT NULL AUTO_INCREMENT,
-  user_id INT NOT NULL,
-  newsletter_id INT NOT NULL,
+  `id` int NOT NULL AUTO_INCREMENT,
+  `user_id` int NOT NULL,
+  `newsletter_id` int NOT NULL,
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB;
 
 CREATE TABLE `valuestore` (
-  `id` INT NOT NULL AUTO_INCREMENT,
+  `id` int NOT NULL AUTO_INCREMENT,
   `key` varchar(20) NOT NULL DEFAULT '',
   `value` varchar(255) NOT NULL DEFAULT '',
   PRIMARY KEY (`id`)
