@@ -1466,7 +1466,6 @@ class Model
 		$values = $sql->get_where_values();
 		$count = static::connection()->query_and_fetch_one($sql->to_s(),$values);
 		return (int) $count;
-		return $count;
 	}
 
 	/**
