@@ -1225,6 +1225,33 @@ class Model
 	}
 
 	/**
+	 * Touch a model, updates `updated_at` and any other column given as argument.
+	 *
+	 * Please note that no validation is performed and only the after_touch, after_commit and after_rollback callbacks are executed.
+	 *
+	 * @param string|array $keys...
+	 * @return bool True if update succeeds
+	 * @throws ActiveRecord\ActiveRecordException if object is a new record
+	 */
+	public function touch($keys = array() /*[, $key...] */){
+		if($this->is_new_record()){
+			throw new ActiveRecordException('Cannot touch on a new record object');
+		}
+
+		if(!is_array($keys))
+			$keys = func_get_args();
+
+		if(!in_array('updated_at', $keys))
+			$keys[] = 'updated_at';
+
+		$now = date('Y-m-d H:i:s');
+		$attributes = array_fill_keys($keys, $now);
+
+		$this->set_attributes($attributes);
+		return $this->update(false);
+	}
+
+	/**
 	 * Mass update the model with an array of attribute data and saves to the database.
 	 *
 	 * @param array $attributes An attribute data array in the form array(name => value, ...)
