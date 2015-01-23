@@ -8,7 +8,7 @@ CREATE TABLE `authors` (
   `name` varchar(25) NOT NULL DEFAULT 'default_name',
   `updated_at` datetime,
   `created_at` datetime,
-  some_Date date,
+  `some_date` date,
   `some_time` time,
   `some_text` text,
   `some_enum` enum('a','b','c'),
@@ -50,8 +50,8 @@ CREATE TABLE `events` (
   `host_id` int(11) NOT NULL,
   `title` varchar(60) NOT NULL,
   `description` varchar(50),
-  PRIMARY KEY (`id`),
-  `type` varchar(15) default NULL
+  `type` varchar(15) default NULL,
+  PRIMARY KEY (`id`)
 );
 
 CREATE TABLE `hosts` (
