@@ -1,5 +1,5 @@
 # Set our `sql_mode` for strict testing
-SET SESSION sql_mode = 'NO_ENGINE_SUBSTITUTION,STRICT_TRANS_TABLES'
+SET SESSION sql_mode = 'NO_ENGINE_SUBSTITUTION,STRICT_TRANS_TABLES';
 
 
 CREATE TABLE `authors` (
