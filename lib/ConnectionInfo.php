@@ -12,6 +12,8 @@ class ConnectionInfo {
 	public $username = null;
 	public $password = null;
 
+	public $charset = null;
+
 	public function __construct($input = array()){
 		foreach($input as $prop => $value){
 			$this->{$prop} = $value;
@@ -40,7 +42,7 @@ class ConnectionInfo {
 	 * </code>
 	 *
 	 * @param string $connection_url A connection URL
-	 * @return object the parsed URL as an object.
+	 * @return ConnectionInfo the parsed URL as an object.
 	 */
 	public static function from_connection_url($connection_url){
 		$url = @parse_url($connection_url);
@@ -96,12 +98,9 @@ class ConnectionInfo {
 
 		if (isset($url['query']))
 		{
-			
-			foreach (explode('/&/', $url['query']) as $pair) {
-				list($name, $value) = explode('=', $pair);
-
-				if ($name == 'charset')
-					$info->charset = $value;
+			parse_str($url['query'], $params);
+			if(isset($params['charset'])){
+				$info->charset = $params['charset'];
 			}
 		}
 
