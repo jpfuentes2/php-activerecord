@@ -87,20 +87,20 @@ class ConnectionInfo {
 		if (isset($url['port']))
 			$info->port = $url['port'];
 
-		if (strpos($connection_url, 'decode=true') !== false)
-		{
-			if ($info->username)
-				$info->username = urldecode($info->username);
-
-			if ($info->password)
-				$info->password = urldecode($info->password);
-		}
-
 		if (isset($url['query']))
 		{
 			parse_str($url['query'], $params);
 			if(isset($params['charset'])){
 				$info->charset = $params['charset'];
+			}
+
+			if(isset($params['decode']) && $params['decode'] == 'true' )
+			{
+				if ($info->username)
+					$info->username = urldecode($info->username);
+
+				if ($info->password)
+					$info->password = urldecode($info->password);
 			}
 		}
 
