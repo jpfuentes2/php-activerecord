@@ -99,6 +99,35 @@ class AdapterTest extends DatabaseTest
 			ActiveRecord\Connection::instance($connection_string);
 	}
 
+	public function test_connect_with_array_connection_info()
+	{
+		$config = ActiveRecord\Config::instance();
+		$name = $config->get_default_connection();
+		$url = parse_url($config->get_connection($name));
+		$conn = $this->conn;
+		$port = $conn::$DEFAULT_PORT;
+
+		$info = array(
+			'protocol' => $url['scheme'],
+			'host' => $url['host']
+		);
+
+		if(isset($url['path'])){
+			$info['database'] = substr($url['path'], 1);
+		}
+
+		if(isset($url['user'])){
+			$info['username'] = $url['user'];
+		}
+
+		if(isset($url['pass'])){
+			$info['password'] = $url['pass'];
+		}
+
+		if ($this->conn->protocol != 'sqlite')
+			ActiveRecord\Connection::instance($info);
+	}
+
 	/**
 	 * @expectedException ActiveRecord\DatabaseException
 	 */

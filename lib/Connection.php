@@ -97,35 +97,45 @@ abstract class Connection
 	 *   A connection name that is set in ActiveRecord\Config
 	 *   If null it will use the default connection specified by ActiveRecord\Config->set_default_connection
 	 * @return Connection
-	 * @see parse_connection_url
+	 * @see ConnectionInfo::from_connection_url
 	 */
-	public static function instance($connection_string_or_connection_name=null)
+	public static function instance($connection_info_or_name=null)
 	{
 		$config = Config::instance();
 
-		if (strpos($connection_string_or_connection_name, '://') === false)
+		if (!is_array($connection_info_or_name))
 		{
-			$connection_string = $connection_string_or_connection_name ?
-				$config->get_connection($connection_string_or_connection_name) :
-				$config->get_default_connection_string();
+			if (strpos($connection_info_or_name, '://') === false)
+			{
+				$connection_url = $connection_info_or_name ?
+					$config->get_connection($connection_info_or_name) :
+					$config->get_default_connection_string();
+			}
+			else
+			{
+				$connection_url = $connection_info_or_name;
+			}
+
+			if (!$connection_url)
+				throw new DatabaseException("Empty connection string");
+
+			$connection_info = ConnectionInfo::from_connection_url($connection_url);
 		}
 		else
-			$connection_string = $connection_string_or_connection_name;
+		{
+			$connection_info = new ConnectionInfo($connection_info_or_name);
+		}
 
-		if (!$connection_string)
-			throw new DatabaseException("Empty connection string");
-
-		$info = static::parse_connection_url($connection_string);
-		$fqclass = static::load_adapter_class($info->protocol);
+		$fqclass = static::load_adapter_class($connection_info->protocol);
 
 		try {
-			$connection = new $fqclass($info);
-			$connection->protocol = $info->protocol;
+			$connection = new $fqclass($connection_info);
+			$connection->protocol = $connection_info->protocol;
 			$connection->logging = $config->get_logging();
 			$connection->logger = $connection->logging ? $config->get_logger() : null;
 
-			if (isset($info->charset))
-				$connection->set_encoding($info->charset);
+			if (isset($connection_info->charset))
+				$connection->set_encoding($connection_info->charset);
 		} catch (PDOException $e) {
 			throw new DatabaseException($e);
 		}
@@ -152,92 +162,6 @@ abstract class Connection
 	}
 
 	/**
-	 * Use this for any adapters that can take connection info in the form below
-	 * to set the adapters connection info.
-	 *
-	 * <code>
-	 * protocol://username:password@host[:port]/dbname
-	 * protocol://urlencoded%20username:urlencoded%20password@host[:port]/dbname?decode=true
-	 * protocol://username:password@unix(/some/file/path)/dbname
-	 * </code>
-	 *
-	 * Sqlite has a special syntax, as it does not need a database name or user authentication:
-	 *
-	 * <code>
-	 * sqlite://file.db
-	 * sqlite://../relative/path/to/file.db
-	 * sqlite://unix(/absolute/path/to/file.db)
-	 * sqlite://windows(c%2A/absolute/path/to/file.db)
-	 * </code>
-	 *
-	 * @param string $connection_url A connection URL
-	 * @return object the parsed URL as an object.
-	 */
-	public static function parse_connection_url($connection_url)
-	{
-		$url = @parse_url($connection_url);
-
-		if (!isset($url['host']))
-			throw new DatabaseException('Database host must be specified in the connection string. If you want to specify an absolute filename, use e.g. sqlite://unix(/path/to/file)');
-
-		$info = new \stdClass();
-		$info->protocol = $url['scheme'];
-		$info->host = $url['host'];
-		$info->db = isset($url['path']) ? substr($url['path'], 1) : null;
-		$info->user = isset($url['user']) ? $url['user'] : null;
-		$info->pass = isset($url['pass']) ? $url['pass'] : null;
-
-		$allow_blank_db = ($info->protocol == 'sqlite');
-
-		if ($info->host == 'unix(')
-		{
-			$socket_database = $info->host . '/' . $info->db;
-
-			if ($allow_blank_db)
-				$unix_regex = '/^unix\((.+)\)\/?().*$/';
-			else
-				$unix_regex = '/^unix\((.+)\)\/(.+)$/';
-
-			if (preg_match_all($unix_regex, $socket_database, $matches) > 0)
-			{
-				$info->host = $matches[1][0];
-				$info->db = $matches[2][0];
-			}
-		} elseif (substr($info->host, 0, 8) == 'windows(')
-		{
-			$info->host = urldecode(substr($info->host, 8) . '/' . substr($info->db, 0, -1));
-			$info->db = null;
-		}
-
-		if ($allow_blank_db && $info->db)
-			$info->host .= '/' . $info->db;
-
-		if (isset($url['port']))
-			$info->port = $url['port'];
-
-		if (strpos($connection_url, 'decode=true') !== false)
-		{
-			if ($info->user)
-				$info->user = urldecode($info->user);
-
-			if ($info->pass)
-				$info->pass = urldecode($info->pass);
-		}
-
-		if (isset($url['query']))
-		{
-			foreach (explode('/&/', $url['query']) as $pair) {
-				list($name, $value) = explode('=', $pair);
-
-				if ($name == 'charset')
-					$info->charset = $value;
-			}
-		}
-
-		return $info;
-	}
-
-	/**
 	 * Class Connection is a singleton. Access it via instance().
 	 *
 	 * @param array $info Array containing URL parts
@@ -257,7 +181,7 @@ abstract class Connection
 			else
 				$host = "unix_socket=$info->host";
 
-			$this->connection = new PDO("$info->protocol:$host;dbname=$info->db", $info->user, $info->pass, static::$PDO_OPTIONS);
+			$this->connection = new PDO("$info->protocol:$host;dbname=$info->database", $info->username, $info->password, static::$PDO_OPTIONS);
 		} catch (PDOException $e) {
 			throw new DatabaseException($e);
 		}
