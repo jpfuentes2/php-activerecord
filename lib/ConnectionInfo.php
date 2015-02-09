@@ -65,24 +65,24 @@ class ConnectionInfo {
 		{
 			$socket_database = $info->host . '/' . $info->database;
 
-			if ($allow_blank_db)
-				$unix_regex = '/^unix\((.+)\)\/?().*$/';
-			else
-				$unix_regex = '/^unix\((.+)\)\/(.+)$/';
+			sscanf($socket_database, 'unix(%[^)])/%s', $host, $database);
 
-			if (preg_match_all($unix_regex, $socket_database, $matches) > 0)
-			{
-				$info->host = $matches[1][0];
-				$info->database = $matches[2][0];
-			}
-		} elseif (substr($info->host, 0, 8) == 'windows(')
+			$info->host = $host;
+			$info->database = $database;
+
+		}
+		elseif (substr($info->host, 0, 8) == 'windows(')
 		{
 			$info->host = urldecode(substr($info->host, 8) . '/' . substr($info->database, 0, -1));
 			$info->database = null;
 		}
+		else
+		{
+			if ($allow_blank_db && $info->database)
+				$info->host .= '/' . $info->database;
+			
+		}
 
-		if ($allow_blank_db && $info->database)
-			$info->host .= '/' . $info->database;
 
 		if (isset($url['port']))
 			$info->port = $url['port'];
