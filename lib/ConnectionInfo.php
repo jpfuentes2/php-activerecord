@@ -14,9 +14,16 @@ class ConnectionInfo {
 
 	public $charset = null;
 
-	public function __construct($input = array()){
-		foreach($input as $prop => $value){
-			$this->{$prop} = $value;
+	public $decode = false;
+
+	public function __construct($input = array())
+	{
+		foreach($input as $prop => $value)
+		{
+			if(property_exists($this, $prop))
+			{
+				$this->{$prop} = $value;
+			}
 		}
 	}
 
@@ -44,7 +51,8 @@ class ConnectionInfo {
 	 * @param string $connection_url A connection URL
 	 * @return ConnectionInfo the parsed URL as an object.
 	 */
-	public static function from_connection_url($connection_url){
+	public static function from_connection_url($connection_url)
+	{
 		$url = @parse_url($connection_url);
 
 		if (!isset($url['host']))
@@ -53,11 +61,20 @@ class ConnectionInfo {
 		$info = new self();
 		$info->protocol = $url['scheme'];
 		$info->host = $url['host'];
-		if(isset($url['path'])){
-			$info->database = substr($url['path'], 1);
+
+		if (isset($url['query']))
+		{
+			parse_str($url['query'], $params);
+
+			if(isset($params['charset']))
+				$info->charset = $params['charset'];
+
+			if(isset($params['decode']))
+				$info->decode = ($params['decode'] == 'true');
 		}
-		$info->username = isset($url['user']) ? $url['user'] : null;
-		$info->password = isset($url['pass']) ? $url['pass'] : null;
+
+		if(isset($url['path']))
+			$info->database = substr($url['path'], 1);
 
 		$allow_blank_db = ($info->protocol == 'sqlite');
 
@@ -69,7 +86,6 @@ class ConnectionInfo {
 
 			$info->host = $host;
 			$info->database = $database;
-
 		}
 		elseif (substr($info->host, 0, 8) == 'windows(')
 		{
@@ -80,29 +96,16 @@ class ConnectionInfo {
 		{
 			if ($allow_blank_db && $info->database)
 				$info->host .= '/' . $info->database;
-			
 		}
-
 
 		if (isset($url['port']))
 			$info->port = $url['port'];
 
-		if (isset($url['query']))
-		{
-			parse_str($url['query'], $params);
-			if(isset($params['charset'])){
-				$info->charset = $params['charset'];
-			}
+		if (isset($url['user']))
+			$info->username = $info->decode ? urldecode($url['user']) : $url['user'];
 
-			if(isset($params['decode']) && $params['decode'] == 'true' )
-			{
-				if ($info->username)
-					$info->username = urldecode($info->username);
-
-				if ($info->password)
-					$info->password = urldecode($info->password);
-			}
-		}
+		if (isset($url['pass']))
+			$info->password = $info->decode ? urldecode($url['pass']) : $url['pass'];
 
 		return $info;
 	}
