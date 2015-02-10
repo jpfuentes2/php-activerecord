@@ -4,7 +4,7 @@ namespace ActiveRecord;
 
 class ConnectionInfo {
 
-	public $protocol = null;
+	public $adapter = null;
 	public $host = null;
 	public $port = null;
 	public $database = null;
@@ -34,9 +34,9 @@ class ConnectionInfo {
 	 * to set the adapters connection info.
 	 *
 	 * <code>
-	 * protocol://username:password@host[:port]/dbname
-	 * protocol://urlencoded%20username:urlencoded%20password@host[:port]/dbname?decode=true
-	 * protocol://username:password@unix(/some/file/path)/dbname
+	 * adapter://username:password@host[:port]/dbname
+	 * adapter://urlencoded%20username:urlencoded%20password@host[:port]/dbname?decode=true
+	 * adapter://username:password@unix(/some/file/path)/dbname
 	 * </code>
 	 *
 	 * Sqlite has a special syntax, as it does not need a database name or user authentication:
@@ -59,7 +59,7 @@ class ConnectionInfo {
 			throw new DatabaseException('Database host must be specified in the connection string. If you want to specify an absolute filename, use e.g. sqlite://unix(/path/to/file)');
 
 		$info = new self();
-		$info->protocol = $url['scheme'];
+		$info->adapter = $url['scheme'];
 		$info->host = $url['host'];
 
 		if (isset($url['query']))
@@ -76,7 +76,7 @@ class ConnectionInfo {
 		if(isset($url['path']))
 			$info->database = substr($url['path'], 1);
 
-		$allow_blank_db = ($info->protocol == 'sqlite');
+		$allow_blank_db = ($info->adapter == 'sqlite');
 
 		if ($info->host == 'unix(')
 		{

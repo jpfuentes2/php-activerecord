@@ -54,10 +54,10 @@ abstract class Connection
 	 */
 	private $logger;
 	/**
-	 * The name of the protocol that is used.
+	 * The name of the adapter that is used.
 	 * @var string
 	 */
-	public $protocol;
+	public $adapter;
 	/**
 	 * Database's date format
 	 * @var string
@@ -92,7 +92,7 @@ abstract class Connection
 	 * Retrieve a database connection.
 	 *
 	 * @param string $connection_info_or_name A database connection string (ex. mysql://user:pass@host[:port]/dbname)
-	 *   Everything after the protocol:// part is specific to the connection adapter.
+	 *   Everything after the adapter:// part is specific to the connection adapter.
 	 *   OR
 	 *   A connection name that is set in ActiveRecord\Config
 	 *   If null it will use the default connection specified by ActiveRecord\Config->set_default_connection
@@ -124,11 +124,11 @@ abstract class Connection
 			}
 		}
 
-		$fqclass = static::load_adapter_class($connection_info->protocol);
+		$fqclass = static::load_adapter_class($connection_info->adapter);
 
 		try {
 			$connection = new $fqclass($connection_info);
-			$connection->protocol = $connection_info->protocol;
+			$connection->adapter = $connection_info->adapter;
 			$connection->logging = $config->get_logging();
 			$connection->logger = $connection->logging ? $config->get_logger() : null;
 
@@ -179,7 +179,7 @@ abstract class Connection
 			else
 				$host = "unix_socket=$info->host";
 
-			$this->connection = new PDO("$info->protocol:$host;dbname=$info->database", $info->username, $info->password, static::$PDO_OPTIONS);
+			$this->connection = new PDO("$info->adapter:$host;dbname=$info->database", $info->username, $info->password, static::$PDO_OPTIONS);
 		} catch (PDOException $e) {
 			throw new DatabaseException($e);
 		}

@@ -28,7 +28,7 @@ class ConfigTest extends SnakeCase_PHPUnit_Framework_TestCase
 			'development' => 'mysql://blah/development',
 			'test' => 'mysql://blah/test',
 			'production' => array(
-				'protocol' => 'mysql',
+				'adapter' => 'mysql',
 				'host' => '127.0.0.1',
 				'database' => 'production'
 			));

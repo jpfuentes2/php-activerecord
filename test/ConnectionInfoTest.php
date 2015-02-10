@@ -15,7 +15,7 @@ class ConnectionInfoTest extends SnakeCase_PHPUnit_Framework_TestCase
 	public function test_connection_info()
 	{
 		$info = ConnectionInfo::from_connection_url('mysql://user:pass@127.0.0.1:3306/dbname');
-		$this->assert_equals('mysql', $info->protocol);
+		$this->assert_equals('mysql', $info->adapter);
 		$this->assert_equals('user', $info->username);
 		$this->assert_equals('pass', $info->password);
 		$this->assert_equals('127.0.0.1', $info->host);
@@ -77,14 +77,14 @@ class ConnectionInfoTest extends SnakeCase_PHPUnit_Framework_TestCase
 
 	public function test_connection_info_from_array(){
 		$info = new ConnectionInfo(array(
-			'protocol' => 'mysql',
+			'adapter' => 'mysql',
 			'host' => '127.0.0.1',
 			'port' => 3306,
 			'database' => 'dbname',
 			'username' => 'user',
 			'password' => 'pass'
 		));
-		$this->assert_equals('mysql', $info->protocol);
+		$this->assert_equals('mysql', $info->adapter);
 		$this->assert_equals('user', $info->username);
 		$this->assert_equals('pass', $info->password);
 		$this->assert_equals('127.0.0.1', $info->host);

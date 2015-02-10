@@ -128,7 +128,7 @@ class Config extends Singleton
 	 * <code>
 	 * $config->set_connections(array(
 	 *     'development' => array(
-	 *         'protocol' => 'mysql',
+	 *         'adapter' => 'mysql',
 	 *         'host' => '127.0.0.1',
 	 *         'database' => 'database_name',
 	 *         'username' => 'username',
