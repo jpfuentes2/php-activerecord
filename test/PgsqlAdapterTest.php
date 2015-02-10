@@ -31,8 +31,9 @@ class PgsqlAdapterTest extends AdapterTest
 
 	public function test_set_charset()
 	{
-		$connection_string = ActiveRecord\Config::instance()->get_connection($this->connection_name);
-		$conn = ActiveRecord\Connection::instance($connection_string . '?charset=utf8');
+		$connection_info = ActiveRecord\Config::instance()->get_connection_info($this->connection_name);
+		$connection_info->charset = 'utf8';
+		$conn = ActiveRecord\Connection::instance($connection_info);
 		$this->assert_equals("SET NAMES 'utf8'",$conn->last_query);
 	}
 

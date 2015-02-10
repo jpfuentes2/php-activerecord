@@ -91,7 +91,7 @@ abstract class Connection
 	/**
 	 * Retrieve a database connection.
 	 *
-	 * @param string $connection_string_or_connection_name A database connection string (ex. mysql://user:pass@host[:port]/dbname)
+	 * @param string $connection_info_or_name A database connection string (ex. mysql://user:pass@host[:port]/dbname)
 	 *   Everything after the protocol:// part is specific to the connection adapter.
 	 *   OR
 	 *   A connection name that is set in ActiveRecord\Config
@@ -99,31 +99,29 @@ abstract class Connection
 	 * @return Connection
 	 * @see ConnectionInfo::from_connection_url
 	 */
-	public static function instance($connection_info_or_name=null)
+	public static function instance($connection_info=null)
 	{
 		$config = Config::instance();
 
-		if (!is_array($connection_info_or_name))
+		if (!($connection_info instanceof ConnectionInfo))
 		{
-			if (strpos($connection_info_or_name, '://') === false)
+			// Connection instantiation using a connection array
+			if (is_array($connection_info))
 			{
-				$connection_url = $connection_info_or_name ?
-					$config->get_connection($connection_info_or_name) :
-					$config->get_default_connection_string();
+				$connection_info = new ConnectionInfo($connection_info);
 			}
+			// Connection instantiation using a connection url
+			else if (is_string($connection_info) && strpos($connection_info, '://') !== false)
+			{
+				$connection_info = ConnectionInfo::from_connection_url($connection_info);
+			}
+			// Connection instantiation using a connection name
 			else
 			{
-				$connection_url = $connection_info_or_name;
+				$connection_info = $connection_info ?
+					$config->get_connection_info($connection_info) :
+					$config->get_default_connection_info();
 			}
-
-			if (!$connection_url)
-				throw new DatabaseException("Empty connection string");
-
-			$connection_info = ConnectionInfo::from_connection_url($connection_url);
-		}
-		else
-		{
-			$connection_info = new ConnectionInfo($connection_info_or_name);
 		}
 
 		$fqclass = static::load_adapter_class($connection_info->protocol);

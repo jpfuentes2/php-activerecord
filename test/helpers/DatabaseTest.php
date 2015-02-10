@@ -22,7 +22,8 @@ class DatabaseTest extends SnakeCase_PHPUnit_Framework_TestCase
 		if ($connection_name == 'sqlite' || $config->get_default_connection() == 'sqlite')
 		{
 			// need to create the db. the adapter specifically does not create it for us.
-			static::$db = substr(ActiveRecord\Config::instance()->get_connection('sqlite'),9);
+			$info = ActiveRecord\Config::instance()->get_connection_info('sqlite');
+			static::$db = $info->host;
 			new SQLite3(static::$db);
 		}
 

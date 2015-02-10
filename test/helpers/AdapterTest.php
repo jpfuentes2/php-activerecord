@@ -8,7 +8,7 @@ class AdapterTest extends DatabaseTest
 	public function set_up($connection_name=null)
 	{
 		if (($connection_name && !in_array($connection_name, PDO::getAvailableDrivers())) ||
-			ActiveRecord\Config::instance()->get_connection($connection_name) == 'skip')
+			ActiveRecord\Config::instance()->get_connection_info($connection_name) == 'skip')
 			$this->mark_test_skipped($connection_name . ' drivers are not present');
 
 		parent::set_up($connection_name);
@@ -84,48 +84,26 @@ class AdapterTest extends DatabaseTest
 	public function test_connect_with_port()
 	{
 		$config = ActiveRecord\Config::instance();
-		$name = $config->get_default_connection();
-		$url = parse_url($config->get_connection($name));
+		$info = $config->get_default_connection_info();
+
 		$conn = $this->conn;
 		$port = $conn::$DEFAULT_PORT;
 
-		$connection_string = "{$url['scheme']}://{$url['user']}";
-		if(isset($url['pass'])){
-			$connection_string =  "{$connection_string}:{$url['pass']}";
-		}
-		$connection_string = "{$connection_string}@{$url['host']}:$port{$url['path']}";
+		$info->port = $port;
 
 		if ($this->conn->protocol != 'sqlite')
-			ActiveRecord\Connection::instance($connection_string);
+			ActiveRecord\Connection::instance($info);
 	}
 
 	public function test_connect_with_array_connection_info()
 	{
 		$config = ActiveRecord\Config::instance();
-		$name = $config->get_default_connection();
-		$url = parse_url($config->get_connection($name));
-		$conn = $this->conn;
-		$port = $conn::$DEFAULT_PORT;
+		$info = $config->get_default_connection_info();
 
-		$info = array(
-			'protocol' => $url['scheme'],
-			'host' => $url['host']
-		);
-
-		if(isset($url['path'])){
-			$info['database'] = substr($url['path'], 1);
-		}
-
-		if(isset($url['user'])){
-			$info['username'] = $url['user'];
-		}
-
-		if(isset($url['pass'])){
-			$info['password'] = $url['pass'];
-		}
+		$info_array = array_filter(get_object_vars($info));
 
 		if ($this->conn->protocol != 'sqlite')
-			ActiveRecord\Connection::instance($info);
+			ActiveRecord\Connection::instance($info_array);
 	}
 
 	/**
