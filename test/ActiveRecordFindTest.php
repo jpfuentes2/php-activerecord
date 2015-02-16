@@ -226,12 +226,12 @@ class ActiveRecordFindTest extends DatabaseTest
 
 	public function test_count()
 	{
-		$this->assert_equals(1,Author::count(1));
-		$this->assert_equals(2,Author::count(array(1,2)));
+		$this->assert_same(1,Author::count(1));
+		$this->assert_same(2,Author::count(array(1,2)));
 		$this->assert_true(Author::count() > 1);
-		$this->assert_equals(0,Author::count(array('conditions' => 'author_id=99999999999999')));
-		$this->assert_equals(2,Author::count(array('conditions' => 'author_id=1 or author_id=2')));
-		$this->assert_equals(1,Author::count(array('name' => 'Tito', 'author_id' => 1)));
+		$this->assert_same(0,Author::count(array('conditions' => 'author_id=99999999999999')));
+		$this->assert_same(2,Author::count(array('conditions' => 'author_id=1 or author_id=2')));
+		$this->assert_same(1,Author::count(array('name' => 'Tito', 'author_id' => 1)));
 	}
 
 	public function test_gh149_empty_count()
