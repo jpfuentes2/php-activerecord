@@ -245,6 +245,10 @@ abstract class Connection
 			}
 			else
 				$host = "unix_socket=$info->host";
+			// PDO driver redshift == pgsql
+			if ($info->protocol == 'redshift') {
+				$info->protocol = 'pgsql';
+			}
 
 			$this->connection = new PDO("$info->protocol:$host;dbname=$info->db", $info->user, $info->pass, static::$PDO_OPTIONS);
 		} catch (PDOException $e) {
