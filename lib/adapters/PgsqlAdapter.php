@@ -6,7 +6,7 @@ namespace ActiveRecord;
 
 /**
  * Adapter for Postgres (not completed yet)
- * 
+ *
  * @package ActiveRecord
  */
 class PgsqlAdapter extends Connection
@@ -47,7 +47,7 @@ SELECT
         WHERE c.oid = pg_index.indrelid
         AND a.attnum = ANY (pg_index.indkey)
         AND pg_index.indisprimary = 't'
-      ) IS NOT NULL AS pk,      
+      ) IS NOT NULL AS pk,
       REGEXP_REPLACE(REGEXP_REPLACE(REGEXP_REPLACE((SELECT pg_attrdef.adsrc
         FROM pg_attrdef
         WHERE c.oid = pg_attrdef.adrelid
@@ -75,7 +75,7 @@ SQL;
 		$c->inflected_name	= Inflector::instance()->variablize($column['field']);
 		$c->name			= $column['field'];
 		$c->nullable		= ($column['not_nullable'] ? false : true);
-		$c->pk				= ($column['pk'] ? true : false);
+		$c->pk				= ($column['pk'] == 't');
 		$c->auto_increment	= false;
 
 		if (substr($column['type'],0,9) == 'timestamp')
