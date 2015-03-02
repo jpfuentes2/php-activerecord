@@ -395,7 +395,7 @@ class Table
 	{
 		// as more adapters are added probably want to do this a better way
 		// than using instanceof but gud enuff for now
-		$quote_name = !($this->conn instanceof PgsqlAdapter || $this->conn instanceof RedshiftAdapter);
+		$quote_name = !($this->conn instanceof PgsqlAdapter);
 
 		$table_name = $this->get_fully_qualified_table_name($quote_name);
 		$conn = $this->conn;
