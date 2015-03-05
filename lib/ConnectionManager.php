@@ -43,6 +43,9 @@ class ConnectionManager extends Singleton
 	 */
 	public static function drop_connection($name=null)
 	{
+		$config = Config::instance();
+		$name = $name ? $name : $config->get_default_connection();
+
 		if (isset(self::$connections[$name]))
 			unset(self::$connections[$name]);
 	}

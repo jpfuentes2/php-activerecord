@@ -35,4 +35,19 @@ class ConnectionManagerTest extends DatabaseTest
 		$this->assert_same($conn_two, $conn_three);
 		$this->assert_same($conn_four, $conn_three);
 	}
+
+	public function test_gh_drop_connection_with_null_connection()
+	{
+		$natural_connection = ConnectionManager::get_connection()->connection;
+
+		$before_drop_connection = ConnectionManager::get_connection()->connection;
+
+		$this->assert_same($natural_connection, $before_drop_connection);
+
+		ConnectionManager::drop_connection();
+
+		$after_drop_connection = ConnectionManager::get_connection()->connection;
+		$this->assert_not_same($before_drop_connection, $after_drop_connection);
+    }
+
 }
