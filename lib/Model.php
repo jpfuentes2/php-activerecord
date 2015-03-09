@@ -283,7 +283,7 @@ class Model
 	/**
 	 * Factory method to facilitate subclassing of Table if desired.
 	 */
-	public static function get_table($model_class_name)
+	public static function make_table($model_class_name)
 	{
 		return new Table($model_class_name);
 	}
