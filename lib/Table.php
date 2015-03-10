@@ -391,7 +391,7 @@ class Table
 		$this->relationships[$relationship->attribute_name] = $relationship;
 	}
 
-	private function get_meta_data()
+	protected function get_meta_data()
 	{
 		// as more adapters are added probably want to do this a better way
 		// than using instanceof but gud enuff for now
