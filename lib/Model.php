@@ -1617,14 +1617,14 @@ class Model
 	 * @param array $pks An array of primary keys
 	 * @return array
 	 */
-	protected static function get_models_from_cache(array $pks)
+	protected static function get_models_from_cache(array $pks, $options)
 	{
 		$models = array();
 		$table = static::table();
 
 		foreach($pks as $pk)
 		{
-			$options =array('conditions' => static::pk_conditions($pk));
+			$options['conditions'] = static::pk_conditions($pk);
 			$models[] = Cache::get($table->cache_key_for_model($pk), function() use ($table, $options)
 			{
 				$res = $table->find($options);
@@ -1655,7 +1655,7 @@ class Model
 		if($table->cache_individual_model)
 		{
 			$pks = is_array($values) ? $values : array($values);
-			$list = static::get_models_from_cache($pks);
+			$list = static::get_models_from_cache($pks, $options);
 		}
 		else
 		{

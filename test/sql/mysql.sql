@@ -1,6 +1,7 @@
 CREATE TABLE authors(
 	author_id INT NOT NULL PRIMARY KEY AUTO_INCREMENT,
 	parent_author_id INT,
+	publisher_id INT,
 	name VARCHAR(25) NOT NULL DEFAULT 'default_name',
 	updated_at datetime,
 	created_at datetime,

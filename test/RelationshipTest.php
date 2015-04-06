@@ -555,6 +555,12 @@ class RelationshipTest extends DatabaseTest
 		$this->assert_equals(2, count($venues[0]->events));
 	}
 
+	public function test_eager_loading_has_many_x_with_caching()
+	{
+		Publisher::find(array(1, 2, 3), array('include' => 'authors'));
+		$this->assert_sql_has("WHERE publisher_id IN(?)",ActiveRecord\Table::load('Author')->last_sql);
+	}
+
 	public function test_eager_loading_has_many_with_no_related_rows()
 	{
 		$venues = Venue::find(array(7, 8), array('include' => 'events'));
