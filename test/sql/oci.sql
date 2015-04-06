@@ -2,6 +2,7 @@ CREATE SEQUENCE authors_seq;
 CREATE TABLE authors(
 	author_id INT NOT NULL PRIMARY KEY,
 	parent_author_id INT,
+	publisher_id INT,
 	name VARCHAR(25) DEFAULT 'default_name' NOT NULL,
 	updated_at timestamp,
 	created_at timestamp,

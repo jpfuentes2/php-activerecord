@@ -1616,7 +1616,7 @@ class Model
 	 * @param mixed $pks primary keys
 	 * @return array
 	 */
-	protected static function get_models_from_cache($pks)
+	protected static function get_models_from_cache($pks, $options)
 	{
 		$models = array();
 		$table = static::table();
@@ -1628,7 +1628,7 @@ class Model
 
 		foreach($pks as $pk)
 		{
-			$options = array('conditions' => static::pk_conditions($pk));
+			$options['conditions'] = static::pk_conditions($pk);
 			$models[] = Cache::get($table->cache_key_for_model($pk), function() use ($table, $options)
 			{
 				$res = $table->find($options);
@@ -1658,7 +1658,7 @@ class Model
 
 		if($table->cache_individual_model)
 		{
-			$list = static::get_models_from_cache($values);
+			$list = static::get_models_from_cache($values, $options);
 		}
 		else
 		{
