@@ -40,9 +40,9 @@ ActiveRecord\Config::initialize(function($cfg)
 {
 	$cfg->set_model_directory(realpath(__DIR__ . '/../models'));
 	$cfg->set_connections(array(
-		'mysql'  => getenv('PHPAR_MYSQL')  ?: 'mysql://test:test@127.0.0.1/test',
-		'pgsql'  => getenv('PHPAR_PGSQL')  ?: 'pgsql://test:test@127.0.0.1/test',
-		'oci'    => getenv('PHPAR_OCI')    ?: 'oci://test:test@127.0.0.1/dev',
+		'mysql'  => getenv('PHPAR_MYSQL')  ?: 'mysql://root:foo@127.0.0.1/test',
+		'pgsql'  => getenv('PHPAR_PGSQL')  ?: 'pgsql://root:foo@127.0.0.1/test',
+		'oci'    => getenv('PHPAR_OCI')    ?: 'oci://root:foo@127.0.0.1/dev',
 		'sqlite' => getenv('PHPAR_SQLITE') ?: 'sqlite://test.db'));
 
 	$cfg->set_default_connection('mysql');
