@@ -1,0 +1,19 @@
+install: composer install --prefer-source --dev
+
+before_script:
+  - echo 'extension = "memcache.so"' >> ~/.phpenv/versions/$(phpenv version-name)/etc/php.ini
+  - mysql -e 'CREATE DATABASE phpar_test;'
+  - psql -c 'CREATE DATABASE phpar_test;' -U postgres
+
+services:
+  - memcache
+
+env: PHPAR_MYSQL=mysql://root@127.0.0.1/phpar_test PHPAR_PGSQL=pgsql://postgres@127.0.0.1/phpar_test
+
+language: php
+php:
+  - 5.3
+  - 5.4
+  - 5.5
+
+script: ./vendor/bin/phpunit

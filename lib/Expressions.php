@@ -148,16 +148,24 @@ class Expressions
 
 		if (is_array($value))
 		{
+			$value_count = count($value);
+
+			if ($value_count === 0)
+				if ($substitute)
+					return 'NULL';
+				else
+					return self::ParameterMarker;
+
 			if ($substitute)
 			{
 				$ret = '';
 
-				for ($i=0,$n=count($value); $i<$n; ++$i)
+				for ($i=0, $n=$value_count; $i<$n; ++$i)
 					$ret .= ($i > 0 ? ',' : '') . $this->stringify_value($value[$i]);
 
 				return $ret;
 			}
-			return join(',',array_fill(0,count($value),self::ParameterMarker));
+			return join(',',array_fill(0,$value_count,self::ParameterMarker));
 		}
 
 		if ($substitute)
@@ -182,4 +190,3 @@ class Expressions
 		return "'" . str_replace("'","''",$value) . "'";
 	}
 }
-?>

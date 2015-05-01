@@ -9,14 +9,14 @@ namespace ActiveRecord;
  *
  * @package ActiveRecord
  */
-class ActiveRecordException extends \Exception {};
+class ActiveRecordException extends \Exception {}
 
 /**
  * Thrown when a record cannot be found.
  *
  * @package ActiveRecord
  */
-class RecordNotFound extends ActiveRecordException {};
+class RecordNotFound extends ActiveRecordException {}
 
 /**
  * Thrown when there was an error performing a database operation.
@@ -44,28 +44,28 @@ class DatabaseException extends ActiveRecordException
 		else
 			parent::__construct($adapter_or_string_or_mystery);
 	}
-};
+}
 
 /**
  * Thrown by {@link Model}.
  *
  * @package ActiveRecord
  */
-class ModelException extends ActiveRecordException {};
+class ModelException extends ActiveRecordException {}
 
 /**
  * Thrown by {@link Expressions}.
  *
  * @package ActiveRecord
  */
-class ExpressionsException extends ActiveRecordException {};
+class ExpressionsException extends ActiveRecordException {}
 
 /**
  * Thrown for configuration problems.
  *
  * @package ActiveRecord
  */
-class ConfigException extends ActiveRecordException {};
+class ConfigException extends ActiveRecordException {}
 
 /**
  * Thrown when attempting to access an invalid property on a {@link Model}.
@@ -91,7 +91,7 @@ class UndefinedPropertyException extends ModelException
 		$this->message = "Undefined property: {$class_name}->{$property_name} in {$this->file} on line {$this->line}";
 		parent::__construct();
 	}
-};
+}
 
 /**
  * Thrown when attempting to perform a write operation on a {@link Model} that is in read-only mode.
@@ -112,26 +112,25 @@ class ReadOnlyException extends ModelException
 		$this->message = "{$class_name}::{$method_name}() cannot be invoked because this model is set to read only";
 		parent::__construct();
 	}
-};
+}
 
 /**
  * Thrown for validations exceptions.
  *
  * @package ActiveRecord
  */
-class ValidationsArgumentError extends ActiveRecordException {};
+class ValidationsArgumentError extends ActiveRecordException {}
 
 /**
  * Thrown for relationship exceptions.
  *
  * @package ActiveRecord
  */
-class RelationshipException extends ActiveRecordException {};
+class RelationshipException extends ActiveRecordException {}
 
 /**
  * Thrown for has many thru exceptions.
  *
  * @package ActiveRecord
  */
-class HasManyThroughAssociationException extends RelationshipException {};
-?>
+class HasManyThroughAssociationException extends RelationshipException {}

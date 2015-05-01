@@ -494,7 +494,7 @@ class Validations
 				$range = $options[$range_options[0]];
 
 				if (!(Utils::is_a('range', $range)))
-					throw new  ValidationsArgumentError("$range_option must be an array composing a range of numbers with key [0] being less than key [1]");
+					throw new  ValidationsArgumentError("$range_options[0] must be an array composing a range of numbers with key [0] being less than key [1]");
 				$range_options = array('minimum', 'maximum');
 				$attr['minimum'] = $range[0];
 				$attr['maximum'] = $range[1];
@@ -814,7 +814,7 @@ class Errors implements IteratorAggregate
 	 * # )
 	 * </code>
 	 *
-	 * @param array $closure Closure to fetch the errors in some other format (optional)
+	 * @param callable $closure Closure to fetch the errors in some other format (optional)
 	 *                       This closure has the signature function($attribute, $message)
 	 *                       and is called for each available error message.
 	 * @return array
@@ -908,5 +908,4 @@ class Errors implements IteratorAggregate
 	{
 		return new ArrayIterator($this->full_messages());
 	}
-};
-?>
+}

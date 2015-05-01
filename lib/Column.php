@@ -30,10 +30,10 @@ class Column
 		'date'		=> self::DATE,
 		'time'		=> self::TIME,
 
-		'int'		=> self::INTEGER,
 		'tinyint'	=> self::INTEGER,
 		'smallint'	=> self::INTEGER,
 		'mediumint'	=> self::INTEGER,
+		'int'		=> self::INTEGER,
 		'bigint'	=> self::INTEGER,
 
 		'float'		=> self::DECIMAL,
@@ -103,6 +103,47 @@ class Column
 	public $sequence;
 
 	/**
+	 * Cast a value to an integer type safely
+	 *
+	 * This will attempt to cast a value to an integer,
+	 * unless its detected that the casting will cause
+	 * the number to overflow or lose precision, in which
+	 * case the number will be returned as a string, so
+	 * that large integers (BIGINTS, unsigned INTS, etc)
+	 * can still be stored without error
+	 *
+	 * This would ideally be done with bcmath or gmp, but
+	 * requiring a new PHP extension for a bug-fix is a
+	 * little ridiculous
+	 *
+	 * @param mixed $value The value to cast
+	 * @return int|string type-casted value
+	 */
+	public static function castIntegerSafely($value)
+	{
+		if (is_int($value))
+			return $value;
+
+		// Its just a decimal number
+		elseif (is_numeric($value) && floor($value) != $value)
+			return (int) $value;
+
+		// If adding 0 to a string causes a float conversion,
+		// we have a number over PHP_INT_MAX
+		elseif (is_string($value) && is_float($value + 0))
+			return (string) $value;
+
+		// If a float was passed and its greater than PHP_INT_MAX
+		// (which could be wrong due to floating point precision)
+		// We'll also check for equal to (>=) in case the precision
+		// loss creates an overflow on casting
+		elseif (is_float($value) && $value >= PHP_INT_MAX)
+			return number_format($value, 0, '', '');
+
+		return (int) $value;
+	}
+
+	/**
 	 * Casts a value to the column's type.
 	 *
 	 * @param mixed $value The value to cast
@@ -117,7 +158,7 @@ class Column
 		switch ($this->type)
 		{
 			case self::STRING:	return (string)$value;
-			case self::INTEGER:	return (int)$value;
+			case self::INTEGER:	return static::castIntegerSafely($value);
 			case self::DECIMAL:	return (double)$value;
 			case self::DATETIME:
 			case self::DATE:
@@ -152,4 +193,3 @@ class Column
 		return $this->type;
 	}
 }
-?>

@@ -106,6 +106,13 @@ function has_namespace($class_name)
 	return false;
 }
 
+function has_absolute_namespace($class_name)
+{
+	if (strpos($class_name, '\\') === 0)
+		return true;
+	return false;
+}
+
 /**
  * Returns true if all values in $haystack === $needle
  * @param $needle
@@ -355,5 +362,9 @@ class Utils
 	{
 		return preg_replace("/$char+/",$char,$string);
 	}
-};
-?>
+
+    public static function add_irregular($singular, $plural)
+    {
+        self::$irregular[$singular] = $plural;
+    }
+}

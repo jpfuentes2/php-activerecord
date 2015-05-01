@@ -1,20 +1,29 @@
 <?php
-/**
- * In order to run these unit tests, you need to install:
- *  - PHPUnit
- *  - PEAR Log (otherwise logging SQL queries will be disabled)
- *  - Memcache (otherwise Caching tests will not be executed)
- *  
- * To run all tests : phpunit AllTests.php --slow-tests
- * To run a specific test : phpunit ????Test.php 
- */
 
-@include_once 'Log.php';
-@include_once 'Log/file.php';
-require_once 'PHPUnit/Framework/TestCase.php';
+/**
+ * In order to run these unit tests, you need to install the required packages using Composer:
+ *
+ *    $ composer install
+ *
+ * After that you can run the tests by invoking the local PHPUnit
+ *
+ * To run all test simply use:
+ *
+ *    $ vendor/bin/phpunit
+ *
+ * Or run a single test file by specifying its path:
+ *
+ *    $ vendor/bin/phpunit test/InflectorTest.php
+ *
+ **/
+
+require_once 'vendor/autoload.php';
+
 require_once 'SnakeCase_PHPUnit_Framework_TestCase.php';
+
 require_once 'DatabaseTest.php';
 require_once 'AdapterTest.php';
+
 require_once __DIR__ . '/../../ActiveRecord.php';
 
 // whether or not to run the slow non-crucial tests
@@ -62,7 +71,7 @@ ActiveRecord\Config::initialize(function($cfg)
 	}
 	
 	if ($GLOBALS['show_warnings']  && !isset($GLOBALS['show_warnings_done']))
-	{ 
+	{
 		if (!extension_loaded('memcache'))
 			echo "(Cache Tests will be skipped, Memcache not found.)\n";
 	}

@@ -1,5 +1,4 @@
 <?php
-include 'helpers/config.php';
 
 class ActiveRecordFindTest extends DatabaseTest
 {
@@ -78,6 +77,15 @@ class ActiveRecordFindTest extends DatabaseTest
 	{
 		$authors = Author::find('all',array('conditions' => array('author_id IN(1,2,3)')));
 		$this->assert_equals(1,$authors[0]->author_id);
+	}
+
+	/**
+	 * @expectedException ActiveRecord\DatabaseException
+	 */
+	public function test_find_all_with_empty_array_bind_value_throws_exception()
+	{
+		$authors = Author::find('all',array('conditions' => array('author_id IN(?)', array())));
+		$this->assertCount(0,$authors);
 	}
 
 	public function test_find_hash_using_alias()
@@ -435,6 +443,14 @@ class ActiveRecordFindTest extends DatabaseTest
 	public function test_find_by_zero()
 	{
 		Author::find(0);
+	}
+
+	/**
+	 * @expectedException ActiveRecord\RecordNotFound
+	 */
+	public function test_find_by_null()
+	{
+		Author::find(null);
 	}
 
 	public function test_count_by()

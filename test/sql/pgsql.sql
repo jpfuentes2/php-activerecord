@@ -20,6 +20,11 @@ CREATE TABLE books(
 	special NUMERIC(10,2) DEFAULT 0.0
 );
 
+CREATE TABLE publishers(
+	publisher_id SERIAL PRIMARY KEY,
+	name VARCHAR(25) NOT NULL DEFAULT 'default_name'
+);
+
 CREATE TABLE venues (
 	id SERIAL PRIMARY KEY,
 	name varchar(50),
@@ -32,7 +37,7 @@ CREATE TABLE venues (
 
 CREATE TABLE events (
 	id SERIAL PRIMARY KEY,
-	venue_id int NOT NULL,
+	venue_id int NULL,
 	host_id int NOT NULL,
 	title varchar(60) NOT NULL,
 	description varchar(10),

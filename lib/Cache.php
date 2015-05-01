@@ -59,17 +59,53 @@ class Cache
 			static::$adapter->flush();
 	}
 
-	public static function get($key, $closure)
+	/**
+	 * Attempt to retrieve a value from cache using a key. If the value is not found, then the closure method
+	 * will be invoked, and the result will be stored in cache using that key.
+	 * @param $key
+	 * @param $closure
+	 * @param $expire in seconds
+	 * @return mixed
+	 */
+	public static function get($key, $closure, $expire=null)
 	{
-		$key = static::get_namespace() . $key;
-		
 		if (!static::$adapter)
 			return $closure();
 
+		if (is_null($expire))
+		{
+			$expire = static::$options['expire'];
+		}
+
+		$key = static::get_namespace() . $key;
+
 		if (!($value = static::$adapter->read($key)))
-			static::$adapter->write($key,($value = $closure()),static::$options['expire']);
+			static::$adapter->write($key, ($value = $closure()), $expire);
 
 		return $value;
+	}
+
+	public static function set($key, $var, $expire=null)
+	{
+		if (!static::$adapter)
+			return;
+
+		if (is_null($expire))
+		{
+			$expire = static::$options['expire'];
+		}
+
+		$key = static::get_namespace() . $key;
+		return static::$adapter->write($key, $var, $expire);
+	}
+
+	public static function delete($key)
+	{
+		if (!static::$adapter)
+			return;
+
+		$key = static::get_namespace() . $key;
+		return static::$adapter->delete($key);
 	}
 
 	private static function get_namespace()
@@ -77,4 +113,3 @@ class Cache
 		return (isset(static::$options['namespace']) && strlen(static::$options['namespace']) > 0) ? (static::$options['namespace'] . "::") : "";
 	}
 }
-?>

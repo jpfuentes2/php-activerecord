@@ -1,5 +1,4 @@
 <?php
-include 'helpers/config.php';
 require_once __DIR__ . '/../lib/adapters/SqliteAdapter.php';
 
 class SqliteAdapterTest extends AdapterTest
@@ -13,8 +12,15 @@ class SqliteAdapterTest extends AdapterTest
 	{
 		parent::tearDown();
 
-		@unlink($this->db);
 		@unlink(self::InvalidDb);
+	}
+
+
+	public static function tearDownAfterClass()
+	{
+		parent::tearDownAfterClass();
+
+		@unlink(static::$db);
 	}
 
 	public function testConnectToInvalidDatabaseShouldNotCreateDbFile()
@@ -56,6 +62,18 @@ class SqliteAdapterTest extends AdapterTest
 		// defined using int: id INT NOT NULL PRIMARY KEY
 		$columns = $this->conn->columns('hosts');
 		$this->assert_true($columns['id']->auto_increment);
+	}
+
+	public function test_datetime_to_string()
+	{
+		$datetime = '2009-01-01 01:01:01';
+		$this->assert_equals($datetime,$this->conn->datetime_to_string(date_create($datetime)));
+	}
+
+	public function test_date_to_string()
+	{
+		$datetime = '2009-01-01';
+		$this->assert_equals($datetime,$this->conn->date_to_string(date_create($datetime)));
 	}
 
 	// not supported

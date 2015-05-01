@@ -51,7 +51,6 @@ abstract class Singleton
 	final protected function get_called_class()
 	{
 		$backtrace = debug_backtrace();
-    	return get_class($backtrace[2]['object']);
+		return get_class($backtrace[2]['object']);
 	}
 }
-?>

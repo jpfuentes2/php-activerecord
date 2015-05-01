@@ -89,8 +89,14 @@ class AdapterTest extends DatabaseTest
 		$conn = $this->conn;
 		$port = $conn::$DEFAULT_PORT;
 
+		$connection_string = "{$url['scheme']}://{$url['user']}";
+		if(isset($url['pass'])){
+			$connection_string =  "{$connection_string}:{$url['pass']}";
+		}
+		$connection_string = "{$connection_string}@{$url['host']}:$port{$url['path']}";
+
 		if ($this->conn->protocol != 'sqlite')
-			ActiveRecord\Connection::instance("{$url['scheme']}://{$url['user']}:{$url['pass']}@{$url['host']}:$port{$url['path']}");
+			ActiveRecord\Connection::instance($connection_string);
 	}
 
 	/**
@@ -261,7 +267,7 @@ class AdapterTest extends DatabaseTest
 		$names = array('author_id','parent_author_id','name','updated_at','created_at','some_Date','some_time','some_text','encrypted_password','mixedCaseField');
 
 		if ($this->conn instanceof ActiveRecord\OciAdapter)
-			$names = array_filter(array_map('strtolower',$names),function($s) { $s !== 'some_time'; });
+			$names = array_filter(array_map('strtolower',$names),function($s) { return $s !== 'some_time'; });
 
 		foreach ($names as $field)
 			$this->assert_true(array_key_exists($field,$columns));
