@@ -13,6 +13,8 @@ In order to run these unit tests, you need to install the required packages usin
 composer install
 ```
 
+Setup a local database called "test". You'll need to ensure the credentials are correct in the connection strings in `test/helpers/config.php`
+
 After that you can run the tests by invoking the local PHPUnit
 
 To run all test simply use:
