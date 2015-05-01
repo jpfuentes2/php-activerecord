@@ -28,3 +28,9 @@ Or run a single test file by specifying its path:
 ```sh
 vendor/bin/phpunit test/InflectorTest.php
 ```
+
+Or run a single test in a file by specifying the method with the [filter option](https://phpunit.de/manual/current/en/textui.html#textui.examples.filter-patterns):
+
+```sh
+vendor/bin/phpunit --filter underscorify test/InflectorTest.php
+```
