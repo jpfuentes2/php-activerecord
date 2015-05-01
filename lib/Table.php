@@ -144,7 +144,21 @@ class Table
 						$alias = null;
 					}
 
-					$ret .= $rel->construct_inner_join_sql($this, false, $alias);
+					if($rel->is_through()) {
+						#join through table to this table
+						$through_rel = $this->get_relationship($rel->through_association_name());
+						$ret .= $through_rel->construct_inner_join_sql($this, false, $alias);
+						
+						#join through table to destination table
+						$through_table = $rel->through_table();
+						$final_rel = $through_table->get_relationship($rel_name = Utils::singularize($rel->attribute_name));
+						if(empty($final_rel)) {
+							throw new RelationshipException("Relationship named $rel_name has not been declared for class: {$through_table->class->getName()}");					
+						}
+						$ret .= $final_rel->construct_inner_join_sql($through_table, false, $alias);
+					} else {
+						$ret .= $rel->construct_inner_join_sql($this, false, $alias);
+					}
 				}
 				else
 					throw new RelationshipException("Relationship named $value has not been declared for class: {$this->class->getName()}");
@@ -316,7 +330,7 @@ class Table
 
 		return $table;
 	}
-
+	
 	/**
 	 * Retrieve a relationship object for this table. Strict as true will throw an error
 	 * if the relationship name does not exist.

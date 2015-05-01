@@ -154,19 +154,9 @@ abstract class AbstractRelationship implements InterfaceRelationship
 			$fk = $this->foreign_key;
 
 			$this->set_keys($this->get_table()->class->getName(), true);
-
-			if (!isset($options['class_name'])) {
-				$class = classify($options['through'], true);
-				if (isset($this->options['namespace']) && !class_exists($class))
-					$class = $this->options['namespace'].'\\'.$class;
-
-				$through_table = $class::table();
-			} else {
-				$class = $options['class_name'];
-				$relation = $class::table()->get_relationship($options['through']);
-				$through_table = $relation->get_table();
+			if($through_table = $this->through_table()) {
+				$options['joins'] = $this->construct_inner_join_sql($through_table, true);
 			}
-			$options['joins'] = $this->construct_inner_join_sql($through_table, true);
 
 			$query_key = $this->primary_key[0];
 
@@ -371,15 +361,55 @@ abstract class AbstractRelationship implements InterfaceRelationship
 		else
 			$aliased_join_table_name = $join_table_name;
 
-		return "INNER JOIN $join_table_name {$alias}ON($from_table_name.$foreign_key = $aliased_join_table_name.$join_primary_key)";
+		return " INNER JOIN $join_table_name {$alias}ON($from_table_name.$foreign_key = $aliased_join_table_name.$join_primary_key)";
 	}
-
+	
+	
 	/**
 	 * This will load the related model data.
 	 *
 	 * @param Model $model The model this relationship belongs to
 	 */
 	abstract function load(Model $model);
+	
+	/**
+	 * @return bool
+	 */
+	public function is_through() 
+	{
+		return array_key_exists('through', $this->options) && !empty($this->options['through']);
+	}	
+	
+	/**
+	 * Attempts to get the through Table instance from the options 
+	 * @return Table on success, null otherwise
+	 */
+	public function through_table() {
+		$options = $this->options;
+		if (empty($options['through'])) { return null; }
+			
+		if (!isset($options['class_name'])) {
+			$class = classify($options['through'], true);
+			if (isset($options['namespace']) && !class_exists($class)) {
+				$class = $options['namespace'] . '\\' . $class;
+			}
+			$through_table = $class::table();
+		} else {
+			$class = $options['class_name'];
+			$relation = $class::table()->get_relationship($options['through']);
+			$through_table = $relation->get_table();
+		}
+		
+		return $through_table;
+	}	
+	
+	/**
+	 * Returns the name of the association that this this relationship is through.
+	 * @return string
+	 */
+	public function through_association_name() {
+		return $this->is_through() ? $this->options['through'] : null;
+	}
 }
 
 /**

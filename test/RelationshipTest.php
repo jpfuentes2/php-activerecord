@@ -785,6 +785,37 @@ class RelationshipTest extends DatabaseTest
 		$this->assert_null($event->venue);
 		$this->assert_null($event->venue_id);
 	}
-}
 
-?>
+	public function test_through_table() {
+		$host_rel = Venue::table()->get_relationship('hosts');
+		$this->assert_instance_of('ActiveRecord\HasMany', $host_rel);
+
+		$events_table = $host_rel->through_table();
+		$this->assert_instance_of('ActiveRecord\Table', $events_table);
+		$this->assert_equals('events', $events_table->table);
+	}
+
+	public function test_through_table_on_non_has_many_through_association() {
+		$events_rel = Venue::table()->get_relationship('events');
+		$this->assert_instance_of('ActiveRecord\HasMany', $events_rel);
+		$this->assert_null($events_rel->through_table());
+	}
+
+	public function test_through_association_name() {
+		$this->assert_equals('events',Venue::table()->get_relationship('hosts')->through_association_name());
+	}		
+	
+	public function test_through_association_name_on_non_has_many_through_association() {
+		$this->assert_null(Venue::table()->get_relationship('events')->through_association_name());
+	}	
+	
+	public function test_gh_87_has_many_through_with_joins() {
+		$v = Venue::first(array('joins' => array('hosts')));
+	}
+
+	public function test_gh_87_eager_loading_has_many_through() {
+		$venues = Venue::find(array(1, 2), array('include' => array('hosts')));
+		$this->assert_equals(2, count($venues));
+		$this->assert_instance_of('Venue', array_shift($venues));
+	}
+}
