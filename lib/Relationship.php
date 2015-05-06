@@ -361,7 +361,17 @@ abstract class AbstractRelationship implements InterfaceRelationship
 		else
 			$aliased_join_table_name = $join_table_name;
 
-		return " INNER JOIN $join_table_name {$alias}ON($from_table_name.$foreign_key = $aliased_join_table_name.$join_primary_key)";
+		$on_clause = "$from_table_name.$foreign_key = $aliased_join_table_name.$join_primary_key";
+		
+		#append association conditions if they exist
+		if($join_conditions = $this->options['conditions']) {
+			if(is_string($join_conditions[0])) {
+				$on_clause = "($on_clause) AND ($join_conditions[0])";
+			} 
+			#TODO: handle conditions as arrays
+		}
+						
+		return " INNER JOIN $join_table_name {$alias}ON($on_clause)";
 	}
 	
 	
