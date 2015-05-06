@@ -126,6 +126,8 @@ class Table
 		{
 			$ret .= $space;
 
+			if(empty($value)) { continue; }
+			
 			if (stripos($value,'JOIN ') === false)
 			{
 				if (array_key_exists($value, $this->relationships))
