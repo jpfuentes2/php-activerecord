@@ -516,7 +516,7 @@ class Table
 			foreach (wrap_strings_in_arrays($definitions) as $definition)
 			{
 				$relationship = null;
-				$definition += compact('namespace');
+				$definition += array('namespace' => $namespace);
 
 				switch ($name)
 				{
