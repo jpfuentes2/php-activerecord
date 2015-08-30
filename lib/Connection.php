@@ -77,6 +77,12 @@ abstract class Connection
 	 */
 	static $DEFAULT_PORT = 0;
 
+    /**
+     * Number of nested transactions
+     * @var int
+     */
+    static protected $transaction_counter = 0;
+
 	/**
 	 * Retrieve a database connection.
 	 *
@@ -376,8 +382,14 @@ abstract class Connection
 	 */
 	public function transaction()
 	{
-		if (!$this->connection->beginTransaction())
-			throw new DatabaseException($this);
+        // Transaction started already
+        if (static::$transaction_counter++) {
+            $this->connection->exec('SAVEPOINT trans'.static::$transaction_counter);
+            return;
+        }
+
+        if (!$this->connection->beginTransaction())
+           throw new DatabaseException($this);
 	}
 
 	/**
@@ -385,6 +397,11 @@ abstract class Connection
 	 */
 	public function commit()
 	{
+        // Nested transaction simply decrease number
+        if (--static::$transaction_counter) {
+            return;
+        }
+
 		if (!$this->connection->commit())
 			throw new DatabaseException($this);
 	}
@@ -394,6 +411,11 @@ abstract class Connection
 	 */
 	public function rollback()
 	{
+        if (--static::$transaction_counter) {
+            $this->connection->exec('ROLLBACK TO trans'.(static::$transaction_counter + 1));
+            return true;
+        }
+
 		if (!$this->connection->rollback())
 			throw new DatabaseException($this);
 	}

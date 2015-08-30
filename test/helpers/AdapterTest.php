@@ -407,5 +407,34 @@ class AdapterTest extends DatabaseTest
 		$datetime = '2009-01-01';
 		$this->assert_equals($datetime,$this->conn->date_to_string(date_create($datetime)));
 	}
+
+
+    public function test_transaction_nested_commit()
+    {
+        $original = $this->conn->query_and_fetch_one("select count(*) from authors");
+
+        $this->conn->transaction();
+        $this->conn->query("insert into authors(author_id,name) values(9998,'blahhhhhhhh')");
+        // Nested
+        $this->conn->transaction();
+        $this->conn->query("insert into authors(author_id,name) values(9999,'blahhhhhhhh')");
+        $this->conn->commit();
+
+        // Another nested
+        try {
+            $this->conn->transaction();
+            $this->conn->query("insert into authors(author_id,name) values(9999,'blahhhhhhhh')"); // fails
+            $this->conn->commit();
+        }
+        catch (Exception $e)
+        {
+            $this->conn->rollback();
+        }
+
+        // Commit primary transaction
+        $this->conn->commit();
+
+        $this->assert_equals($original+2, $this->conn->query_and_fetch_one("select count(*) from authors"));
+    }
 }
 ?>
