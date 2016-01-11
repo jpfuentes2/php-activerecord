@@ -43,8 +43,16 @@ class DatabaseException extends ActiveRecordException
 		}
 		elseif ($adapter_or_string_or_mystery instanceof \PDOException)
 		{
+			if ($adapter_or_string_or_mystery->errorInfo)
+			{
+				$message = join(", ",$adapter_or_string_or_mystery->errorInfo);
+			}
+			else
+			{
+				$message = $adapter_or_string_or_mystery->getMessage();
+			}
 			parent::__construct(
-				join(", ",$adapter_or_string_or_mystery->errorInfo),
+				$message,
 				intval($adapter_or_string_or_mystery->getCode()),
 				$adapter_or_string_or_mystery);
 		}
