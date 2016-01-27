@@ -15,7 +15,7 @@ namespace ActiveRecord;
  */
 class Table
 {
-	private static $cache = array();
+	protected static $cache = array();
 
 	public $class;
 	public $conn;
@@ -60,7 +60,7 @@ class Table
 	/**
 	 * List of relationships for this table.
 	 */
-	private $relationships = array();
+	protected $relationships = array();
 
 	public static function load($model_class_name)
 	{
@@ -276,7 +276,7 @@ class Table
 	 * @param $includes array eager load directives
 	 * @return void
 	 */
-	private function execute_eager_load($models=array(), $attrs=array(), $includes=array())
+	protected function execute_eager_load($models=array(), $attrs=array(), $includes=array())
 	{
 		if (!is_array($includes))
 			$includes = array($includes);
@@ -386,12 +386,12 @@ class Table
 	 *
 	 * @param Relationship $relationship a Relationship object
 	 */
-	private function add_relationship($relationship)
+	protected function add_relationship($relationship)
 	{
 		$this->relationships[$relationship->attribute_name] = $relationship;
 	}
 
-	private function get_meta_data()
+	protected function get_meta_data()
 	{
 		// as more adapters are added probably want to do this a better way
 		// than using instanceof but gud enuff for now
@@ -409,7 +409,7 @@ class Table
 	 * @param $map array Hash of used_name => real_name
 	 * @return array Array with any aliases replaced with their read field name
 	 */
-	private function map_names(&$hash, &$map)
+	protected function map_names(&$hash, &$map)
 	{
 		$ret = array();
 
@@ -423,7 +423,7 @@ class Table
 		return $ret;
 	}
 
-	private function &process_data($hash)
+	protected function &process_data($hash)
 	{
 		if (!$hash)
 			return $hash;
@@ -443,7 +443,7 @@ class Table
 		return $hash;
 	}
 
-	private function set_primary_key()
+	protected function set_primary_key()
 	{
 		if (($pk = $this->class->getStaticPropertyValue('pk',null)) || ($pk = $this->class->getStaticPropertyValue('primary_key',null)))
 			$this->pk = is_array($pk) ? $pk : array($pk);
@@ -459,7 +459,7 @@ class Table
 		}
 	}
 
-	private function set_table_name()
+	protected function set_table_name()
 	{
 		if (($table = $this->class->getStaticPropertyValue('table',null)) || ($table = $this->class->getStaticPropertyValue('table_name',null)))
 			$this->table = $table;
@@ -477,7 +477,7 @@ class Table
 			$this->db_name = $db;
 	}
 
-	private function set_cache()
+	protected function set_cache()
 	{
 		if (!Cache::$adapter)
 			return;
@@ -494,7 +494,7 @@ class Table
 		}
 	}
 
-	private function set_sequence_name()
+	protected function set_sequence_name()
 	{
 		if (!$this->conn->supports_sequences())
 			return;
@@ -503,7 +503,7 @@ class Table
 			$this->sequence = $this->conn->get_sequence_name($this->table,$this->pk[0]);
 	}
 
-	private function set_associations()
+	protected function set_associations()
 	{
 		require_once __DIR__ . '/Relationship.php';
 		$namespace = $this->class->getNamespaceName();
@@ -551,7 +551,7 @@ class Table
 	 *       'to'       => 'delegate_to_relationship',
 	 *       'prefix'	=> 'prefix')
 	 */
-	private function set_delegates()
+	protected function set_delegates()
 	{
 		$delegates = $this->class->getStaticPropertyValue('delegate',array());
 		$new = array();
@@ -591,7 +591,7 @@ class Table
 	/**
 	 * @deprecated Model.php now checks for get|set_ methods via method_exists so there is no need for declaring static g|setters.
 	 */
-	private function set_setters_and_getters()
+	protected function set_setters_and_getters()
 	{
 		$getters = $this->class->getStaticPropertyValue('getters', array());
 		$setters = $this->class->getStaticPropertyValue('setters', array());

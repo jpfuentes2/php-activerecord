@@ -85,35 +85,35 @@ class Model
 	 *
 	 * @var array
 	 */
-	private $attributes = array();
+	protected $attributes = array();
 
 	/**
 	 * Flag whether or not this model's attributes have been modified since it will either be null or an array of column_names that have been modified
 	 *
 	 * @var array
 	 */
-	private $__dirty = null;
+	protected $__dirty = null;
 
 	/**
 	 * Flag that determines of this model can have a writer method invoked such as: save/update/insert/delete
 	 *
 	 * @var boolean
 	 */
-	private $__readonly = false;
+	protected $__readonly = false;
 
 	/**
 	 * Array of relationship objects as model_attribute_name => relationship
 	 *
 	 * @var array
 	 */
-	private $__relationships = array();
+	protected $__relationships = array();
 
 	/**
 	 * Flag that determines if a call to save() should issue an insert or an update sql statement
 	 *
 	 * @var boolean
 	 */
-	private $__new_record = true;
+	protected $__new_record = true;
 
 	/**
 	 * Set to the name of the connection this {@link Model} should use.
@@ -671,7 +671,7 @@ class Model
 	 * @param array $delegate An array containing delegate data
 	 * @return delegated attribute name or null
 	 */
-	private function is_delegated($name, &$delegate)
+	protected function is_delegated($name, &$delegate)
 	{
 		if ($delegate['prefix'] != '')
 			$name = substr($name,strlen($delegate['prefix'])+1);
@@ -708,7 +708,7 @@ class Model
 	 * @throws \ActiveRecord\ReadOnlyException
 	 * @param string $method_name Name of method that was invoked on model for exception message
 	 */
-	private function verify_not_readonly($method_name)
+	protected function verify_not_readonly($method_name)
 	{
 		if ($this->is_readonly())
 			throw new ReadOnlyException(get_class($this), $method_name);
@@ -797,7 +797,7 @@ class Model
 	 * @param boolean $validate Set to true or false depending on if you want the validators to run or not
 	 * @return boolean True if the model was saved to the database otherwise false
 	 */
-	private function insert($validate=true)
+	protected function insert($validate=true)
 	{
 		$this->verify_not_readonly('insert');
 
@@ -858,7 +858,7 @@ class Model
 	 * @param boolean $validate Set to true or false depending on if you want the validators to run or not
 	 * @return boolean True if the model was saved to the database otherwise false
 	 */
-	private function update($validate=true)
+	protected function update($validate=true)
 	{
 		$this->verify_not_readonly('update');
 
@@ -1077,7 +1077,7 @@ class Model
 	 *
 	 * @return boolean True if passed validators otherwise false
 	 */
-	private function _validate()
+	protected function _validate()
 	{
 		require_once 'Validations.php';
 
@@ -1195,7 +1195,7 @@ class Model
 	 * @param array $attributes An array in the form array(name => value, ...)
 	 * @param boolean $guard_attributes Flag of whether or not protected/non-accessible attributes should be guarded
 	 */
-	private function set_attributes_via_mass_assignment(array &$attributes, $guard_attributes)
+	protected function set_attributes_via_mass_assignment(array &$attributes, $guard_attributes)
 	{
 		//access uninflected columns since that is what we would have in result set
 		$table = static::table();
@@ -1861,7 +1861,7 @@ class Model
 	 * @param array $options Options array for the serializer
 	 * @return string Serialized representation of the model
 	 */
-	private function serialize($type, $options)
+	protected function serialize($type, $options)
 	{
 		require_once 'Serialization.php';
 		$class = "ActiveRecord\\{$type}Serializer";
@@ -1876,7 +1876,7 @@ class Model
 	 * @param boolean $must_exist Set to true to raise an exception if the callback does not exist.
 	 * @return boolean True if invoked or null if not
 	 */
-	private function invoke_callback($method_name, $must_exist=true)
+	protected function invoke_callback($method_name, $must_exist=true)
 	{
 		return static::table()->callback->invoke($this,$method_name,$must_exist);
 	}
