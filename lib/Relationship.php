@@ -168,7 +168,16 @@ abstract class AbstractRelationship implements InterfaceRelationship
 			}
 			$options['joins'] = $this->construct_inner_join_sql($through_table, true);
 
-			$query_key = $this->primary_key[0];
+			// Copy over the foreign key from the association
+			if( !isset( $options['select'] ) ) {
+				$options['select'] = $this->get_table()->get_fully_qualified_table_name(). '.*';
+			}
+
+			$options['select'] .= ", " . $through_table->get_fully_qualified_table_name();
+			$options['select'] .= ".{$fk[0]} AS {$fk[0]}";
+
+			// Changed from $this->primary_key[0]
+			$query_key = $fk[0];
 
 			// reset keys
 			$this->primary_key = $pk;
