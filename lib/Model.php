@@ -918,7 +918,7 @@ class Model
 	 * Delete all using a string:
 	 *
 	 * <code>
-	 * YourModel::delete_all(array('conditions' => 'name = "Tito"));
+	 * YourModel::delete_all(array('conditions' => 'name = "Tito"'));
 	 * </code>
 	 *
 	 * An options array takes the following parameters:
