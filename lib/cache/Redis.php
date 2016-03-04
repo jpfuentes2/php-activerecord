@@ -61,7 +61,14 @@ class Redis
 	 */
 	public function write($key, $value, $expire)
 	{
-		$this->adapter->setex($key, $expire, serialize($value));
+		if ($expire)
+		{
+			$this->adapter->setex($key, $expire, serialize($value));
+		}
+		else
+		{
+			$this->adapter->set($key, serialize($value));
+		}
 	}
 
 	/**
