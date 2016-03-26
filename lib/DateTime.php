@@ -147,4 +147,29 @@ class DateTime extends \DateTime
 		$this->flag_dirty();
 		call_user_func_array(array($this,'parent::setTimestamp'),func_get_args());
 	}
+
+	public function setTimezone(\DateTimeZone $timezone)
+	{
+		$this->flag_dirty();
+		call_user_func_array(array($this,'parent::setTimezone'),func_get_args());
+	}
+	
+	public function modify($modify)
+	{
+		$this->flag_dirty();
+		call_user_func_array(array($this,'parent::modify'),func_get_args());
+	}
+	
+	public function add(\DateInterval $interval)
+	{
+		$this->flag_dirty();
+		call_user_func_array(array($this,'parent::add'),func_get_args());
+	}
+
+	public function sub(\DateInterval $interval)
+	{
+		$this->flag_dirty();
+		call_user_func_array(array($this,'parent::sub'),func_get_args());
+	}
+
 }
