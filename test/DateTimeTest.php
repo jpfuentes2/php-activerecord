@@ -38,6 +38,11 @@ class DateTimeTest extends SnakeCase_PHPUnit_Framework_TestCase
 		$this->assert_dirtifies('setISODate',2001,1);
 		$this->assert_dirtifies('setTime',1,1);
 		$this->assert_dirtifies('setTimestamp',1);
+		$this->assert_dirtifies('setTimezone',1);
+		$this->assert_dirtifies('modify','+1 day');
+		$interval = new DateInterval('PT1S');
+		$this->assert_dirtifies('add',$interval);
+		$this->assert_dirtifies('sub',$interval);
 	}
 
 	public function test_set_iso_date()

@@ -127,49 +127,49 @@ class DateTime extends \DateTime
 	public function setDate($year, $month, $day)
 	{
 		$this->flag_dirty();
-		call_user_func_array(array($this,'parent::setDate'),func_get_args());
+		return parent::setDate($year, $month, $day);
 	}
 
 	public function setISODate($year, $week , $day=null)
 	{
 		$this->flag_dirty();
-		call_user_func_array(array($this,'parent::setISODate'),func_get_args());
+		return parent::setISODate($year, $week, $day);
 	}
 
 	public function setTime($hour, $minute, $second=null)
 	{
 		$this->flag_dirty();
-		call_user_func_array(array($this,'parent::setTime'),func_get_args());
+		return parent::setTime($hour, $minute, $second);
 	}
 
 	public function setTimestamp($unixtimestamp)
 	{
 		$this->flag_dirty();
-		call_user_func_array(array($this,'parent::setTimestamp'),func_get_args());
+		return parent::setTimestamp($unixtimestamp);
 	}
 
 	public function setTimezone(\DateTimeZone $timezone)
 	{
 		$this->flag_dirty();
-		call_user_func_array(array($this,'parent::setTimezone'),func_get_args());
+		return parent::setTimezone($timezone);
 	}
 	
 	public function modify($modify)
 	{
 		$this->flag_dirty();
-		call_user_func_array(array($this,'parent::modify'),func_get_args());
+		return parent::modify($modify);
 	}
 	
 	public function add(\DateInterval $interval)
 	{
 		$this->flag_dirty();
-		call_user_func_array(array($this,'parent::add'),func_get_args());
+		return parent::add($interval);
 	}
 
 	public function sub(\DateInterval $interval)
 	{
 		$this->flag_dirty();
-		call_user_func_array(array($this,'parent::sub'),func_get_args());
+		return parent::sub($interval);
 	}
 
 }
