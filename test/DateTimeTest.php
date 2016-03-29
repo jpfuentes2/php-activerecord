@@ -34,13 +34,14 @@ class DateTimeTest extends SnakeCase_PHPUnit_Framework_TestCase
 
 	public function test_should_flag_the_attribute_dirty()
 	{
+		$interval = new DateInterval('PT1S');
+		$timezone = new DateTimeZone('America/New_York');
 		$this->assert_dirtifies('setDate',2001,1,1);
 		$this->assert_dirtifies('setISODate',2001,1);
 		$this->assert_dirtifies('setTime',1,1);
 		$this->assert_dirtifies('setTimestamp',1);
-		$this->assert_dirtifies('setTimezone',1);
+		$this->assert_dirtifies('setTimezone',$timezone);
 		$this->assert_dirtifies('modify','+1 day');
-		$interval = new DateInterval('PT1S');
 		$this->assert_dirtifies('add',$interval);
 		$this->assert_dirtifies('sub',$interval);
 	}

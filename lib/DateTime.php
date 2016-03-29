@@ -148,7 +148,7 @@ class DateTime extends \DateTime
 		return parent::setTimestamp($unixtimestamp);
 	}
 
-	public function setTimezone(\DateTimeZone $timezone)
+	public function setTimezone($timezone)
 	{
 		$this->flag_dirty();
 		return parent::setTimezone($timezone);
@@ -160,13 +160,13 @@ class DateTime extends \DateTime
 		return parent::modify($modify);
 	}
 	
-	public function add(\DateInterval $interval)
+	public function add($interval)
 	{
 		$this->flag_dirty();
 		return parent::add($interval);
 	}
 
-	public function sub(\DateInterval $interval)
+	public function sub($interval)
 	{
 		$this->flag_dirty();
 		return parent::sub($interval);
