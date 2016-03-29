@@ -130,13 +130,13 @@ class DateTime extends \DateTime
 		return parent::setDate($year, $month, $day);
 	}
 
-	public function setISODate($year, $week , $day=null)
+	public function setISODate($year, $week , $day = 1)
 	{
 		$this->flag_dirty();
 		return parent::setISODate($year, $week, $day);
 	}
 
-	public function setTime($hour, $minute, $second=null)
+	public function setTime($hour, $minute, $second = 0)
 	{
 		$this->flag_dirty();
 		return parent::setTime($hour, $minute, $second);
