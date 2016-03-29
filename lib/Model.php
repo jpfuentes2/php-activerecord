@@ -918,7 +918,7 @@ class Model
 	 * Delete all using a string:
 	 *
 	 * <code>
-	 * YourModel::delete_all(array('conditions' => 'name = "Tito"));
+	 * YourModel::delete_all(array('conditions' => 'name = "Tito"'));
 	 * </code>
 	 *
 	 * An options array takes the following parameters:
@@ -1645,6 +1645,11 @@ class Model
 	 */
 	public static function find_by_pk($values, $options)
 	{
+		if($values===null)
+		{
+			throw new RecordNotFound("Couldn't find ".get_called_class()." without an ID");
+		}
+
 		$table = static::table();
 
 		if($table->cache_individual_model)
@@ -1662,16 +1667,14 @@ class Model
 		if ($results != ($expected = count($values)))
 		{
 			$class = get_called_class();
+			if (is_array($values))
+				$values = join(',',$values);
 
 			if ($expected == 1)
 			{
-				if (!is_array($values))
-					$values = array($values);
-
-				throw new RecordNotFound("Couldn't find $class with ID=" . join(',',$values));
+				throw new RecordNotFound("Couldn't find $class with ID=$values");
 			}
 
-			$values = join(',',$values);
 			throw new RecordNotFound("Couldn't find all $class with IDs ($values) (found $results, but was looking for $expected)");
 		}
 		return $expected == 1 ? $list[0] : $list;

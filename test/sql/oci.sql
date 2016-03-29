@@ -41,7 +41,7 @@ CREATE TABLE venues (
 CREATE SEQUENCE events_seq;
 CREATE TABLE events (
   id INT NOT NULL PRIMARY KEY,
-  venue_id int NOT NULL,
+  venue_id int NULL,
   host_id int NOT NULL,
   title varchar(60) NOT NULL,
   description varchar(10),

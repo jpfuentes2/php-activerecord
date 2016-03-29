@@ -505,7 +505,7 @@ class Table
 
 	private function set_associations()
 	{
-		require_once 'Relationship.php';
+		require_once __DIR__ . '/Relationship.php';
 		$namespace = $this->class->getNamespaceName();
 
 		foreach ($this->class->getStaticProperties() as $name => $definitions)
@@ -516,7 +516,7 @@ class Table
 			foreach (wrap_strings_in_arrays($definitions) as $definition)
 			{
 				$relationship = null;
-				$definition += compact('namespace');
+				$definition += array('namespace' => $namespace);
 
 				switch ($name)
 				{

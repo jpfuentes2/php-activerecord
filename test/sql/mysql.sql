@@ -38,7 +38,7 @@ CREATE TABLE venues (
 
 CREATE TABLE events (
 	id int NOT NULL auto_increment PRIMARY KEY,
-	venue_id int NOT NULL,
+	venue_id int NULL,
 	host_id int NOT NULL,
 	title varchar(60) NOT NULL,
 	description varchar(50),

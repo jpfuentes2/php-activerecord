@@ -199,6 +199,31 @@ class ValidatesLengthOfTest extends DatabaseTest
 		$this->fail('An expected exception has not be raised.');
 	}
 
+    public function test_not_array_as_impossible_range_option()
+    {
+        BookLength::$validates_length_of[0]['within'] = 'string';
+        $book = new BookLength;
+        $book->name = '123';
+        try {
+            $book->save();
+        } catch (ActiveRecord\ValidationsArgumentError $e) {
+            $this->assert_equals('within must be an array composing a range of numbers with key [0] being less than key [1]', $e->getMessage());
+        }
+
+        $this->set_up();
+        BookLength::$validates_length_of[0]['in'] = 'string';
+        $book = new BookLength;
+        $book->name = '123';
+        try {
+            $book->save();
+        } catch (ActiveRecord\ValidationsArgumentError $e) {
+            $this->assert_equals('in must be an array composing a range of numbers with key [0] being less than key [1]', $e->getMessage());
+            return;
+        }
+
+        $this->fail('An expected exception has not be raised.');
+    }
+
 	public function test_signed_integer_as_impossible_is_option()
 	{
 		BookLength::$validates_length_of[0]['is'] = -8;
