@@ -526,11 +526,20 @@ class ActiveRecordTest extends DatabaseTest
 		$this->assert_true($event->attribute_is_dirty('title'));
 	}
 
-	public function test_assigning_php_datetime_gets_converted_to_ar_datetime()
+	public function test_assigning_php_datetime_gets_converted_to_date_class_with_defaults()
 	{
 		$author = new Author();
 		$author->created_at = $now = new \DateTime();
-		$this->assert_is_a("ActiveRecord\\DateTime",$author->created_at);
+		$this->assert_is_a("ActiveRecord\\DateTime", $author->created_at);
+		$this->assert_datetime_equals($now,$author->created_at);
+	}
+
+	public function test_assigning_php_datetime_gets_converted_to_date_class_with_custom_date_class()
+	{
+		ActiveRecord\Config::instance()->set_date_class('\\DateTime'); // use PHP built-in DateTime
+		$author = new Author();
+		$author->created_at = $now = new \DateTime();
+		$this->assert_is_a("DateTime", $author->created_at);
 		$this->assert_datetime_equals($now,$author->created_at);
 	}
 

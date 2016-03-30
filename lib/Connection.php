@@ -469,7 +469,7 @@ abstract class Connection
 	 * Converts a string representation of a datetime into a DateTime object.
 	 *
 	 * @param string $string A datetime in the form accepted by date_create()
-	 * @return DateTime
+	 * @return object The date_class set in Config
 	 */
 	public function string_to_datetime($string)
 	{
@@ -479,7 +479,8 @@ abstract class Connection
 		if ($errors['warning_count'] > 0 || $errors['error_count'] > 0)
 			return null;
 
-		return new DateTime($date->format(static::$datetime_format));
+		$date_class = Config::instance()->get_date_class();
+		return $date_class::createFromFormat(static::$datetime_format, $date->format(static::$datetime_format));
 	}
 
 	/**
