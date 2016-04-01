@@ -480,7 +480,7 @@ class Model
 		}
 
 		// convert php's \DateTime to ours
-		if ($value instanceof \DateTime)
+		if (!($value instanceof DateTime) && $value instanceof \DateTime)
 			$value = new DateTime($value->format('Y-m-d H:i:s T'));
 
 		// make sure DateTime values know what model they belong to so
@@ -938,7 +938,7 @@ class Model
 	 * Delete all using a string:
 	 *
 	 * <code>
-	 * YourModel::delete_all(array('conditions' => 'name = "Tito"));
+	 * YourModel::delete_all(array('conditions' => 'name = "Tito"'));
 	 * </code>
 	 *
 	 * An options array takes the following parameters:
