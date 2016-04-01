@@ -33,7 +33,7 @@ namespace ActiveRecord;
  * @package ActiveRecord
  * @see http://php.net/manual/en/class.datetime.php
  */
-class DateTime extends \DateTime
+class DateTime extends \DateTime implements DateTimeLinkedModelInterface
 {
 	/**
 	 * Default format used for format() and __toString()
@@ -111,6 +111,21 @@ class DateTime extends \DateTime
 
 		// raw format
 		return $format;
+	}
+
+	/**
+	 * This needs to be overriden so it returns an instance of this class instead of PHP's \DateTime.
+	 * See http://php.net/manual/en/datetime.createfromformat.php
+	 */
+	public static function createFromFormat($format, $time, $tz = null)
+	{
+		$phpDate = $tz ? parent::createFromFormat($format, $time, $tz) : parent::createFromFormat($format, $time);
+		if (!$phpDate)
+			return false;
+		// convert to this class using the timestamp
+		$ourDate = new static;
+		$ourDate->setTimestamp($phpDate->getTimestamp());
+		return $ourDate;
 	}
 
 	public function __toString()
