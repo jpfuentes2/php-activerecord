@@ -461,7 +461,7 @@ class Model
 
 		// convert php's \DateTime to ours
 		if (!($value instanceof DateTime) && $value instanceof \DateTime)
-			$value = new DateTime($value->format('Y-m-d H:i:s T'));
+			$value = new DateTime($value->format('Y-m-d H:i:s'), $value->getTimezone());
 
 		// make sure DateTime values know what model they belong to so
 		// dirty stuff works when calling set methods on the DateTime object
