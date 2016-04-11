@@ -460,9 +460,9 @@ class Model
 		}
 
 		// convert php's \DateTime to ours
-		if (is_object($value) && get_class($value) === 'DateTime') {
+		if ($value instanceof \DateTime) {
 			$date_class = Config::instance()->get_date_class();
-			if ($date_class !== 'DateTime')
+			if (!($value instanceof $date_class))
 				$value = $date_class::createFromFormat('Y-m-d H:i:s T', $value->format('Y-m-d H:i:s T'));
 		}
 
