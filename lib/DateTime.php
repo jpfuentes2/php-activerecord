@@ -33,7 +33,7 @@ namespace ActiveRecord;
  * @package ActiveRecord
  * @see http://php.net/manual/en/class.datetime.php
  */
-class DateTime extends \DateTime implements DateTimeLinkedModelInterface
+class DateTime extends \DateTime implements DateTimeInterface
 {
 	/**
 	 * Default format used for format() and __toString()

@@ -466,7 +466,7 @@ class Model
 				$value = $date_class::createFromFormat('Y-m-d H:i:s T', $value->format('Y-m-d H:i:s T'));
 		}
 
-		if ($value instanceof DateTimeLinkedModelInterface)
+		if ($value instanceof DateTimeInterface)
 			// Tell the Date object that it's associated with this model and attribute. This is so it
 			// has the ability to flag this model as dirty if a field in the Date object changes.
 			$value->attribute_of($this,$name);
