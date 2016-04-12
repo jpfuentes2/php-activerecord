@@ -24,7 +24,7 @@ abstract class Singleton
 	/**
 	 * Static method for instantiating a singleton object.
 	 *
-	 * @return object
+	 * @return static
 	 */
 	final public static function instance()
 	{

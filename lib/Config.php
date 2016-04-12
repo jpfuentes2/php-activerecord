@@ -73,6 +73,13 @@ class Config extends Singleton
 	private $logger;
 
 	/**
+	 * Log level used by query logger. Defaults to "info"
+	 *
+	 * @var string
+	 */
+	private $log_level = 'info';
+
+	/**
 	 * The format to serialize DateTime values into.
 	 *
 	 * @var string
@@ -120,7 +127,7 @@ class Config extends Singleton
 	 * @param array $connections Array of connections
 	 * @param string $default_connection Optionally specify the default_connection
 	 * @return void
-	 * @throws ActiveRecord\ConfigException
+	 * @throws \ActiveRecord\ConfigException
 	 */
 	public function set_connections($connections, $default_connection=null)
 	{
@@ -226,6 +233,37 @@ class Config extends Singleton
 	}
 
 	/**
+	 * Return whether or not logging is on
+	 *
+	 * @return boolean
+	 */
+	public function get_logging()
+	{
+		return $this->logging;
+	}
+
+	/**
+	 * Configures the log level used by SQL logs.
+	 *
+	 * @param boolean $level
+	 * @return string
+	 */
+	public function set_log_level($level)
+	{
+		$this->log_level = $level;
+	}
+
+	/**
+	 * Return the log level used by SQL logs.
+	 *
+	 * @return string
+	 */
+	public function get_log_level()
+	{
+		return $this->log_level;
+	}
+
+	/**
 	 * Sets the logger object for future SQL logging
 	 *
 	 * @param object $logger
@@ -243,16 +281,6 @@ class Config extends Singleton
 	}
 
 	/**
-	 * Return whether or not logging is on
-	 *
-	 * @return boolean
-	 */
-	public function get_logging()
-	{
-		return $this->logging;
-	}
-
-	/**
 	 * Returns the logger
 	 *
 	 * @return object
@@ -260,6 +288,23 @@ class Config extends Singleton
 	public function get_logger()
 	{
 		return $this->logger;
+	}
+
+	public function set_log_options(array $options)
+	{
+		foreach($options as $key => $value) {
+			switch ($key) {
+				case 'logging':
+				case 'log_level':
+				case 'logger':
+					$this->{'set_'.$key}($value);
+				break;
+
+				default:
+					throw new \InvalidArgumentException("Unrecognized ActiveRecord log option: '$key'");
+				break;
+			}
+		}
 	}
 
 	/**

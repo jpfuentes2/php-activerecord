@@ -43,6 +43,11 @@ abstract class Connection
 	 */
 	private $logger;
 	/**
+	 * Default log level used by the logger. Defaults to 'info'
+	 * @var string
+	 */
+	private $log_level = 'info';
+	/**
 	 * The name of the protocol that is used.
 	 * @var string
 	 */
@@ -112,6 +117,7 @@ abstract class Connection
 			$connection->protocol = $info->protocol;
 			$connection->logging = $config->get_logging();
 			$connection->logger = $connection->logging ? $config->get_logger() : null;
+			$connection->log_level = $connection->logging ? $config->get_log_level() : null;
 
 			if (isset($info->charset))
 				$connection->set_encoding($info->charset);
@@ -303,8 +309,9 @@ abstract class Connection
 	{
 		if ($this->logging)
 		{
-			$this->logger->log($sql);
-			if ( $values ) $this->logger->log($values);
+			$msg = "[SQL] \"$sql\"";
+			if ($values) $msg .= ' with values: '.var_export($values, true);
+			$this->logger->log($this->log_level, $msg);
 		}
 
 		$this->last_query = $sql;
