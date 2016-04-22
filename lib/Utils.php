@@ -239,7 +239,7 @@ class Utils
         '/(bu)s$/i'                => "$1ses",
         '/(alias)$/i'              => "$1es",
         '/(octop)us$/i'            => "$1i",
-        '/(ax|test)is$/i'          => "$1es",
+        '/(cris|ax|test)is$/i'     => "$1es",
         '/(us)$/i'                 => "$1es",
         '/s$/i'                    => "s",
         '/$/'                      => "s"
