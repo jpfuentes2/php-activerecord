@@ -129,5 +129,23 @@ class DateTimeTest extends SnakeCase_PHPUnit_Framework_TestCase
 	{
 		$this->assert_equals(date(DateTime::get_format()), "" . $this->date);
 	}
+
+	public function test_create_from_format_error_handling()
+	{
+		$d = DateTime::createFromFormat('H:i:s Y-d-m', '!!!');
+		$this->assert_false($d);
+	}
+
+	public function test_create_from_format_without_tz()
+	{
+		$d = DateTime::createFromFormat('H:i:s Y-d-m', '03:04:05 2000-02-01');
+		$this->assert_equals(new DateTime('2000-01-02 03:04:05'), $d);
+	}
+
+	public function test_create_from_format_with_tz()
+	{
+		$d = DateTime::createFromFormat('Y-m-d H:i:s', '2000-02-01 03:04:05', new \DateTimeZone('Etc/GMT-10'));
+		$this->assert_equals(new DateTime('2000-01-31 17:04:05'), $d);
+	}
 }
 ?>

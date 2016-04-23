@@ -460,12 +460,15 @@ class Model
 		}
 
 		// convert php's \DateTime to ours
-		if (!($value instanceof DateTime) && $value instanceof \DateTime)
-			$value = new DateTime($value->format('Y-m-d H:i:s'), $value->getTimezone());
+		if ($value instanceof \DateTime) {
+			$date_class = Config::instance()->get_date_class();
+			if (!($value instanceof $date_class))
+				$value = $date_class::createFromFormat('Y-m-d H:i:s T', $value->format('Y-m-d H:i:s T'), $value->getTimezone());
+		}
 
-		// make sure DateTime values know what model they belong to so
-		// dirty stuff works when calling set methods on the DateTime object
-		if ($value instanceof DateTime)
+		if ($value instanceof DateTimeInterface)
+			// Tell the Date object that it's associated with this model and attribute. This is so it
+			// has the ability to flag this model as dirty if a field in the Date object changes.
 			$value->attribute_of($this,$name);
 
 		$this->attributes[$name] = $value;
