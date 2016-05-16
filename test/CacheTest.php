@@ -74,9 +74,20 @@ class CacheTest extends SnakeCase_PHPUnit_Framework_TestCase
 	
 	public function test_namespace_is_set_properly()
 	{
-	  Cache::$options['namespace'] = 'myapp';
-	  $this->cache_get();
-	  $this->assert_same("abcd", Cache::$adapter->read("myapp::1337"));
+		Cache::$options['namespace'] = 'myapp';
+		$this->cache_get();
+		$this->assert_same("abcd", Cache::$adapter->read("myapp::1337"));
+	}
+
+	/**
+	 * @expectedException ActiveRecord\CacheException
+	 */
+	public function test_exception_when_connect_fails()
+	{
+		$stub = $this->getMockBuilder('ActiveRecord\Memcache')
+			->setMethods(array('connect'))
+			->setConstructorArgs(array(array('host' => '127.0.0.1')))
+			->getMock();
 	}
 }
 ?>
