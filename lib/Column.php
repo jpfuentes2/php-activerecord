@@ -171,6 +171,9 @@ class Column
 					return $value;
 
 				if ($value instanceof \DateTime)
+					// NOTE!: The DateTime "format" used must not include a time-zone (name, abbreviation, etc) or offset.
+					// Including one will cause PHP to ignore the passed in time-zone in the 3rd argument.
+					// See bug: https://bugs.php.net/bug.php?id=61022
 					return $date_class::createFromFormat('Y-m-d H:i:s', $value->format('Y-m-d H:i:s'), $value->getTimezone());
 
 				return $connection->string_to_datetime($value);
