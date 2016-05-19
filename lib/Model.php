@@ -463,10 +463,11 @@ class Model
 		if ($value instanceof \DateTime) {
 			$date_class = Config::instance()->get_date_class();
 			if (!($value instanceof $date_class))
-				// NOTE!: The DateTime "format" used must not include a time-zone (name, abbreviation, etc) or offset.
-				// Including one will cause PHP to ignore the passed in time-zone in the 3rd argument.
-				// See bug: https://bugs.php.net/bug.php?id=61022
-				$value = $date_class::createFromFormat('Y-m-d H:i:s', $value->format('Y-m-d H:i:s'), $value->getTimezone());
+				$value = $date_class::createFromFormat(
+					Connection::DATETIME_TRANSLATE_FORMAT,
+					$value->format(Connection::DATETIME_TRANSLATE_FORMAT),
+					$value->getTimezone()
+				);
 		}
 
 		if ($value instanceof DateTimeInterface)
