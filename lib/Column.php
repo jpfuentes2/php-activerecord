@@ -171,7 +171,7 @@ class Column
 					return $value;
 
 				if ($value instanceof \DateTime)
-					return $date_class::createFromFormat('Y-m-d H:i:s T', $value->format('Y-m-d H:i:s T'), $value->getTimezone());
+					return $date_class::createFromFormat('Y-m-d H:i:s', $value->format('Y-m-d H:i:s'), $value->getTimezone());
 
 				return $connection->string_to_datetime($value);
 		}

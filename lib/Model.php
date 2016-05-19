@@ -463,7 +463,7 @@ class Model
 		if ($value instanceof \DateTime) {
 			$date_class = Config::instance()->get_date_class();
 			if (!($value instanceof $date_class))
-				$value = $date_class::createFromFormat('Y-m-d H:i:s T', $value->format('Y-m-d H:i:s T'), $value->getTimezone());
+				$value = $date_class::createFromFormat('Y-m-d H:i:s', $value->format('Y-m-d H:i:s'), $value->getTimezone());
 		}
 
 		if ($value instanceof DateTimeInterface)
