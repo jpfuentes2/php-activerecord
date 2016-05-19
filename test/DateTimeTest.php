@@ -145,7 +145,9 @@ class DateTimeTest extends SnakeCase_PHPUnit_Framework_TestCase
 	public function test_create_from_format_with_tz()
 	{
 		$d = DateTime::createFromFormat('Y-m-d H:i:s', '2000-02-01 03:04:05', new \DateTimeZone('Etc/GMT-10'));
-		$this->assert_equals(new DateTime('2000-01-31 17:04:05'), $d);
+		$d2 = new DateTime('2000-01-31 17:04:05');
+
+		$this->assert_equals($d2->getTimestamp(), $d->getTimestamp());
 	}
 
 	public function test_native_date_time_attribute_copies_exact_tz()
