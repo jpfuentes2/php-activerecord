@@ -21,6 +21,17 @@ abstract class Connection
 {
 
 	/**
+	 * The DateTime format to use when translating other DateTime-compatible objects.
+	 *
+	 * NOTE!: The DateTime "format" used must not include a time-zone (name, abbreviation, etc) or offset.
+	 * Including one will cause PHP to ignore the passed in time-zone in the 3rd argument.
+	 * See bug: https://bugs.php.net/bug.php?id=61022
+	 *
+	 * @var string
+	 */
+	const DATETIME_TRANSLATE_FORMAT = 'Y-m-d\TH:i:s';
+
+	/**
 	 * The PDO connection object.
 	 * @var mixed
 	 */
@@ -480,7 +491,12 @@ abstract class Connection
 			return null;
 
 		$date_class = Config::instance()->get_date_class();
-		return $date_class::createFromFormat(static::$datetime_format, $date->format(static::$datetime_format));
+
+		return $date_class::createFromFormat(
+			static::DATETIME_TRANSLATE_FORMAT,
+			$date->format(static::DATETIME_TRANSLATE_FORMAT),
+			$date->getTimezone()
+		);
 	}
 
 	/**
