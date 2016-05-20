@@ -145,7 +145,37 @@ class DateTimeTest extends SnakeCase_PHPUnit_Framework_TestCase
 	public function test_create_from_format_with_tz()
 	{
 		$d = DateTime::createFromFormat('Y-m-d H:i:s', '2000-02-01 03:04:05', new \DateTimeZone('Etc/GMT-10'));
-		$this->assert_equals(new DateTime('2000-01-31 17:04:05'), $d);
+		$d2 = new DateTime('2000-01-31 17:04:05');
+
+		$this->assert_equals($d2->getTimestamp(), $d->getTimestamp());
+	}
+
+	public function test_native_date_time_attribute_copies_exact_tz()
+	{
+		$dt = new \DateTime(null, new \DateTimeZone('America/New_York'));
+		$model = new Author();
+
+		// Test that the data transforms without modification
+		$model->assign_attribute('updated_at', $dt);
+		$dt2 = $model->read_attribute('updated_at');
+
+		$this->assert_equals($dt->getTimestamp(), $dt2->getTimestamp());
+		$this->assert_equals($dt->getTimeZone(), $dt2->getTimeZone());
+		$this->assert_equals($dt->getTimeZone()->getName(), $dt2->getTimeZone()->getName());
+	}
+
+	public function test_ar_date_time_attribute_copies_exact_tz()
+	{
+		$dt = new DateTime(null, new \DateTimeZone('America/New_York'));
+		$model = new Author();
+
+		// Test that the data transforms without modification
+		$model->assign_attribute('updated_at', $dt);
+		$dt2 = $model->read_attribute('updated_at');
+
+		$this->assert_equals($dt->getTimestamp(), $dt2->getTimestamp());
+		$this->assert_equals($dt->getTimeZone(), $dt2->getTimeZone());
+		$this->assert_equals($dt->getTimeZone()->getName(), $dt2->getTimeZone()->getName());
 	}
 }
 ?>
