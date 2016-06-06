@@ -196,16 +196,20 @@ class DateTimeTest extends SnakeCase_PHPUnit_Framework_TestCase
 
 		$cloned_datetime = clone $datetime;
 
+		// Assert initial state
 		$this->assert_false($model->attribute_is_dirty($model_attribute));
 
 		$cloned_datetime->add(new DateInterval('PT1S'));
 
+		// Assert that modifying the cloned object didn't flag the model
 		$this->assert_false($model->attribute_is_dirty($model_attribute));
 
 		$datetime->add(new DateInterval('PT1S'));
 
+		// Assert that modifying the model-attached object did flag the model
 		$this->assert_true($model->attribute_is_dirty($model_attribute));
 
+		// Assert that the dates are equal but not the same instance
 		$this->assert_equals($datetime, $cloned_datetime);
 		$this->assert_not_same($datetime, $cloned_datetime);
 	}
