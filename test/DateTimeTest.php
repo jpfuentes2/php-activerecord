@@ -1,6 +1,6 @@
 <?php
-use ActiveRecord\DateTime as DateTime;
 use ActiveRecord\DatabaseException;
+use ActiveRecord\DateTime as DateTime;
 
 class DateTimeTest extends SnakeCase_PHPUnit_Framework_TestCase
 {
@@ -15,13 +15,20 @@ class DateTimeTest extends SnakeCase_PHPUnit_Framework_TestCase
 		DateTime::$DEFAULT_FORMAT = $this->original_format;
 	}
 
-	private function assert_dirtifies($method /*, method params, ...*/)
+	private function get_model()
 	{
 		try {
 			$model = new Author();
 		} catch (DatabaseException $e) {
 			$this->mark_test_skipped('failed to connect. '.$e->getMessage());
 		}
+
+		return $model;
+	}
+
+	private function assert_dirtifies($method /*, method params, ...*/)
+	{
+		$model = $this->get_model();
 		$datetime = new DateTime();
 		$datetime->attribute_of($model,'some_date');
 
@@ -153,7 +160,7 @@ class DateTimeTest extends SnakeCase_PHPUnit_Framework_TestCase
 	public function test_native_date_time_attribute_copies_exact_tz()
 	{
 		$dt = new \DateTime(null, new \DateTimeZone('America/New_York'));
-		$model = new Author();
+		$model = $this->get_model();
 
 		// Test that the data transforms without modification
 		$model->assign_attribute('updated_at', $dt);
@@ -167,7 +174,7 @@ class DateTimeTest extends SnakeCase_PHPUnit_Framework_TestCase
 	public function test_ar_date_time_attribute_copies_exact_tz()
 	{
 		$dt = new DateTime(null, new \DateTimeZone('America/New_York'));
-		$model = new Author();
+		$model = $this->get_model();
 
 		// Test that the data transforms without modification
 		$model->assign_attribute('updated_at', $dt);
@@ -176,6 +183,34 @@ class DateTimeTest extends SnakeCase_PHPUnit_Framework_TestCase
 		$this->assert_equals($dt->getTimestamp(), $dt2->getTimestamp());
 		$this->assert_equals($dt->getTimeZone(), $dt2->getTimeZone());
 		$this->assert_equals($dt->getTimeZone()->getName(), $dt2->getTimeZone()->getName());
+	}
+
+	public function test_clone()
+	{
+		$model = $this->get_model();
+		$model_attribute = 'some_date';
+
+		$datetime = new DateTime();
+		$datetime->attribute_of($model, $model_attribute);
+
+		$cloned_datetime = clone $datetime;
+
+		// Assert initial state
+		$this->assert_false($model->attribute_is_dirty($model_attribute));
+
+		$cloned_datetime->add(new DateInterval('PT1S'));
+
+		// Assert that modifying the cloned object didn't flag the model
+		$this->assert_false($model->attribute_is_dirty($model_attribute));
+
+		$datetime->add(new DateInterval('PT1S'));
+
+		// Assert that modifying the model-attached object did flag the model
+		$this->assert_true($model->attribute_is_dirty($model_attribute));
+
+		// Assert that the dates are equal but not the same instance
+		$this->assert_equals($datetime, $cloned_datetime);
+		$this->assert_not_same($datetime, $cloned_datetime);
 	}
 }
 ?>
