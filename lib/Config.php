@@ -244,8 +244,8 @@ class Config extends Singleton
 	{
 		$klass = Reflections::instance()->add($logger)->get($logger);
 
-		if (!$klass->getMethod('log') || !$klass->getMethod('log')->isPublic())
-			throw new ConfigException("Logger object must implement a public log method");
+		if (!$klass->getMethod('debug') || !$klass->getMethod('debug')->isPublic())
+			throw new ConfigException("Logger object must implement a public debug method");
 
 		$this->logger = $logger;
 	}
