@@ -50,7 +50,7 @@ abstract class AbstractRelationship implements InterfaceRelationship
 	 *
 	 * @var array
 	 */
-	protected $options = array();
+	public $options = array();
 
 	/**
 	 * Is the relationship single or multi.
