@@ -762,7 +762,7 @@ class Model
 	 * @param array $attributes Array of the models attributes
 	 * @param boolean $validate True if the validators should be run
 	 * @param boolean $guard_attributes Set to true to guard protected/non-accessible attributes
-	 * @return Model
+	 * @return $this
 	 */
 	public static function create($attributes, $validate=true, $guard_attributes=true)
 	{
@@ -1430,7 +1430,7 @@ class Model
 	 * Alias for self::find('all').
 	 *
 	 * @see find
-	 * @return array array of records found
+	 * @return $this[] array of records found
 	 */
 	public static function all(/* ... */)
 	{
@@ -1488,7 +1488,7 @@ class Model
 	 * Alias for self::find('first').
 	 *
 	 * @see find
-	 * @return Model The first matched record or null if not found
+	 * @return $this The first matched record or null if not found
 	 */
 	public static function first(/* ... */)
 	{
@@ -1499,7 +1499,7 @@ class Model
 	 * Alias for self::find('last')
 	 *
 	 * @see find
-	 * @return Model The last matched record or null if not found
+	 * @return $this The last matched record or null if not found
 	 */
 	public static function last(/* ... */)
 	{
@@ -1690,7 +1690,7 @@ class Model
 	 *
 	 * @param string $sql The raw SELECT query
 	 * @param array $values An array of values for any parameters that needs to be bound
-	 * @return array An array of models
+	 * @return $this[] An array of models
 	 */
 	public static function find_by_sql($sql, $values=null)
 	{
