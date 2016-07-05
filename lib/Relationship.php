@@ -725,4 +725,13 @@ class BelongsTo extends AbstractRelationship
 	{
 		$this->query_and_attach_related_models_eagerly($table,$models,$attributes,$includes, $this->primary_key,$this->foreign_key);
 	}
+
+	// Unlike the other relationships, a belongs_to stores its foreign key on the associate (and not
+	// on the new record). Therewfore, we must override the append_record_to_associate behaviour of
+	// AbstractRelationship to provide this behaviour.
+	protected function append_record_to_associate(Model $associate, Model $record)
+	{
+		$associate->{$this->foreign_key[0]} = $record->id;
+		return $record;
+	}
 }

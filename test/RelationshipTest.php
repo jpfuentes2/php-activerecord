@@ -230,6 +230,15 @@ class RelationshipTest extends DatabaseTest
 		$this->assert_not_null($venue->id);
 	}
 
+	public function test_belongs_to_create_association_sets_foreign_key()
+	{
+		$event = $this->get_relationship();
+		$values = array('city' => 'Richmond', 'state' => 'VA', 'name' => 'Club 54', 'address' => '123 street');
+		$venue = $event->create_venue($values);
+
+		$this->assert_equals($venue->id, $event->venue_id);
+	}
+
 	public function test_build_association_overwrites_guarded_foreign_keys()
 	{
 		$author = new AuthorAttrAccessible();
