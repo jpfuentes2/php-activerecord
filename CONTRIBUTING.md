@@ -26,3 +26,19 @@ Or run a single test file by specifying its path:
 ```sh
 vendor/bin/phpunit test/InflectorTest.php
 ```
+
+#### Skipped Tests ####
+
+You might notice that some tests are marked as skipped. To obtain more information about skipped
+tests, pass the `--verbose` flag to PHPUnit:
+
+```sh
+vendor/bin/phpunit --verbose
+```
+
+Some common steps for fixing skipped tests are to:
+
+* Install `memcached` and the PHP memcached extension (e.g., `brew install php56-memcache memcached`)
+* Install the PDO drivers for PostgreSQL (e.g., `brew install php56-pdo-pgsql`)
+* Setup a MySQL database at `mysql://test:test@127.0.0.1/test`
+* Setup a PostgreSQL database at `pgsql://test:test@127.0.0.1/test`
