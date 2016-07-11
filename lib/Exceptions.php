@@ -68,6 +68,13 @@ class ExpressionsException extends ActiveRecordException {}
 class ConfigException extends ActiveRecordException {}
 
 /**
+ * Thrown for cache problems.
+ *
+ * @package ActiveRecord
+ */
+class CacheException extends ActiveRecordException {}
+
+/**
  * Thrown when attempting to access an invalid property on a {@link Model}.
  *
  * @package ActiveRecord

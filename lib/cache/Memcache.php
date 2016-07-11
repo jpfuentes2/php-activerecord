@@ -23,8 +23,14 @@ class Memcache
 		$this->memcache = new \Memcache();
 		$options['port'] = isset($options['port']) ? $options['port'] : self::DEFAULT_PORT;
 
-		if (!$this->memcache->connect($options['host'],$options['port']))
-			throw new CacheException("Could not connect to $options[host]:$options[port]");
+		if (!@$this->memcache->connect($options['host'], $options['port'])) {
+			if ($error = error_get_last()) {
+				$message = $error['message'];
+			} else {
+				$message = sprintf('Could not connect to %s:%s', $options['host'], $options['port']);
+			}
+			throw new CacheException($message);
+		}
 	}
 
 	public function flush()
