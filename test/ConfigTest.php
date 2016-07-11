@@ -8,6 +8,17 @@ class TestLogger
 	private function log() {}
 }
 
+class TestDateTimeWithoutCreateFromFormat
+{
+   public function format($format=null) {}
+}
+
+class TestDateTime
+{
+   public function format($format=null) {}
+   public static function createFromFormat($format, $time) {}
+}
+
 class ConfigTest extends SnakeCase_PHPUnit_Framework_TestCase
 {
 	public function set_up()
@@ -112,6 +123,42 @@ class ConfigTest extends SnakeCase_PHPUnit_Framework_TestCase
 		$this->assert_equals(realpath(__DIR__ . '/models'), $this->config->get_model_directory());
 
 		ActiveRecord\Config::instance()->set_model_directory($home);
+
+	}
+
+	public function test_get_date_class_with_default()
+	{
+		$this->assert_equals('ActiveRecord\\DateTime', $this->config->get_date_class());
+	}
+
+	/**
+	 * @expectedException ActiveRecord\ConfigException
+	 */
+	public function test_set_date_class_when_class_doesnt_exist()
+	{
+		$this->config->set_date_class('doesntexist');
+	}
+
+	/**
+	 * @expectedException ActiveRecord\ConfigException
+	 */
+	public function test_set_date_class_when_class_doesnt_have_format_or_createfromformat()
+	{
+		$this->config->set_date_class('TestLogger');
+	}
+
+	/**
+	 * @expectedException ActiveRecord\ConfigException
+	 */
+	public function test_set_date_class_when_class_doesnt_have_createfromformat()
+	{
+		$this->config->set_date_class('TestDateTimeWithoutCreateFromFormat');
+	}
+
+	public function test_set_date_class_with_valid_class()
+	{
+		$this->config->set_date_class('TestDateTime');
+		$this->assert_equals('TestDateTime', $this->config->get_date_class());
 	}
 
 	public function test_initialize_closure()
