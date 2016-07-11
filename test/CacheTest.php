@@ -81,13 +81,11 @@ class CacheTest extends SnakeCase_PHPUnit_Framework_TestCase
 
 	/**
 	 * @expectedException ActiveRecord\CacheException
+	 * @expectedExceptionMessage Connection refused
 	 */
 	public function test_exception_when_connect_fails()
 	{
-		$stub = $this->getMockBuilder('ActiveRecord\Memcache')
-			->setMethods(array('connect'))
-			->setConstructorArgs(array(array('host' => '127.0.0.1')))
-			->getMock();
+		Cache::initialize('memcache://127.0.0.1:1234');
 	}
 }
 ?>
