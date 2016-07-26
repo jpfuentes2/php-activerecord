@@ -7,7 +7,7 @@ class Venue extends ActiveRecord\Model
 	static $use_custom_set_city_setter = false;
 	
 	static $has_many = array(
-		'events',
+		array('events'),
 		array('hosts', 'through' => 'events')
 	);
 
