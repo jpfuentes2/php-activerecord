@@ -1458,7 +1458,7 @@ class Model
 	{
 		$args = func_get_args();
 		$options = static::extract_and_validate_options($args);
-		$options['select'] = 'COUNT(*)';
+		if (! isset($options['select']) || strpos($options['select'], 'COUNT') === false) $options['select'] = 'COUNT(*)';
 
 		if (!empty($args) && !is_null($args[0]) && !empty($args[0]))
 		{
