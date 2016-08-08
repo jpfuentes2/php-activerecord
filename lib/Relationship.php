@@ -168,8 +168,6 @@ abstract class AbstractRelationship implements InterfaceRelationship
 			}
 			$options['joins'] = $this->construct_inner_join_sql($through_table, true);
 
-			$query_key = $this->primary_key[0];
-
 			// reset keys
 			$this->primary_key = $pk;
 			$this->foreign_key = $fk;
@@ -181,18 +179,13 @@ abstract class AbstractRelationship implements InterfaceRelationship
 
 		$related_models = $class::find('all', $options);
 		$used_models = array();
-		$model_values_key = $inflector->variablize($model_values_key);
-		$query_key = $inflector->variablize($query_key);
 
 		foreach ($models as $model)
 		{
 			$matches = 0;
-			$key_to_match = $model->$model_values_key;
 
 			foreach ($related_models as $related)
 			{
-				if ($related->$query_key == $key_to_match)
-				{
 					$hash = spl_object_hash($related);
 
 					if (in_array($hash, $used_models))
@@ -202,7 +195,6 @@ abstract class AbstractRelationship implements InterfaceRelationship
 
 					$used_models[] = $hash;
 					$matches++;
-				}
 			}
 
 			if (0 === $matches)
