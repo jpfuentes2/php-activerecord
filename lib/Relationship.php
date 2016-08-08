@@ -176,32 +176,44 @@ abstract class AbstractRelationship implements InterfaceRelationship
 		}
 
 		$options = $this->unset_non_finder_options($options);
-
+		
 		$class = $this->class_name;
-
 		$related_models = $class::find('all', $options);
+		
 		$used_models = array();
 		$model_values_key = $inflector->variablize($model_values_key);
 		$query_key = $inflector->variablize($query_key);
-
+		
+		$all_related_with_value = null;
 		foreach ($models as $model)
 		{
+			if(!isset($all_related_with_value))
+			{
+				$all_related_with_value = array();
+				foreach ($related_models as $related)
+				{
+					$all_related_with_value[$related->$query_key][] = $related;
+				}
+			}
 			$matches = 0;
 			$key_to_match = $model->$model_values_key;
-
-			foreach ($related_models as $related)
+			
+			if(array_key_exists($key_to_match,$all_related_with_value))
 			{
-				if ($related->$query_key == $key_to_match)
+				foreach ($all_related_with_value[$key_to_match] as $related)
 				{
-					$hash = spl_object_hash($related);
-
-					if (in_array($hash, $used_models))
-						$model->set_relationship_from_eager_load(clone($related), $this->attribute_name);
-					else
-						$model->set_relationship_from_eager_load($related, $this->attribute_name);
-
-					$used_models[] = $hash;
-					$matches++;
+					if ($related->$query_key == $key_to_match)
+					{
+						$hash = spl_object_hash($related);
+	
+						if (array_key_exists($hash, $used_models))
+							$model->set_relationship_from_eager_load(clone($related), $this->attribute_name);
+						else
+							$model->set_relationship_from_eager_load($related, $this->attribute_name);
+	
+						$used_models[$hash] = null;
+						$matches++;
+					}
 				}
 			}
 
