@@ -483,6 +483,24 @@ class HasMany extends AbstractRelationship
 
 	public function load(Model $model)
 	{
+		if($init = $this->initialize($model))
+		{
+			extract($init);
+			return $class_name::find($this->poly_relationship ? 'all' : 'first', $options);
+		}
+	}
+
+
+	public function load_count(Model $model)
+	{
+		if($init = $this->initialize($model))
+		{
+			extract($init);
+			return $class_name::count($options);
+		}
+	}
+
+	private function initialize(Model $model) {
 		$class_name = $this->class_name;
 		$this->set_keys(get_class($model));
 
@@ -524,7 +542,7 @@ class HasMany extends AbstractRelationship
 
 		$options = $this->unset_non_finder_options($this->options);
 		$options['conditions'] = $conditions;
-		return $class_name::find($this->poly_relationship ? 'all' : 'first',$options);
+		return compact('class_name', 'options');
 	}
 
 	/**

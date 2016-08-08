@@ -512,6 +512,14 @@ class Model
 			return $this->__relationships[$name];
 		}
 
+
+		if (substr($name, -6) == '_count' &&
+			($relationship = $table->get_relationship(substr($name, 0, -6))))
+		{
+			$this->__relationships[$name] = $relationship->load_count($this);
+			return $this->__relationships[$name];
+		}
+
 		if ($name == 'id')
 		{
 			$pk = $this->get_primary_key(true);
