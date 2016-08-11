@@ -204,7 +204,7 @@ abstract class AbstractRelationship implements InterfaceRelationship
 					else
 						$model->set_relationship_from_eager_load($related, $this->attribute_name);
 
-					$used_models_map[$hash] = $hash;
+					$used_models_map[$hash] = true;
 				}
 			} else {
 				$model->set_relationship_from_eager_load(null, $this->attribute_name);
