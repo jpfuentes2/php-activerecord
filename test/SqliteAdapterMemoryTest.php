@@ -22,7 +22,7 @@ class SqliteAdapterMemoryTest extends SqliteAdapterTest
 		}
 		catch (ActiveRecord\DatabaseException $e)
 		{
-			$this->assertFalse(true);
+			$this->fail("could not open connection to :memory: database");
 		}
 	}
 
