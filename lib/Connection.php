@@ -178,7 +178,7 @@ abstract class Connection
 	{
 		$url = @parse_url($connection_url);
 
-		if ( $url['scheme'] == "sqlite" && $url['host'] == ":memory" )
+		if ($url['scheme'] == "sqlite" && $url['host'] == ":memory")
 			$url['host'] = ":memory:";
 
 		if (!isset($url['host']))

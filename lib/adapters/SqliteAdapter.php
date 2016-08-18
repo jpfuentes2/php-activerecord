@@ -22,7 +22,7 @@ class SqliteAdapter extends Connection
 		if ($info->host != ":memory:" && !file_exists($info->host))
 			throw new DatabaseException("Could not find sqlite db: $info->host");
 
-		if ( self::$cached_connection == null ) {
+		if (self::$cached_connection == null) {
 			self::$cached_connection = new PDO("sqlite:$info->host",null,null,static::$PDO_OPTIONS);
 		}
 		$this->connection = self::$cached_connection;

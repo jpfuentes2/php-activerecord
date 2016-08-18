@@ -8,7 +8,7 @@ class SqliteAdapterMemoryTest extends SqliteAdapterTest
 	{
 		$connections = ActiveRecord\Config::instance()->get_connections();
     $connections['sqlite'] = 'sqlite://:memory:';
-		ActiveRecord\Config::instance()->set_connections( $connections );
+		ActiveRecord\Config::instance()->set_connections($connections);
 
 		parent::set_up();
 	}
@@ -18,7 +18,7 @@ class SqliteAdapterMemoryTest extends SqliteAdapterTest
 		try
 		{
 			ActiveRecord\Connection::instance("sqlite://:memory:");
-			$this->assertFalse(file_exists(__DIR__ . "/" . ":memory:" ));
+			$this->assertFalse(file_exists(__DIR__ . "/" . ":memory:"));
 		}
 		catch (ActiveRecord\DatabaseException $e)
 		{
