@@ -1692,9 +1692,9 @@ class Model
 	 * @param array $values An array of values for any parameters that needs to be bound
 	 * @return $this[] An array of models
 	 */
-	public static function find_by_sql($sql, $values=null)
+	public static function find_by_sql($sql, $values=null, $includes=nul)
 	{
-		return static::table()->find_by_sql($sql, $values, true);
+		return static::table()->find_by_sql($sql, $values, true, $includes);
 	}
 
 	/**
