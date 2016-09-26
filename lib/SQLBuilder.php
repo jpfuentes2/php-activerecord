@@ -21,6 +21,7 @@ class SQLBuilder
 	private $offset;
 	private $group;
 	private $having;
+	private $locks;
 	private $update;
 
 	// for where
@@ -114,6 +115,12 @@ class SQLBuilder
 	public function having($having)
 	{
 		$this->having = $having;
+		return $this;
+	}
+	
+	public function locks($locks)
+	{
+		$this->locks = $locks;
 		return $this;
 	}
 
@@ -382,6 +389,9 @@ class SQLBuilder
 
 		if ($this->limit || $this->offset)
 			$sql = $this->connection->limit($sql,$this->offset,$this->limit);
+		
+		if ($this->locks)
+			$sql .= " $this->locks";
 
 		return $sql;
 	}

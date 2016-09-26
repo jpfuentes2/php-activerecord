@@ -206,6 +206,9 @@ class Table
 
 		if (array_key_exists('having',$options))
 			$sql->having($options['having']);
+		
+		if (array_key_exists('locks',$options))
+			$sql->locks($options['locks']);
 
 		return $sql;
 	}
