@@ -12,6 +12,7 @@ namespace ActiveRecord;
 class MysqlAdapter extends Connection
 {
 	static $DEFAULT_PORT = 3306;
+	static $datetime_format = 'Y-m-d H:i:s';
 
 	public function limit($sql, $offset, $limit)
 	{
