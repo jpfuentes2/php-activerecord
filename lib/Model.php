@@ -1430,7 +1430,7 @@ class Model
 	 * Alias for self::find('all').
 	 *
 	 * @see find
-	 * @return $this[] array of records found
+	 * @return array<$this> array of records found
 	 */
 	public static function all(/* ... */)
 	{
@@ -1690,7 +1690,7 @@ class Model
 	 *
 	 * @param string $sql The raw SELECT query
 	 * @param array $values An array of values for any parameters that needs to be bound
-	 * @return $this[] An array of models
+	 * @return array<$this> An array of models
 	 */
 	public static function find_by_sql($sql, $values=null, $includes=null)
 	{
