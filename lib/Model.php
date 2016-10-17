@@ -242,7 +242,9 @@ class Model
 	 */
 	static $delegate = array();
 
-	/**
+    protected $_cacheAttributesData = [];
+
+    /**
 	 * Constructs a model.
 	 *
 	 * When a user instantiates a new object (e.g.: it was not ActiveRecord that instantiated via a find)
@@ -334,15 +336,21 @@ class Model
 	 */
 	public function &__get($name)
 	{
+	    if (isset($this->_cacheAttributesData[$name])) {
+	        return $this->_cacheAttributesData[$name];
+        }
+
 		// check for getter
 		if (method_exists($this, "get_$name"))
 		{
 			$name = "get_$name";
 			$value = $this->$name();
-			return $value;
-		}
+		} else {
+		    $value = &$this->read_attribute($name);
+        }
 
-		return $this->read_attribute($name);
+        $this->_cacheAttributesData[$name] = &$value;
+        return $value;
 	}
 
 	/**
@@ -408,6 +416,8 @@ class Model
 	 */
 	public function __set($name, $value)
 	{
+	    $this->_cacheAttributesData = [];
+
 		if (array_key_exists($name, static::$alias_attribute))
 			$name = static::$alias_attribute[$name];
 
@@ -447,6 +457,8 @@ class Model
 	 */
 	public function assign_attribute($name, $value)
 	{
+        $this->_cacheAttributesData = [];
+
 		$table = static::table();
 		if (!is_object($value)) {
 			if (array_key_exists($name, $table->columns)) {
@@ -1243,15 +1255,18 @@ class Model
 			throw new UndefinedPropertyException(get_called_class(),$exceptions);
 	}
 
-	/**
-	 * Add a model to the given named ($name) relationship.
-	 *
-	 * @internal This should <strong>only</strong> be used by eager load
-	 * @param Model $model
-	 * @param $name of relationship for this table
-	 * @return void
-	 */
-	public function set_relationship_from_eager_load(Model $model=null, $name)
+    /**
+     * Add a model to the given named ($name) relationship.
+     *
+     * @internal This should <strong>only</strong> be used by eager load
+     *
+     * @param Model  $model
+     * @param string $name of relationship for this table
+     *
+     * @return Model|array|null
+     * @throws RelationshipException
+     */
+	public function set_relationship_from_eager_load($model=null, $name)
 	{
 		$table = static::table();
 
