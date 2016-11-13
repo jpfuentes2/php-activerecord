@@ -356,5 +356,26 @@ class ValidatesLengthOfTest extends DatabaseTest
 		$book->is_valid();
 		$this->assert_equals(array("Name is the wrong length (should be 2 characters)"),$book->errors->full_messages());
 	}
+	
+	    public function test_validates_length_utf8_of_maximum()
+    {
+        BookLength::$validates_length_of[0] = array('name', 'maximum' => 10);
+        $book = new BookLength(array('name' => 'абвгдеё'));
+        $this->assert_true($book->is_valid('name'));
+    }
+
+    public function test_validates_length_utf8_of_minimum()
+    {
+        BookLength::$validates_length_of[0] = array('name', 'minimum' => 3);
+        $book = new BookLength(array('name' => 'аб'));
+        $this->assert_true($book->is_invalid('name'));
+    }
+
+    public function test_validates_length_utf8_of_is()
+    {
+        BookLength::$validates_length_of[0] = array('name', 'is' => 6);
+        $book = new BookLength(array('name' => 'АаЁёЯя'));
+        $this->assert_true($book->is_valid('name'));
+    }
 };
 ?>
