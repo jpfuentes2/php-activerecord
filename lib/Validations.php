@@ -45,6 +45,8 @@ class Validations
 	private $options = array();
 	private $validators = array();
 	private $record;
+    // TODO add ability to set charset
+    private $charset = 'UTF-8';
 
 	private static $VALIDATION_FUNCTIONS = array(
 		'validates_presence_of',
@@ -517,11 +519,18 @@ class Validations
 						$message = $options['message'];
 					else
 						$message = $options[$messageOptions[$range_option]];
-					
+
 
 					$message = str_replace('%d', $option, $message);
 					$attribute_value = $this->model->$attribute;
-					$len = strlen($attribute_value);
+
+                    //TODO add exception if charset wrong
+                    if (@mb_check_encoding($attribute_value, $this->charset)) {
+                        $len = mb_strlen($attribute_value, $this->charset);
+                    } else {
+                        $len = strlen($attribute_value);
+                    }
+
 					$value = (int)$attr[$range_option];
 
 					if ('maximum' == $range_option && $len > $value)
