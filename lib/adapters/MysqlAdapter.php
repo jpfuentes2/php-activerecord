@@ -65,7 +65,14 @@ class MysqlAdapter extends Connection
 		}
 
 		$c->map_raw_type();
-		$c->default = $c->cast($column['default'],$this);
+		switch($column['default']){
+			case 'CURRENT_TIMESTAMP':
+				$c->default = Config::instance()->get_current_time();
+				break;
+
+			default:
+				$c->default = $c->cast($column['default'], $this);
+		}
 
 		return $c;
 	}

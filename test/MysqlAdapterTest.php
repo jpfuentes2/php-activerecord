@@ -33,5 +33,11 @@ class MysqlAdapterTest extends AdapterTest
 
 		$this->assert_true(strpos($this->conn->last_query, 'LIMIT 1') !== false);
 	}
+
+	public function test_construction_of_current_timestamp()
+	{
+		$publisher = new Publisher();
+		$this->assertNotEmpty($publisher->start_date);
+	}
 }
 ?>

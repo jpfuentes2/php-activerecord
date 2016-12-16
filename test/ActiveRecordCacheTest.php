@@ -37,7 +37,7 @@ class ActiveRecordCacheTest extends DatabaseTest
 		Author::first();
 
 		$table_name = Author::table()->get_fully_qualified_table_name(!($this->conn instanceof ActiveRecord\PgsqlAdapter));
-		$value = Cache::$adapter->read("get_meta_data-$table_name");
+		$value = Cache::$adapter->read("get_meta_data-".$this->conn->protocol."-$table_name-rows");
 		$this->assert_true(is_array($value));
 	}
 }
