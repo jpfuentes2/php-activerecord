@@ -458,6 +458,10 @@ class Table
 					$this->pk[] = $c->inflected_name;
 			}
 		}
+		
+		$this->pk = array_map(function($value) {
+			return Inflector::instance()->variablize($value);
+		}, $this->pk);
 	}
 
 	private function set_table_name()
