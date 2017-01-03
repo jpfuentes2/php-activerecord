@@ -424,4 +424,21 @@ class ActiveRecordWriteTest extends DatabaseTest
 		$this->assert_equals(1, $num_affected);
 		$this->assert_true(strpos(Author::table()->last_sql, 'ORDER BY name asc LIMIT 1') !== false);
 	}
+
+	public function test_update_native_datetime()
+	{
+		$author = Author::create(array('name' => 'Blah Blah'));
+		$native_datetime = new \DateTime('1983-12-05');
+		$author->some_date = $native_datetime;
+		$this->assert_false($native_datetime === $author->some_date);
+	}
+
+	public function test_update_our_datetime()
+	{
+		$author = Author::create(array('name' => 'Blah Blah'));
+		$our_datetime = new DateTime('1983-12-05');
+		$author->some_date = $our_datetime;
+		$this->assert_true($our_datetime === $author->some_date);
+	}
+
 };

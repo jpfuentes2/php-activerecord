@@ -180,33 +180,35 @@ abstract class AbstractRelationship implements InterfaceRelationship
 		$class = $this->class_name;
 
 		$related_models = $class::find('all', $options);
-		$used_models = array();
+		$used_models_map = array();
+		$related_models_map = array();
 		$model_values_key = $inflector->variablize($model_values_key);
 		$query_key = $inflector->variablize($query_key);
 
+		foreach ($related_models as $related)
+		{
+			$related_models_map[$related->$query_key][] = $related;
+		}
+
 		foreach ($models as $model)
 		{
-			$matches = 0;
 			$key_to_match = $model->$model_values_key;
 
-			foreach ($related_models as $related)
-			{
-				if ($related->$query_key == $key_to_match)
+			if (isset($related_models_map[$key_to_match])) {
+				foreach ($related_models_map[$key_to_match] as $related)
 				{
 					$hash = spl_object_hash($related);
 
-					if (in_array($hash, $used_models))
+					if (isset($used_models_map[$hash]))
 						$model->set_relationship_from_eager_load(clone($related), $this->attribute_name);
 					else
 						$model->set_relationship_from_eager_load($related, $this->attribute_name);
 
-					$used_models[] = $hash;
-					$matches++;
+					$used_models_map[$hash] = true;
 				}
-			}
-
-			if (0 === $matches)
+			} else {
 				$model->set_relationship_from_eager_load(null, $this->attribute_name);
+			}
 		}
 	}
 

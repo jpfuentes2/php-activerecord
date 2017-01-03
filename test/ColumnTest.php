@@ -126,5 +126,33 @@ class ColumnTest extends SnakeCase_PHPUnit_Framework_TestCase
 		$this->assert_equals(null,$column->cast(null,$this->conn));
 		$this->assert_equals(null,$column->cast('',$this->conn));
 	}
+
+	public function test_native_date_time_attribute_copies_exact_tz()
+	{
+		$dt = new \DateTime(null, new \DateTimeZone('America/New_York'));
+
+		$column = new Column();
+		$column->type = Column::DATETIME;
+
+		$dt2 = $column->cast($dt, $this->conn);
+
+		$this->assert_equals($dt->getTimestamp(), $dt2->getTimestamp());
+		$this->assert_equals($dt->getTimeZone(), $dt2->getTimeZone());
+		$this->assert_equals($dt->getTimeZone()->getName(), $dt2->getTimeZone()->getName());
+	}
+
+	public function test_ar_date_time_attribute_copies_exact_tz()
+	{
+		$dt = new DateTime(null, new \DateTimeZone('America/New_York'));
+
+		$column = new Column();
+		$column->type = Column::DATETIME;
+
+		$dt2 = $column->cast($dt, $this->conn);
+
+		$this->assert_equals($dt->getTimestamp(), $dt2->getTimestamp());
+		$this->assert_equals($dt->getTimeZone(), $dt2->getTimeZone());
+		$this->assert_equals($dt->getTimeZone()->getName(), $dt2->getTimeZone()->getName());
+	}
 }
 ?>

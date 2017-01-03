@@ -165,11 +165,17 @@ class Column
 				if (!$value)
 					return null;
 
-				if ($value instanceof DateTime)
+				$date_class = Config::instance()->get_date_class();
+
+				if ($value instanceof $date_class)
 					return $value;
 
 				if ($value instanceof \DateTime)
-					return new DateTime($value->format('Y-m-d H:i:s T'));
+					return $date_class::createFromFormat(
+						Connection::DATETIME_TRANSLATE_FORMAT,
+						$value->format(Connection::DATETIME_TRANSLATE_FORMAT),
+						$value->getTimezone()
+					);
 
 				return $connection->string_to_datetime($value);
 		}
