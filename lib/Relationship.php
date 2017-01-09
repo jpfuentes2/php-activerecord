@@ -348,22 +348,22 @@ abstract class AbstractRelationship implements InterfaceRelationship
 		{
 			$this->set_keys($from_table->class->getName());
 
-			if ($using_through)
-			{
-				$foreign_key = $this->primary_key[0];
-				$join_primary_key = $this->foreign_key[0];
-			}
-			else
-			{
-				$join_primary_key = $this->foreign_key[0];
-				$foreign_key = $this->primary_key[0];
-			}
-		}
-		else
-		{
-			$foreign_key = $this->foreign_key[0];
-			$join_primary_key = $this->primary_key[0];
-		}
+            if ($using_through)
+            {
+                $foreign_keys = $this->primary_key;
+                $join_primary_keys = $this->foreign_key;
+            }
+            else
+            {
+                $join_primary_keys = $this->foreign_key;
+                $foreign_keys = $this->primary_key;
+            }
+        }
+        else
+        {
+            $foreign_keys = $this->foreign_key;
+            $join_primary_keys = $this->primary_key;
+        }
 
 		if (!is_null($alias))
 		{
@@ -373,8 +373,13 @@ abstract class AbstractRelationship implements InterfaceRelationship
 		else
 			$aliased_join_table_name = $join_table_name;
 
-		return "INNER JOIN $join_table_name {$alias}ON($from_table_name.$foreign_key = $aliased_join_table_name.$join_primary_key)";
-	}
+        $on_join_keys = [];
+        foreach ($foreign_keys as $num => $foreign_key) {
+            $on_join_keys[] = "$from_table_name.$foreign_key = $aliased_join_table_name.{$join_primary_keys[$num]}";
+        }
+
+        return "INNER JOIN $join_table_name {$alias}ON(" . implode(' AND ', $on_join_keys) . ")";
+    }
 
 	/**
 	 * This will load the related model data.
