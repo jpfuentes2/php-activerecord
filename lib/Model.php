@@ -666,8 +666,9 @@ class Model
 
 		foreach ($attributes as $name)
 		{
-			if (array_key_exists($name,$this->attributes))
-				$ret[$name] = $this->attributes[$name];
+            $real_name = $this->get_real_attribute_name($name);
+            if (array_key_exists($real_name,$this->attributes))
+                $ret[$name] = $this->attributes[$real_name];
 		}
 		return $ret;
 	}
