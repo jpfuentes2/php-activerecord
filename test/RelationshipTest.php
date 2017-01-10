@@ -81,24 +81,32 @@ class RelationshipTest extends DatabaseTest
 		$this->assert_default_has_many($this->get_relationship());
 	}
 	
-	public function test_gh_256_eager_loading_three_levels_deep()
+	public function test_eager_load_with_empty_nested_includes()
 	{
-		/* Before fix Undefined offset: 0 */
-		$conditions['include'] = array('events'=>array('host'=>array('events')));
-		$venue = Venue::find(2,$conditions);
-		
-		$events = $venue->events;
-		$this->assertEquals(2,count($events));
-		$event_yeah_yeahs = $events[0];
-		$this->assertEquals('Yeah Yeah Yeahs',$event_yeah_yeahs->title);
-		
-		$event_host = $event_yeah_yeahs->host;
-		$this->assertEquals('Billy Crystal',$event_host->name);
-		
-		$bill_events = $event_host->events;
-		
-		$this->assertEquals('Yeah Yeah Yeahs',$bill_events[0]->title);
+		$conditions['include'] = array('events'=>array());
+		Venue::find(2,$conditions);
+
+        $this->assert_sql_has("WHERE venue_id IN(?)",ActiveRecord\Table::load('Event')->last_sql);
 	}
+
+    public function test_gh_256_eager_loading_three_levels_deep()
+    {
+        /* Before fix Undefined offset: 0 */
+        $conditions['include'] = array('events'=>array('host'=>array('events')));
+        $venue = Venue::find(2,$conditions);
+
+        $events = $venue->events;
+        $this->assertEquals(2,count($events));
+        $event_yeah_yeahs = $events[0];
+        $this->assertEquals('Yeah Yeah Yeahs',$event_yeah_yeahs->title);
+
+        $event_host = $event_yeah_yeahs->host;
+        $this->assertEquals('Billy Crystal',$event_host->name);
+
+        $bill_events = $event_host->events;
+
+        $this->assertEquals('Yeah Yeah Yeahs',$bill_events[0]->title);
+    }
 	
 	/**
 	 * @expectedException ActiveRecord\RelationshipException
