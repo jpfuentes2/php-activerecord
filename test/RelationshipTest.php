@@ -84,9 +84,9 @@ class RelationshipTest extends DatabaseTest
 	public function test_eager_load_with_empty_nested_includes()
 	{
 		$conditions['include'] = array('events'=>array());
-		Venue::find(2,$conditions);
+		Venue::find(2, $conditions);
 
-        $this->assert_sql_has("WHERE venue_id IN(?)",ActiveRecord\Table::load('Event')->last_sql);
+		$this->assert_sql_has("WHERE venue_id IN(?)", ActiveRecord\Table::load('Event')->last_sql);
 	}
 
     public function test_gh_256_eager_loading_three_levels_deep()
