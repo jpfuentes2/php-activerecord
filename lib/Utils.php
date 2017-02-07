@@ -63,13 +63,15 @@ function array_flatten(array $array)
 /**
  * Somewhat naive way to determine if an array is a hash.
  */
-function is_hash(&$array)
+function is_hash($array)
 {
-	if (!is_array($array))
+	if (!is_array($array)) {
 		return false;
+	}
 
 	$keys = array_keys($array);
-	return @is_string($keys[0]) ? true : false;
+
+	return isset($keys[0]) && is_string($keys[0]);
 }
 
 /**
