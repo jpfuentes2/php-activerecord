@@ -42,7 +42,8 @@ CREATE TABLE events (
 	host_id int NOT NULL,
 	title varchar(60) NOT NULL,
 	description varchar(50),
-	type varchar(15) default NULL
+	type varchar(15) default NULL,
+	start_date timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP
 );
 
 CREATE TABLE hosts(
