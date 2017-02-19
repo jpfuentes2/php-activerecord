@@ -72,6 +72,16 @@ class SerializationTest extends DatabaseTest
 		$this->assert_equals('ancient art of main tanking', $a['name']);
 	}
 
+    public function test_methods_uses_getter_if_method_does_not_exist() {
+        $a = $this->_a(array('methods' => 'lower_name'));
+		$this->assert_equals('ancient art of main tanking', $a['lower_name']);
+    }
+
+    public function test_methods_method_has_precedence_over_getter() {
+        $a = $this->_a(array('methods' => 'name'));
+        $this->assert_equals('ancient art of main tanking', $a['name']);
+    }
+
 	public function test_include()
 	{
 		$a = $this->_a(array('include' => array('author')));
