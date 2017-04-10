@@ -75,6 +75,17 @@ class DateTimeTest extends SnakeCase_PHPUnit_Framework_TestCase
 		$this->assert_datetime_equals($a,$b);
 	}
 
+    public function test_set_time_microseconds()
+    {
+        $a = new \DateTime();
+        $a->setTime(1, 1, 1);
+
+        $b = new DateTime();
+        $b->setTime(1, 1, 1, 0);
+
+        $this->assert_datetime_equals($a,$b);
+	}
+
 	public function test_get_format_with_friendly()
 	{
 		$this->assert_equals('Y-m-d H:i:s', DateTime::get_format('db'));
