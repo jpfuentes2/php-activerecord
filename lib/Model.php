@@ -578,15 +578,29 @@ class Model
 	}
 
 	/**
-	 * Returns a copy of the model's attributes hash.
+	 * Returns a copy of the model's attributes hash, with support of model getters
 	 *
-	 * @return array A copy of the model's attribute data
+	 * @return array A copy of the model's attribute data with getters
 	 */
 	public function attributes()
 	{
-		return $this->attributes;
+        $attributes = array();
+
+        foreach($this->attributes as $name => $value){
+            $attributes[$name] = $this->__get($name);
+        }
+        return $attributes;
 	}
 
+    /**
+     * Returns copy of the model's fields data
+     *
+     * @return array A copy of the table fields data
+     */
+    public function fields()
+    {
+        return $this->attributes;
+    }
 	/**
 	 * Retrieve the primary key name.
 	 *
@@ -1299,8 +1313,9 @@ class Model
 
 	public function __clone()
 	{
-		$this->__relationships = array();
-		$this->reset_dirty();
+        // do not clear relationship on clone!
+		//$this->__relationships = array();
+        $this->reset_dirty();
 		return $this;
 	}
 
@@ -1650,7 +1665,7 @@ class Model
 	 * @return Model
 	 * @throws {@link RecordNotFound} if a record could not be found
 	 */
-	public static function find_by_pk($values, $options)
+	public static function find_by_pk($values, $options = array())
 	{
 		if($values===null)
 		{
