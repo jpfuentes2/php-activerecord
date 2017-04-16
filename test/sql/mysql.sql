@@ -23,7 +23,8 @@ CREATE TABLE books(
 
 CREATE TABLE publishers(
 	publisher_id INT NOT NULL PRIMARY KEY AUTO_INCREMENT,
-	name VARCHAR(25) NOT NULL DEFAULT 'default_name'
+	name VARCHAR(25) NOT NULL DEFAULT 'default_name',
+	start_date timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP
 ) ENGINE=InnoDB;
 
 CREATE TABLE venues (
@@ -35,6 +36,8 @@ CREATE TABLE venues (
 	phone varchar(10) default NULL,
 	UNIQUE(name,address)
 );
+
+
 
 CREATE TABLE events (
 	id int NOT NULL auto_increment PRIMARY KEY,
