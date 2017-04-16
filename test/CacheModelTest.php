@@ -107,7 +107,8 @@ class CacheModelTest extends DatabaseTest
 
 	}
 
-	public function test_model_update_cache(){
+	public function test_model_update_cache()
+	{
 		$method = $this->set_method_public('Publisher', 'cache_key');
 
 		$publisher = Publisher::find(1);
@@ -123,5 +124,21 @@ class CacheModelTest extends DatabaseTest
 
 		$publisherDirectlyFromCache = Cache::$adapter->read($cache_key);
 		$this->assertEquals("Puppy Publishing", $publisherDirectlyFromCache->name);
+	}
+
+	public function test_cached_current_timestamp()
+	{
+		$publisher = new Publisher(array(
+			"name" => "HarperCollins"
+		));
+		$publisher->save();
+
+		$method = $this->set_method_public('Publisher', 'cache_key');
+		$cache_key = $method->invokeArgs($publisher, array());
+
+		$from_cache = Cache::$adapter->read($cache_key);
+		
+		$this->assertInstanceOf('ActiveRecord\\DateTime', $publisher->cached_timestamp);
+		$this->assertEquals($publisher->cached_timestamp, $from_cache->cached_timestamp);
 	}
 }
