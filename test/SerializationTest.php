@@ -2,6 +2,7 @@
 require_once __DIR__ . '/../lib/Serialization.php';
 
 use ActiveRecord\DateTime;
+use Symfony\Component\Yaml\Yaml;
 
 class SerializationTest extends DatabaseTest
 {
@@ -122,6 +123,13 @@ class SerializationTest extends DatabaseTest
 		$book = Book::find(1);
 		$this->assert_equals($book->attributes(),get_object_vars(new SimpleXMLElement($book->to_xml())));
 	}
+
+	public function test_to_yaml()
+	{
+	    $book = Book::find(1);
+	    $this->assert_equals($book->attributes(), Yaml::parse($book->to_yaml()));
+	}
+
 
   public function test_to_array()
   {

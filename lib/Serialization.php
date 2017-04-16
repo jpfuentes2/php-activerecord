@@ -107,7 +107,7 @@ abstract class Serialization
 		$this->check_except();
 		$this->check_methods();
 		$this->check_include();
-		$this->check_only_method();        
+		$this->check_only_method();
 	}
 
 	private function check_only()
@@ -143,7 +143,7 @@ abstract class Serialization
 			}
 		}
 	}
-	
+
 	private function check_only_method()
 	{
 		if (isset($this->options['only_method']))
@@ -273,6 +273,22 @@ class JsonSerializer extends ArraySerializer
 		parent::$include_root = self::$include_root;
 		return json_encode(parent::to_s());
 	}
+}
+
+/**
+ * YAML serializer.
+ *
+ * @package ActiveRecord
+ */
+class YamlSerializer extends ArraySerializer
+{
+    public static $include_root = false;
+
+    public function to_s()
+    {
+        parent::$include_root = self::$include_root;
+        return Yaml::dump(parent::to_s());
+    }
 }
 
 /**

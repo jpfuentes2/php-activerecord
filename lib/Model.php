@@ -1803,6 +1803,18 @@ class Model
 	}
 
 	/**
+	 * Returns a YAML representation of this model.
+	 *
+	 * @see Serialization
+	 * @param array $options An array containing options for yaml serialization (see {@link Serialization} for valid options)
+	 * @return string YAML representation of the model
+	 */
+	public function to_yaml(array $options = array())
+	{
+	    return $this->serialize('Yaml', $options);
+	}
+
+	/**
 	 * Returns an XML representation of this model.
 	 *
 	 * @see Serialization
