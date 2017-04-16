@@ -1,5 +1,7 @@
 # PHP ActiveRecord - Version 1.0 #
 
+[![Gitter](https://badges.gitter.im/Join Chat.svg)](https://gitter.im/jpfuentes2/php-activerecord?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
+
 [![Build Status](https://travis-ci.org/jpfuentes2/php-activerecord.png?branch=master)](https://travis-ci.org/jpfuentes2/php-activerecord)
 
 by 
