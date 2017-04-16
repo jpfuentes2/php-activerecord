@@ -109,3 +109,10 @@ CREATE TABLE valuestore (
   `key` varchar(20) NOT NULL DEFAULT '',
   `value` varchar(255) NOT NULL DEFAULT ''
 );
+
+CREATE TABLE units(
+	id INTEGER NOT NULL PRIMARY KEY,
+	name VARCHAR(50),
+	updated_time datetime,
+	created_time datetime
+);

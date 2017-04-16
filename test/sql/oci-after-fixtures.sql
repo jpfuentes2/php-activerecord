@@ -36,3 +36,6 @@ CREATE SEQUENCE property_amenities_seq START WITH 100;
 
 DROP SEQUENCE valuestore_seq;
 CREATE SEQUENCE valuestore_seq START WITH 100;
+
+DROP SEQUENCE units_seq;
+CREATE SEQUENCE units_seq START WITH 100;

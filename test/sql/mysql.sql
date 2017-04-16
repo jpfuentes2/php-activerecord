@@ -110,3 +110,10 @@ CREATE TABLE valuestore (
   `key` varchar(20) NOT NULL DEFAULT '',
   `value` varchar(255) NOT NULL DEFAULT ''
 ) ENGINE=InnoDB;
+
+CREATE TABLE units(
+	id INT NOT NULL PRIMARY KEY AUTO_INCREMENT,
+	name VARCHAR(50),
+	updated_time datetime,
+	created_time datetime
+);

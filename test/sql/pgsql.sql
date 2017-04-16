@@ -110,5 +110,12 @@ CREATE TABLE valuestore (
   value varchar(255) NOT NULL DEFAULT ''
 );
 
+CREATE TABLE units(
+	id SERIAL PRIMARY KEY,
+	name VARCHAR(50),
+	updated_time timestamp,
+	created_time timestamp
+);
+
 -- reproduces issue GH-96 for testing
 CREATE INDEX user_newsletters_id_and_user_id_idx ON user_newsletters USING btree(id, user_id);

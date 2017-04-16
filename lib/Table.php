@@ -97,7 +97,10 @@ class Table
 		$this->set_setters_and_getters();
 
 		$this->callback = new CallBack($class_name);
-		$this->callback->register('before_save', function(Model $model) { $model->set_timestamps(); }, array('prepend' => true));
+
+        if ($this->conn->get_timestamps_management())
+		    $this->callback->register('before_save', function(Model $model) { $model->set_timestamps(); }, array('prepend' => true));
+
 		$this->callback->register('after_save', function(Model $model) { $model->reset_dirty(); }, array('prepend' => true));
 	}
 

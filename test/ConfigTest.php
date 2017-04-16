@@ -137,5 +137,46 @@ class ConfigTest extends SnakeCase_PHPUnit_Framework_TestCase
 			$this->assert_equals($e->getMessage(), "Logger object must implement a public log method");
 		}
 	}
+
+    public function test_set_and_get_timestamps_management()
+    {
+        $this->config->set_timestamps_management();
+        $this->assert_equals(true, $this->config->get_timestamps_management());
+
+        $this->config->set_timestamps_management(true);
+        $this->assert_equals(true, $this->config->get_timestamps_management());
+
+        $this->config->set_timestamps_management(false);
+        $this->assert_equals(false, $this->config->get_timestamps_management());
+    }
+
+    public function test_set_and_get_timestamps_management_with_not_boolean_values()
+    {
+        $this->config->set_timestamps_management('0');
+        $this->assert_equals(false, $this->config->get_timestamps_management());
+
+        $this->config->set_timestamps_management('0123');
+        $this->assert_equals(true, $this->config->get_timestamps_management());
+
+        $this->config->set_timestamps_management(array());
+        $this->assert_equals(false, $this->config->get_timestamps_management());
+
+        $this->config->set_timestamps_management(array('1'));
+        $this->assert_equals(true, $this->config->get_timestamps_management());
+
+        $this->config->set_timestamps_management(0);
+        $this->assert_equals(false, $this->config->get_timestamps_management());
+
+        $this->config->set_timestamps_management(1);
+        $this->assert_equals(true, $this->config->get_timestamps_management());
+
+        $object = new stdClass();
+        $this->config->set_timestamps_management($object);
+        $this->assert_equals(true, $this->config->get_timestamps_management());
+
+        $func = function(){};
+        $this->config->set_timestamps_management($func);
+        $this->assert_equals(true, $this->config->get_timestamps_management());
+    }
 }
 ?>
