@@ -194,6 +194,18 @@ class ActiveRecordWriteTest extends DatabaseTest
 		$this->assert_equals(array('name','special'),array_keys($book->dirty_attributes()));
 	}
 
+	public function test_id_type()
+	{
+		$book = new Book;
+		$book->save();
+
+		$bookFromFind = Book::find($book->id);
+
+		// both should be ints
+		$this->assert_same($book->id, $bookFromFind->id);
+	}
+
+
 	public function test_dirty_attributes_cleared_after_saving()
 	{
 		$book = $this->make_new_book_and();
