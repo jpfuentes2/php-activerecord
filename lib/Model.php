@@ -134,6 +134,8 @@ class Model
 
 	/**
 	 * Flag whether or not this model has been validated
+	 *
+	 * @var boolean
 	 */
 	private $__validated = false;
 
@@ -1227,20 +1229,7 @@ class Model
 	}
 
 	/**
-	 * Returns whether or not model passed validation.
-	 *
-	 * <p>
-	 * Case of use for <code>is_valid(true)</code>:
-	 * You call some method that will run validations (including this), and
-	 * got a result.
-	 * After, a <strong>virtual attribute</strong> (attribute not stored in Database)
-	 * <strong>used by validation</strong> change is value.
-	 * So, in this case, and only this, you have to use `is_valid(true)` to
-	 * get a correct value.
-	 * </p>
-	 *
-	 * Probably you never use <code>is_valid(true)</code>, but if you spot a
-	 * bug related to validation, you know what to try!
+	 * Returns true if the model is valid.
 	 *
 	 * @param boolean $force_validation If true, will always run validations.
 	 * @see is_invalid
@@ -1255,7 +1244,7 @@ class Model
 	}
 
 	/**
-	 * Returns true if invalid.
+	 * Returns true if the model is invalid.
 	 *
 	 * @param boolean $force_validation If true, will always run validations.
 	 * @see is_valid
