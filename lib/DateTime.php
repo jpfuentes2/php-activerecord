@@ -33,7 +33,7 @@ namespace ActiveRecord;
  * @package ActiveRecord
  * @see http://php.net/manual/en/class.datetime.php
  */
-class DateTime extends \DateTime
+class DateTime extends \DateTime implements DateTimeInterface
 {
 	/**
 	 * Default format used for format() and __toString()
@@ -113,9 +113,38 @@ class DateTime extends \DateTime
 		return $format;
 	}
 
+	/**
+	 * This needs to be overriden so it returns an instance of this class instead of PHP's \DateTime.
+	 * See http://php.net/manual/en/datetime.createfromformat.php
+	 */
+	public static function createFromFormat($format, $time, $tz = null)
+	{
+		$phpDate = $tz ? parent::createFromFormat($format, $time, $tz) : parent::createFromFormat($format, $time);
+		if (!$phpDate)
+			return false;
+		// convert to this class using the timestamp
+		$ourDate = new static(null, $phpDate->getTimezone());
+		$ourDate->setTimestamp($phpDate->getTimestamp());
+		return $ourDate;
+	}
+
 	public function __toString()
 	{
 		return $this->format();
+	}
+
+	/**
+	 * Handle PHP object `clone`.
+	 *
+	 * This makes sure that the object doesn't still flag an attached model as
+	 * dirty after cloning the DateTime object and making modifications to it.
+	 *
+	 * @return void
+	 */
+	public function __clone()
+	{
+		$this->model = null;
+		$this->attribute_name = null;
 	}
 
 	private function flag_dirty()
@@ -127,24 +156,49 @@ class DateTime extends \DateTime
 	public function setDate($year, $month, $day)
 	{
 		$this->flag_dirty();
-		call_user_func_array(array($this,'parent::setDate'),func_get_args());
+		return parent::setDate($year, $month, $day);
 	}
 
-	public function setISODate($year, $week , $day=null)
+	public function setISODate($year, $week , $day = 1)
 	{
 		$this->flag_dirty();
-		call_user_func_array(array($this,'parent::setISODate'),func_get_args());
+		return parent::setISODate($year, $week, $day);
 	}
 
-	public function setTime($hour, $minute, $second=null)
+	public function setTime($hour, $minute, $second = 0, $microseconds = 0)
 	{
 		$this->flag_dirty();
-		call_user_func_array(array($this,'parent::setTime'),func_get_args());
+		return parent::setTime($hour, $minute, $second);
 	}
 
 	public function setTimestamp($unixtimestamp)
 	{
 		$this->flag_dirty();
-		call_user_func_array(array($this,'parent::setTimestamp'),func_get_args());
+		return parent::setTimestamp($unixtimestamp);
 	}
+
+	public function setTimezone($timezone)
+	{
+		$this->flag_dirty();
+		return parent::setTimezone($timezone);
+	}
+	
+	public function modify($modify)
+	{
+		$this->flag_dirty();
+		return parent::modify($modify);
+	}
+	
+	public function add($interval)
+	{
+		$this->flag_dirty();
+		return parent::add($interval);
+	}
+
+	public function sub($interval)
+	{
+		$this->flag_dirty();
+		return parent::sub($interval);
+	}
+
 }

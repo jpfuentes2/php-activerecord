@@ -14,6 +14,8 @@ class DatabaseTest extends SnakeCase_PHPUnit_Framework_TestCase
 		$config = ActiveRecord\Config::instance();
 		$this->original_default_connection = $config->get_default_connection();
 
+		$this->original_date_class = $config->get_date_class();
+
 		if ($connection_name)
 			$config->set_default_connection($connection_name);
 
@@ -42,6 +44,7 @@ class DatabaseTest extends SnakeCase_PHPUnit_Framework_TestCase
 
 	public function tear_down()
 	{
+		ActiveRecord\Config::instance()->set_date_class($this->original_date_class);
 		if ($this->original_default_connection)
 			ActiveRecord\Config::instance()->set_default_connection($this->original_default_connection);
 	}
