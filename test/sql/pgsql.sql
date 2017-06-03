@@ -1,6 +1,7 @@
 CREATE TABLE authors(
 	author_id SERIAL PRIMARY KEY,
 	parent_author_id INT,
+	publisher_id INT,
 	name VARCHAR(25) NOT NULL DEFAULT 'default_name',
 	updated_at timestamp,
 	created_at timestamp,
