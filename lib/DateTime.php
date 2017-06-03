@@ -165,7 +165,7 @@ class DateTime extends \DateTime implements DateTimeInterface
 		return parent::setISODate($year, $week, $day);
 	}
 
-	public function setTime($hour, $minute, $second = 0)
+	public function setTime($hour, $minute, $second = 0, $microseconds = 0)
 	{
 		$this->flag_dirty();
 		return parent::setTime($hour, $minute, $second);
