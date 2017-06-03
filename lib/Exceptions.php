@@ -148,3 +148,10 @@ class HasManyThroughAssociationException extends RelationshipException {}
  * @package ActiveRecord
  */
 class UnsafeParametersException extends ActiveRecordException {}
+
+/**
+ * Thrown for non existing parameter from requireParam
+ *
+ * @package ActiveRecord
+ */
+class ParameterMissingException extends ActiveRecordException {}

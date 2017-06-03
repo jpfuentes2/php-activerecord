@@ -14,10 +14,7 @@ use ArrayIterator;
  *
  *   public function beforeFilter()
  *   {
- *       foreach($_POST as $group => $params)
- *       {
- *           $this->request->data[$group] = new ActiveRecord\StrongParameters($params);
- *       }
+ *       $this->request->params = new ActiveRecord\StrongParameters($_POST);
  *   }
  *
  * This assumes that your POST data is grouped as follows;
@@ -41,7 +38,7 @@ use ArrayIterator;
  *
  *   protected function user_params()
  *   {
- *       return $this->request->data['user']->permit('name', 'bio', 'email');
+ *       return $this->request->params->requireParam('user')->permit('name', 'bio', 'email');
  *   }
  *
  *
@@ -69,16 +66,33 @@ class StrongParameters implements IteratorAggregate
 	 * @param array $data
 	 * @return void
 	 */
-	public function __construct(array $data = array())
+	public function __construct(array $data)
 	{
-		$this->data = $data;
+		$this->data = $this->parse($data);
+	}
+
+	/**
+	 * Recursively parse array into StrongParameter
+	 * @param array $data
+	 * @return array
+	 */
+	protected function parse(array $data)
+	{
+		return array_map(function($value)
+		{
+			if (!is_array($value))
+			{
+				return $value;
+			}
+			return new StrongParameters($value);
+		}, $data);
 	}
 
 	/**
 	 * Permit the specified attributes to be returned for mass assignment.
 	 *
 	 * @param mixed $attrs,...
-	 * @return void
+	 * @return this
 	 */
 	public function permit($attrs = array()/* [, ...$attr] */)
 	{
@@ -91,6 +105,24 @@ class StrongParameters implements IteratorAggregate
 			$attrs = array($attrs);
 		}
 		$this->permitted = $attrs;
+		return $this;
+	}
+
+	public function fetch($key)
+	{
+		if (isset($this->data[$key])) {
+			return $this->data[$key];
+		}
+		return null;
+	}
+
+	public function requireParam($key)
+	{
+		$param = $this->fetch($key);
+		if (empty($param)) {
+			throw new ParameterMissingException("Missing param '$key'");
+		}
+		return $param;
 	}
 
 	/**

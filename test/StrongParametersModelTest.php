@@ -1,26 +1,30 @@
 <?php
 
-class StrongParametersModelTest extends DatabaseTest
+namespace ActiveRecord;
+
+use Book;
+
+class StrongParametersModelTest extends \DatabaseTest
 {
 
 	private static $require_strong_parameters;
 
 	public static function setUpBeforeClass()
 	{
-		$config = ActiveRecord\Config::instance();
+		$config = Config::instance();
 		self::$require_strong_parameters = $config->get_require_strong_parameters();
 		$config->set_require_strong_parameters(true);
 	}
 
 	public static function tearDownAfterClass()
 	{
-		$config = ActiveRecord\Config::instance();
+		$config = Config::instance();
 		$config->set_require_strong_parameters(self::$require_strong_parameters);
 	}
 
 	public function testConstructWithStrongParameters()
 	{
-		$params = new ActiveRecord\StrongParameters(array(
+		$params = new StrongParameters(array(
 			'name' => 'Foo',
 		));
 		$book = new Book($params);
@@ -36,7 +40,7 @@ class StrongParametersModelTest extends DatabaseTest
 	 */
 	public function testConstructWithoutStrongParametersThrowsException()
 	{
-		$config = ActiveRecord\Config::instance();
+		$config = Config::instance();
 		$require_strong_parameters = $config->get_require_strong_parameters();
 		$config->set_require_strong_parameters(true);
 
@@ -46,7 +50,7 @@ class StrongParametersModelTest extends DatabaseTest
 
 	public function testUpdateAttributesWithStrongParameters()
 	{
-		$params = new ActiveRecord\StrongParameters(array(
+		$params = new StrongParameters(array(
 			'name' => 'Foo',
 		));
 		$book = new Book();
@@ -63,7 +67,7 @@ class StrongParametersModelTest extends DatabaseTest
 	 */
 	public function testUpdateAttributesWithoutStrongParameters()
 	{
-		$config = ActiveRecord\Config::instance();
+		$config = Config::instance();
 		$require_strong_parameters = $config->get_require_strong_parameters();
 		$config->set_require_strong_parameters(true);
 
