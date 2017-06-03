@@ -108,6 +108,12 @@ class StrongParameters implements IteratorAggregate
 		return $this;
 	}
 
+	/**
+	 * Fetch a value from the data
+	 *
+	 * @param string $key
+	 * @return mixed
+	 */
 	public function fetch($key)
 	{
 		if (isset($this->data[$key])) {
@@ -116,6 +122,14 @@ class StrongParameters implements IteratorAggregate
 		return null;
 	}
 
+	/**
+	 * Fetch a required value from the data. If the param doesn't exist an error
+	 * is thrown
+	 *
+	 * @param string $key
+	 * @throws ActiveRecord\ParameterMissingException
+	 * @return mixed
+	 */
 	public function requireParam($key)
 	{
 		$param = $this->fetch($key);
