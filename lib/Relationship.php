@@ -291,7 +291,7 @@ abstract class AbstractRelationship implements InterfaceRelationship
 		if (!has_absolute_namespace($class_name) && isset($this->options['namespace'])) {
 			$class_name = $this->options['namespace'].'\\'.$class_name;
 		}
-		
+
 		$reflection = Reflections::instance()->add($class_name)->get($class_name);
 
 		if (!$reflection->isSubClassOf('ActiveRecord\\Model'))
@@ -507,7 +507,7 @@ class HasMany extends AbstractRelationship
 				$fk = $this->foreign_key;
 
 				$this->set_keys($this->get_table()->class->getName(), true);
-				
+
 				$class = $this->class_name;
 				$relation = $class::table()->get_relationship($this->through);
 				$through_table = $relation->get_table();
@@ -726,5 +726,14 @@ class BelongsTo extends AbstractRelationship
 	public function load_eagerly($models=array(), $attributes, $includes, Table $table)
 	{
 		$this->query_and_attach_related_models_eagerly($table,$models,$attributes,$includes, $this->primary_key,$this->foreign_key);
+	}
+
+	// Unlike the other relationships, a belongs_to stores its foreign key on the associate (and not
+	// on the new record). Therewfore, we must override the append_record_to_associate behaviour of
+	// AbstractRelationship to provide this behaviour.
+	protected function append_record_to_associate(Model $associate, Model $record)
+	{
+		$associate->{$this->foreign_key[0]} = $record->id;
+		return $record;
 	}
 }
