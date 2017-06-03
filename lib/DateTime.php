@@ -168,7 +168,7 @@ class DateTime extends \DateTime implements DateTimeInterface
 	public function setTime($hour, $minute, $second = null, $microseconds = null)
 	{
 		$this->flag_dirty();
-		return parent::setTime($hour, $minute, $second);
+		return parent::setTime($hour, $minute, $second, $microseconds);
 	}
 
 	public function setTimestamp($unixtimestamp)
