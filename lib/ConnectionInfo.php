@@ -4,17 +4,54 @@ namespace ActiveRecord;
 
 class ConnectionInfo {
 
+	/**
+	 * The adapter to use for this connection
+	 *
+	 * @var string
+	 */
 	public $adapter = null;
+
+	/**
+	 * The host to use for this connection.
+	 *
+	 * @var string
+	 */
 	public $host = null;
+
+	/**
+	 * The port to use for this connection.
+	 *
+	 * @var int
+	 */
 	public $port = null;
+
+	/**
+	 * The database to use for this connection.
+	 *
+	 * @var string
+	 */
 	public $database = null;
 
+	/**
+	 * The username to use for this connection.
+	 *
+	 * @var string
+	 */
 	public $username = null;
+
+	/**
+	 * The password to use for this connection.
+	 *
+	 * @var string
+	 */
 	public $password = null;
 
+	/**
+	 * The charset to use for this connection.
+	 *
+	 * @var string
+	 */
 	public $charset = null;
-
-	public $decode = false;
 
 	public function __construct($input = array())
 	{
@@ -62,6 +99,8 @@ class ConnectionInfo {
 		$info->adapter = $url['scheme'];
 		$info->host = $url['host'];
 
+		$decode = false;
+
 		if (isset($url['query']))
 		{
 			parse_str($url['query'], $params);
@@ -70,7 +109,7 @@ class ConnectionInfo {
 				$info->charset = $params['charset'];
 
 			if(isset($params['decode']))
-				$info->decode = ($params['decode'] == 'true');
+				$decode = ($params['decode'] == 'true');
 		}
 
 		if(isset($url['path']))
@@ -102,10 +141,10 @@ class ConnectionInfo {
 			$info->port = $url['port'];
 
 		if (isset($url['user']))
-			$info->username = $info->decode ? urldecode($url['user']) : $url['user'];
+			$info->username = $decode ? urldecode($url['user']) : $url['user'];
 
 		if (isset($url['pass']))
-			$info->password = $info->decode ? urldecode($url['pass']) : $url['pass'];
+			$info->password = $decode ? urldecode($url['pass']) : $url['pass'];
 
 		return $info;
 	}
