@@ -314,8 +314,8 @@ abstract class Connection
 	{
 		if ($this->logging)
 		{
-			$this->logger->log($sql);
-			if ( $values ) $this->logger->log($values);
+			$this->logger->debug($sql);
+			if ( $values ) $this->logger->debug("Values:", $values);
 		}
 
 		$this->last_query = $sql;
