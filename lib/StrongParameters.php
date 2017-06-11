@@ -80,7 +80,7 @@ class StrongParameters implements IteratorAggregate
 	{
 		return array_map(function($value)
 		{
-			if (!is_array($value))
+			if (!is_hash($value))
 			{
 				return $value;
 			}
