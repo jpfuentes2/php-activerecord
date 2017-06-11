@@ -4,22 +4,25 @@ namespace ActiveRecord;
 
 use IteratorAggregate;
 use ArrayIterator;
+use ArrayAccess;
+use InvalidArgumentException;
 
 /**
  * The use of StrongParameters is implementation dependent.
  *
  * You probably want to integrate this somewhere in your application where the POST data is processed.
  *
- * For example, in your Controller class you can process the POST data:
+ * For example, in your controller class you can process the request data:
  *
  *   public function beforeFilter()
  *   {
- *       $this->params = new ActiveRecord\StrongParameters($_POST);
+ *       $this->params = new ActiveRecord\StrongParameters(array_merge($_GET, $_POST));
  *   }
  *
- * This assumes that your POST data is grouped as follows;
+ * This example assumes that your request data is structured as follows;
  *
- *   $_POST = array(
+ *   array(
+ *       "id" => 1,
  *       "user" => array(
  *           "name" => "Foo Bar",
  *           "bio" => "I'm Foo Bar",
@@ -27,11 +30,11 @@ use ArrayIterator;
  *       )
  *   )
  *
- * And then in the UserController class you can access the data
+ * And then to use the data in a controller:
  *
  *   public function update_profile()
  *   {
- *       $user = User::find($this->request->params['id']);
+ *       $user = User::find($this->params['id']);
  *       $user->update_attributes($this->user_params());
  *       $this->redirect('back');
  *   }
@@ -44,7 +47,7 @@ use ArrayIterator;
  *
  * @package ActiveRecord
  */
-class StrongParameters implements IteratorAggregate
+class StrongParameters implements IteratorAggregate, ArrayAccess
 {
 	/**
 	 * Array containing data
@@ -156,6 +159,56 @@ class StrongParameters implements IteratorAggregate
 	{
 		$permitted_data = array_intersect_key($this->data, array_flip($this->permitted));
 		return new ArrayIterator($permitted_data);
+	}
+
+	/**
+	 * Required method for ArrayAccess interface.
+	 *
+	 * @param string $offset
+	 * @return bool true if offset exists
+	 */
+	public function offsetExists($offset)
+	{
+		return isset($this->data[$offset]);
+	}
+
+	/**
+	 * Required method for ArrayAccess interface.
+	 *
+	 * @param string $offset
+	 * @return mixed
+	 * @see fetch
+	 */
+	public function offsetGet($offset)
+	{
+		return $this->fetch($offset);
+	}
+
+	/**
+	 * Required method for ArrayAccess interface.
+	 *
+	 * @param string $offset
+	 * @param mixed $value
+	 * @return void
+	 * @throws InvalidArgumentException when offset is null
+	 */
+	public function offsetSet($offset, $value)
+	{
+		if (is_null($offset)) {
+			throw new InvalidArgumentException('offset cannot be null');
+		}
+		$this->data[$offset] = $value;
+	}
+
+	/**
+	 * Required method for ArrayAccess interface.
+	 *
+	 * @param string $offset
+	 * @return void
+	 */
+	public function offsetUnset($offset)
+	{
+		unset($this->data[$offset]);
 	}
 
 }
