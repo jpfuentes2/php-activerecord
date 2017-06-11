@@ -133,6 +133,13 @@ class Model
 	private $__new_record = true;
 
 	/**
+	 * Flag whether or not this model has been validated
+	 *
+	 * @var boolean
+	 */
+	private $__validated = false;
+
+	/**
 	 * Set to the name of the connection this {@link Model} should use.
 	 *
 	 * @var string
@@ -504,6 +511,7 @@ class Model
 			// set the attribute and flag as dirty
 			$this->attributes[$name] = $value;
 			$this->flag_dirty($name);
+			$this->reset_validated();
 		}
 		return $value;
 	}
@@ -1155,6 +1163,8 @@ class Model
 	{
 		require_once 'Validations.php';
 
+		$this->flag_validated();
+
 		$validator = new Validations($this);
 		$validation_mode = $this->is_new_record() ? 'create' : 'update';
 		$validation_on = 'validation_on_' . $validation_mode;
@@ -1180,6 +1190,36 @@ class Model
 	}
 
 	/**
+	 * Returns true if the model has been validated.
+	 *
+	 * @return boolean true if validated
+	 */
+	private function is_validated()
+	{
+		return $this->__validated;
+	}
+
+	/**
+	 * Flag model as validated
+	 *
+	 * @return void
+	 */
+	private function flag_validated()
+	{
+		$this->__validated = true;
+	}
+
+	/**
+	 * Resets the validated flag.
+	 *
+	 * @return void
+	 */
+	private function reset_validated()
+	{
+		$this->__validated = false;
+	}
+
+	/**
 	 * Returns true if the model has been modified.
 	 *
 	 * @return boolean true if modified
@@ -1190,25 +1230,30 @@ class Model
 	}
 
 	/**
-	 * Run validations on model and returns whether or not model passed validation.
+	 * Returns true if the model is valid.
 	 *
+	 * @param boolean $force_validation If true, will always run validations.
 	 * @see is_invalid
 	 * @return boolean
 	 */
-	public function is_valid()
+	public function is_valid($force_validation = false)
 	{
-		return $this->_validate();
+		if( $force_validation || !$this->is_validated() )
+			return $this->_validate();
+
+		return $this->errors->is_empty();
 	}
 
 	/**
-	 * Runs validations and returns true if invalid.
+	 * Returns true if the model is invalid.
 	 *
+	 * @param boolean $force_validation If true, will always run validations.
 	 * @see is_valid
 	 * @return boolean
 	 */
-	public function is_invalid()
+	public function is_invalid($force_validation = false)
 	{
-		return !$this->_validate();
+		return !$this->is_valid($force_validation);
 	}
 
 	/**
@@ -1376,6 +1421,7 @@ class Model
 		$this->expire_cache();
 		$this->set_attributes_via_mass_assignment($this->find($pk)->attributes, false);
 		$this->reset_dirty();
+		$this->reset_validated();
 
 		return $this;
 	}
@@ -1384,6 +1430,7 @@ class Model
 	{
 		$this->__relationships = array();
 		$this->reset_dirty();
+		$this->reset_validated();
 		return $this;
 	}
 
