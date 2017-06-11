@@ -1,9 +1,9 @@
 <?php
 use ActiveRecord\Cache;
 
-class CacheTest extends SnakeCase_PHPUnit_Framework_TestCase
+class CacheTest extends TestCase
 {
-	public function set_up()
+	public function setUp()
 	{
 		if (!extension_loaded('memcache'))
 		{
@@ -14,7 +14,7 @@ class CacheTest extends SnakeCase_PHPUnit_Framework_TestCase
 		Cache::initialize('memcache://localhost');
 	}
 
-	public function tear_down()
+	public function tearDown()
 	{
 		Cache::flush();
 	}
@@ -26,24 +26,24 @@ class CacheTest extends SnakeCase_PHPUnit_Framework_TestCase
 
 	public function test_initialize()
 	{
-		$this->assert_not_null(Cache::$adapter);
+		$this->assertNotNull(Cache::$adapter);
 	}
 
 	public function test_initialize_with_null()
 	{
 		Cache::initialize(null);
-		$this->assert_null(Cache::$adapter);
+		$this->assertNull(Cache::$adapter);
 	}
 
 	public function test_get_returns_the_value()
 	{
-		$this->assert_equals("abcd", $this->cache_get());
+		$this->assertEquals("abcd", $this->cache_get());
 	}
 
 	public function test_get_writes_to_the_cache()
 	{
 		$this->cache_get();
-		$this->assert_equals("abcd", Cache::$adapter->read("1337"));
+		$this->assertEquals("abcd", Cache::$adapter->read("1337"));
 	}
 
 	public function test_get_does_not_execute_closure_on_cache_hit()
@@ -54,13 +54,13 @@ class CacheTest extends SnakeCase_PHPUnit_Framework_TestCase
 
 	public function test_cache_adapter_returns_false_on_cache_miss()
 	{
-		$this->assert_same(false, Cache::$adapter->read("some-key"));
+		$this->assertSame(false, Cache::$adapter->read("some-key"));
 	}
 
 	public function test_get_works_without_caching_enabled()
 	{
 		Cache::$adapter = null;
-		$this->assert_equals("abcd", $this->cache_get());
+		$this->assertEquals("abcd", $this->cache_get());
 	}
 
 	public function test_cache_expire()
@@ -69,14 +69,14 @@ class CacheTest extends SnakeCase_PHPUnit_Framework_TestCase
 		$this->cache_get();
 		sleep(2);
 
-		$this->assert_same(false, Cache::$adapter->read("1337"));
+		$this->assertSame(false, Cache::$adapter->read("1337"));
 	}
 	
 	public function test_namespace_is_set_properly()
 	{
 		Cache::$options['namespace'] = 'myapp';
 		$this->cache_get();
-		$this->assert_same("abcd", Cache::$adapter->read("myapp::1337"));
+		$this->assertSame("abcd", Cache::$adapter->read("myapp::1337"));
 	}
 
 	/**

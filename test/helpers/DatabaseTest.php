@@ -1,13 +1,13 @@
 <?php
 require_once __DIR__ . '/DatabaseLoader.php';
 
-class DatabaseTest extends SnakeCase_PHPUnit_Framework_TestCase
+class DatabaseTest extends TestCase
 {
 	protected $conn;
 	public static $log = false;
 	public static $db;
 
-	public function set_up($connection_name=null)
+	public function setUp($connection_name=null)
 	{
 		ActiveRecord\Table::clear_cache();
 
@@ -31,7 +31,7 @@ class DatabaseTest extends SnakeCase_PHPUnit_Framework_TestCase
 		try {
 			$this->conn = ActiveRecord\ConnectionManager::get_connection($connection_name);
 		} catch (ActiveRecord\DatabaseException $e) {
-			$this->mark_test_skipped($connection_name . ' failed to connect. '.$e->getMessage());
+			$this->markTestSkipped($connection_name . ' failed to connect. '.$e->getMessage());
 		}
 
 		$GLOBALS['ACTIVERECORD_LOG'] = false;
@@ -43,14 +43,14 @@ class DatabaseTest extends SnakeCase_PHPUnit_Framework_TestCase
 			$GLOBALS['ACTIVERECORD_LOG'] = true;
 	}
 
-	public function tear_down()
+	public function tearDown()
 	{
 		ActiveRecord\Config::instance()->set_date_class($this->original_date_class);
 		if ($this->original_default_connection)
 			ActiveRecord\Config::instance()->set_default_connection($this->original_default_connection);
 	}
 
-	public function assert_exception_message_contains($contains, $closure)
+	public function assertExceptionMessageContains($contains, $closure)
 	{
 		$message = "";
 
@@ -69,14 +69,14 @@ class DatabaseTest extends SnakeCase_PHPUnit_Framework_TestCase
 	 * Takes database specific quotes into account by removing them. So, this won't
 	 * work if you have actual quotes in your strings.
 	 */
-	public function assert_sql_has($needle, $haystack)
+	public function assertSqlHas($needle, $haystack)
 	{
 		$needle = str_replace(array('"','`'),'',$needle);
 		$haystack = str_replace(array('"','`'),'',$haystack);
 		return $this->assertContains($needle, $haystack);
 	}
 
-	public function assert_sql_doesnt_has($needle, $haystack)
+	public function assertSqlDoesntHas($needle, $haystack)
 	{
 		$needle = str_replace(array('"','`'),'',$needle);
 		$haystack = str_replace(array('"','`'),'',$haystack);
