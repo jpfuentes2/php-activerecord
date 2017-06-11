@@ -272,7 +272,7 @@ class Validations
 				$enum = $options['within'];
 
 			if (!is_array($enum))
-				array($enum);
+				$enum = array($enum);
 
 			$message = str_replace('%s', $var, $options['message']);
 

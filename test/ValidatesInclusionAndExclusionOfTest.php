@@ -101,7 +101,7 @@ class ValidatesInclusionAndExclusionOfTest extends DatabaseTest
 		$this->assert_true($book->errors->is_invalid('name'));
 	}
 
-	public function tes_inclusion_within_option()
+	public function test_inclusion_within_option()
 	{
 		BookInclusion::$validates_inclusion_of[0] = array('name', 'within' => array('okay'));
 		$book = new BookInclusion;
@@ -110,7 +110,7 @@ class ValidatesInclusionAndExclusionOfTest extends DatabaseTest
 		$this->assert_false($book->errors->is_invalid('name'));
 	}
 
-	public function tes_inclusion_scalar_value()
+	public function test_inclusion_scalar_value()
 	{
 		BookInclusion::$validates_inclusion_of[0] = array('name', 'within' => 'okay');
 		$book = new BookInclusion;
