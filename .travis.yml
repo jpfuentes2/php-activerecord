@@ -3,6 +3,7 @@ install: composer install --prefer-source --dev
 before_script:
   - echo 'extension = "memcache.so"' >> ~/.phpenv/versions/$(phpenv version-name)/etc/php.ini
   - mysql -e 'CREATE DATABASE phpar_test;'
+  - mysql -e "SET GLOBAL sql_mode = 'NO_ENGINE_SUBSTITUTION,STRICT_TRANS_TABLES'"
   - psql -c 'CREATE DATABASE phpar_test;' -U postgres
 
 services:
