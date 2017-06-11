@@ -14,7 +14,7 @@ use ArrayIterator;
  *
  *   public function beforeFilter()
  *   {
- *       $this->request->params = new ActiveRecord\StrongParameters($_POST);
+ *       $this->params = new ActiveRecord\StrongParameters($_POST);
  *   }
  *
  * This assumes that your POST data is grouped as follows;
@@ -38,7 +38,7 @@ use ArrayIterator;
  *
  *   protected function user_params()
  *   {
- *       return $this->request->params->requireParam('user')->permit('name', 'bio', 'email');
+ *       return $this->params->require_param('user')->permit('name', 'bio', 'email');
  *   }
  *
  *
@@ -137,6 +137,14 @@ class StrongParameters implements IteratorAggregate
 			throw new ParameterMissingException("Missing param '$key'");
 		}
 		return $param;
+	}
+
+	/**
+	 * @see requireParam
+	 */
+	public function require_param($key)
+	{
+		return $this->requireParam($key);
 	}
 
 	/**
