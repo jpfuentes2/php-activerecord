@@ -20,9 +20,10 @@ class MysqlAdapterTest extends AdapterTest
 
 	public function test_set_charset()
 	{
-		$connection_string = ActiveRecord\Config::instance()->get_connection($this->connection_name);
-		$conn = ActiveRecord\Connection::instance($connection_string . '?charset=utf8');
-		$this->assert_equals('SET NAMES ?',$conn->last_query);
+		$connection_info = ActiveRecord\Config::instance()->get_connection_info($this->connection_name);
+		$connection_info->charset = 'utf8';
+		$conn = ActiveRecord\Connection::instance($connection_info);
+		$this->assert_equals('SET NAMES ?', $conn->last_query);
 	}
 
 	public function test_limit_with_null_offset_does_not_contain_offset()

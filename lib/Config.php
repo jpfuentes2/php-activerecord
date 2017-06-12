@@ -125,11 +125,23 @@ class Config extends Singleton
 	}
 
 	/**
-	 * Sets the list of database connection strings.
+	 * Sets the list of database connections. Can be an array of connection strings or an array of arrays.
 	 *
 	 * <code>
 	 * $config->set_connections(array(
 	 *     'development' => 'mysql://username:password@127.0.0.1/database_name'));
+	 * </code>
+	 *
+	 * <code>
+	 * $config->set_connections(array(
+	 *     'development' => array(
+	 *         'adapter' => 'mysql',
+	 *         'host' => '127.0.0.1',
+	 *         'database' => 'database_name',
+	 *         'username' => 'username',
+	 *         'password' => 'password'
+	 *     )
+	 * ));
 	 * </code>
 	 *
 	 * @param array $connections Array of connections
@@ -145,7 +157,16 @@ class Config extends Singleton
 		if ($default_connection)
 			$this->set_default_connection($default_connection);
 
-		$this->connections = $connections;
+		$this->connections = array_map(function($connection){
+			if(is_string($connection))
+			{
+				return ConnectionInfo::from_connection_url($connection);
+			}
+			else
+			{
+				return new ConnectionInfo($connection);
+			}
+		}, $connections);
 	}
 
 	/**
@@ -164,7 +185,7 @@ class Config extends Singleton
 	 * @param string $name Name of connection to retrieve
 	 * @return string connection info for specified connection name
 	 */
-	public function get_connection($name)
+	public function get_connection_info($name)
 	{
 		if (array_key_exists($name, $this->connections))
 			return $this->connections[$name];
@@ -177,7 +198,7 @@ class Config extends Singleton
 	 *
 	 * @return string
 	 */
-	public function get_default_connection_string()
+	public function get_default_connection_info()
 	{
 		return array_key_exists($this->default_connection,$this->connections) ?
 			$this->connections[$this->default_connection] : null;
