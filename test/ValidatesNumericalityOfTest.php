@@ -19,86 +19,86 @@ class ValidatesNumericalityOfTest extends DatabaseTest
 	static $INTEGERS = array(0, 10, -10);
 	static $JUNK = array("not a number", "42 not a number", "00-1", "--3", "+-3", "+3-1", "-+019.0", "12.12.13.12", "123\nnot a number");
 
-	public function set_up($connection_name=null)
+	public function setUp($connection_name=null)
 	{
-		parent::set_up($connection_name);
+		parent::setUp($connection_name);
 		BookNumericality::$validates_numericality_of = array(
 			array('numeric_test')
 		);
 	}
 
-	private function assert_validity($value, $boolean, $msg=null)
+	private function assertValidity($value, $boolean, $msg=null)
 	{
 		$book = new BookNumericality;
 		$book->numeric_test = $value;
 
 		if ($boolean == 'valid')
 		{
-			$this->assert_true($book->save());
-			$this->assert_false($book->errors->is_invalid('numeric_test'));
+			$this->assertTrue($book->save());
+			$this->assertFalse($book->errors->is_invalid('numeric_test'));
 		}
 		else
 		{
-			$this->assert_false($book->save());
-			$this->assert_true($book->errors->is_invalid('numeric_test'));
+			$this->assertFalse($book->save());
+			$this->assertTrue($book->errors->is_invalid('numeric_test'));
 
 			if (!is_null($msg))
-				$this->assert_same($msg, $book->errors->on('numeric_test'));
+				$this->assertSame($msg, $book->errors->on('numeric_test'));
 		}
 	}
 
-	private function assert_invalid($values, $msg=null)
+	private function assertInvalid($values, $msg=null)
 	{
 		foreach ($values as $value)
-			$this->assert_validity($value, 'invalid', $msg);
+			$this->assertValidity($value, 'invalid', $msg);
 	}
 
-	private function assert_valid($values, $msg=null)
+	private function assertValid($values, $msg=null)
 	{
 		foreach ($values as $value)
-			$this->assert_validity($value, 'valid', $msg);
+			$this->assertValidity($value, 'valid', $msg);
 	}
 
 	public function test_numericality()
 	{
-		//$this->assert_invalid(array("0xdeadbeef"));
+		//$this->assertInvalid(array("0xdeadbeef"));
 
-		$this->assert_valid(array_merge(self::$FLOATS, self::$INTEGERS));
-		$this->assert_invalid(array_merge(self::$NULL, self::$BLANK, self::$JUNK));
+		$this->assertValid(array_merge(self::$FLOATS, self::$INTEGERS));
+		$this->assertInvalid(array_merge(self::$NULL, self::$BLANK, self::$JUNK));
 	}
 
 	public function test_not_anumber()
 	{
-		$this->assert_invalid(array('blah'), 'is not a number');
+		$this->assertInvalid(array('blah'), 'is not a number');
 	}
 
 	public function test_invalid_null()
 	{
-		$this->assert_invalid(array(null));
+		$this->assertInvalid(array(null));
 	}
 
 	public function test_invalid_blank()
 	{
-		$this->assert_invalid(array(' ', '  '), 'is not a number');
+		$this->assertInvalid(array(' ', '  '), 'is not a number');
 	}
 
 	public function test_invalid_whitespace()
 	{
-		$this->assert_invalid(array(''));
+		$this->assertInvalid(array(''));
 	}
 
 	public function test_valid_null()
 	{
 		BookNumericality::$validates_numericality_of[0]['allow_null'] = true;
-		$this->assert_valid(array(null));
+		$this->assertValid(array(null));
 	}
 
 	public function test_only_integer()
 	{
 		BookNumericality::$validates_numericality_of[0]['only_integer'] = true;
 
-		$this->assert_valid(array(1, '1'));
-		$this->assert_invalid(array(1.5, '1.5'));
+		$this->assertValid(array(1, '1'));
+		$this->assertInvalid(array(1.5, '1.5'));
 	}
 
 	public function test_only_integer_matching_does_not_ignore_other_options()
@@ -106,47 +106,47 @@ class ValidatesNumericalityOfTest extends DatabaseTest
 		BookNumericality::$validates_numericality_of[0]['only_integer'] = true;
 		BookNumericality::$validates_numericality_of[0]['greater_than'] = 0;
 
-		$this->assert_invalid(array(-1,'-1'));
+		$this->assertInvalid(array(-1,'-1'));
 	}
 
 	public function test_greater_than()
 	{
 		BookNumericality::$validates_numericality_of[0]['greater_than'] = 5;
 
-		$this->assert_valid(array(6, '7'));
-		$this->assert_invalid(array(5, '5'), 'must be greater than 5');
+		$this->assertValid(array(6, '7'));
+		$this->assertInvalid(array(5, '5'), 'must be greater than 5');
 	}
 
 	public function test_greater_than_or_equal_to()
 	{
 		BookNumericality::$validates_numericality_of[0]['greater_than_or_equal_to'] = 5;
 
-		$this->assert_valid(array(5, 5.1, '5.1'));
-		$this->assert_invalid(array(-50, 4.9, '4.9','-5.1'));
+		$this->assertValid(array(5, 5.1, '5.1'));
+		$this->assertInvalid(array(-50, 4.9, '4.9','-5.1'));
 	}
 
 	public function test_less_than()
 	{
 		BookNumericality::$validates_numericality_of[0]['less_than'] = 5;
 
-		$this->assert_valid(array(4.9, -1, 0, '-5'));
-		$this->assert_invalid(array(5, '5'), 'must be less than 5');
+		$this->assertValid(array(4.9, -1, 0, '-5'));
+		$this->assertInvalid(array(5, '5'), 'must be less than 5');
 	}
 
 	public function test_less_than_or_equal_to()
 	{
 		BookNumericality::$validates_numericality_of[0]['less_than_or_equal_to'] = 5;
 
-		$this->assert_valid(array(5, -1, 0, 4.9, '-5'));
-		$this->assert_invalid(array('8', 5.1), 'must be less than or equal to 5');
+		$this->assertValid(array(5, -1, 0, 4.9, '-5'));
+		$this->assertInvalid(array('8', 5.1), 'must be less than or equal to 5');
 	}
 
 	public function test_greater_than_less_than_and_even()
 	{
 		BookNumericality::$validates_numericality_of[0] = array('numeric_test', 'greater_than' => 1, 'less_than' => 4, 'even' => true);
 
-		$this->assert_valid(array(2));
-		$this->assert_invalid(array(1,3,4));
+		$this->assertValid(array(2));
+		$this->assertInvalid(array(1,3,4));
 	}
 
 	public function test_custom_message()
@@ -156,7 +156,7 @@ class ValidatesNumericalityOfTest extends DatabaseTest
 		);
 		$book = new BookNumericality(array('numeric_test' => 'NaN'));
 		$book->is_valid();
-		$this->assert_equals(array('Numeric test Hello'),$book->errors->full_messages());
+		$this->assertEquals(array('Numeric test Hello'),$book->errors->full_messages());
 	}
 }
 
