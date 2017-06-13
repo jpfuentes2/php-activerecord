@@ -441,4 +441,46 @@ class ActiveRecordWriteTest extends DatabaseTest
 		$this->assert_true($our_datetime === $author->some_date);
 	}
 
+	public function test_touch()
+	{
+		$author = Author::create(array('name' => 'MC Hammer'));
+		$updated_at = $author->updated_at = new DateTime('yesterday');
+		$author->save();
+		$author->touch();
+		$this->assertGreaterThan($updated_at, $author->updated_at);
+	}
+
+	/**
+	 * @expectedException ActiveRecord\ActiveRecordException
+	 * @expectedExceptionMessage Cannot touch on a new record object
+	 */
+	public function test_touch_on_new_record()
+	{
+		$author = new Author(array('name' => 'MC Hammer'));
+		$author->touch();
+	}
+
+	public function test_touch_with_additional_keys()
+	{
+		$author = Author::create(array('name' => 'MC Hammer'));
+		$updated_at = $author->updated_at = new DateTime('yesterday');
+		$some_date = $author->some_date = new DateTime('yesterday');
+		$author->save();
+		$author->touch(array('some_date'));
+		$this->assertGreaterThan($updated_at, $author->updated_at);
+		$this->assertGreaterThan($some_date, $author->some_date);
+	}
+
+	public function test_touch_with_scalar()
+	{
+		$author = Author::create(array('name' => 'MC Hammer'));
+		$updated_at = $author->updated_at = new DateTime('yesterday');
+		$some_date = $author->some_date = new DateTime('yesterday');
+		$author->save();
+		$author->touch('some_date');
+		$this->assertGreaterThan($updated_at, $author->updated_at);
+		$this->assertGreaterThan($some_date, $author->some_date);
+	}
+
+
 }
