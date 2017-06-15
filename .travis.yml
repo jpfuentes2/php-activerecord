@@ -1,3 +1,5 @@
+sudo: false
+
 install: composer install --prefer-source --dev
 
 before_script:
