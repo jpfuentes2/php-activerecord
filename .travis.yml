@@ -3,10 +3,8 @@ dist: trusty
 
 install: composer install --prefer-source --dev
 
-before_script:
-  - echo 'extension = "memcache.so"' >> ~/.phpenv/versions/$(phpenv version-name)/etc/php.ini
-  - mysql -e 'CREATE DATABASE phpar_test;'
-  - psql -c 'CREATE DATABASE phpar_test;' -U postgres
+env:
+  - ENGINE=php
 
 services:
   - memcache
@@ -20,15 +18,22 @@ php:
   - 5.5
   - 7.0
   - 7.1
-  - hhvm
   - nightly
 
 matrix:
+  include:
+    - php: hhvm
+      env: ENGINE=hhvm
   allow_failures:
     - php: 7.0
     - php: 7.1
     - php: hhvm
     - php: nightly
   fast_finish: true
+
+before_script:
+  - if [[ "$ENGINE" == "php" ]]; then echo 'extension = "memcache.so"' >> ~/.phpenv/versions/$(phpenv version-name)/etc/php.ini; fi
+  - mysql -e 'CREATE DATABASE phpar_test;'
+  - psql -c 'CREATE DATABASE phpar_test;' -U postgres
 
 script: ./vendor/bin/phpunit
