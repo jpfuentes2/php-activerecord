@@ -1,4 +1,3 @@
-sudo: false
 dist: trusty
 
 install: composer install --prefer-source --dev
