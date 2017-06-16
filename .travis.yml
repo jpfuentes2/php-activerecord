@@ -1,12 +1,9 @@
 install: composer install --prefer-source --dev
 
-env:
-  - ENGINE=php
-
 services:
   - memcache
 
-env: PHPAR_MYSQL=mysql://root@127.0.0.1/phpar_test PHPAR_PGSQL=pgsql://postgres@127.0.0.1/phpar_test
+env: ENGINE=php PHPAR_MYSQL=mysql://root@127.0.0.1/phpar_test PHPAR_PGSQL=pgsql://postgres@127.0.0.1/phpar_test
 
 language: php
 php:
@@ -20,7 +17,7 @@ php:
 matrix:
   include:
     - php: hhvm
-      env: ENGINE=hhvm
+      env: ENGINE=hhvm PHPAR_MYSQL=mysql://root@127.0.0.1/phpar_test PHPAR_PGSQL=pgsql://postgres@127.0.0.1/phpar_test
       dist: trusty
   allow_failures:
     - php: 7.0
