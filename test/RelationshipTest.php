@@ -673,6 +673,23 @@ class RelationshipTest extends DatabaseTest
 		$this->assert_sql_has("WHERE author_id IN(?,?)",ActiveRecord\Table::load('AwesomePerson')->last_sql);
 	}
 
+	public function test_eager_loading_belongs_to_nested_with_same_foreign_key()
+	{
+		Author::$has_many = array(array('awesome_people'));
+
+		$books = Book::find(array(2,3), array('include' => array('author' => array('awesome_people'))));
+
+		foreach ($books as $book)
+		{
+			$this->assert_equals($book->author_id,$book->author->author_id);
+			$this->assert_equals($book->author->author_id,$book->author->awesome_people[0]->author_id);
+		}
+
+		$this->assert_sql_has("WHERE book_id IN(?,?)",ActiveRecord\Table::load('Book')->last_sql);
+		$this->assert_sql_has("WHERE author_id IN(?,?)",ActiveRecord\Table::load('Author')->last_sql);
+		$this->assert_sql_has("WHERE author_id IN(?,?)",ActiveRecord\Table::load('AwesomePerson')->last_sql);
+	}
+
 	public function test_eager_loading_belongs_to_with_no_related_rows()
 	{
 		$e1 = Event::create(array('venue_id' => 200, 'host_id' => 200, 'title' => 'blah','type' => 'Music'));
