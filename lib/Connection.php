@@ -168,6 +168,7 @@ abstract class Connection
 	 * sqlite://../relative/path/to/file.db
 	 * sqlite://unix(/absolute/path/to/file.db)
 	 * sqlite://windows(c%2A/absolute/path/to/file.db)
+	 * sqlite://:memory:
 	 * </code>
 	 *
 	 * @param string $connection_url A connection URL
@@ -176,6 +177,9 @@ abstract class Connection
 	public static function parse_connection_url($connection_url)
 	{
 		$url = @parse_url($connection_url);
+
+		if ($url['scheme'] == "sqlite" && $url['host'] == ":memory")
+			$url['host'] = ":memory:";
 
 		if (!isset($url['host']))
 			throw new DatabaseException('Database host must be specified in the connection string. If you want to specify an absolute filename, use e.g. sqlite://unix(/path/to/file)');

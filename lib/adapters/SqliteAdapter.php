@@ -15,13 +15,17 @@ class SqliteAdapter extends Connection
 {
 
 	static $datetime_format = 'Y-m-d H:i:s';
+	private static $cached_connection;
 
 	protected function __construct($info)
 	{
-		if (!file_exists($info->host))
+		if ($info->host != ":memory:" && !file_exists($info->host))
 			throw new DatabaseException("Could not find sqlite db: $info->host");
 
-		$this->connection = new PDO("sqlite:$info->host",null,null,static::$PDO_OPTIONS);
+		if (self::$cached_connection == null) {
+			self::$cached_connection = new PDO("sqlite:$info->host",null,null,static::$PDO_OPTIONS);
+		}
+		$this->connection = self::$cached_connection;
 	}
 
 	public function limit($sql, $offset, $limit)
