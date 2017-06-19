@@ -1,10 +1,5 @@
 install: composer install --prefer-source --dev
 
-before_script:
-  - echo 'extension = "memcache.so"' >> ~/.phpenv/versions/$(phpenv version-name)/etc/php.ini
-  - mysql -e 'CREATE DATABASE phpar_test;'
-  - psql -c 'CREATE DATABASE phpar_test;' -U postgres
-
 services:
   - memcache
 
@@ -17,11 +12,26 @@ php:
   - 5.5
   - 7.0
   - 7.1
+  - nightly
 
 matrix:
+  include:
+    - php: hhvm
+      dist: trusty
   allow_failures:
-    - php: 7.0
-    - php: 7.1
+    - php: hhvm
+    - php: nightly
   fast_finish: true
+
+before_script:
+  - |
+    if [[ "${TRAVIS_PHP_VERSION:0:1}" == "7" ]]; then
+      curl -L https://github.com/websupport-sk/pecl-memcache/archive/NON_BLOCKING_IO_php7.tar.gz | tar xz;
+      (cd pecl-memcache-NON_BLOCKING_IO_php7 && phpize && ./configure && make && make install);
+    fi
+  - if [[ "$TRAVIS_PHP_VERSION" != "hhvm" ]]; then echo 'extension = "memcache.so"' >> ~/.phpenv/versions/$(phpenv version-name)/etc/php.ini; fi
+  
+  - mysql -e 'CREATE DATABASE phpar_test;'
+  - psql -c 'CREATE DATABASE phpar_test;' -U postgres
 
 script: ./vendor/bin/phpunit
