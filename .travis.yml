@@ -3,21 +3,23 @@ install: composer install --prefer-source --dev
 services:
   - memcache
 
-env: ENGINE=php PHPAR_MYSQL=mysql://root@127.0.0.1/phpar_test PHPAR_PGSQL=pgsql://postgres@127.0.0.1/phpar_test
+env: PHPAR_MYSQL=mysql://root@127.0.0.1/phpar_test PHPAR_PGSQL=pgsql://postgres@127.0.0.1/phpar_test
 
 language: php
 php:
   - 5.3
   - 5.4
   - 5.5
-  - 7.0
-  - 7.1
-  - nightly
 
 matrix:
   include:
+    - php: 7.0
+      env: PHPAR_MYSQL=mysql://root@127.0.0.1/phpar_test PHPAR_PGSQL=pgsql://postgres@127.0.0.1/phpar_test EXTENSION=memcached
+    - php: 7.1
+      env: PHPAR_MYSQL=mysql://root@127.0.0.1/phpar_test PHPAR_PGSQL=pgsql://postgres@127.0.0.1/phpar_test EXTENSION=memcached
+    - php: nightly
+      env: PHPAR_MYSQL=mysql://root@127.0.0.1/phpar_test PHPAR_PGSQL=pgsql://postgres@127.0.0.1/phpar_test EXTENSION=memcached
     - php: hhvm
-      env: ENGINE=hhvm PHPAR_MYSQL=mysql://root@127.0.0.1/phpar_test PHPAR_PGSQL=pgsql://postgres@127.0.0.1/phpar_test
       dist: trusty
   allow_failures:
     - php: hhvm
@@ -25,7 +27,7 @@ matrix:
   fast_finish: true
 
 before_script:
-  - if [[ "$ENGINE" == "php" ]]; then echo 'extension = "memcache.so"' >> ~/.phpenv/versions/$(phpenv version-name)/etc/php.ini; fi
+  - if [[ "$TRAVIS_PHP_VERSION" != "hhvm" ]]; then echo 'extension = "${EXTENSION:-memcache}.so"' >> ~/.phpenv/versions/$(phpenv version-name)/etc/php.ini; fi
   - mysql -e 'CREATE DATABASE phpar_test;'
   - psql -c 'CREATE DATABASE phpar_test;' -U postgres
 
