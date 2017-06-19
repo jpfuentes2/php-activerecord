@@ -68,7 +68,7 @@ class Table
 		{
 			/* do not place set_assoc in constructor..it will lead to infinite loop due to
 			   relationships requesting the model's table, but the cache hasn't been set yet */
-			self::$cache[$model_class_name] = new Table($model_class_name);
+			self::$cache[$model_class_name] = Model::make_table($model_class_name);
 			self::$cache[$model_class_name]->set_associations();
 		}
 
@@ -391,7 +391,7 @@ class Table
 		$this->relationships[$relationship->attribute_name] = $relationship;
 	}
 
-	private function get_meta_data()
+	protected function get_meta_data()
 	{
 		// as more adapters are added probably want to do this a better way
 		// than using instanceof but gud enuff for now

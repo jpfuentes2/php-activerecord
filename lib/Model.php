@@ -281,6 +281,14 @@ class Model
 
 		$this->invoke_callback('after_construct',false);
 	}
+	
+	/**
+	 * Factory method to facilitate subclassing of Table if desired.
+	 */
+	public static function make_table($model_class_name)
+	{
+		return new Table($model_class_name);
+	}
 
 	/**
 	 * Magic method which delegates to read_attribute(). This handles firing off getter methods,
