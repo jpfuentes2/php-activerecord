@@ -43,6 +43,7 @@ ActiveRecord\Config::initialize(function($cfg)
 		'mysql'  => getenv('PHPAR_MYSQL')  ?: 'mysql://test:test@127.0.0.1/test',
 		'pgsql'  => getenv('PHPAR_PGSQL')  ?: 'pgsql://test:test@127.0.0.1/test',
 		'oci'    => getenv('PHPAR_OCI')    ?: 'oci://test:test@127.0.0.1/dev',
+		'sqlsrv' => getenv('PHPAR_SQLSRV') ?: 'sqlsrv://sa:test@(local)\SQLEXPRESS/test',
 		'sqlite' => getenv('PHPAR_SQLITE') ?: 'sqlite://test.db'));
 
 	$cfg->set_default_connection('mysql');
