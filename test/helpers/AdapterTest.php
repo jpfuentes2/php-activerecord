@@ -8,7 +8,7 @@ class AdapterTest extends DatabaseTest
 	public function set_up($connection_name=null)
 	{
 		if (($connection_name && !in_array($connection_name, PDO::getAvailableDrivers())) ||
-			ActiveRecord\Config::instance()->get_connection($connection_name) == 'skip')
+			ActiveRecord\Config::instance()->get_connection_info($connection_name) == 'skip')
 			$this->mark_test_skipped($connection_name . ' drivers are not present');
 
 		parent::set_up($connection_name);
@@ -25,7 +25,7 @@ class AdapterTest extends DatabaseTest
 
 	public function test_should_set_adapter_variables()
 	{
-		$this->assert_not_null($this->conn->protocol);
+		$this->assert_not_null($this->conn->adapter);
 	}
 
 	public function test_null_connection_string_uses_default_connection()
@@ -38,7 +38,7 @@ class AdapterTest extends DatabaseTest
 	/**
 	 * @expectedException ActiveRecord\DatabaseException
 	 */
-	public function test_invalid_connection_protocol()
+	public function test_invalid_connection_adapter()
 	{
 		ActiveRecord\Connection::instance('terribledb://user:pass@host/db');
 	}
@@ -51,7 +51,7 @@ class AdapterTest extends DatabaseTest
 		if (!$GLOBALS['slow_tests'])
 			throw new ActiveRecord\DatabaseException("");
 
-		ActiveRecord\Connection::instance("{$this->conn->protocol}://user:pass");
+		ActiveRecord\Connection::instance("{$this->conn->adapter}://user:pass");
 	}
 
 	/**
@@ -62,7 +62,7 @@ class AdapterTest extends DatabaseTest
 		if (!$GLOBALS['slow_tests'])
 			throw new ActiveRecord\DatabaseException("");
 
-		ActiveRecord\Connection::instance("{$this->conn->protocol}://user:pass/1.1.1.1/db");
+		ActiveRecord\Connection::instance("{$this->conn->adapter}://user:pass/1.1.1.1/db");
 	}
 
 	/**
@@ -70,7 +70,7 @@ class AdapterTest extends DatabaseTest
 	 */
 	public function test_connection_failed()
 	{
-		ActiveRecord\Connection::instance("{$this->conn->protocol}://baduser:badpass@127.0.0.1/db");
+		ActiveRecord\Connection::instance("{$this->conn->adapter}://baduser:badpass@127.0.0.1/db");
 	}
 
 	/**
@@ -78,25 +78,32 @@ class AdapterTest extends DatabaseTest
 	 */
 	public function test_connect_failed()
 	{
-		ActiveRecord\Connection::instance("{$this->conn->protocol}://zzz:zzz@127.0.0.1/test");
+		ActiveRecord\Connection::instance("{$this->conn->adapter}://zzz:zzz@127.0.0.1/test");
 	}
 
 	public function test_connect_with_port()
 	{
 		$config = ActiveRecord\Config::instance();
-		$name = $config->get_default_connection();
-		$url = parse_url($config->get_connection($name));
+		$info = $config->get_default_connection_info();
+
 		$conn = $this->conn;
 		$port = $conn::$DEFAULT_PORT;
 
-		$connection_string = "{$url['scheme']}://{$url['user']}";
-		if(isset($url['pass'])){
-			$connection_string =  "{$connection_string}:{$url['pass']}";
-		}
-		$connection_string = "{$connection_string}@{$url['host']}:$port{$url['path']}";
+		$info->port = $port;
 
-		if ($this->conn->protocol != 'sqlite')
-			ActiveRecord\Connection::instance($connection_string);
+		if ($this->conn->adapter != 'sqlite')
+			ActiveRecord\Connection::instance($info);
+	}
+
+	public function test_connect_with_array_connection_info()
+	{
+		$config = ActiveRecord\Config::instance();
+		$info = $config->get_default_connection_info();
+
+		$info_array = array_filter(get_object_vars($info));
+
+		if ($this->conn->adapter != 'sqlite')
+			ActiveRecord\Connection::instance($info_array);
 	}
 
 	/**
@@ -104,7 +111,7 @@ class AdapterTest extends DatabaseTest
 	 */
 	public function test_connect_to_invalid_database()
 	{
-		ActiveRecord\Connection::instance("{$this->conn->protocol}://test:test@127.0.0.1/" . self::InvalidDb);
+		ActiveRecord\Connection::instance("{$this->conn->adapter}://test:test@127.0.0.1/" . self::InvalidDb);
 	}
 
 	public function test_date_time_type()
@@ -408,4 +415,3 @@ class AdapterTest extends DatabaseTest
 		$this->assert_equals($datetime,$this->conn->date_to_string(date_create($datetime)));
 	}
 }
-?>

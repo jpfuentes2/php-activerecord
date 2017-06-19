@@ -54,10 +54,10 @@ abstract class Connection
 	 */
 	private $logger;
 	/**
-	 * The name of the protocol that is used.
+	 * The name of the adapter that is used.
 	 * @var string
 	 */
-	public $protocol;
+	public $adapter;
 	/**
 	 * Database's date format
 	 * @var string
@@ -91,41 +91,49 @@ abstract class Connection
 	/**
 	 * Retrieve a database connection.
 	 *
-	 * @param string $connection_string_or_connection_name A database connection string (ex. mysql://user:pass@host[:port]/dbname)
-	 *   Everything after the protocol:// part is specific to the connection adapter.
+	 * @param string $connection_info_or_name A database connection string (ex. mysql://user:pass@host[:port]/dbname)
+	 *   Everything after the adapter:// part is specific to the connection adapter.
 	 *   OR
 	 *   A connection name that is set in ActiveRecord\Config
 	 *   If null it will use the default connection specified by ActiveRecord\Config->set_default_connection
 	 * @return Connection
-	 * @see parse_connection_url
+	 * @see ConnectionInfo::from_connection_url
 	 */
-	public static function instance($connection_string_or_connection_name=null)
+	public static function instance($connection_info=null)
 	{
 		$config = Config::instance();
 
-		if (strpos($connection_string_or_connection_name, '://') === false)
+		if (!($connection_info instanceof ConnectionInfo))
 		{
-			$connection_string = $connection_string_or_connection_name ?
-				$config->get_connection($connection_string_or_connection_name) :
-				$config->get_default_connection_string();
+			// Connection instantiation using a connection array
+			if (is_array($connection_info))
+			{
+				$connection_info = new ConnectionInfo($connection_info);
+			}
+			// Connection instantiation using a connection url
+			else if (is_string($connection_info) && strpos($connection_info, '://') !== false)
+			{
+				$connection_info = ConnectionInfo::from_connection_url($connection_info);
+			}
+			// Connection instantiation using a connection name
+			else
+			{
+				$connection_info = $connection_info ?
+					$config->get_connection_info($connection_info) :
+					$config->get_default_connection_info();
+			}
 		}
-		else
-			$connection_string = $connection_string_or_connection_name;
 
-		if (!$connection_string)
-			throw new DatabaseException("Empty connection string");
-
-		$info = static::parse_connection_url($connection_string);
-		$fqclass = static::load_adapter_class($info->protocol);
+		$fqclass = static::load_adapter_class($connection_info->adapter);
 
 		try {
-			$connection = new $fqclass($info);
-			$connection->protocol = $info->protocol;
+			$connection = new $fqclass($connection_info);
+			$connection->adapter = $connection_info->adapter;
 			$connection->logging = $config->get_logging();
 			$connection->logger = $connection->logging ? $config->get_logger() : null;
 
-			if (isset($info->charset))
-				$connection->set_encoding($info->charset);
+			if (isset($connection_info->charset))
+				$connection->set_encoding($connection_info->charset);
 		} catch (PDOException $e) {
 			throw new DatabaseException($e);
 		}
@@ -152,92 +160,6 @@ abstract class Connection
 	}
 
 	/**
-	 * Use this for any adapters that can take connection info in the form below
-	 * to set the adapters connection info.
-	 *
-	 * <code>
-	 * protocol://username:password@host[:port]/dbname
-	 * protocol://urlencoded%20username:urlencoded%20password@host[:port]/dbname?decode=true
-	 * protocol://username:password@unix(/some/file/path)/dbname
-	 * </code>
-	 *
-	 * Sqlite has a special syntax, as it does not need a database name or user authentication:
-	 *
-	 * <code>
-	 * sqlite://file.db
-	 * sqlite://../relative/path/to/file.db
-	 * sqlite://unix(/absolute/path/to/file.db)
-	 * sqlite://windows(c%2A/absolute/path/to/file.db)
-	 * </code>
-	 *
-	 * @param string $connection_url A connection URL
-	 * @return object the parsed URL as an object.
-	 */
-	public static function parse_connection_url($connection_url)
-	{
-		$url = @parse_url($connection_url);
-
-		if (!isset($url['host']))
-			throw new DatabaseException('Database host must be specified in the connection string. If you want to specify an absolute filename, use e.g. sqlite://unix(/path/to/file)');
-
-		$info = new \stdClass();
-		$info->protocol = $url['scheme'];
-		$info->host = $url['host'];
-		$info->db = isset($url['path']) ? substr($url['path'], 1) : null;
-		$info->user = isset($url['user']) ? $url['user'] : null;
-		$info->pass = isset($url['pass']) ? $url['pass'] : null;
-
-		$allow_blank_db = ($info->protocol == 'sqlite');
-
-		if ($info->host == 'unix(')
-		{
-			$socket_database = $info->host . '/' . $info->db;
-
-			if ($allow_blank_db)
-				$unix_regex = '/^unix\((.+)\)\/?().*$/';
-			else
-				$unix_regex = '/^unix\((.+)\)\/(.+)$/';
-
-			if (preg_match_all($unix_regex, $socket_database, $matches) > 0)
-			{
-				$info->host = $matches[1][0];
-				$info->db = $matches[2][0];
-			}
-		} elseif (substr($info->host, 0, 8) == 'windows(')
-		{
-			$info->host = urldecode(substr($info->host, 8) . '/' . substr($info->db, 0, -1));
-			$info->db = null;
-		}
-
-		if ($allow_blank_db && $info->db)
-			$info->host .= '/' . $info->db;
-
-		if (isset($url['port']))
-			$info->port = $url['port'];
-
-		if (strpos($connection_url, 'decode=true') !== false)
-		{
-			if ($info->user)
-				$info->user = urldecode($info->user);
-
-			if ($info->pass)
-				$info->pass = urldecode($info->pass);
-		}
-
-		if (isset($url['query']))
-		{
-			foreach (explode('/&/', $url['query']) as $pair) {
-				list($name, $value) = explode('=', $pair);
-
-				if ($name == 'charset')
-					$info->charset = $value;
-			}
-		}
-
-		return $info;
-	}
-
-	/**
 	 * Class Connection is a singleton. Access it via instance().
 	 *
 	 * @param array $info Array containing URL parts
@@ -257,7 +179,7 @@ abstract class Connection
 			else
 				$host = "unix_socket=$info->host";
 
-			$this->connection = new PDO("$info->protocol:$host;dbname=$info->db", $info->user, $info->pass, static::$PDO_OPTIONS);
+			$this->connection = new PDO("$info->adapter:$host;dbname=$info->database", $info->username, $info->password, static::$PDO_OPTIONS);
 		} catch (PDOException $e) {
 			throw new DatabaseException($e);
 		}
@@ -497,6 +419,22 @@ abstract class Connection
 			$date->format(static::DATETIME_TRANSLATE_FORMAT),
 			$date->getTimezone()
 		);
+	}
+
+	/**
+	 * Converts a boolean value to a string representation.
+	 *
+	 * The converted string representation should be in a format acceptable by the
+	 * underlying database connection.
+	 *
+	 * @param mixed $value
+	 * @access public
+	 * @return string
+	 */
+	public function boolean_to_string($value)
+	{
+		$boolean = (boolean)$value;
+		return (string)$boolean;
 	}
 
 	/**

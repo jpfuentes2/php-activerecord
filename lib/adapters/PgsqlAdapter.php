@@ -101,7 +101,7 @@ SQL;
 
 		$c->map_raw_type();
 
-		if ($column['default'])
+		if (!is_null($column['default']))
 		{
 			preg_match("/^nextval\('(.*)'\)$/",$column['default'],$matches);
 
@@ -131,9 +131,21 @@ SQL;
 			'time' => array('name' => 'time'),
 			'date' => array('name' => 'date'),
 			'binary' => array('name' => 'binary'),
-			'boolean' => array('name' => 'boolean')
+			'boolean' => array('name' => 'boolean'),
+			'bigint' => array('name' => 'integer'),
+			'smallint' => array('name' => 'integer'),
+			'real' => array('name' => 'float'),
+			'double precision' => array('name' => 'float'),
+			'numeric' => array('name' => 'float'),
+			'decimal' => array('name' => 'float')
 		);
 	}
 
+	public function boolean_to_string($value)
+	{
+		if (!$value || in_array(strtolower($value), array('f','false','n','no','off')))
+			return "0";
+		else
+			return "1";
+	}
 }
-?>

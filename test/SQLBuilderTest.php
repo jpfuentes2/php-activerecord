@@ -278,5 +278,4 @@ class SQLBuilderTest extends DatabaseTest
 
 		$this->assert_sql_has("SELECT * FROM authors $joins WHERE authors.id=? AND authors.name=?",(string)$this->sql);
 	}
-};
-?>
+}

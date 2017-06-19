@@ -92,7 +92,8 @@ CREATE TABLE property_amenities(
 );
 
 CREATE TABLE users (
-    id INTEGER NOT NULL PRIMARY KEY
+    id INTEGER NOT NULL PRIMARY KEY,
+    password VARCHAR(255) NOT NULL
 );
 
 CREATE TABLE newsletters (

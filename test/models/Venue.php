@@ -4,6 +4,7 @@ class Venue extends ActiveRecord\Model
 	static $use_custom_get_state_getter = false;
 	static $use_custom_set_state_setter = false;
 	
+	static $use_custom_set_city_setter = false;
 	
 	static $has_many = array(
 		'events',
@@ -32,6 +33,13 @@ class Venue extends ActiveRecord\Model
 		else
 			return $this->assign_attribute('state', $value);
 	}
+
+	public function set_city($value)
+	{
+		if (self::$use_custom_set_city_setter)
+			return $this->assign_attribute('city', $value . '#');
+		else
+			return $this->assign_attribute('city', $value);
+	}
 	
-};
-?>
+}

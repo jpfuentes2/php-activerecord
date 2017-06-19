@@ -224,4 +224,3 @@ class DateTimeTest extends SnakeCase_PHPUnit_Framework_TestCase
 		$this->assert_not_same($datetime, $cloned_datetime);
 	}
 }
-?>

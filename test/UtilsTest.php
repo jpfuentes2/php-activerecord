@@ -103,5 +103,19 @@ class UtilsTest extends SnakeCase_PHPUnit_Framework_TestCase
 		$x = '1';
 		$this->assert_equals(array(array('1')),ActiveRecord\wrap_strings_in_arrays($x));
 	}
+
+	public function test_is_hash()
+	{
+		$hash = array('key' => 'value');
+		$this->assert_true(ActiveRecord\is_hash($hash));
+		
+		$notHash = array(0 => 'value');
+		$this->assert_false(ActiveRecord\is_hash($notHash));
+	}
+	
+	public function test_is_hash_empty_array()
+	{
+		$notHash = array();
+		$this->assert_false(ActiveRecord\is_hash($notHash));
+	}
 };
-?>

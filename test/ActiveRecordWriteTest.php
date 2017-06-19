@@ -10,7 +10,7 @@ class DirtyAuthor extends ActiveRecord\Model
 	{
 		$this->name = 'i saved';
 	}
-};
+}
 
 class AuthorWithoutSequence extends ActiveRecord\Model
 {
@@ -441,4 +441,4 @@ class ActiveRecordWriteTest extends DatabaseTest
 		$this->assert_true($our_datetime === $author->some_date);
 	}
 
-};
+}

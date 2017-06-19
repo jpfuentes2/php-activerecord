@@ -22,7 +22,7 @@ class OciAdapter extends Connection
 	{
 		try {
 			$this->dsn_params = isset($info->charset) ? ";charset=$info->charset" : "";
-			$this->connection = new PDO("oci:dbname=//$info->host/$info->db$this->dsn_params",$info->user,$info->pass,static::$PDO_OPTIONS);
+			$this->connection = new PDO("oci:dbname=//$info->host/$info->database$this->dsn_params",$info->username,$info->password,static::$PDO_OPTIONS);
 		} catch (PDOException $e) {
 			throw new DatabaseException($e);
 		}
@@ -143,4 +143,3 @@ class OciAdapter extends Connection
 		);
 	}
 }
-?>

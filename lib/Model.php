@@ -88,6 +88,23 @@ class Model
 	private $attributes = array();
 
 	/**
+	 * Contains changes made to model attributes as
+	 * $attribute_name => array($original_value, $current_value)
+	 *
+	 * @var array
+	 * @access private
+	 */
+	private $changed_attributes = array();
+
+	/**
+	 * Contains changes made to model attributes before it was saved
+	 *
+	 * @var array
+	 * @access private
+	 */
+	private $previously_changed = array();
+
+	/**
 	 * Flag whether or not this model's attributes have been modified since it will either be null or an array of column_names that have been modified
 	 *
 	 * @var array
@@ -114,6 +131,13 @@ class Model
 	 * @var boolean
 	 */
 	private $__new_record = true;
+
+	/**
+	 * Flag whether or not this model has been validated
+	 *
+	 * @var boolean
+	 */
+	private $__validated = false;
 
 	/**
 	 * Set to the name of the connection this {@link Model} should use.
@@ -255,13 +279,14 @@ class Model
 	 * new Person(array('first_name' => 'Tito', 'last_name' => 'the Grief'));
 	 * </code>
 	 *
-	 * @param array $attributes Hash containing names and values to mass assign to the model
+	 * @param array $attributes Hash containing names and values to mass assign to the model or
+	 *  StrongParameters object
 	 * @param boolean $guard_attributes Set to true to guard protected/non-accessible attributes
 	 * @param boolean $instantiating_via_find Set to true if this model is being created from a find call
 	 * @param boolean $new_record Set to true if this should be considered a new record
 	 * @return Model
 	 */
-	public function __construct(array $attributes=array(), $guard_attributes=true, $instantiating_via_find=false, $new_record=true)
+	public function __construct($attributes=null, $guard_attributes=true, $instantiating_via_find=false, $new_record=true)
 	{
 		$this->__new_record = $new_record;
 
@@ -413,7 +438,7 @@ class Model
 		if (array_key_exists($name, static::$alias_attribute))
 			$name = static::$alias_attribute[$name];
 
-		elseif (method_exists($this,"set_$name"))
+		if (method_exists($this,"set_$name"))
 		{
 			$name = "set_$name";
 			return $this->$name($value);
@@ -477,8 +502,17 @@ class Model
 			// has the ability to flag this model as dirty if a field in the Date object changes.
 			$value->attribute_of($this,$name);
 
-		$this->attributes[$name] = $value;
-		$this->flag_dirty($name);
+		// only update the attribute if it isn't set or has changed
+		if (!isset($this->attributes[$name]) || ($this->attributes[$name] !== $value)) {
+			// track changes to the attribute
+			if (array_key_exists($name, $this->attributes) && !isset($this->changed_attributes[$name]))
+				$this->changed_attributes[$name] = $this->attributes[$name];
+
+			// set the attribute and flag as dirty
+			$this->attributes[$name] = $value;
+			$this->flag_dirty($name);
+			$this->reset_validated();
+		}
 		return $value;
 	}
 
@@ -498,8 +532,10 @@ class Model
 			$name = static::$alias_attribute[$name];
 
 		// check for attribute
-		if (array_key_exists($name,$this->attributes))
-			return $this->attributes[$name];
+		if (array_key_exists($name,$this->attributes)) {
+			$value = $this->attributes[$name];
+			return $value;
+		}
 
 		// check relationships if no attribute
 		if (array_key_exists($name,$this->__relationships))
@@ -587,6 +623,52 @@ class Model
 	public function attributes()
 	{
 		return $this->attributes;
+	}
+
+	/**
+	 * Returns a copy of the model's changed attributes hash with the
+	 * attribute name and the original value.
+	 *
+	 * @return array A copy of the model's changed attribute data
+	 */
+	public function changed_attributes()
+	{
+		return $this->changed_attributes;
+	}
+
+	/**
+	 * Returns a copy of the model's changed attributes as a hash
+	 * in the form $attribute => array($original_value, $current_value)
+	 *
+	 * @return array A copy of the model's attribute changes
+	 */
+	public function changes()
+	{
+		$changes = array();
+		$attributes = array_intersect_key($this->attributes, $this->changed_attributes);
+		foreach($attributes as $name => $value) {
+			$changes[$name] = array($this->changed_attributes[$name],$value);
+		}
+		return $changes;
+	}
+
+	/**
+	 * Returns a copy of the model's changed attributes before it was saved
+	 *
+	 * @return array A copy of the model's changed attribute before a save
+	 */
+	public function previous_changes()
+	{
+		return $this->previously_changed;
+	}
+
+	/**
+	 * Returns the value of an attribute before it was changed
+	 *
+	 * @return string The original value of an attribute
+	 */
+	public function attribute_was($name) {
+		return isset($this->changed_attributes[$name]) ? $this->changed_attributes[$name] : null;
 	}
 
 	/**
@@ -810,7 +892,7 @@ class Model
 	{
 		$this->verify_not_readonly('insert');
 
-		if (($validate && !$this->_validate() || !$this->invoke_callback('before_create',false)))
+		if (($validate && !$this->_validate()) || !$this->invoke_callback('before_create',false))
 			return false;
 
 		$table = static::table();
@@ -1081,8 +1163,12 @@ class Model
 	{
 		require_once 'Validations.php';
 
+		$this->flag_validated();
+
 		$validator = new Validations($this);
-		$validation_on = 'validation_on_' . ($this->is_new_record() ? 'create' : 'update');
+		$validation_mode = $this->is_new_record() ? 'create' : 'update';
+		$validation_on = 'validation_on_' . $validation_mode;
+		$validator->set_validation_mode($validation_mode);
 
 		foreach (array('before_validation', "before_$validation_on") as $callback)
 		{
@@ -1104,6 +1190,36 @@ class Model
 	}
 
 	/**
+	 * Returns true if the model has been validated.
+	 *
+	 * @return boolean true if validated
+	 */
+	private function is_validated()
+	{
+		return $this->__validated;
+	}
+
+	/**
+	 * Flag model as validated
+	 *
+	 * @return void
+	 */
+	private function flag_validated()
+	{
+		$this->__validated = true;
+	}
+
+	/**
+	 * Resets the validated flag.
+	 *
+	 * @return void
+	 */
+	private function reset_validated()
+	{
+		$this->__validated = false;
+	}
+
+	/**
 	 * Returns true if the model has been modified.
 	 *
 	 * @return boolean true if modified
@@ -1114,25 +1230,30 @@ class Model
 	}
 
 	/**
-	 * Run validations on model and returns whether or not model passed validation.
+	 * Returns true if the model is valid.
 	 *
+	 * @param boolean $force_validation If true, will always run validations.
 	 * @see is_invalid
 	 * @return boolean
 	 */
-	public function is_valid()
+	public function is_valid($force_validation = false)
 	{
-		return $this->_validate();
+		if( $force_validation || !$this->is_validated() )
+			return $this->_validate();
+
+		return $this->errors->is_empty();
 	}
 
 	/**
-	 * Runs validations and returns true if invalid.
+	 * Returns true if the model is invalid.
 	 *
+	 * @param boolean $force_validation If true, will always run validations.
 	 * @see is_valid
 	 * @return boolean
 	 */
-	public function is_invalid()
+	public function is_invalid($force_validation = false)
 	{
-		return !$this->_validate();
+		return !$this->is_valid($force_validation);
 	}
 
 	/**
@@ -1150,9 +1271,10 @@ class Model
 	}
 
 	/**
-	 * Mass update the model with an array of attribute data and saves to the database.
+	 * Mass update the model with attribute data and saves to the database.
 	 *
-	 * @param array $attributes An attribute data array in the form array(name => value, ...)
+	 * @param StrongParameters|array $attributes An StrongParameters object or array
+	 *  containing data to update in the form array(name => value, ...)
 	 * @return boolean True if successfully updated and saved otherwise false
 	 */
 	public function update_attributes($attributes)
@@ -1175,15 +1297,16 @@ class Model
 	}
 
 	/**
-	 * Mass update the model with data from an attributes hash.
+	 * Mass update the model with data from an attributes hash or object.
 	 *
 	 * Unlike update_attributes() this method only updates the model's data
 	 * but DOES NOT save it to the database.
 	 *
 	 * @see update_attributes
-	 * @param array $attributes An array containing data to update in the form array(name => value, ...)
+	 * @param StrongParameters|array $attributes An StrongParameters object or array
+	 *  containing data to update in the form array(name => value, ...)
 	 */
-	public function set_attributes(array $attributes)
+	public function set_attributes($attributes)
 	{
 		$this->set_attributes_via_mass_assignment($attributes, true);
 	}
@@ -1192,35 +1315,48 @@ class Model
 	 * Passing $guard_attributes as true will throw an exception if an attribute does not exist.
 	 *
 	 * @throws \ActiveRecord\UndefinedPropertyException
-	 * @param array $attributes An array in the form array(name => value, ...)
+	 * @param StrongParameters|array $attributes An StrongParameters object or array
+	 *  containing data to update in the form array(name => value, ...)
 	 * @param boolean $guard_attributes Flag of whether or not protected/non-accessible attributes should be guarded
 	 */
-	private function set_attributes_via_mass_assignment(array &$attributes, $guard_attributes)
+	private function set_attributes_via_mass_assignment(&$attributes, $guard_attributes)
 	{
-		//access uninflected columns since that is what we would have in result set
+		// return fast when no attributes are given
+		if(empty($attributes)) return;
+
+		$require_strong_parameters = Config::instance()->get_require_strong_parameters();
+		if($guard_attributes && $require_strong_parameters && !($attributes instanceof StrongParameters))
+		{
+			throw new UnsafeParametersException();
+		}
+
+		// Legacy support for attr_accessible/attr_protected
+		// Recommended way of protecting attributes is by using StrongParameters
+		if($guard_attributes && !($attributes instanceof StrongParameters))
+		{
+			if (!empty(static::$attr_accessible))
+				$attributes = array_intersect_key($attributes, array_flip(static::$attr_accessible));
+
+			if (!empty(static::$attr_protected))
+				$attributes = array_diff_key($attributes, array_flip(static::$attr_protected));
+		}
+
 		$table = static::table();
 		$exceptions = array();
-		$use_attr_accessible = !empty(static::$attr_accessible);
-		$use_attr_protected = !empty(static::$attr_protected);
 		$connection = static::connection();
 
+		// access uninflected columns since that is what we would have in result set
 		foreach ($attributes as $name => $value)
 		{
 			// is a normal field on the table
-			if (array_key_exists($name,$table->columns))
+			if (array_key_exists($name, $table->columns))
 			{
-				$value = $table->columns[$name]->cast($value,$connection);
+				$value = $table->columns[$name]->cast($value, $connection);
 				$name = $table->columns[$name]->inflected_name;
 			}
 
 			if ($guard_attributes)
 			{
-				if ($use_attr_accessible && !in_array($name,static::$attr_accessible))
-					continue;
-
-				if ($use_attr_protected && in_array($name,static::$attr_protected))
-					continue;
-
 				// set valid table data
 				try {
 					$this->$name = $value;
@@ -1235,7 +1371,7 @@ class Model
 					continue;
 
 				// set arbitrary data
-				$this->assign_attribute($name,$value);
+				$this->assign_attribute($name, $value);
 			}
 		}
 
@@ -1285,6 +1421,7 @@ class Model
 		$this->expire_cache();
 		$this->set_attributes_via_mass_assignment($this->find($pk)->attributes, false);
 		$this->reset_dirty();
+		$this->reset_validated();
 
 		return $this;
 	}
@@ -1293,6 +1430,7 @@ class Model
 	{
 		$this->__relationships = array();
 		$this->reset_dirty();
+		$this->reset_validated();
 		return $this;
 	}
 
@@ -1301,9 +1439,11 @@ class Model
 	 *
 	 * @see dirty_attributes
 	 */
-	public function reset_dirty()
+	public function reset_dirty($model_was_saved=false)
 	{
 		$this->__dirty = null;
+		$this->previously_changed = $model_was_saved ? $this->changes() : array();
+		$this->changed_attributes = array();
 	}
 
 	/**
@@ -1463,7 +1603,7 @@ class Model
 		$table = static::table();
 		$sql = $table->options_to_sql($options);
 		$values = $sql->get_where_values();
-		return static::connection()->query_and_fetch_one($sql->to_s(),$values);
+		return (int) static::connection()->query_and_fetch_one($sql->to_s(),$values);
 	}
 
 	/**

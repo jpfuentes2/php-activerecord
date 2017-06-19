@@ -8,14 +8,14 @@ class DatabaseLoader
 	{
 		$this->db = $db;
 
-		if (!isset(static::$instances[$db->protocol]))
-			static::$instances[$db->protocol] = 0;
+		if (!isset(static::$instances[$db->adapter]))
+			static::$instances[$db->adapter] = 0;
 
-		if (static::$instances[$db->protocol]++ == 0)
+		if (static::$instances[$db->adapter]++ == 0)
 		{
 			// drop and re-create the tables one time only
 			$this->drop_tables();
-			$this->exec_sql_script($db->protocol);
+			$this->exec_sql_script($db->adapter);
 		}
 	}
 
@@ -23,14 +23,14 @@ class DatabaseLoader
 	{
 		foreach ($this->get_fixture_tables() as $table)
 		{
-			if ($this->db->protocol == 'oci' && $table == 'rm-bldg')
+			if ($this->db->adapter == 'oci' && $table == 'rm-bldg')
 				continue;
 
 			$this->db->query('DELETE FROM ' . $this->quote_name($table));
 			$this->load_fixture_data($table);
 		}
 
-		$after_fixtures = $this->db->protocol.'-after-fixtures';
+		$after_fixtures = $this->db->adapter.'-after-fixtures';
 		try {
 			$this->exec_sql_script($after_fixtures);
 		} catch (Exception $e) {
@@ -44,7 +44,7 @@ class DatabaseLoader
 
 		foreach ($this->get_fixture_tables() as $table)
 		{
-			if ($this->db->protocol == 'oci')
+			if ($this->db->adapter == 'oci')
 			{
 				$table = strtoupper($table);
 
@@ -55,7 +55,7 @@ class DatabaseLoader
 			if (in_array($table,$tables))
 				$this->db->query('DROP TABLE ' . $this->quote_name($table));
 
-			if ($this->db->protocol == 'oci')
+			if ($this->db->adapter == 'oci')
 			{
 				try {
 					$this->db->query("DROP SEQUENCE {$table}_seq");
@@ -121,10 +121,9 @@ class DatabaseLoader
 
 	public function quote_name($name)
 	{
-		if ($this->db->protocol == 'oci')
+		if ($this->db->adapter == 'oci')
 			$name = strtoupper($name);
 
 		return $this->db->quote_name($name);
 	}
 }
-?>

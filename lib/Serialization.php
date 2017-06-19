@@ -136,10 +136,13 @@ abstract class Serialization
 		{
 			$this->options_to_a('methods');
 
-			foreach ($this->options['methods'] as $method)
+			foreach ($this->options['methods'] as $method => $name)
 			{
+				if (is_numeric($method))
+					$method = $name;
+
 				if (method_exists($this->model, $method))
-					$this->attributes[$method] = $this->model->$method();
+					$this->attributes[$name] = $this->model->$method();
 			}
 		}
 	}
@@ -242,7 +245,7 @@ abstract class Serialization
 	 * @return string
 	 */
 	abstract public function to_s();
-};
+}
 
 /**
  * Array serializer.
@@ -345,32 +348,32 @@ class XmlSerializer extends Serialization
  */
 class CsvSerializer extends Serialization
 {
-  public static $delimiter = ',';
-  public static $enclosure = '"';
+	public static $delimiter = ',';
+	public static $enclosure = '"';
 
-  public function to_s()
-  {
-    if (@$this->options['only_header'] == true) return $this->header();
-    return $this->row();
-  }
+	public function to_s()
+	{
+		if (@$this->options['only_header'] == true) return $this->header();
+		return $this->row();
+	}
 
-  private function header()
-  {
-    return $this->to_csv(array_keys($this->to_a()));
-  }
+	private function header()
+	{
+		return $this->to_csv(array_keys($this->to_a()));
+	}
 
-  private function row()
-  {
-    return $this->to_csv($this->to_a());
-  }
+	private function row()
+	{
+		return $this->to_csv($this->to_a());
+	}
 
-  private function to_csv($arr)
-  {
-    $outstream = fopen('php://temp', 'w');
-    fputcsv($outstream, $arr, self::$delimiter, self::$enclosure);
-    rewind($outstream);
-    $buffer = trim(stream_get_contents($outstream));
-    fclose($outstream);
-    return $buffer;
-  }
+	private function to_csv($arr)
+	{
+		$outstream = fopen('php://temp', 'w');
+		fputcsv($outstream, $arr, self::$delimiter, self::$enclosure);
+		rewind($outstream);
+		$buffer = trim(stream_get_contents($outstream));
+		fclose($outstream);
+		return $buffer;
+	}
 }

@@ -82,4 +82,3 @@ ActiveRecord\Config::initialize(function($cfg)
 });
 
 error_reporting(E_ALL | E_STRICT);
-?>

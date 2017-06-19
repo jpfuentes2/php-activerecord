@@ -88,4 +88,3 @@ class CacheTest extends SnakeCase_PHPUnit_Framework_TestCase
 		Cache::initialize('memcache://127.0.0.1:1234');
 	}
 }
-?>
