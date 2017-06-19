@@ -1357,6 +1357,12 @@ class Model
 		$options = static::extract_and_validate_options($args);
 		$create = false;
 
+		$class = get_called_class();
+		$method = static::normalize_method($method);
+		if (method_exists($class, $method)) {
+			return call_user_func_array(array($class, $method), $args);
+		}
+
 		if (substr($method,0,17) == 'find_or_create_by')
 		{
 			$attributes = substr($method,17);
@@ -1402,6 +1408,11 @@ class Model
 	 */
 	public function __call($method, $args)
 	{
+		$method = self::normalize_method($method);
+		if (method_exists($this, $method)) {
+			return call_user_func_array(array($this, $method), $args);
+		}
+
 		//check for build|create_association methods
 		if (preg_match('/(build|create)_/', $method))
 		{
@@ -1423,6 +1434,17 @@ class Model
 		}
 
 		throw new ActiveRecordException("Call to undefined method: $method");
+	}
+
+	/**
+	 * Convert a camelCase method name to a snake_case method name 
+	 * 
+	 * @param string $method The possibly camelCase method name
+	 * @return string The normalized snake_case method name
+	 */
+	protected static function normalize_method($method)
+	{
+		return strtolower(preg_replace('/([a-z0-9])([A-Z])/', '$1_$2', $method));
 	}
 
 	/**
