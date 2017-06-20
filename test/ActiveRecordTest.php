@@ -259,6 +259,22 @@ class ActiveRecordTest extends DatabaseTest
 		$this->assert_equals($venue->marquee, $venue->name);
 	}
 
+	public function test_alias_attribute_custom_setter()
+	{
+		Venue::$use_custom_set_city_setter = true;
+		$venue = Venue::find(1);
+
+		$venue->mycity = 'cityname';
+		$this->assert_equals($venue->mycity, 'cityname#');
+		$this->assert_equals($venue->mycity, $venue->city);
+
+		$venue->city = 'anothercity';
+		$this->assert_equals($venue->city, 'anothercity#');
+		$this->assert_equals($venue->city, $venue->mycity);
+
+		Venue::$use_custom_set_city_setter = false;
+	}
+
 	public function test_alias_from_mass_attributes()
 	{
 		$venue = new Venue(array('marquee' => 'meme', 'id' => 123));
