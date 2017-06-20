@@ -135,5 +135,12 @@ SQL;
 		);
 	}
 
+	public function boolean_to_string($value)
+	{
+		if (!$value || in_array(strtolower($value), array('f','false','n','no','off')))
+			return "0";
+		else
+			return "1";
+	}
 }
 ?>
