@@ -79,14 +79,14 @@ class Model
 	 * @var Errors
 	 */
 	public $errors;
-
+	
 	/**
 	 * Contains model values as column_name => value
 	 *
 	 * @var array
 	 */
 	private $attributes = array();
-
+	
 	/**
 	 * Flag whether or not this model's attributes have been modified since it will either be null or an array of column_names that have been modified
 	 *
@@ -1311,10 +1311,10 @@ class Model
 	 *
 	 * @var array
 	 */
-	static $VALID_OPTIONS = array('conditions', 'limit', 'offset', 'order', 'select', 'joins', 'include', 'readonly', 'group', 'from', 'having');
+	static $VALID_OPTIONS = array('conditions', 'limit', 'offset', 'order', 'select', 'joins', 'include', 'readonly', 'group', 'from', 'having', 'scope_options');
 
 	/**
-	 * Enables the use of dynamic finders.
+	 * Enables the use of dynamic finders and scopes.
 	 *
 	 * Dynamic finders are just an easy way to do queries quickly without having to
 	 * specify an options array with conditions in it.
@@ -1389,8 +1389,119 @@ class Model
 			$options['conditions'] = SQLBuilder::create_conditions_from_underscored_string(static::connection(),substr($method,9),$args,static::$alias_attribute);
 			return static::count($options);
 		}
-
+		if($scope = static::check_for_named_scope($method))
+		{
+			return static::scoped()->$method();
+		}
 		throw new ActiveRecordException("Call to undefined method: $method");
+	}
+	
+	/**
+	*  Puts the model into "Scoped" mode.  It will allow the appending of options
+	*  arrays.
+	*
+	*  Usage 
+	*  <code>
+	*  Model::scoped()->where('name="tito"');
+	*  Model::scoped()->where('name="tito"')->limit(3)->all();
+	*  </code>
+	*  It allows parameterized named scopes to be declared. 
+	* 
+	*  For Example: 
+	*	<code>
+	*	public function last_few($number)
+	*	{
+	*	     return self::scoped()->limit($number)->order('created_at DESC');
+	*	}
+	*	//Used as Model::last_few(5)->all(); Will return the latest 5 created records
+	*	</code>
+	*
+	*  @return Scopes
+	*/
+	public static function scoped()
+	{
+		require_once(__DIR__.'/Scope.php');
+		$instance = new static();
+		return $instance->scope();
+	}
+	
+	public function scope()
+	{
+		return new Scopes($this);
+	}
+	
+	/**
+	* To be overridden by the model. It should return an array of options that are named
+	* by their key.
+	*
+	*	<code>
+	*	public function named_scopes()
+	*    {
+	*    public static $named_scopes = array(
+	*            'is_tito'=>array(
+	*                'conditions'=>'name="tito"',
+	*            ),
+	*            'last_two'=>array(
+	*                'order'=>'created_at DESC',
+	*                'limit'=>2,
+	*            ),
+	*        );
+	*  	Model::is_tito()->find('all');
+	*   </code>
+	*
+	*  @return array|null An array of the options within the named scope
+	*/
+	public static function check_for_named_scope($scope)
+	{
+		if(!isset(static::$named_scopes))
+		{
+			return null;
+		}
+		$scopes = static::$named_scopes;
+		if(array_key_exists($scope,$scopes))
+			return $scopes[$scope];
+		else
+			return null;
+	}
+	
+	/**
+	 * Returns true if the model has a default scope declared
+	 * 
+	 * @return 
+	 */
+	public function get_default_scope()
+	{
+		$scope = $this->default_scope();
+		if($scope)
+		{
+			return $scope;
+		}
+		if(isset(static::$default_scope))
+			return static::$default_scope;
+		return null;
+	}
+	
+	/**
+	*  To be overridden by the model.  It should return an options array that is 
+	*  to be applied every time the model is called
+	*
+	*	<code>
+	*	public function default_scope()
+	*    {
+	*        return array(
+	*       			'conditions'=>'deleted == 0',
+	*       			'limit'=>3,
+	*        	);
+	*    }
+	*    //Model::all() will then never return a result that is flagged as deleted
+	*    //unless you call Model::scoped()->disable_default_scope()->all();
+	*    </code>
+	*
+	* @return array An array of finder options
+	*/
+	public function default_scope()
+	{
+		return array();
 	}
 
 	/**
@@ -1451,7 +1562,6 @@ class Model
 		$args = func_get_args();
 		$options = static::extract_and_validate_options($args);
 		$options['select'] = 'COUNT(*)';
-
 		if (!empty($args) && !is_null($args[0]) && !empty($args[0]))
 		{
 			if (is_hash($args[0]))
@@ -1562,7 +1672,7 @@ class Model
 	public static function find(/* $type, $options */)
 	{
 		$class = get_called_class();
-
+		
 		if (func_num_args() <= 0)
 			throw new RecordNotFound("Couldn't find $class without an ID");
 
@@ -1599,10 +1709,12 @@ class Model
 		//find by pk
 		elseif (1 === count($args) && 1 == $num_args)
 			$args = $args[0];
-
 		// anything left in $args is a find by pk
-		if ($num_args > 0 && !isset($options['conditions']))
+		if ($num_args > 0 && (!isset($options['conditions']) || 
+			(isset($options['scope_options']) && !$options['scope_options']->added_unscoped_conditions)))
+		{
 			return static::find_by_pk($args, $options);
+		}
 
 		$options['mapped_names'] = static::$alias_attribute;
 		$list = static::table()->find($options);
@@ -1762,11 +1874,9 @@ class Model
 	public static function extract_and_validate_options(array &$array)
 	{
 		$options = array();
-
 		if ($array)
 		{
 			$last = &$array[count($array)-1];
-
 			try
 			{
 				if (self::is_options_hash($last))
@@ -1782,6 +1892,53 @@ class Model
 
 				$options = array('conditions' => $last);
 			}
+		}
+		$options = self::append_default_scope_to_options($options);
+		return $options;
+	}
+	
+	/**
+	* 
+	* Applies the Model's default scope if it has not been disabled through
+	* a call to Model::disable_default_scope()
+	*
+	* @param array &$array An array
+	* @return array A valid options array
+	*/
+	public static function append_default_scope_to_options($options)
+	{
+		if(isset($options['scope_options']))
+		{
+			$scope = $options['scope_options'];
+		}
+		else
+		{
+			$scope = static::scoped();
+		}
+
+		if(!isset($options['scope_options']) && !$scope->default_scope())//Model does not use scopes at all
+    	{
+			return $options;
+    	}
+		
+		if($options)
+		{
+			$scope->added_unscoped_conditions = true;
+			$scope = $scope->add_scope($options);
+		}
+		
+		//Default scope is always applied last
+		if($scope->default_scope_is_enabled() && $default = $scope->default_scope())
+		{
+			$options = $scope->add_scope($default)->get_options();
+		}
+		elseif($options)
+		{
+			$options = $scope->get_options();
+		}
+		if($scope->remove_scope_from_hash_after_adding_default_scope)
+		{
+			unset($options['scope_options']);
 		}
 		return $options;
 	}
