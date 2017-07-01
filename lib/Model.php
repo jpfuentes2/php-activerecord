@@ -191,6 +191,12 @@ class Model
 	 *
 	 * This is the opposite of {@link attr_protected $attr_protected}.
 	 *
+	 * The security implementations of this property are larger than one might expect.
+	 * By default, this is set to have a single null value, so that no attributes are accessible via mass assignment.
+	 * It is strongly suggested to list each property that you'd be comfortable excepting overwrites from in this array.
+	 *
+	 * For more details on the security importance of this property, see {@link https://github.com/kla/php-activerecord/issues/287}
+	 *
 	 * <code>
 	 * class Person extends ActiveRecord\Model {
 	 *   static $attr_accessible = array('first_name','last_name');
@@ -206,7 +212,7 @@ class Model
 	 *
 	 * @var array
 	 */
-	static $attr_accessible = array();
+	static $attr_accessible = array(null);
 
 	/**
 	 * Blacklist of attributes that cannot be mass-assigned.
