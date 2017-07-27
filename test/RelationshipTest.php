@@ -165,6 +165,19 @@ class RelationshipTest extends DatabaseTest
 		Book::$belongs_to = $old;
 	}
 
+	public function test_belongs_to_with_explicit_primary_key()
+	{
+		$old = Book::$belongs_to;
+		Book::$belongs_to = array(array('explicit_author', 'class_name' => 'Author', 'primary_key' => 'parent_author_id'));
+
+		$book = Book::find(1);
+		$this->assert_equals(1, $book->author_id);
+		$this->assert_equals(1, $book->explicit_author->parent_author_id);
+		$this->assert_equals(3, $book->explicit_author->author_id);
+
+		Book::$belongs_to = $old;
+	}
+
 	public function test_belongs_to_with_select()
 	{
 		Event::$belongs_to[0]['select'] = 'id, city';
