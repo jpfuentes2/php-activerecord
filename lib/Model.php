@@ -491,6 +491,21 @@ class Model
 		$this->flag_dirty($name);
 		return $value;
 	}
+	
+	/**
+	 * Remove assigned attribute.
+	 *
+	 * @param $name
+	 */
+	public function unassign_attribute($name)
+	{
+		if (isset($this->attributes[$name])) {
+			unset($this->attributes[$name]);
+		}
+		if (isset($this->__dirty[$name])) {
+			unset($this->__dirty[$name]);
+		}
+	}
 
 	/**
 	 * Retrieves an attribute's value or a relationship object based on the name passed. If the attribute
