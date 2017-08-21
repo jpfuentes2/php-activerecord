@@ -263,7 +263,7 @@ class Validations
 				$enum = $options['within'];
 
 			if (!is_array($enum))
-				array($enum);
+				$enum = array($enum);
 
 			$message = str_replace('%s', $var, $options['message']);
 
@@ -517,7 +517,7 @@ class Validations
 						$message = $options['message'];
 					else
 						$message = $options[$messageOptions[$range_option]];
-					
+
 
 					$message = str_replace('%d', $option, $message);
 					$attribute_value = $this->model->$attribute;
