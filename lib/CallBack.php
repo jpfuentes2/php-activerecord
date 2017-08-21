@@ -149,7 +149,7 @@ class CallBack
 	 * model object. For (after|before)_(create|update) callbacks, it will merge with
 	 * a generic 'save' callback which is called first for the lease amount of precision.
 	 *
-	 * @param string $model Model to invoke the callback on.
+	 * @param object $model Model to invoke the callback on.
 	 * @param string $name Name of the callback to invoke
 	 * @param boolean $must_exist Set to true to raise an exception if the callback does not exist.
 	 * @return mixed null if $name was not a valid callback type or false if a method was invoked
