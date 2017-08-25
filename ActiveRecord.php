@@ -43,7 +43,7 @@ function activerecord_autoload($class_name)
 		$root .= DIRECTORY_SEPARATOR . implode($directories, DIRECTORY_SEPARATOR);
 	}
 
-	$file = "$root/$class_name.php";
+	$file = "$root" . DIRECTORY_SEPARATOR . "$class_name.php";
 
 	if (file_exists($file))
 		require_once $file;
