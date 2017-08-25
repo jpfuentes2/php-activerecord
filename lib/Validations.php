@@ -54,7 +54,8 @@ class Validations
 		'validates_exclusion_of',
 		'validates_format_of',
 		'validates_numericality_of',
-		'validates_uniqueness_of'
+		'validates_uniqueness_of',
+		'validates_confirmation_of'
 	);
 
 	private static $DEFAULT_VALIDATION_OPTIONS = array(
@@ -151,6 +152,46 @@ class Validations
 	}
 
 	/**
+	 * Validates that a field, if set, has a confirmation
+	 * field with the same contents.
+	 *
+	 * <code>
+	 * class User extends ActiveRecord\Model {
+	 *   static $validates_confirmation_of = array(
+	 *     array('password')
+	 *   );
+	 * }
+	 * </code>
+	 *
+	 * Available options:
+	 *
+	 * <ul>
+	 * <li><b>message:</b> custom error message</li>
+	 * </ul>
+	 *
+	 * @param array $attrs Validation definition
+	 */
+	public function validates_confirmation_of($attrs)
+	{
+		$configuration = array_merge(self::$DEFAULT_VALIDATION_OPTIONS, array('message' => Errors::$DEFAULT_ERROR_MESSAGES['confirmation'], 'on' => 'save'));
+
+		foreach ($attrs as $attr)
+		{
+			$options = array_merge($configuration, $attr);
+			$attribute = $options[0];
+			$attribute_confirmation = "{$attribute}_confirmation";
+
+			if (isset($this->model->$attribute) && $this->model->attribute_is_dirty($attribute))
+			{
+				if ($this->model->$attribute !== $this->model->$attribute_confirmation)
+				{
+					$this->record->add($attribute, $options['message']);
+				}
+			}
+		}
+	}
+
+    /**
 	 * Validates a field is not null and not blank.
 	 *
 	 * <code>
