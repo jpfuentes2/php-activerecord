@@ -229,6 +229,28 @@ class RelationshipTest extends DatabaseTest
 		$this->assert_equals($author->id, $author->build_books()->author_id);
 		$this->assert_equals($author->id, $author->build_book()->author_id);
 	}
+	
+	public function test_create_association_throws_exception_on_unknown_association(){
+		$author = Author::first();
+		$values = array('foo' => 'bar');
+		try{
+			$venue = $author->create_some_unknown_association($values);
+			$this->fail('Should throw exception');
+		}catch(ActiveRecord\ActiveRecordException $e){
+			$this->assert_equals('Call to undefined method: create_some_unknown_association', $e->getMessage());
+		}
+	}
+	
+	public function test_build_association_throws_exception_on_unknown_association(){
+		$author = Author::first();
+		$values = array('foo' => 'bar');
+		try{
+			$venue = $author->build_some_unknown_association($values);
+			$this->fail('Should throw exception');
+		}catch(ActiveRecord\ActiveRecordException $e){
+			$this->assert_equals('Call to undefined method: build_some_unknown_association', $e->getMessage());
+		}
+	}
 
 	public function test_belongs_to_create_association()
 	{

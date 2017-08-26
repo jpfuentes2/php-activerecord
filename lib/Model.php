@@ -1409,7 +1409,7 @@ class Model
 				$args = $args[0];
 
 			$association_name = str_replace(array('build_', 'create_'), '', $method);
-			$method = str_replace($association_name, 'association', $method);
+			$association_method = str_replace($association_name, 'association', $method);
 			$table = static::table();
 
 			if (($association = $table->get_relationship($association_name)) ||
@@ -1418,7 +1418,7 @@ class Model
 				// access association to ensure that the relationship has been loaded
 				// so that we do not double-up on records if we append a newly created
 				$this->$association_name;
-				return $association->$method($this, $args);
+				return $association->$association_method($this, $args);
 			}
 		}
 
