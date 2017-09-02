@@ -301,7 +301,7 @@ class Table
 	{
 		foreach ($this->columns as $raw_name => $column)
 		{
-			if ($column->inflected_name == $inflected_name)
+			if ($raw_name == $inflected_name)
 				return $column;
 		}
 		return null;
