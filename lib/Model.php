@@ -858,6 +858,35 @@ class Model
 		$this->expire_cache();
 		return true;
 	}
+	
+	/**
+	 * UPDATE sql for the primary key.
+	 * 
+	 * @param mixed $value The new value to the primary key
+	 * @param boolean $validate Set to true or false depending on if you want the validators to run or not
+	 * @return boolean True if the model was saved to the database otherwise false
+	 */
+	public function update_pk($value,$validate=true)
+	{
+		$this->verify_not_readonly('update');
+
+		if ($validate && !$this->_validate())
+			return false;
+		
+		$pk = $this->values_for_pk();
+
+		if (empty($pk))
+			throw new ActiveRecordException("Cannot update, no primary key defined for: " . get_called_class());
+		
+		$a = array($this->get_primary_key(true)=>$value);
+		
+		static::table()->update($a,$pk);
+		$this->invoke_callback('after_update',false);
+		
+		$this->assign_attribute($this->get_primary_key(true),$value);
+		
+		return true;
+	}
 
 	/**
 	 * Issue an UPDATE sql statement for this model's dirty attributes.
