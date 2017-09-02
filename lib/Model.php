@@ -447,12 +447,15 @@ class Model
 	 * @param mixed &$value Value of the attribute
 	 * @return mixed the attribute value
 	 */
-	public function assign_attribute($name, $value)
+	public function assign_attribute($name, $value, $cast = true)
 	{
 		$table = static::table();
 		if (!is_object($value)) {
 			if (array_key_exists($name, $table->columns)) {
-				$value = $table->columns[$name]->cast($value, static::connection());
+			  //checks if $cast is enabled
+			  if($cast === true) {
+				  $value = $table->columns[$name]->cast($value, static::connection());
+				}
 			} else {
 				$col = $table->get_column_by_inflected_name($name);
 				if (!is_null($col)){
