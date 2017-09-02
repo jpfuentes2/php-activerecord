@@ -598,7 +598,7 @@ class Model
 	public function get_primary_key($first=false)
 	{
 		$pk = static::table()->pk;
-		return $first ? $pk[0] : $pk;
+		return ($first && !empty($pk)) ? $pk[0] : $pk;
 	}
 
 	/**
@@ -844,8 +844,9 @@ class Model
 			$table->insert($attributes);
 
 		// if we've got an autoincrementing/sequenced pk set it
-		// don't need this check until the day comes that we decide to support composite pks
-		// if (count($pk) == 1)
+        // this is needed because we might have a table without primary key
+		// @TODO: support composite pks
+		if (count($pk) == 1)
 		{
 			$column = $table->get_column_by_inflected_name($pk);
 
@@ -947,7 +948,7 @@ class Model
 		$conn = static::connection();
 		$sql = new SQLBuilder($conn, $table->get_fully_qualified_table_name());
 
-		$conditions = is_array($options) ? $options['conditions'] : $options;
+		$conditions = (is_array($options) && isset($options['conditions']))? $options['conditions'] : $options;
 
 		if (is_array($conditions) && !is_hash($conditions))
 			call_user_func_array(array($sql, 'delete'), $conditions);
