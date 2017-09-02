@@ -351,7 +351,7 @@ abstract class AbstractRelationship implements InterfaceRelationship
 			if ($using_through)
 			{
 				$foreign_key = $this->primary_key[0];
-				$join_primary_key = $this->foreign_key[0];
+				$join_primary_key = isset($this->options['join_primary_key']) ? $this->options['join_primary_key'] : $this->foreign_key[0];
 			}
 			else
 			{
@@ -441,7 +441,7 @@ class HasMany extends AbstractRelationship
 	 *
 	 * @var array
 	 */
-	static protected $valid_association_options = array('primary_key', 'order', 'group', 'having', 'limit', 'offset', 'through', 'source');
+	static protected $valid_association_options = array('primary_key', 'order', 'group', 'having', 'limit', 'offset', 'through', 'source','join_primary_key');
 
 	protected $primary_key;
 
