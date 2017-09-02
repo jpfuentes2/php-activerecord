@@ -22,6 +22,7 @@ class SqliteAdapter extends Connection
 			throw new DatabaseException("Could not find sqlite db: $info->host");
 
 		$this->connection = new PDO("sqlite:$info->host",null,null,static::$PDO_OPTIONS);
+        $this->connection->sqliteCreateFunction('regexp', '\\ActiveRecord\\SqliteAdapter::sqlite_regexp', 2);
 	}
 
 	public function limit($sql, $offset, $limit)
@@ -108,6 +109,17 @@ class SqliteAdapter extends Connection
 			'boolean' => array('name' => 'boolean')
 		);
 	}
+
+    public static function sqlite_regexp($pattern, $string)
+    {
+        /* Insert delimiter if needed */
+        if(!preg_match('/^([^[:alnum:]\\\s]).*?\1[imsxUXJ]*$/', $pattern))
+        {
+            $pattern = '/'.$pattern.'/';
+        }
+        return preg_match($pattern, $string);
+    }
+
 
 }
 ?>
