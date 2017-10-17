@@ -417,11 +417,18 @@ class Model
 	public function __set($name, $value)
 	{
 	    $this->_cacheAttributesData = [];
-
+		$originalName	= $name;
 		if (array_key_exists($name, static::$alias_attribute))
+		{
 			$name = static::$alias_attribute[$name];
+		}
 		
-		if (method_exists($this,"set_$name"))
+		if (method_exists($this,"set_$originalName"))
+		{
+			$name = "set_$originalName";
+			return $this->$name($value);
+		}
+		elseif (method_exists($this,"set_$name"))
 		{
 			$name = "set_$name";
 			return $this->$name($value);
