@@ -154,14 +154,16 @@ class Model
 	static $sequence;
 
 	/**
-	 * Set this to true in your subclass to use caching for this model. Note that you must also configure a cache object.
+	 * Set this to true in your subclass to use caching for this model.
+	 * Note that you must also configure a cache object.
 	 */
 	static $cache = false;
 
 	/**
-	 * Set this to specify an expiration period for this model. If not set, the expire value you set in your cache options will be used.
+	 * Set this to specify an expiration period for this model.
+	 * If not set, the expire value you set in your cache options will be used.
 	 *
-	 * @var number
+	 * @var integer
 	 */
 	static $cache_expire;
 
@@ -443,7 +445,7 @@ class Model
 		foreach (static::$delegate as &$item)
 		{
 			if (($delegated_name = $this->is_delegated($name,$item)))
-				return $this->$item['to']->$delegated_name = $value;
+				return $this->{$item['to']}->{$delegated_name} = $value;
 		}
 
 		throw new UndefinedPropertyException(get_called_class(),$name);
@@ -888,8 +890,7 @@ class Model
 
 		$this->__new_record = false;
 		$this->invoke_callback('after_create',false);
-
-		$this->update_cache();
+		$this->expire_cache();
 		return true;
 	}
 
@@ -920,17 +921,18 @@ class Model
 			$dirty = $this->dirty_attributes();
 			static::table()->update($dirty,$pk);
 			$this->invoke_callback('after_update',false);
-			$this->update_cache();
+			$this->expire_cache();
 		}
 
 		return true;
 	}
 
-	protected function update_cache()
+	protected function expire_cache()
 	{
 		$table = static::table();
-		if($table->cache_individual_model){
-			Cache::set($this->cache_key(), $this, $table->cache_model_expire);
+		if($table->cache_individual_model)
+		{
+			Cache::delete($this->cache_key());
 		}
 	}
 
@@ -1074,18 +1076,9 @@ class Model
 
 		static::table()->delete($pk);
 		$this->invoke_callback('after_destroy',false);
-		$this->remove_from_cache();
+		$this->expire_cache();
 
 		return true;
-	}
-
-	public function remove_from_cache()
-	{
-		$table = static::table();
-		if($table->cache_individual_model)
-		{
-			Cache::delete($this->cache_key());
-		}
 	}
 
 	/**
@@ -1324,11 +1317,10 @@ class Model
 	 */
 	public function reload()
 	{
-		$this->remove_from_cache();
-
 		$this->__relationships = array();
 		$pk = array_values($this->get_values_for($this->get_primary_key()));
 
+		$this->expire_cache();
 		$this->set_attributes_via_mass_assignment($this->find($pk)->attributes, false);
 		$this->reset_dirty();
 
@@ -1659,17 +1651,22 @@ class Model
 	/**
 	 * Will look up a list of primary keys from cache
 	 *
-	 * @param array $pks An array of primary keys
+	 * @param mixed $pks primary keys
 	 * @return array
 	 */
-	protected static function get_models_from_cache(array $pks)
+	protected static function get_models_from_cache($pks, $options)
 	{
 		$models = array();
 		$table = static::table();
 
+		if(!is_array($pks))
+		{
+			$pks = array($pks);
+		}
+
 		foreach($pks as $pk)
 		{
-			$options =array('conditions' => static::pk_conditions($pk));
+			$options['conditions'] = static::pk_conditions($pk);
 			$models[] = Cache::get($table->cache_key_for_model($pk), function() use ($table, $options)
 			{
 				$res = $table->find($options);
@@ -1699,8 +1696,7 @@ class Model
 
 		if($table->cache_individual_model)
 		{
-			$pks = is_array($values) ? $values : array($values);
-			$list = static::get_models_from_cache($pks);
+			$list = static::get_models_from_cache($values, $options);
 		}
 		else
 		{
