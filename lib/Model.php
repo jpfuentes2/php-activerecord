@@ -109,6 +109,19 @@ class Model
 	private $__relationships = array();
 
 	/**
+	 * Array of relationships that are known to be out-of-sync.
+	 *
+	 * Example: Invoice can add line items to itself by setting that
+	 * line item's invoice_id and saving it. The relationsip, however, doesn't
+	 * know about that additional item until the next reload. Marking it 
+	 * with this array will force this relationship to be reloaded
+	 * before the next read.
+	 *
+	 * @var array
+	 */
+	private $__out_of_sync_relationships = array();
+
+	/**
 	 * Flag that determines if a call to save() should issue an insert or an update sql statement
 	 *
 	 * @var boolean
@@ -516,7 +529,7 @@ class Model
 			return $this->attributes[$name];
 
 		// check relationships if no attribute and return if not marked as out-of-sync
-		if (array_key_exists($name,$this->__relationships)) 
+		if (array_key_exists($name,$this->__relationships) && !array_key_exists($name,$this->__out_of_sync_relationships))
 			return $this->__relationships[$name];
 
 		$table = static::table();
@@ -575,10 +588,10 @@ class Model
 	 */
 	public function flag_out_of_sync($name)
 	{
-		if(!$this->__relationships)
-			$this->__relationships = array();
+		if(!$this->__out_of_sync_relationships)
+			$this->__out_of_sync_relationships = array();
 
-		$this->__relationships[$name] = null;
+		$this->__out_of_sync_relationships[$name] = true;
 	}
 
 	/**
