@@ -516,7 +516,7 @@ class Model
 			return $this->attributes[$name];
 
 		// check relationships if no attribute and return if not marked as out-of-sync
-		if (array_key_exists($name,$this->__relationships) && !array_key_exists($name,$this->__out_of_sync_relationships))
+		if (array_key_exists($name,$this->__relationships)) 
 			return $this->__relationships[$name];
 
 		$table = static::table();
