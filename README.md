@@ -8,7 +8,7 @@ by
 * [@jpfuentes2](https://github.com/jpfuentes2) - Jacques Fuentes
 * [And these terrific Contributors](https://github.com/kla/php-activerecord/contributors)
 
-<http://www.phpactiverecord.org/> 
+<http://www.phpactiverecord.xyz/> 
 
 ## Introduction ##
 A brief summarization of what ActiveRecord is:
