@@ -515,13 +515,13 @@ class Model
 		if (array_key_exists($name,$this->attributes))
 			return $this->attributes[$name];
 
-		// check relationships if no attribute
-		if (array_key_exists($name,$this->__relationships))
+		// check relationships if no attribute and return if not marked as out-of-sync
+		if (array_key_exists($name,$this->__relationships) && !array_key_exists($name,$this->__out_of_sync_relationships))
 			return $this->__relationships[$name];
 
 		$table = static::table();
 
-		// this may be first access to the relationship so check Table
+		// this may be first access to the relationship or known to be out-of-syn so check Table
 		if (($relationship = $table->get_relationship($name)))
 		{
 			$this->__relationships[$name] = $relationship->load($this);
@@ -567,6 +567,18 @@ class Model
 			$this->__dirty = array();
 
 		$this->__dirty[$name] = true;
+	}
+
+	/** Flags a relationship as dirty.
+	 *
+	 * @param string $name Relationship name
+	 */
+	public function flag_out_of_sync($name)
+	{
+		if(!$this->__relationships)
+			$this->__relationships = array();
+
+		$this->__relationships[$name] = null;
 	}
 
 	/**
@@ -1959,4 +1971,3 @@ class Model
 		return true;
 	}
 }
-
