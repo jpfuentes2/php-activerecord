@@ -591,7 +591,7 @@ class Model
 		if(!$this->__out_of_sync_relationships)
 			$this->__out_of_sync_relationships = array();
 
-		$this->__out_of_sync_relationships[$name] = true;
+		$this->__relationships[$name] = null;
 	}
 
 	/**
