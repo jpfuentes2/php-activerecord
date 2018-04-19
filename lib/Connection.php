@@ -48,6 +48,16 @@ abstract class Connection
 	 */
 	public $protocol;
 	/**
+	 * The connection info
+	 * @var string
+	 */
+	private $info;
+	/**
+	 * If the connection should be reconnect if gone.
+	 * @var bool
+	 */
+	public $shouldReconnect = false;
+	/**
 	 * Database's date format
 	 * @var string
 	 */
@@ -76,7 +86,11 @@ abstract class Connection
 	 * @var int
 	 */
 	static $DEFAULT_PORT = 0;
-
+	/**
+	 * Max reconnection retries
+	 * @var int
+	 */
+	static $RETRY_ATTEMPTS = 2;
 	/**
 	 * Retrieve a database connection.
 	 *
@@ -112,7 +126,8 @@ abstract class Connection
 			$connection->protocol = $info->protocol;
 			$connection->logging = $config->get_logging();
 			$connection->logger = $connection->logging ? $config->get_logger() : null;
-
+			$connection->shouldReconnect = $config->get_reconnect();
+			
 			if (isset($info->charset))
 				$connection->set_encoding($info->charset);
 		} catch (PDOException $e) {
@@ -234,22 +249,32 @@ abstract class Connection
 	 */
 	protected function __construct($info)
 	{
+		$this->info = $info;
+
 		try {
-			// unix sockets start with a /
-			if ($info->host[0] != '/')
-			{
-				$host = "host=$info->host";
-
-				if (isset($info->port))
-					$host .= ";port=$info->port";
-			}
-			else
-				$host = "unix_socket=$info->host";
-
-			$this->connection = new PDO("$info->protocol:$host;dbname=$info->db", $info->user, $info->pass, static::$PDO_OPTIONS);
+			$this->connect();
 		} catch (PDOException $e) {
 			throw new DatabaseException($e);
 		}
+	}
+
+	/**
+	 * connect to the database using info provided
+	 * @return void
+	 */
+	protected function connect(){
+		// unix sockets start with a /
+		if ($this->info->host[0] != '/')
+		{
+			$host = "host=" .  $this->info->host;
+
+			if (isset($this->info->port))
+				$host .= ";port=" . $this->info->port;
+		}
+		else
+			$host = "unix_socket=" . $this->info->host;
+
+		$this->connection = new PDO("{$this->info->protocol}:$host;dbname={$this->info->db}", $this->info->user, $this->info->pass, static::$PDO_OPTIONS);
 	}
 
 	/**
@@ -294,6 +319,8 @@ abstract class Connection
 
 	/**
 	 * Execute a raw SQL query on the database.
+	 * Added code inspired by https://stackoverflow.com/questions/2232150/pdo-mysql-server-has-gone-away/31202604#31202604
+	 * to help with long running php processes. Open to ideas to remove the dreaded goto statement..
 	 *
 	 * @param string $sql Raw SQL string to execute.
 	 * @param array &$values Optional array of bind values
@@ -309,6 +336,10 @@ abstract class Connection
 
 		$this->last_query = $sql;
 
+		$has_gone_away = false;
+		$retry_attempt = 0;
+		try_again:
+
 		try {
 			if (!($sth = $this->connection->prepare($sql)))
 				throw new DatabaseException($this);
@@ -322,8 +353,24 @@ abstract class Connection
 			if (!$sth->execute($values))
 				throw new DatabaseException($this);
 		} catch (PDOException $e) {
-			throw new DatabaseException($e);
+			$exception_message = $e->getMessage();
+
+			if (($this->shouldReconnect)
+				 && strpos($exception_message, 'server has gone away') !== false
+				 && $retry_attempt <= self::RETRY_ATTEMPTS
+			) {
+				 $has_gone_away = true;
+			} else {
+				throw new DatabaseException($e);
+			}
 		}
+
+		if ($has_gone_away) {
+			 $retry_attempt++;
+			 $this->connect();
+			 goto try_again;
+		}
+
 		return $sth;
 	}
 

@@ -66,6 +66,13 @@ class Config extends Singleton
 	private $logging = false;
 
 	/**
+	 * Switch for reconnecting
+	 *
+	 * @var bool
+	 */
+	private $reconnect = false;
+
+	/**
 	 * Contains a Logger object that must impelement a log() method.
 	 *
 	 * @var object
@@ -220,6 +227,27 @@ class Config extends Singleton
 			throw new ConfigException('Invalid or non-existent directory: '.$this->model_directory);
 
 		return $this->model_directory;
+	}
+
+	/**
+	 * Turn on/off reconnect
+	 *
+	 * @param boolean $bool
+	 * @return void
+	 */
+	public function set_reconnect($bool)
+	{
+		$this->reconnect = (bool)$bool;
+	}
+
+	/**
+	 * Return whether reconnect is enabled
+	 *
+	 * @return boolean
+	 */
+	public function get_reconnect()
+	{
+		return $this->reconnect;
 	}
 
 	/**
