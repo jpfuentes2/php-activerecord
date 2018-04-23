@@ -53,10 +53,10 @@ abstract class Connection
 	 */
 	private $info;
 	/**
-	 * If the connection should be reconnect if gone.
+	 * Force a check of server and reconnect if it went away
 	 * @var bool
 	 */
-	public $shouldReconnect = false;
+	public $ensure_connection = false;
 	/**
 	 * Database's date format
 	 * @var string
@@ -86,11 +86,6 @@ abstract class Connection
 	 * @var int
 	 */
 	static $DEFAULT_PORT = 0;
-	/**
-	 * Max reconnection retries
-	 * @var int
-	 */
-	static $RETRY_ATTEMPTS = 2;
 	/**
 	 * Retrieve a database connection.
 	 *
@@ -126,8 +121,8 @@ abstract class Connection
 			$connection->protocol = $info->protocol;
 			$connection->logging = $config->get_logging();
 			$connection->logger = $connection->logging ? $config->get_logger() : null;
-			$connection->shouldReconnect = $config->get_reconnect();
-			
+			$connection->ensure_connect = $config->get_ensure_connection();
+
 			if (isset($info->charset))
 				$connection->set_encoding($info->charset);
 		} catch (PDOException $e) {
@@ -250,12 +245,7 @@ abstract class Connection
 	protected function __construct($info)
 	{
 		$this->info = $info;
-
-		try {
-			$this->connect();
-		} catch (PDOException $e) {
-			throw new DatabaseException($e);
-		}
+		$this->connect();
 	}
 
 	/**
@@ -274,7 +264,11 @@ abstract class Connection
 		else
 			$host = "unix_socket=" . $this->info->host;
 
-		$this->connection = new PDO("{$this->info->protocol}:$host;dbname={$this->info->db}", $this->info->user, $this->info->pass, static::$PDO_OPTIONS);
+		try {
+			$this->connection = new PDO("{$this->info->protocol}:$host;dbname={$this->info->db}", $this->info->user, $this->info->pass, static::$PDO_OPTIONS);
+		} catch (PDOException $e) {
+			throw new DatabaseException($e);
+		}
 	}
 
 	/**
@@ -336,9 +330,9 @@ abstract class Connection
 
 		$this->last_query = $sql;
 
-		$has_gone_away = false;
-		$retry_attempt = 0;
-		try_again:
+		if ($this->ensure_connection){
+			$this->reconnect_if_gone();
+		}
 
 		try {
 			if (!($sth = $this->connection->prepare($sql)))
@@ -353,25 +347,28 @@ abstract class Connection
 			if (!$sth->execute($values))
 				throw new DatabaseException($this);
 		} catch (PDOException $e) {
-			$exception_message = $e->getMessage();
+			throw new DatabaseException($e);
+		}
 
-			if (($this->shouldReconnect)
-				 && strpos($exception_message, 'server has gone away') !== false
-				 && $retry_attempt <= self::RETRY_ATTEMPTS
-			) {
-				 $has_gone_away = true;
+		return $sth;
+	}
+
+	/**
+	 * Attempt a simple query and reconnect if the server went away
+	 * @return void
+	 */
+	private function reconnect_if_gone(){
+		try {
+			if (!$this->connection->exec('SELECT 1'))
+				throw new DatabaseException($this);
+		} catch (PDOException $e) {
+			$exception_message = $e->getMessage();
+			if (strpos($exception_message, 'server has gone away') !== false ) {
+				$this->connect();
 			} else {
 				throw new DatabaseException($e);
 			}
 		}
-
-		if ($has_gone_away) {
-			 $retry_attempt++;
-			 $this->connect();
-			 goto try_again;
-		}
-
-		return $sth;
 	}
 
 	/**

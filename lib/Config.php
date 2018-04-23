@@ -66,11 +66,11 @@ class Config extends Singleton
 	private $logging = false;
 
 	/**
-	 * Switch for reconnecting
+	 * Attempt a reconnect if server goes away
 	 *
 	 * @var bool
 	 */
-	private $reconnect = false;
+	private $ensure_connection = false;
 
 	/**
 	 * Contains a Logger object that must impelement a log() method.
@@ -230,24 +230,24 @@ class Config extends Singleton
 	}
 
 	/**
-	 * Turn on/off reconnect
+	 * Turn on/off ensure_connection
 	 *
 	 * @param boolean $bool
 	 * @return void
 	 */
-	public function set_reconnect($bool)
+	public function set_ensure_connection($bool)
 	{
-		$this->reconnect = (bool)$bool;
+		$this->ensure_connection = (bool)$bool;
 	}
 
 	/**
-	 * Return whether reconnect is enabled
+	 * Return whether ensure_connection is enabled
 	 *
 	 * @return boolean
 	 */
-	public function get_reconnect()
+	public function get_ensure_connection()
 	{
-		return $this->reconnect;
+		return $this->ensure_connection;
 	}
 
 	/**
