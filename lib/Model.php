@@ -1526,6 +1526,8 @@ class Model
 	 *
 	 * @see find
 	 * @return $this The first matched record or null if not found
+	 *
+	 * @throws RecordNotFound
 	 */
 	public static function first(/* ... */)
 	{
