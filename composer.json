@@ -2,6 +2,7 @@
     "name": "php-activerecord/php-activerecord",
     "type": "library",
     "description": "php-activerecord is an open source ORM library based on the ActiveRecord pattern.",
+    "version": "1.2.1",
     "keywords": ["activerecord", "orm"],
     "homepage": "http://www.phpactiverecord.org/",
     "license": "MIT",
