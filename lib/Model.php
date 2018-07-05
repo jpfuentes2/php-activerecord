@@ -1667,7 +1667,7 @@ class Model
 		}
 		$results = count($list);
 
-		$count_values = (!is_array($values)) ? [$values] : $values;
+		$count_values = (!is_array($values)) ? array($values) : $values;
 		if ($results != ($expected = count($count_values)))
 		{
 			$class = get_called_class();
