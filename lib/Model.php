@@ -1642,7 +1642,7 @@ class Model
 	 * Finder method which will find by a single or array of primary keys for this model.
 	 *
 	 * @see find
-	 * @param array $values An array containing values for the pk
+	 * @param array|string $values An array or a comma separated string containing values for the pk
 	 * @param array $options An options array
 	 * @return Model
 	 * @throws {@link RecordNotFound} if a record could not be found
@@ -1667,7 +1667,8 @@ class Model
 		}
 		$results = count($list);
 
-		if ($results != ($expected = count($values)))
+		$count_values = (!is_array($values)) ? array($values) : $values;
+		if ($results != ($expected = count($count_values)))
 		{
 			$class = get_called_class();
 			if (is_array($values))

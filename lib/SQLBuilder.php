@@ -217,7 +217,7 @@ class SQLBuilder
 			return null;
 
 		$parts = preg_split('/(_and_|_or_)/i',$name,-1,PREG_SPLIT_DELIM_CAPTURE);
-		$num_values = count($values);
+		$num_values = !empty($values) ? count($values) : 0;
 		$conditions = array('');
 
 		for ($i=0,$j=0,$n=count($parts); $i<$n; $i+=2,++$j)
