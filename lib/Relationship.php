@@ -347,6 +347,12 @@ abstract class AbstractRelationship implements InterfaceRelationship
 		if ($this instanceof HasMany || $this instanceof HasOne)
 		{
 			$this->set_keys($from_table->class->getName());
+			
+			if(isset($this->options['through']))
+			{
+			    $through_table = Table::load($this->options['through']);
+			    $from_table_name = $through_table->get_fully_qualified_table_name();
+			}
 
 			if ($using_through)
 			{
