@@ -339,12 +339,12 @@ class AdapterTest extends DatabaseTest
 
 	public function test_query_column_info()
 	{
-		$this->assert_greater_than(0,count($this->conn->query_column_info("authors")));
+		$this->assert_greater_than(0,count((array) $this->conn->query_column_info("authors")));
 	}
 
 	public function test_query_table_info()
 	{
-		$this->assert_greater_than(0,count($this->conn->query_for_tables()));
+		$this->assert_greater_than(0,count((array) $this->conn->query_for_tables()));
 	}
 
 	public function test_query_table_info_must_return_one_field()
