@@ -7,15 +7,17 @@ env: PHPAR_MYSQL=mysql://root@127.0.0.1/phpar_test PHPAR_PGSQL=pgsql://postgres@
 
 language: php
 php:
-  - 5.3
   - 5.4
   - 5.5
   - 7.0
   - 7.1
+  - 7.2
   - nightly
 
 matrix:
   include:
+    - php: 5.3
+      dist: precise
     - php: hhvm
       dist: trusty
   allow_failures:
