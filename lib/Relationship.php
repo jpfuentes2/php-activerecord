@@ -291,7 +291,7 @@ abstract class AbstractRelationship implements InterfaceRelationship
 		if (!has_absolute_namespace($class_name) && isset($this->options['namespace'])) {
 			$class_name = $this->options['namespace'].'\\'.$class_name;
 		}
-		
+
 		$reflection = Reflections::instance()->add($class_name)->get($class_name);
 
 		if (!$reflection->isSubClassOf('ActiveRecord\\Model'))
@@ -507,7 +507,7 @@ class HasMany extends AbstractRelationship
 				$fk = $this->foreign_key;
 
 				$this->set_keys($this->get_table()->class->getName(), true);
-				
+
 				$class = $this->class_name;
 				$relation = $class::table()->get_relationship($this->through);
 				$through_table = $relation->get_table();
@@ -604,7 +604,7 @@ class HasMany extends AbstractRelationship
 	public function load_eagerly($models=array(), $attributes=array(), $includes, Table $table)
 	{
 		$this->set_keys($table->class->name);
-		$this->query_and_attach_related_models_eagerly($table,$models,$attributes,$includes,$this->foreign_key, $table->pk);
+		$this->query_and_attach_related_models_eagerly($table,$models,$attributes,$includes,$this->foreign_key, $this->primary_key);
 	}
 }
 
@@ -685,6 +685,9 @@ class HasAndBelongsToMany extends AbstractRelationship
  */
 class BelongsTo extends AbstractRelationship
 {
+
+	static protected $valid_association_options = array('primary_key');
+
 	public function __construct($options=array())
 	{
 		parent::__construct($options);
@@ -695,6 +698,9 @@ class BelongsTo extends AbstractRelationship
 		//infer from class_name
 		if (!$this->foreign_key)
 			$this->foreign_key = array(Inflector::instance()->keyify($this->class_name));
+
+		if (!isset($this->primary_key) && isset($this->options['primary_key']))
+			$this->primary_key = is_array($this->options['primary_key']) ? $this->options['primary_key'] : array($this->options['primary_key']);
 	}
 
 	public function __get($name)

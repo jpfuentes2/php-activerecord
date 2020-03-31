@@ -23,7 +23,7 @@ class RelationshipTest extends DatabaseTest
 		Venue::$has_one = array();
 		Employee::$has_one = array(array('position'));
 		Host::$has_many = array(array('events', 'order' => 'id asc'));
-		
+
 		foreach ($this->relationship_names as $name)
 		{
 			if (preg_match("/$name/", $this->getName(), $match))
@@ -80,7 +80,7 @@ class RelationshipTest extends DatabaseTest
 	{
 		$this->assert_default_has_many($this->get_relationship());
 	}
-	
+
 	public function test_eager_load_with_empty_nested_includes()
 	{
 		$conditions['include'] = array('events'=>array());
@@ -107,7 +107,7 @@ class RelationshipTest extends DatabaseTest
 
         $this->assertEquals('Yeah Yeah Yeahs',$bill_events[0]->title);
     }
-	
+
 	/**
 	 * @expectedException ActiveRecord\RelationshipException
 	 */
@@ -161,6 +161,19 @@ class RelationshipTest extends DatabaseTest
 		$book = Book::find(1);
 		$this->assert_equals(2, $book->secondary_author_id);
 		$this->assert_equals($book->secondary_author_id, $book->explicit_author->author_id);
+
+		Book::$belongs_to = $old;
+	}
+
+	public function test_belongs_to_with_explicit_primary_key()
+	{
+		$old = Book::$belongs_to;
+		Book::$belongs_to = array(array('explicit_author', 'class_name' => 'Author', 'primary_key' => 'parent_author_id'));
+
+		$book = Book::find(1);
+		$this->assert_equals(1, $book->author_id);
+		$this->assert_equals(1, $book->explicit_author->parent_author_id);
+		$this->assert_equals(3, $book->explicit_author->author_id);
 
 		Book::$belongs_to = $old;
 	}
@@ -422,6 +435,23 @@ class RelationshipTest extends DatabaseTest
 		$old = Author::$has_many;
 		Author::$has_many = array(array('explicit_books', 'class_name' => 'Book', 'primary_key' => 'parent_author_id', 'foreign_key' => 'secondary_author_id'));
 		$author = Author::find(4);
+
+		$this->assert_equals(2, count($author->explicit_books));
+
+		foreach ($author->explicit_books as $book)
+			$this->assert_equals($book->secondary_author_id, $author->parent_author_id);
+
+		$this->assert_true(strpos(ActiveRecord\Table::load('Book')->last_sql, "secondary_author_id") !== false);
+		Author::$has_many = $old;
+	}
+
+	public function test_has_many_with_explicit_keys_and_eager_loading()
+	{
+		$old = Author::$has_many;
+		Author::$has_many = array(array('explicit_books', 'class_name' => 'Book', 'primary_key' => 'parent_author_id', 'foreign_key' => 'secondary_author_id'));
+		$author = Author::find(4, array('include' => 'explicit_books'));
+
+		$this->assert_equals(2, count($author->explicit_books));
 
 		foreach ($author->explicit_books as $book)
 			$this->assert_equals($book->secondary_author_id, $author->parent_author_id);
