@@ -1291,7 +1291,9 @@ class Model
 
 	public function __clone()
 	{
-		$this->__relationships = array();
+		$this->__relationships = array_map(function ($rel) {
+			return is_object($rel) ? clone($rel) : $rel;
+		}, $this->__relationships);
 		$this->reset_dirty();
 		return $this;
 	}
