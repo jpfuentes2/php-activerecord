@@ -703,6 +703,12 @@ class BelongsTo extends AbstractRelationship
 			$this->primary_key = is_array($this->options['primary_key']) ? $this->options['primary_key'] : array($this->options['primary_key']);
 	}
 
+	public function __isset($name)
+	{
+		$attribute = $this->{$name};
+		return isset($attribute);
+	}
+
 	public function __get($name)
 	{
 		if($name === 'primary_key' && !isset($this->primary_key)) {
