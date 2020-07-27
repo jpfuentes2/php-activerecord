@@ -6,13 +6,14 @@ namespace ActiveRecord;
 
 /**
  * Adapter for Postgres (not completed yet)
- * 
+ *
  * @package ActiveRecord
  */
 class PgsqlAdapter extends Connection
 {
 	static $QUOTE_CHARACTER = '"';
 	static $DEFAULT_PORT = 5432;
+	static $VERSION;
 
 	public function supports_sequences()
 	{
@@ -34,8 +35,25 @@ class PgsqlAdapter extends Connection
 		return $sql . ' LIMIT ' . intval($limit) . ' OFFSET ' . intval($offset);
 	}
 
+	public function get_version()
+	{
+		if (self::$VERSION === null) {
+			$version_stmt = $this->query("SELECT version();");
+			$version_stmt->execute();
+			$version_string = $version_stmt->fetch()['version'];
+			preg_match('/^PostgreSQL ([0-9\.]+)/', $version_string, $matches);
+			self::$VERSION = $matches[1];
+		}
+		return self::$VERSION;
+	}
+
 	public function query_column_info($table)
 	{
+
+		$default_select = self::get_version() < 12 ?
+			'pg_attrdef.adsrc' :
+			'pg_get_expr(adbin, adrelid)';
+
 		$sql = <<<SQL
 SELECT
       a.attname AS field,
@@ -47,8 +65,8 @@ SELECT
         WHERE c.oid = pg_index.indrelid
         AND a.attnum = ANY (pg_index.indkey)
         AND pg_index.indisprimary = 't'
-      ) IS NOT NULL AS pk,      
-      REGEXP_REPLACE(REGEXP_REPLACE(REGEXP_REPLACE((SELECT pg_attrdef.adsrc
+      ) IS NOT NULL AS pk,
+      REGEXP_REPLACE(REGEXP_REPLACE(REGEXP_REPLACE((SELECT $default_select
         FROM pg_attrdef
         WHERE c.oid = pg_attrdef.adrelid
         AND pg_attrdef.adnum=a.attnum
@@ -136,4 +154,3 @@ SQL;
 	}
 
 }
-?>
