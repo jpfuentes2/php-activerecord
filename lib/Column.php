@@ -18,6 +18,7 @@ class Column
 	const DATETIME	= 4;
 	const DATE		= 5;
 	const TIME		= 6;
+	const BOOLEAN	= 7;
 
 	/**
 	 * Map a type to an column type.
@@ -25,6 +26,7 @@ class Column
 	 * @var array
 	 */
 	static $TYPE_MAPPING = array(
+
 		'datetime'	=> self::DATETIME,
 		'timestamp'	=> self::DATETIME,
 		'date'		=> self::DATE,
@@ -40,7 +42,11 @@ class Column
 		'double'	=> self::DECIMAL,
 		'numeric'	=> self::DECIMAL,
 		'decimal'	=> self::DECIMAL,
-		'dec'		=> self::DECIMAL);
+		'dec'		=> self::DECIMAL,
+
+		'boolean'   => self::BOOLEAN,
+
+	);
 
 	/**
 	 * The true name of this column.
@@ -160,6 +166,7 @@ class Column
 			case self::STRING:	return (string)$value;
 			case self::INTEGER:	return static::castIntegerSafely($value);
 			case self::DECIMAL:	return (double)$value;
+			case self::BOOLEAN:	return (bool) $value;
 			case self::DATETIME:
 			case self::DATE:
 				if (!$value)
