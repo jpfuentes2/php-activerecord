@@ -122,11 +122,13 @@ SQL;
 		if ($column['default'])
 		{
 			preg_match("/^nextval\('(.*)'\)$/",$column['default'],$matches);
-
-			if (count($matches) == 2)
+			if (count($matches) == 2) {
 				$c->sequence = $matches[1];
-			else
-				$c->default = $c->cast($column['default'],$this);
+			} elseif ($column['type'] == 'boolean') {
+				$c->default = $c->cast($column['default'] === 'true' ? true : ($column['default'] === 'false' ? false : $column['default']), $this);
+			} else {
+				$c->default = $c->cast($column['default'], $this);
+			}
 		}
 		return $c;
 	}
