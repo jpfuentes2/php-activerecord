@@ -355,7 +355,7 @@ class Model
 	 */
 	public function __isset($attribute_name)
 	{
-		return array_key_exists($attribute_name,$this->attributes) || array_key_exists($attribute_name,static::$alias_attribute);
+		return array_key_exists($attribute_name,$this->attributes) || array_key_exists($attribute_name,static::$alias_attribute) || static::table()->get_relationship($attribute_name) || method_exists($this, "get_$attribute_name");
 	}
 
 	/**
