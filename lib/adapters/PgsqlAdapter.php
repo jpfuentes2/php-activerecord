@@ -112,12 +112,6 @@ SQL;
 		{
 			preg_match('/^([A-Za-z0-9_]+(?:\[\])?)(\(([0-9]+(,[0-9]+)?)\))?/',$column['type'],$matches);
 
-			if (!is_array($matches)) {
-				var_dump($column['type']);
-				var_dump($matches);
-				exit;
-			}
-
 			$raw_type = (count($matches) > 0 ? $matches[1] : $column['type']);
 			$c->length = count($matches) >= 4 ? intval($matches[3]) : intval($column['attlen']);
 
