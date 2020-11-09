@@ -150,7 +150,7 @@ function wrap_strings_in_arrays(&$strings)
 {
 	if (!is_array($strings))
 		$strings = array(array($strings));
-	else 
+	else
 	{
 		foreach ($strings as &$str)
 		{
@@ -182,7 +182,8 @@ class Utils
 			else
 			{
 				$conditions[0] .= " $conjuction " . array_shift($condition);
-				$conditions[] = array_flatten($condition);
+				$flattened_condition = array_flatten($condition);
+				$conditions[] = count($flattened_condition) > 1 ? $flattened_condition : $flattened_condition[0];
 			}
 		}
 		elseif (is_string($condition))
