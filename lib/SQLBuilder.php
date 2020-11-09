@@ -305,15 +305,46 @@ class SQLBuilder
 		{
 			// if the values has a nested array then we'll need to use Expressions to expand the bind marker for us
 			$values = array_slice($args,1);
+			$index_position = 0;
 
 			foreach ($values as $name => &$value)
 			{
+				++$index_position;
+
 				if (is_array($value))
 				{
 					$e = new Expressions($this->connection,$args[0]);
 					$e->bind_values($values);
 					$this->where = $e->to_s();
-					$this->where_values = array_flatten($e->values());
+
+					// TODO: Maybe this block should only be executed if the adapter (and therefore the database) supports native database arrays.
+
+					// While a regex expression here would be more concise, the below process of stepping through charactes should be faster.
+
+					$placeholder_position = strpos(
+						$args[0],
+						is_int($name) ? Expressions::ParameterMarker : $name,
+						$index_position
+					);
+
+					$char_position_previous = $char_position_next = $placeholder_position;
+
+					while (in_array($args[0][$char_position_previous], [' ', ',', ':', '?'])) {
+						--$char_position_previous;
+					}
+
+					while (in_array($args[0][$char_position_next], [' ', ',', ':', '?'])) {
+						++$char_position_next;
+					}
+
+					if ($args[0][$char_position_previous] == '(' && $args[0][$char_position_next] == ')') {
+						// Looks like the placeholder is enclosed in parentheses, meaning it's intended as a list of values.
+						$this->where_values = array_flatten($e->values());
+					} else {
+						// Looks like the placeholder is no enclosed in parentheses, so we think it's intended as a native database array.
+						$this->where_values = $e->values();
+					}
+
 					return;
 				}
 			}
