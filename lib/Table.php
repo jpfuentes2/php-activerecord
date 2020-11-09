@@ -431,15 +431,17 @@ class Table
 		$date_class = Config::instance()->get_date_class();
 		foreach ($hash as $name => &$value)
 		{
-			if ($value instanceof $date_class || $value instanceof \DateTime)
-			{
-				if (isset($this->columns[$name]) && $this->columns[$name]->type == Column::DATE)
+			if ($value instanceof $date_class || $value instanceof \DateTime) {
+				if (isset($this->columns[$name]) && $this->columns[$name]->type == Column::DATE) {
 					$hash[$name] = $this->conn->date_to_string($value);
-				else
+				} else {
 					$hash[$name] = $this->conn->datetime_to_string($value);
-			}
-			else
+				}
+			} elseif (is_array($value)) {
+				$hash[$name] = $this->conn->array_to_database_string($value);
+			} else {
 				$hash[$name] = $value;
+			}
 		}
 		return $hash;
 	}

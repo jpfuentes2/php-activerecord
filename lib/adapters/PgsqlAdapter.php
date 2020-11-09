@@ -96,6 +96,8 @@ SQL;
 		$c->pk				= ($column['pk'] ? true : false);
 		$c->auto_increment	= false;
 
+		$is_array = false;
+
 		if (substr($column['type'],0,9) == 'timestamp')
 		{
 			$c->raw_type = 'datetime';
@@ -108,15 +110,30 @@ SQL;
 		}
 		else
 		{
-			preg_match('/^([A-Za-z0-9_]+)(\(([0-9]+(,[0-9]+)?)\))?/',$column['type'],$matches);
+			preg_match('/^([A-Za-z0-9_]+(?:\[\])?)(\(([0-9]+(,[0-9]+)?)\))?/',$column['type'],$matches);
 
-			$c->raw_type = (count($matches) > 0 ? $matches[1] : $column['type']);
+			if (!is_array($matches)) {
+				var_dump($column['type']);
+				var_dump($matches);
+				exit;
+			}
+
+			$raw_type = (count($matches) > 0 ? $matches[1] : $column['type']);
 			$c->length = count($matches) >= 4 ? intval($matches[3]) : intval($column['attlen']);
 
 			if ($c->length < 0)
 				$c->length = null;
+
+			if (substr($raw_type, -2) == '[]') {
+				$raw_type = substr($raw_type, 0, -2);
+				$is_array = true;
+			}
+
+			$c->raw_type = $raw_type;
+
 		}
 
+		$c->is_array = $is_array;
 		$c->map_raw_type();
 
 		if ($column['default'])
@@ -153,6 +170,30 @@ SQL;
 			'binary' => array('name' => 'binary'),
 			'boolean' => array('name' => 'boolean')
 		);
+	}
+
+	public function array_to_database_string(array $value)
+	{
+		return '{' . $this->str_putcsv($value) . '}';
+	}
+
+	public function database_string_to_array(string $value)
+	{
+		preg_match('/^{(.*)}$/', $value, $matches);
+		if ($matches && !strlen($matches[1])) {
+			return [];
+		}
+		return $matches ? str_getcsv($matches[1]) : $value;
+	}
+
+	private function str_putcsv(array $input, $delimiter = ',', $enclosure = '"')
+	{
+		$h = fopen('php://temp', 'r+b');
+		fputcsv($h, $input, $delimiter, $enclosure);
+		rewind($h);
+		$data = rtrim(stream_get_contents($h), "\n");
+		fclose($h);
+		return $data;
 	}
 
 }

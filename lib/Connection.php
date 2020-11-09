@@ -524,6 +524,32 @@ abstract class Connection
 	}
 
 	/**
+	 *
+	 * Converts arrays to string for inserting/updating in database. Necessary because PDO doesn't support arrays directly.
+	 *
+	 * @param array $array The array to serialize
+	 * @return string The serialized array
+	 */
+
+	public function array_to_database_string(array $array)
+	{
+		throw new DatabaseException(get_called_class() . ' does not support arrays');
+	}
+
+	/**
+	 *
+	 * Converts arrays to string for inserting/updating in database. Necessary because PDO doesn't support arrays directly.
+	 *
+	 * @param array $array The array to serialize
+	 * @return string The serialized array
+	 */
+
+	public function database_string_to_array(array $array)
+	{
+		throw new DatabaseException(get_called_class() . ' does not support arrays');
+	}
+
+	/**
 	 * Adds a limit clause to the SQL query.
 	 *
 	 * @param string $sql The SQL statement.

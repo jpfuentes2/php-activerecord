@@ -108,6 +108,8 @@ class Column
 	 */
 	public $sequence;
 
+	public $is_array = false;
+
 	/**
 	 * Cast a value to an integer type safely
 	 *
@@ -156,10 +158,24 @@ class Column
 	 * @param Connection $connection The Connection this column belongs to
 	 * @return mixed type-casted value
 	 */
-	public function cast($value, $connection)
+	public function cast($value, $connection, bool $process_arrays = true)
 	{
 		if ($value === null)
 			return null;
+
+		if ($this->is_array && $process_arrays) {
+
+			// Convert database array representation to PHP array
+			$value_array = is_array($value) ? $value : $connection->database_string_to_array($value);
+
+			// Cast each array member according to database type
+			$self = $this;
+
+			return array_map(function ($value) use ($self, $connection) {
+				return $self->cast($value, $connection, false);
+			}, $value_array);
+
+		}
 
 		switch ($this->type)
 		{
@@ -186,6 +202,7 @@ class Column
 
 				return $connection->string_to_datetime($value);
 		}
+
 		return $value;
 	}
 
