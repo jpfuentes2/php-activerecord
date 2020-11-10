@@ -1311,7 +1311,7 @@ class Model
 	 *
 	 * @var array
 	 */
-	static $VALID_OPTIONS = array('conditions', 'limit', 'offset', 'order', 'select', 'joins', 'include', 'readonly', 'group', 'from', 'having');
+	static $VALID_OPTIONS = array('conditions', 'limit', 'offset', 'order', 'select', 'joins', 'include', 'readonly', 'group', 'from', 'having', 'array_placeholders');
 
 	/**
 	 * Enables the use of dynamic finders.

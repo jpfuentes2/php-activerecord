@@ -162,6 +162,9 @@ class Table
 		$table = array_key_exists('from', $options) ? $options['from'] : $this->get_fully_qualified_table_name();
 		$sql = new SQLBuilder($this->conn, $table);
 
+		if (array_key_exists('array_placeholders',$options))
+			$sql->array_placeholders($options['array_placeholders']);
+
 		if (array_key_exists('joins',$options))
 		{
 			$sql->joins($this->create_joins($options['joins']));
@@ -215,8 +218,9 @@ class Table
 		$sql = $this->options_to_sql($options);
 		$readonly = (array_key_exists('readonly',$options) && $options['readonly']) ? true : false;
 		$eager_load = array_key_exists('include',$options) ? $options['include'] : null;
+		$array_placeholders = array_key_exists('array_placeholders',$options) ? $options['array_placeholders'] : [];
 
-		return $this->find_by_sql($sql->to_s(),$sql->get_where_values(), $readonly, $eager_load);
+		return $this->find_by_sql($sql->to_s(),$sql->get_where_values(), $readonly, $eager_load, $array_placeholders);
 	}
 
 	public function cache_key_for_model($pk)
@@ -228,13 +232,13 @@ class Table
 		return $this->class->name . '-' . $pk;
 	}
 
-	public function find_by_sql($sql, $values=null, $readonly=false, $includes=null)
+	public function find_by_sql($sql, $values=null, $readonly=false, $includes=null, $array_placeholders = [])
 	{
 		$this->last_sql = $sql;
 
 		$collect_attrs_for_includes = is_null($includes) ? false : true;
 		$list = $attrs = array();
-		$sth = $this->conn->query($sql,$this->process_data($values));
+		$sth = $this->conn->query($sql, $this->process_data($values, $array_placeholders));
 
 		$self = $this;
 		while (($row = $sth->fetch()))
@@ -423,7 +427,7 @@ class Table
 		return $ret;
 	}
 
-	private function &process_data($hash)
+	private function &process_data($hash, $array_placeholders = [])
 	{
 		if (!$hash)
 			return $hash;
@@ -437,7 +441,7 @@ class Table
 				} else {
 					$hash[$name] = $this->conn->datetime_to_string($value);
 				}
-			} elseif (is_array($value)) {
+			} elseif (is_array($value) && ((isset($this->columns[$name]) && $this->columns[$name]->is_array || in_array($name, $array_placeholders))) ) {
 				$hash[$name] = $this->conn->array_to_database_string($value);
 			} else {
 				$hash[$name] = $value;

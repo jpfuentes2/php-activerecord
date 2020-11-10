@@ -182,8 +182,7 @@ class Utils
 			else
 			{
 				$conditions[0] .= " $conjuction " . array_shift($condition);
-				$flattened_condition = array_flatten($condition);
-				$conditions[] = count($flattened_condition) > 1 ? $flattened_condition : $flattened_condition[0];
+				$conditions[] = array_flatten($condition);
 			}
 		}
 		elseif (is_string($condition))

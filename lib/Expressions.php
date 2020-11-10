@@ -11,7 +11,7 @@ namespace ActiveRecord;
  * 'name = :name AND author = :author'
  * 'id = IN(:ids)'
  * 'id IN(:subselect)'
- * 
+ *
  * @package ActiveRecord
  */
 class Expressions
@@ -90,7 +90,7 @@ class Expressions
 	public function to_s($substitute=false, &$options=null)
 	{
 		if (!$options) $options = array();
-		
+
 		$values = array_key_exists('values',$options) ? $options['values'] : $this->values;
 
 		$ret = "";
@@ -190,3 +190,4 @@ class Expressions
 		return "'" . str_replace("'","''",$value) . "'";
 	}
 }
+
