@@ -55,9 +55,10 @@ class Expressions
 		$this->values[$parameter_number-1] = $value;
 	}
 
-	public function bind_values($values)
+	public function bind_values($values, $array_placeholders = [])
 	{
 		$this->values = $values;
+		$this->array_placeholders = $array_placeholders;
 	}
 
 	/**
@@ -145,6 +146,7 @@ class Expressions
 	private function substitute(&$values, $substitute, $pos, $parameter_index)
 	{
 		$value = $values[$parameter_index];
+		$is_array_placeholder = in_array($parameter_index, $this->array_placeholders);
 
 		if (is_array($value))
 		{
@@ -165,7 +167,7 @@ class Expressions
 
 				return $ret;
 			}
-			return join(',',array_fill(0,$value_count,self::ParameterMarker));
+			return join(',', array_fill(0, $is_array_placeholder ? 1 : $value_count, self::ParameterMarker));
 		}
 
 		if ($substitute)

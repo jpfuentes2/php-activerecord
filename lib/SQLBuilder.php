@@ -319,8 +319,11 @@ class SQLBuilder
 				if (!is_array($value)) {
 					continue;
 				}
+
+				$is_array_placeholder = in_array($name, $this->array_placeholders);
+
 				$e = new Expressions($this->connection, $args[0]);
-				$e->bind_values($values);
+				$e->bind_values($values, $this->array_placeholders);
 				$this->where = $e->to_s();
 
 				if (in_array($name, $this->array_placeholders)) {
