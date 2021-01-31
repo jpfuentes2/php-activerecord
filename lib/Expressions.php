@@ -21,6 +21,7 @@ class Expressions
 	private $expressions;
 	private $values = array();
 	private $connection;
+	private $array_placeholders = [];
 
 	public function __construct($connection, $expressions=null /* [, $values ... ] */)
 	{
