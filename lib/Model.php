@@ -1291,6 +1291,9 @@ class Model
 
 	public function __clone()
 	{
+		$this->__new_record = true;
+		$pk = $this->get_primary_key(true);
+		$this->assign_attribute($pk, null);
 		$this->__relationships = array();
 		$this->reset_dirty();
 		return $this;
