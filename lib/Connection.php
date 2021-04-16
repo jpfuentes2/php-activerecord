@@ -544,7 +544,7 @@ abstract class Connection
 	 * @return string The serialized array
 	 */
 
-	public function database_string_to_array(array $array)
+	public function database_string_to_array(string $value)
 	{
 		throw new DatabaseException(get_called_class() . ' does not support arrays');
 	}
