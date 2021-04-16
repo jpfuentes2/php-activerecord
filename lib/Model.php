@@ -431,7 +431,7 @@ class Model
 				$services = \Zend_Registry::get('publisher-services');
 
 				if ($sentry = $services['sentry']) {
-					$sentry->captureMessage('Delegate is ' . var_export($item, true));
+					$sentry->captureMessage('Delegates: ' . var_export(static::$delegate, true));
 				}
 				continue;
 			}
@@ -538,7 +538,7 @@ class Model
 				$services = \Zend_Registry::get('publisher-services');
 
 				if ($sentry = $services['sentry']) {
-					$sentry->captureMessage('Delegate is ' . var_export($item, true));
+					$sentry->captureMessage('Delegates: ' . var_export(static::$delegate, true));
 				}
 				continue;
 			}
