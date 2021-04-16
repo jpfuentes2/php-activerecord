@@ -1,5 +1,5 @@
 <?php
-class SnakeCase_PHPUnit_Framework_TestCase extends PHPUnit_Framework_TestCase
+class SnakeCase_PHPUnit_Framework_TestCase extends PHPUnit\Framework\TestCase
 {
 	public function __call($meth, $args)
 	{
@@ -13,13 +13,13 @@ class SnakeCase_PHPUnit_Framework_TestCase extends PHPUnit_Framework_TestCase
 		die("PHP Fatal Error:  Call to undefined method $class_name::$meth() in {$trace[1]['file']} on line {$trace[1]['line']}" . PHP_EOL);
 	}
 
-	public function setUp()
+	public function setUp() : void
 	{
 		if (method_exists($this,'set_up'))
 			call_user_func_array(array($this,'set_up'),func_get_args());
 	}
 
-	public function tearDown()
+	public function tearDown() : void
 	{
 		if (method_exists($this,'tear_down'))
 			call_user_func_array(array($this,'tear_down'),func_get_args());
