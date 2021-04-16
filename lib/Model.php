@@ -1697,7 +1697,7 @@ class Model
 	 * @param array $values An array of values for any parameters that needs to be bound
 	 * @return array An array of models
 	 */
-	public static function find_by_sql($sql, $values=null)
+	public static function find_by_sql($sql, $values=[])
 	{
 		return static::table()->find_by_sql($sql, $values, true);
 	}
@@ -1709,7 +1709,7 @@ class Model
 	 * @param array $values Bind values, if any, for the query
 	 * @return object A PDOStatement object
 	 */
-	public static function query($sql, $values=null)
+	public static function query($sql, $values=[])
 	{
 		return static::connection()->query($sql, $values);
 	}
