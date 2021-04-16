@@ -329,8 +329,32 @@ abstract class Connection
 
 		$sth->setFetchMode(PDO::FETCH_ASSOC);
 
+		$numeric_keys = false;
+
+		foreach ($values as $key => &$value) {
+			switch (gettype($value)) {
+				case 'boolean' :
+					$pdo_type = PDO::PARAM_BOOL;
+					break;
+				case 'integer' :
+					$pdo_type = PDO::PARAM_INT;
+					break;
+				case 'NULL' :
+					$pdo_type = PDO::PARAM_NULL;
+					break;
+				default :
+					$pdo_type = PDO::PARAM_STR;
+					break;
+			}
+			if ($numeric_keys || $key === 0) {
+				$numeric_keys = true;
+				++$key;
+			}
+			$sth->bindParam($key, $value, $pdo_type);
+		}
+
 		try {
-			if (!$sth->execute($values))
+			if (!$sth->execute())
 				throw new DatabaseException($this);
 		} catch (PDOException $e) {
 			throw new DatabaseException($e);
@@ -497,6 +521,32 @@ abstract class Connection
 			$date->format(static::DATETIME_TRANSLATE_FORMAT),
 			$date->getTimezone()
 		);
+	}
+
+	/**
+	 *
+	 * Converts arrays to string for inserting/updating in database. Necessary because PDO doesn't support arrays directly.
+	 *
+	 * @param array $array The array to serialize
+	 * @return string The serialized array
+	 */
+
+	public function array_to_database_string(array $array)
+	{
+		throw new DatabaseException(get_called_class() . ' does not support arrays');
+	}
+
+	/**
+	 *
+	 * Converts arrays to string for inserting/updating in database. Necessary because PDO doesn't support arrays directly.
+	 *
+	 * @param array $array The array to serialize
+	 * @return string The serialized array
+	 */
+
+	public function database_string_to_array(string $value)
+	{
+		throw new DatabaseException(get_called_class() . ' does not support arrays');
 	}
 
 	/**

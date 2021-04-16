@@ -8,7 +8,7 @@ class SqliteAdapterTest extends AdapterTest
 		parent::set_up('sqlite');
 	}
 
-	public function tearDown()
+	public function tearDown() : void
 	{
 		parent::tearDown();
 
@@ -16,7 +16,7 @@ class SqliteAdapterTest extends AdapterTest
 	}
 
 
-	public static function tearDownAfterClass()
+	public static function tearDownAfterClass() : void
 	{
 		parent::tearDownAfterClass();
 

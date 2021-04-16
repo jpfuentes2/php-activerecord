@@ -150,7 +150,7 @@ function wrap_strings_in_arrays(&$strings)
 {
 	if (!is_array($strings))
 		$strings = array(array($strings));
-	else 
+	else
 	{
 		foreach ($strings as &$str)
 		{
@@ -173,7 +173,7 @@ class Utils
 		return is_array(end($options)) ? end($options) : array();
 	}
 
-	public static function add_condition(&$conditions=array(), $condition, $conjuction='AND')
+	public static function add_condition(&$conditions, $condition, $conjuction='AND')
 	{
 		if (is_array($condition))
 		{

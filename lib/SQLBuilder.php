@@ -22,6 +22,7 @@ class SQLBuilder
 	private $group;
 	private $having;
 	private $update;
+	private $array_placeholders = [];
 
 	// for where
 	private $where;
@@ -102,6 +103,12 @@ class SQLBuilder
 	public function order($order)
 	{
 		$this->order = $order;
+		return $this;
+	}
+
+	public function array_placeholders(array $array_placeholders)
+	{
+		$this->array_placeholders = $array_placeholders;
 		return $this;
 	}
 
@@ -303,20 +310,30 @@ class SQLBuilder
 		}
 		elseif ($num_args > 0)
 		{
+
 			// if the values has a nested array then we'll need to use Expressions to expand the bind marker for us
 			$values = array_slice($args,1);
+			$index_position = 0;
 
-			foreach ($values as $name => &$value)
-			{
-				if (is_array($value))
-				{
-					$e = new Expressions($this->connection,$args[0]);
-					$e->bind_values($values);
-					$this->where = $e->to_s();
-					$this->where_values = array_flatten($e->values());
-					return;
+			foreach ($values as $name => &$value) {
+				if (!is_array($value)) {
+					continue;
 				}
+
+				$is_array_placeholder = in_array($name, $this->array_placeholders);
+
+				$e = new Expressions($this->connection, $args[0]);
+				$e->bind_values($values, $this->array_placeholders);
+				$this->where = $e->to_s();
+
+				if (in_array($name, $this->array_placeholders)) {
+					$this->where_values = $e->values();
+				} else {
+					$this->where_values = array_flatten($e->values());
+				}
+				return;
 			}
+
 
 			// no nested array so nothing special to do
 			$this->where = $args[0];

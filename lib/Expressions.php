@@ -11,7 +11,7 @@ namespace ActiveRecord;
  * 'name = :name AND author = :author'
  * 'id = IN(:ids)'
  * 'id IN(:subselect)'
- * 
+ *
  * @package ActiveRecord
  */
 class Expressions
@@ -21,6 +21,7 @@ class Expressions
 	private $expressions;
 	private $values = array();
 	private $connection;
+	private $array_placeholders = [];
 
 	public function __construct($connection, $expressions=null /* [, $values ... ] */)
 	{
@@ -55,9 +56,10 @@ class Expressions
 		$this->values[$parameter_number-1] = $value;
 	}
 
-	public function bind_values($values)
+	public function bind_values($values, $array_placeholders = [])
 	{
 		$this->values = $values;
+		$this->array_placeholders = $array_placeholders;
 	}
 
 	/**
@@ -90,7 +92,7 @@ class Expressions
 	public function to_s($substitute=false, &$options=null)
 	{
 		if (!$options) $options = array();
-		
+
 		$values = array_key_exists('values',$options) ? $options['values'] : $this->values;
 
 		$ret = "";
@@ -145,6 +147,7 @@ class Expressions
 	private function substitute(&$values, $substitute, $pos, $parameter_index)
 	{
 		$value = $values[$parameter_index];
+		$is_array_placeholder = in_array($parameter_index, $this->array_placeholders);
 
 		if (is_array($value))
 		{
@@ -165,7 +168,7 @@ class Expressions
 
 				return $ret;
 			}
-			return join(',',array_fill(0,$value_count,self::ParameterMarker));
+			return join(',', array_fill(0, $is_array_placeholder ? 1 : $value_count, self::ParameterMarker));
 		}
 
 		if ($substitute)
@@ -190,3 +193,4 @@ class Expressions
 		return "'" . str_replace("'","''",$value) . "'";
 	}
 }
+
