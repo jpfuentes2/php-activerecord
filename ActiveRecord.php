@@ -25,7 +25,7 @@ require __DIR__.'/lib/Exceptions.php';
 require __DIR__.'/lib/Cache.php';
 
 if (!defined('PHP_ACTIVERECORD_AUTOLOAD_DISABLE'))
-	spl_autoload_register('activerecord_autoload',false,PHP_ACTIVERECORD_AUTOLOAD_PREPEND);
+	spl_autoload_register('activerecord_autoload',true,PHP_ACTIVERECORD_AUTOLOAD_PREPEND);
 
 function activerecord_autoload($class_name)
 {
