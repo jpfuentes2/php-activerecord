@@ -428,11 +428,6 @@ class Model
 		foreach (static::$delegate as &$item)
 		{
 			if (!is_array($item)) {
-				$services = \Zend_Registry::get('publisher-services');
-
-				if ($sentry = $services['sentry']) {
-					$sentry->captureMessage('Delegates: ' . var_export(static::$delegate, true));
-				}
 				continue;
 			}
 			if (($delegated_name = $this->is_delegated($name,$item)))
@@ -535,11 +530,6 @@ class Model
 		foreach (static::$delegate as &$item)
 		{
 			if (!is_array($item)) {
-				$services = \Zend_Registry::get('publisher-services');
-
-				if ($sentry = $services['sentry']) {
-					$sentry->captureMessage('Delegates: ' . var_export(static::$delegate, true));
-				}
 				continue;
 			}
 			if (($delegated_name = $this->is_delegated($name,$item)))
