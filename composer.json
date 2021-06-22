@@ -1,5 +1,5 @@
 {
-    "name": "adnow/php-activerecord",
+    "name": "adnow-vn/php-activerecord",
     "type": "library",
     "description": "php-activerecord is an open source ORM library based on the ActiveRecord pattern.",
     "keywords": ["activerecord", "orm"],
