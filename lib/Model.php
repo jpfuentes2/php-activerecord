@@ -1666,6 +1666,9 @@ class Model
 			$list = $table->find($options);
 		}
 		$results = count($list);
+		if ( !is_array( $values ) ) {
+			$values = array( $values );
+		}
 
 		if ( is_array($values) ){
 			$expected = count($values);
