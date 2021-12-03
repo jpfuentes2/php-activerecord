@@ -4,9 +4,6 @@ if (!defined('PHP_VERSION_ID') || PHP_VERSION_ID < 50300)
 
 define('PHP_ACTIVERECORD_VERSION_ID','1.0');
 
-if (!defined('PHP_ACTIVERECORD_AUTOLOAD_PREPEND'))
-	define('PHP_ACTIVERECORD_AUTOLOAD_PREPEND',true);
-
 require __DIR__.'/lib/Singleton.php';
 require __DIR__.'/lib/Config.php';
 require __DIR__.'/lib/Utils.php';
@@ -26,7 +23,7 @@ require __DIR__.'/lib/Cache.php';
 require __DIR__.'/lib/Expressions.php';
 
 if (!defined('PHP_ACTIVERECORD_AUTOLOAD_DISABLE'))
-	spl_autoload_register('activerecord_autoload',false,PHP_ACTIVERECORD_AUTOLOAD_PREPEND);
+	spl_autoload_register('activerecord_autoload');
 
 function activerecord_autoload($class_name)
 {
