@@ -117,7 +117,7 @@ class SQLBuilder
 		$this->having = $having;
 		return $this;
 	}
-	
+
 	public function locks($locks)
 	{
 		$this->locks = $locks;
@@ -389,7 +389,7 @@ class SQLBuilder
 
 		if ($this->limit || $this->offset)
 			$sql = $this->connection->limit($sql,$this->offset,$this->limit);
-		
+
 		if ($this->locks)
 			$sql .= " $this->locks";
 
@@ -398,7 +398,7 @@ class SQLBuilder
 
 	private function build_update()
 	{
-		if (strlen($this->update) > 0)
+		if (strlen($this->update ?? '') > 0)
 			$set = $this->update;
 		else
 			$set = join('=?, ', $this->quoted_key_names()) . '=?';

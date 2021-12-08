@@ -140,7 +140,7 @@ abstract class AbstractRelationship implements InterfaceRelationship
 		$values = array($values);
 		$conditions = SQLBuilder::create_conditions_from_underscored_string($table->conn,$query_key,$values);
 
-		if (isset($options['conditions']) && strlen($options['conditions'][0]) > 1)
+		if (isset($options['conditions']) && strlen($options['conditions'][0] ?? '') > 1)
 			Utils::add_condition($options['conditions'], $conditions);
 		else
 			$options['conditions'] = $conditions;
@@ -291,7 +291,7 @@ abstract class AbstractRelationship implements InterfaceRelationship
         if (!has_namespace($class_name) && isset($this->options['namespace'])) {
 			$class_name = $this->options['namespace'].'\\'.$class_name;
 		}
-		
+
 		$reflection = Reflections::instance()->add($class_name)->get($class_name);
 
 		if (!$reflection->isSubClassOf('ActiveRecord\\Model'))
@@ -512,7 +512,7 @@ class HasMany extends AbstractRelationship
 				$fk = $this->foreign_key;
 
 				$this->set_keys($this->get_table()->class->getName(), true);
-				
+
 				$class = $this->class_name;
 				$relation = $class::table()->get_relationship($this->through);
 				$through_table = $relation->get_table();

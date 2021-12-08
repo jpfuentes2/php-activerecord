@@ -110,6 +110,6 @@ class Cache
 
 	private static function get_namespace()
 	{
-		return (isset(static::$options['namespace']) && strlen(static::$options['namespace']) > 0) ? (static::$options['namespace'] . "::") : "";
+		return (isset(static::$options['namespace']) && strlen(static::$options['namespace'] ?? '') > 0) ? (static::$options['namespace'] . "::") : "";
 	}
 }

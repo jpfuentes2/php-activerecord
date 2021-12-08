@@ -11,7 +11,7 @@ namespace ActiveRecord;
  * 'name = :name AND author = :author'
  * 'id = IN(:ids)'
  * 'id IN(:subselect)'
- * 
+ *
  * @package ActiveRecord
  */
 class Expressions
@@ -90,16 +90,16 @@ class Expressions
 	public function to_s($substitute=false, &$options=null)
 	{
 		if (!$options) $options = array();
-		
+
 		$values = array_key_exists('values',$options) ? $options['values'] : $this->values;
 
 		$ret = "";
 		$replace = array();
 		$num_values = count($values);
-		$len = strlen($this->expressions);
+		$len = strlen($this->expressions ?? '');
 		$quotes = 0;
 
-		for ($i=0,$n=strlen($this->expressions),$j=0; $i<$n; ++$i)
+		for ($i=0,$n=strlen($this->expressions ?? ''),$j=0; $i<$n; ++$i)
 		{
 			$ch = $this->expressions[$i];
 

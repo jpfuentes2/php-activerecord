@@ -424,7 +424,7 @@ class Model
 		{
 			$name = static::$alias_attribute[$name];
 		}
-		
+
 		if (method_exists($this,"set_$originalName"))
 		{
 			$name = "set_$originalName";
@@ -500,7 +500,7 @@ class Model
 		$this->flag_dirty($name);
 		return $value;
 	}
-	
+
 	/**
 	 * Remove assigned attribute.
 	 *
@@ -718,7 +718,7 @@ class Model
 	private function is_delegated($name, &$delegate)
 	{
 		if ($delegate['prefix'] != '')
-			$name = substr($name,strlen($delegate['prefix'])+1);
+			$name = substr($name,strlen($delegate['prefix'] ?? '')+1);
 
 		if (is_array($delegate) && in_array($name,$delegate['delegate']))
 			return $name;
