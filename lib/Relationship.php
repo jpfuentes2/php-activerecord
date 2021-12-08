@@ -45,8 +45,6 @@ abstract class AbstractRelationship implements InterfaceRelationship
 	 */
 	public string|array $foreign_key	= [];
 
-	public string|array $primary_key	= [];
-
 	/**
 	 * Options of the relationship.
 	 *
@@ -467,10 +465,6 @@ class HasMany extends AbstractRelationship
 	 * @var array
 	 */
 	static protected array $valid_association_options = ['primary_key', 'order', 'group', 'having', 'limit', 'offset', 'through', 'source'];
-
-	public string|array $foreign_key	= [];
-
-	public string|array $primary_key	= [];
 
 	private $has_one = false;
 	private $through;
