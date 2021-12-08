@@ -200,14 +200,14 @@ abstract class AbstractRelationship implements InterfaceRelationship
 					$hash = spl_object_hash($related);
 
 					if (isset($used_models_map[$hash]))
-						$model->set_relationship_from_eager_load(clone($related), $this->attribute_name);
+						$model->set_relationship_from_eager_load($this->attribute_name, clone($related));
 					else
-						$model->set_relationship_from_eager_load($related, $this->attribute_name);
+						$model->set_relationship_from_eager_load($this->attribute_name, $related);
 
 					$used_models_map[$hash] = true;
 				}
 			} else {
-				$model->set_relationship_from_eager_load(null, $this->attribute_name);
+				$model->set_relationship_from_eager_load($this->attribute_name, null);
 			}
 		}
 	}
@@ -606,7 +606,7 @@ class HasMany extends AbstractRelationship
 		return $record;
 	}
 
-	public function load_eagerly($models=array(), $attributes=array(), $includes, Table $table)
+	public function load_eagerly($includes, Table $table, $models=array(), $attributes=array())
 	{
 		$this->set_keys($table->class->name);
 		$this->query_and_attach_related_models_eagerly($table,$models,$attributes,$includes,$this->foreign_key, $table->pk);
