@@ -469,6 +469,8 @@ class HasMany extends AbstractRelationship
 	private $has_one = false;
 	private $through;
 
+	public string|array $foreign_key	= [];
+
 	/**
 	 * Constructs a {@link HasMany} relationship.
 	 *
