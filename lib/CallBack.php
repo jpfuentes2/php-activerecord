@@ -139,7 +139,7 @@ class CallBack
 	 */
 	public function get_callbacks($name)
 	{
-		return isset($this->registry[$name]) ? $this->registry[$name] : null;
+		return $this->registry[$name] ?? null;
 	}
 
 	/**
@@ -164,7 +164,7 @@ class CallBack
 		// if it doesn't exist it might be a /(after|before)_(create|update)/ so we still need to run the save
 		// callback
 		if (!array_key_exists($name, $this->registry))
-			$registry = array();
+			$registry = [];
 		else
 			$registry = $this->registry[$name];
 

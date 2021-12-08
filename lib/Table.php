@@ -15,7 +15,7 @@ namespace ActiveRecord;
  */
 class Table
 {
-	private static $cache = array();
+	private static $cache = [];
 
 	public $class;
 	public $conn;
@@ -23,7 +23,7 @@ class Table
 	public $last_sql;
 
 	// Name/value pairs of columns in this table
-	public $columns = array();
+	public $columns = [];
 
 	/**
 	 * Name of the table.
@@ -60,7 +60,7 @@ class Table
 	/**
 	 * List of relationships for this table.
 	 */
-	private $relationships = array();
+	private $relationships = [];
 
 	public static function load($model_class_name)
 	{
@@ -75,12 +75,12 @@ class Table
 		return self::$cache[$model_class_name];
 	}
 
-	public static function clear_cache($model_class_name=null)
+	public static function clear_cache($model_class_name = null)
 	{
-		if ($model_class_name && array_key_exists($model_class_name,self::$cache))
+		if ($model_class_name && array_key_exists($model_class_name, self::$cache))
 			unset(self::$cache[$model_class_name]);
 		else
-			self::$cache = array();
+			self::$cache = [];
 	}
 
 	public function __construct($class_name)
@@ -94,14 +94,17 @@ class Table
 		$this->set_sequence_name();
 		$this->set_delegates();
 		$this->set_cache();
-		$this->set_setters_and_getters();
 
 		$this->callback = new CallBack($class_name);
-		$this->callback->register('before_save', function(Model $model) { $model->set_timestamps(); }, array('prepend' => true));
-		$this->callback->register('after_save', function(Model $model) { $model->reset_dirty(); }, array('prepend' => true));
+		$this->callback->register('before_save', function(Model $model) { $model->set_timestamps(); }, ['prepend' => true]);
+		$this->callback->register('after_save', function(Model $model) { $model->reset_dirty(); }, ['prepend' => true]);
 	}
 
-	public function reestablish_connection($close=true)
+	/**
+	 * @param bool $close
+	 * @return \ActiveRecord\Connection
+	 */
+	public function reestablish_connection(bool $close = true): Connection
 	{
 		// if connection name property is null the connection manager will use the default connection
 		$connection = $this->class->getStaticPropertyValue('connection',null);
@@ -121,7 +124,7 @@ class Table
 
 		$ret = $space = '';
 
-		$existing_tables = array();
+		$existing_tables = [];
 		foreach ($joins as $value)
 		{
 			$ret .= $space;
@@ -157,7 +160,13 @@ class Table
 		return $ret;
 	}
 
-	public function options_to_sql($options)
+	/**
+	 * @param array $options
+	 * @return \ActiveRecord\SQLBuilder
+	 * @throws \ActiveRecord\ActiveRecordException
+	 * @throws \ActiveRecord\RelationshipException
+	 */
+	public function options_to_sql(array $options): SQLBuilder
 	{
 		$table = array_key_exists('from', $options) ? $options['from'] : $this->get_fully_qualified_table_name();
 		$sql = new SQLBuilder($this->conn, $table);
@@ -179,9 +188,9 @@ class Table
 			if (!is_hash($options['conditions']))
 			{
 				if (is_string($options['conditions']))
-					$options['conditions'] = array($options['conditions']);
+					$options['conditions'] = [$options['conditions']];
 
-				call_user_func_array(array($sql,'where'),$options['conditions']);
+				call_user_func_array([$sql,'where'], $options['conditions']);
 			}
 			else
 			{
@@ -213,16 +222,22 @@ class Table
 		return $sql;
 	}
 
-	public function find($options)
+	/**
+	 * @param array $options
+	 * @return array
+	 * @throws \ActiveRecord\ActiveRecordException
+	 * @throws \ActiveRecord\RelationshipException
+	 */
+	public function find(array $options): array
 	{
 		$sql = $this->options_to_sql($options);
-		$readonly = (array_key_exists('readonly',$options) && $options['readonly']) ? true : false;
+		$readonly = array_key_exists('readonly',$options) && $options['readonly'];
 		$eager_load = array_key_exists('include',$options) ? $options['include'] : null;
 
 		return $this->find_by_sql($sql->to_s(),$sql->get_where_values(), $readonly, $eager_load);
 	}
 
-	public function cache_key_for_model($pk)
+	public function cache_key_for_model($pk): string
 	{
 		if (is_array($pk))
 		{
@@ -231,12 +246,19 @@ class Table
 		return $this->class->name . '-' . $pk;
 	}
 
-	public function find_by_sql($sql, $values=null, $readonly=false, $includes=null)
+	/**
+	 * @param string $sql
+	 * @param array|null $values
+	 * @param bool $readonly
+	 * @param array|null $includes
+	 * @return array
+	 */
+	public function find_by_sql(string $sql, ?array $values = null, bool $readonly = false, ?array $includes = null): array
 	{
 		$this->last_sql = $sql;
 
-		$collect_attrs_for_includes = is_null($includes) ? false : true;
-		$list = $attrs = array();
+		$collect_attrs_for_includes = ! is_null($includes);
+		$list = $attrs = [];
 		$sth = $this->conn->query($sql,$this->process_data($values));
 
 		$self = $this;
@@ -279,21 +301,21 @@ class Table
 	 * @param $includes array eager load directives
 	 * @return void
 	 */
-	private function execute_eager_load($models=array(), $attrs=array(), $includes=array())
+	private function execute_eager_load(array $models = [], array $attrs = [], array $includes = [])
 	{
 		if (!is_array($includes))
-			$includes = array($includes);
+			$includes = [$includes];
 
 		foreach ($includes as $index => $name)
 		{
 			// nested include
 			if (is_array($name))
 			{
-				$nested_includes = count($name) > 0 ? $name : array();
+				$nested_includes = count($name) > 0 ? $name : [];
 				$name = $index;
 			}
 			else
-				$nested_includes = array();
+				$nested_includes = [];
 
 			$rel = $this->get_relationship($name, true);
 			$rel->load_eagerly($nested_includes, $this, $models, $attrs);
@@ -310,7 +332,7 @@ class Table
 		return null;
 	}
 
-	public function get_fully_qualified_table_name($quote_name=true)
+	public function get_fully_qualified_table_name(bool $quote_name = true): string
 	{
 		$table = $quote_name ? $this->conn->quote_name($this->table) : $this->table;
 
@@ -327,9 +349,9 @@ class Table
 	 * @param $name string name of Relationship
 	 * @param $strict bool
 	 * @throws RelationshipException
-	 * @return HasOne|HasMany|BelongsTo Relationship or null
+	 * @return HasOne|HasMany|BelongsTo|null
 	 */
-	public function get_relationship($name, $strict=false)
+	public function get_relationship(string $name, bool $strict = false): HasMany|BelongsTo|HasOne|null
 	{
 		if ($this->has_relationship($name))
 			return $this->relationships[$name];
@@ -346,7 +368,7 @@ class Table
 	 * @param $name string name of Relationship
 	 * @return bool
 	 */
-	public function has_relationship($name)
+	public function has_relationship(string $name): bool
 	{
 		return array_key_exists($name, $this->relationships);
 	}
@@ -387,9 +409,9 @@ class Table
 	/**
 	 * Add a relationship.
 	 *
-	 * @param Relationship $relationship a Relationship object
+	 * @param \ActiveRecord\HasAndBelongsToMany|\ActiveRecord\HasMany|\ActiveRecord\BelongsTo|\ActiveRecord\HasOne $relationship a Relationship object
 	 */
-	private function add_relationship($relationship)
+	private function add_relationship(HasAndBelongsToMany|HasMany|BelongsTo|HasOne $relationship): void
 	{
 		$this->relationships[$relationship->attribute_name] = $relationship;
 	}
@@ -412,9 +434,9 @@ class Table
 	 * @param $map array Hash of used_name => real_name
 	 * @return array Array with any aliases replaced with their read field name
 	 */
-	private function map_names(&$hash, &$map)
+	private function map_names(&$hash, &$map): array
 	{
-		$ret = array();
+		$ret = [];
 
 		foreach ($hash as $name => &$value)
 		{
@@ -450,10 +472,10 @@ class Table
 	private function set_primary_key()
 	{
 		if (($pk = $this->class->getStaticPropertyValue('pk',null)) || ($pk = $this->class->getStaticPropertyValue('primary_key',null)))
-			$this->pk = is_array($pk) ? $pk : array($pk);
+			$this->pk = is_array($pk) ? $pk : [$pk];
 		else
 		{
-			$this->pk = array();
+			$this->pk = [];
 
 			foreach ($this->columns as $c)
 			{
@@ -520,7 +542,7 @@ class Table
 			foreach (wrap_strings_in_arrays($definitions) as $definition)
 			{
 				$relationship = null;
-				$definition += array('namespace' => $namespace);
+				$definition += ['namespace' => $namespace];
 
 				switch ($name)
 				{
@@ -557,8 +579,8 @@ class Table
 	 */
 	private function set_delegates()
 	{
-		$delegates = $this->class->getStaticPropertyValue('delegate',array());
-		$new = array();
+		$delegates = $this->class->getStaticPropertyValue('delegate', []);
+		$new = [];
 
 		if (!array_key_exists('processed', $delegates))
 			$delegates['processed'] = false;
@@ -573,10 +595,11 @@ class Table
 				if (!isset($delegate['prefix']))
 					$delegate['prefix'] = null;
 
-				$new_delegate = array(
+				$new_delegate = [
 					'to'		=> $delegate['to'],
 					'prefix'	=> $delegate['prefix'],
-					'delegate'	=> array());
+					'delegate'	=> []
+				];
 
 				foreach ($delegate as $name => $value)
 				{
@@ -590,18 +613,5 @@ class Table
 			$new['processed'] = true;
 			$this->class->setStaticPropertyValue('delegate',$new);
 		}
-	}
-
-	/**
-	 * @deprecated Model.php now checks for get|set_ methods via method_exists so there is no need for declaring static g|setters.
-	 */
-	private function set_setters_and_getters()
-	{
-		$getters = $this->class->getStaticPropertyValue('getters', array());
-		$setters = $this->class->getStaticPropertyValue('setters', array());
-
-		if (!empty($getters) || !empty($setters))
-			trigger_error('static::$getters and static::$setters are deprecated. Please define your setters and getters by declaring methods in your model prefixed with get_ or set_. See
-			http://www.phpactiverecord.org/projects/main/wiki/Utilities#attribute-setters and http://www.phpactiverecord.org/projects/main/wiki/Utilities#attribute-getters on how to make use of this option.', E_USER_DEPRECATED);
 	}
 }

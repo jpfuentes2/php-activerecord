@@ -15,19 +15,20 @@ class ConnectionManager extends Singleton
 	 * Array of {@link Connection} objects.
 	 * @var array
 	 */
-	static private $connections = array();
+	static private array $connections = [];
 
 	/**
 	 * If $name is null then the default connection will be returned.
 	 *
 	 * @see Config
-	 * @param string $name Optional name of a connection
-	 * @return Connection
+	 * @param string|null $name Optional name of a connection
+	 * @return \ActiveRecord\Connection|mixed
+	 * @throws \ActiveRecord\DatabaseException
 	 */
-	public static function get_connection($name=null)
+	public static function get_connection(?string $name = null)
 	{
 		$config = Config::instance();
-		$name = $name ? $name : $config->get_default_connection();
+		$name = $name ?: $config->get_default_connection();
 
 		if (!isset(self::$connections[$name]) || !self::$connections[$name]->connection)
 			self::$connections[$name] = Connection::instance($config->get_connection($name));
@@ -41,12 +42,12 @@ class ConnectionManager extends Singleton
 	 *
 	 * If $name is null then the default connection will be returned.
 	 *
-	 * @param string $name Name of the connection to forget about
+	 * @param string|null $name Name of the connection to forget about
 	 */
-	public static function drop_connection($name=null)
+	public static function drop_connection(?string $name = null)
 	{
 		$config = Config::instance();
-		$name = $name ? $name : $config->get_default_connection();
+		$name = $name ?: $config->get_default_connection();
 
 		if (isset(self::$connections[$name]))
 			unset(self::$connections[$name]);

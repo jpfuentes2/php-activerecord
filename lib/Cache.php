@@ -64,10 +64,10 @@ class Cache
 	 * will be invoked, and the result will be stored in cache using that key.
 	 * @param $key
 	 * @param $closure
-	 * @param $expire in seconds
+	 * @param $expire int|null in seconds
 	 * @return mixed
 	 */
-	public static function get($key, $closure, $expire=null)
+	public static function get($key, $closure, ?int $expire = null)
 	{
 		if (!static::$adapter)
 			return $closure();
@@ -85,7 +85,7 @@ class Cache
 		return $value;
 	}
 
-	public static function set($key, $var, $expire=null)
+	public static function set($key, $var, ?int $expire = null)
 	{
 		if (!static::$adapter)
 			return;

@@ -99,7 +99,7 @@ abstract class Connection
 	 * @return Connection
 	 * @see parse_connection_url
 	 */
-	public static function instance($connection_string_or_connection_name=null)
+	public static function instance(?string $connection_string_or_connection_name = null)
 	{
 		$config = Config::instance();
 
@@ -184,8 +184,8 @@ abstract class Connection
 		$info->protocol = $url['scheme'];
 		$info->host = $url['host'];
 		$info->db = isset($url['path']) ? substr($url['path'], 1) : null;
-		$info->user = isset($url['user']) ? $url['user'] : null;
-		$info->pass = isset($url['pass']) ? $url['pass'] : null;
+		$info->user = $url['user'] ?? null;
+		$info->pass = $url['pass'] ?? null;
 
 		$allow_blank_db = ($info->protocol == 'sqlite');
 
@@ -241,7 +241,6 @@ abstract class Connection
 	 * Class Connection is a singleton. Access it via instance().
 	 *
 	 * @param array $info Array containing URL parts
-	 * @return Connection
 	 */
 	protected function __construct($info)
 	{
@@ -513,7 +512,7 @@ abstract class Connection
 	 * Query for column meta info and return statement handle.
 	 *
 	 * @param string $table Name of a table
-	 * @return PDOStatement
+	 * @return \PDOStatement
 	 */
 	abstract public function query_column_info($table);
 
@@ -521,7 +520,7 @@ abstract class Connection
 	 * Query for all tables in the current database. The result must only
 	 * contain one column which has the name of the table.
 	 *
-	 * @return PDOStatement
+	 * @return \PDOStatement
 	 */
 	abstract function query_for_tables();
 

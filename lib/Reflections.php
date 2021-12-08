@@ -22,16 +22,16 @@ class Reflections extends Singleton
 	/**
 	 * Instantiates a new ReflectionClass for the given class.
 	 *
-	 * @param string $class Name of a class
+	 * @param string|null $class Name of a class
 	 * @return Reflections $this so you can chain calls like Reflections::instance()->add('class')->get()
 	 */
-	public function add($class=null)
+	public function add(string $class = null): static
 	{
 		$class = $this->get_class($class);
 
 		if (!isset($this->reflections[$class]))
 			$this->reflections[$class] = new ReflectionClass($class);
-			
+
 		return $this;
 	}
 
@@ -39,24 +39,24 @@ class Reflections extends Singleton
 	 * Destroys the cached ReflectionClass.
 	 *
 	 * Put this here mainly for testing purposes.
-	 * 
+	 *
 	 * @param string $class Name of a class.
 	 * @return void
 	 */
-	public function destroy($class)
+	public function destroy(string $class)
 	{
 		if (isset($this->reflections[$class]))
 			$this->reflections[$class] = null;
 	}
-	
+
 	/**
 	 * Get a cached ReflectionClass.
 	 *
-	 * @param string $class Optional name of a class
+	 * @param string|null $class Optional name of a class
 	 * @return mixed null or a ReflectionClass instance
 	 * @throws ActiveRecordException if class was not found
 	 */
-	public function get($class=null)
+	public function get(string $class = null): mixed
 	{
 		$class = $this->get_class($class);
 
@@ -69,10 +69,10 @@ class Reflections extends Singleton
 	/**
 	 * Retrieve a class name to be reflected.
 	 *
-	 * @param mixed $mixed An object or name of a class
+	 * @param mixed|null $mixed An object or name of a class
 	 * @return string
 	 */
-	private function get_class($mixed=null)
+	private function get_class(mixed $mixed = null): string
 	{
 		if (is_object($mixed))
 			return get_class($mixed);

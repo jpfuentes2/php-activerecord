@@ -24,11 +24,11 @@ abstract class Singleton
 	/**
 	 * Static method for instantiating a singleton object.
 	 *
-	 * @return object
+	 * @return \ActiveRecord\Singleton
 	 */
-	final public static function instance()
+	final public static function instance(): Singleton
 	{
-		$class_name = get_called_class();
+		$class_name = static::class;
 
 		if (!isset(self::$instances[$class_name]))
 			self::$instances[$class_name] = new $class_name;
@@ -48,7 +48,7 @@ abstract class Singleton
 	 *
 	 * @return string
 	 */
-	final protected function get_called_class()
+	final protected function get_called_class(): string
 	{
 		$backtrace = debug_backtrace();
 		return get_class($backtrace[2]['object']);

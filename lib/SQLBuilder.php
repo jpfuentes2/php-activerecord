@@ -26,7 +26,7 @@ class SQLBuilder
 
 	// for where
 	private $where;
-	private $where_values = array();
+	private $where_values = [];
 
 	// for insert/update
 	private $data;
@@ -37,10 +37,9 @@ class SQLBuilder
 	 *
 	 * @param Connection $connection A database connection object
 	 * @param string $table Name of a table
-	 * @return SQLBuilder
 	 * @throws ActiveRecordException if connection was invalid
 	 */
-	public function __construct($connection, $table)
+	public function __construct(Connection $connection, string $table)
 	{
 		if (!$connection)
 			throw new ActiveRecordException('A valid database connection is required.');
@@ -65,7 +64,7 @@ class SQLBuilder
 	 * @see __toString
 	 * @return string
 	 */
-	public function to_s()
+	public function to_s(): string
 	{
 		$func = 'build_' . strtolower($this->operation);
 		return $this->$func();
@@ -76,9 +75,9 @@ class SQLBuilder
 	 *
 	 * @return array
 	 */
-	public function bind_values()
+	public function bind_values(): array
 	{
-		$ret = array();
+		$ret = [];
 
 		if ($this->data)
 			$ret = array_values($this->data);
@@ -89,67 +88,67 @@ class SQLBuilder
 		return array_flatten($ret);
 	}
 
-	public function get_where_values()
+	public function get_where_values(): array
 	{
 		return $this->where_values;
 	}
 
-	public function where(/* (conditions, values) || (hash) */)
+	public function where(/* (conditions, values) || (hash) */): static
 	{
 		$this->apply_where_conditions(func_get_args());
 		return $this;
 	}
 
-	public function order($order)
+	public function order($order): static
 	{
 		$this->order = $order;
 		return $this;
 	}
 
-	public function group($group)
+	public function group($group): static
 	{
 		$this->group = $group;
 		return $this;
 	}
 
-	public function having($having)
+	public function having($having): static
 	{
 		$this->having = $having;
 		return $this;
 	}
 
-	public function locks($locks)
+	public function locks($locks): static
 	{
 		$this->locks = $locks;
 		return $this;
 	}
 
-	public function limit($limit)
+	public function limit($limit): static
 	{
 		$this->limit = intval($limit);
 		return $this;
 	}
 
-	public function offset($offset)
+	public function offset($offset): static
 	{
 		$this->offset = intval($offset);
 		return $this;
 	}
 
-	public function select($select)
+	public function select($select): static
 	{
 		$this->operation = 'SELECT';
 		$this->select = $select;
 		return $this;
 	}
 
-	public function joins($joins)
+	public function joins($joins): static
 	{
 		$this->joins = $joins;
 		return $this;
 	}
 
-	public function insert($hash, $pk=null, $sequence_name=null)
+	public function insert($hash, $pk=null, $sequence_name=null): static
 	{
 		if (!is_hash($hash))
 			throw new ActiveRecordException('Inserting requires a hash.');
@@ -158,12 +157,12 @@ class SQLBuilder
 		$this->data = $hash;
 
 		if ($pk && $sequence_name)
-			$this->sequence = array($pk,$sequence_name);
+			$this->sequence = [$pk,$sequence_name];
 
 		return $this;
 	}
 
-	public function update($mixed)
+	public function update($mixed): static
 	{
 		$this->operation = 'UPDATE';
 
@@ -177,7 +176,7 @@ class SQLBuilder
 		return $this;
 	}
 
-	public function delete()
+	public function delete(): static
 	{
 		$this->operation = 'DELETE';
 		$this->apply_where_conditions(func_get_args());
@@ -187,7 +186,7 @@ class SQLBuilder
 	/**
 	 * Reverses an order clause.
 	 */
-	public static function reverse_order($order)
+	public static function reverse_order($order): mixed
 	{
 		if (!trim($order))
 			return $order;
@@ -212,25 +211,25 @@ class SQLBuilder
 	 * Converts a string like "id_and_name_or_z" into a conditions value like array("id=? AND name=? OR z=?", values, ...).
 	 *
 	 * @param Connection $connection
-	 * @param $name Underscored string
-	 * @param $values Array of values for the field names. This is used
+	 * @param $name string
+	 * @param $values array of values for the field names. This is used
 	 *   to determine what kind of bind marker to use: =?, IN(?), IS NULL
 	 * @param $map A hash of "mapped_column_name" => "real_column_name"
 	 * @return A conditions array in the form array(sql_string, value1, value2,...)
 	 */
-	public static function create_conditions_from_underscored_string(Connection $connection, $name, &$values=array(), &$map=null)
+	public static function create_conditions_from_underscored_string(Connection $connection, string $name, array &$values = [], &$map=null): array|null
 	{
 		if (!$name)
 			return null;
 
 		$parts = preg_split('/(_and_|_or_)/i',$name,-1,PREG_SPLIT_DELIM_CAPTURE);
 		$num_values = count($values);
-		$conditions = array('');
+		$conditions = [''];
 
 		for ($i=0,$j=0,$n=count($parts); $i<$n; $i+=2,++$j)
 		{
 			if ($i >= 2)
-				$conditions[0] .= preg_replace(array('/_and_/i','/_or_/i'),array(' AND ',' OR '),$parts[$i-1]);
+				$conditions[0] .= preg_replace(['/_and_/i','/_or_/i'],[' AND ',' OR '],$parts[$i-1]);
 
 			if ($j < $num_values)
 			{
@@ -261,10 +260,10 @@ class SQLBuilder
 	 * @param $map A hash of "mapped_column_name" => "real_column_name"
 	 * @return array A hash of array(name => value, ...)
 	 */
-	public static function create_hash_from_underscored_string($name, &$values=array(), &$map=null)
+	public static function create_hash_from_underscored_string(string $name, array &$values = [], &$map=null): array
 	{
 		$parts = preg_split('/(_and_|_or_)/i',$name);
-		$hash = array();
+		$hash = [];
 
 		for ($i=0,$n=count($parts); $i<$n; ++$i)
 		{
@@ -282,9 +281,9 @@ class SQLBuilder
 	 * @param array $hash
 	 * @return array $new
 	 */
-	private function prepend_table_name_to_fields($hash=array())
+	private function prepend_table_name_to_fields(array $hash = []): array
 	{
-		$new = array();
+		$new = [];
 		$table = $this->connection->quote_name($this->table);
 
 		foreach ($hash as $key => $value)
@@ -331,7 +330,7 @@ class SQLBuilder
 		}
 	}
 
-	private function build_delete()
+	private function build_delete(): string
 	{
 		$sql = "DELETE FROM $this->table";
 
@@ -350,7 +349,7 @@ class SQLBuilder
 		return $sql;
 	}
 
-	private function build_insert()
+	private function build_insert(): string
 	{
 		require_once 'Expressions.php';
 		$keys = join(',',$this->quoted_key_names());
@@ -368,7 +367,7 @@ class SQLBuilder
 		return $e->to_s();
 	}
 
-	private function build_select()
+	private function build_select(): string
 	{
 		$sql = "SELECT $this->select FROM $this->table";
 
@@ -396,7 +395,7 @@ class SQLBuilder
 		return $sql;
 	}
 
-	private function build_update()
+	private function build_update(): string
 	{
 		if (strlen($this->update ?? '') > 0)
 			$set = $this->update;
@@ -420,10 +419,9 @@ class SQLBuilder
 		return $sql;
 	}
 
-	private function quoted_key_names()
+	private function quoted_key_names(): array
 	{
-		$keys = array();
-
+		$keys = [];
 		foreach ($this->data as $key => $value)
 			$keys[] = $this->connection->quote_name($key);
 

@@ -12,9 +12,9 @@ abstract class Inflector
 	/**
 	 * Get an instance of the {@link Inflector} class.
 	 *
-	 * @return object
+	 * @return StandardInflector
 	 */
-	public static function instance()
+	public static function instance(): StandardInflector
 	{
 		return new StandardInflector();
 	}
@@ -25,7 +25,7 @@ abstract class Inflector
 	 * @param string $s string to convert
 	 * @return string
 	 */
-	public function camelize($s)
+	public function camelize(string $s): string
 	{
 		$s = preg_replace('/[_-]+/','_',trim($s));
 		$s = str_replace(' ', '_', $s);
@@ -54,7 +54,7 @@ abstract class Inflector
 	 * @param string $s string to check
 	 * @return bool
 	 */
-	public static function is_upper($s)
+	public static function is_upper(string $s): bool
 	{
 		return (strtoupper($s) === $s);
 	}
@@ -65,7 +65,7 @@ abstract class Inflector
 	 * @param string $s string to check
 	 * @return bool
 	 */
-	public static function is_lower($s)
+	public static function is_lower(string $s): bool
 	{
 		return (strtolower($s) === $s);
 	}
@@ -76,7 +76,7 @@ abstract class Inflector
 	 * @param string $s string to convert
 	 * @return string
 	 */
-	public function uncamelize($s)
+	public function uncamelize(string $s): string
 	{
 		$normalized = '';
 
@@ -96,12 +96,12 @@ abstract class Inflector
 	 * @param string $s string to convert
 	 * @return string
 	 */
-	public function underscorify($s)
+	public function underscorify(string $s): string
 	{
 		return preg_replace(array('/[_\- ]+/','/([a-z])([A-Z])/'),array('_','\\1_\\2'),trim($s));
 	}
 
-	public function keyify($class_name)
+	public function keyify($class_name): string
 	{
 		return strtolower($this->underscorify(denamespace($class_name))) . '_id';
 	}

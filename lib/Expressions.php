@@ -19,7 +19,7 @@ class Expressions
 	const ParameterMarker = '?';
 
 	private $expressions;
-	private $values = array();
+	private $values = [];
 	private $connection;
 
 	public function __construct($connection, $expressions=null /* [, $values ... ] */)
@@ -46,6 +46,7 @@ class Expressions
 	/**
 	 * Bind a value to the specific one based index. There must be a bind marker
 	 * for each value bound or to_s() will throw an exception.
+	 * @throws \ActiveRecord\ExpressionsException
 	 */
 	public function bind($parameter_number, $value)
 	{
@@ -87,16 +88,20 @@ class Expressions
 		$this->connection = $connection;
 	}
 
-	public function to_s($substitute=false, &$options=null)
+	/**
+	 * @param $substitute
+	 * @param $options
+	 * @return string
+	 * @throws \ActiveRecord\ExpressionsException
+	 */
+	public function to_s($substitute=false, &$options=null): string
 	{
-		if (!$options) $options = array();
+		if (!$options) $options = [];
 
 		$values = array_key_exists('values',$options) ? $options['values'] : $this->values;
 
 		$ret = "";
-		$replace = array();
 		$num_values = count($values);
-		$len = strlen($this->expressions ?? '');
 		$quotes = 0;
 
 		for ($i=0,$n=strlen($this->expressions ?? ''),$j=0; $i<$n; ++$i)
@@ -121,7 +126,7 @@ class Expressions
 		return $ret;
 	}
 
-	private function build_sql_from_hash(&$hash, $glue)
+	private function build_sql_from_hash(&$hash, $glue): array
 	{
 		$sql = $g = "";
 
@@ -142,7 +147,7 @@ class Expressions
 		return array($sql,array_values($hash));
 	}
 
-	private function substitute(&$values, $substitute, $pos, $parameter_index)
+	private function substitute(&$values, $substitute, $pos, $parameter_index): mixed
 	{
 		$value = $values[$parameter_index];
 
@@ -182,7 +187,7 @@ class Expressions
 		return is_string($value) ? $this->quote_string($value) : $value;
 	}
 
-	private function quote_string($value)
+	private function quote_string($value): string
 	{
 		if ($this->connection)
 			return $this->connection->escape($value);

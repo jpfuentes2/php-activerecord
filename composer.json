@@ -7,7 +7,9 @@
     "license": "MIT",
     "require": {
         "php": ">=7.0|>=8.0",
-        "ext-ctype": "*"
+        "ext-ctype": "*",
+        "ext-pdo": "*",
+        "ext-xmlwriter": "*"
     },
     "require-dev": {
         "phpunit/phpunit": "4.*",

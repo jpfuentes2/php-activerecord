@@ -42,11 +42,11 @@ use ArrayIterator;
 class Validations
 {
 	private $model;
-	private $options = array();
-	private $validators = array();
+	private $options = [];
+	private $validators = [];
 	private $record;
 
-	private static $VALIDATION_FUNCTIONS = array(
+	private static array $VALIDATION_FUNCTIONS = [
 		'validates_presence_of',
 		'validates_size_of',
 		'validates_length_of',
@@ -55,24 +55,24 @@ class Validations
 		'validates_format_of',
 		'validates_numericality_of',
 		'validates_uniqueness_of'
-	);
+	];
 
-	private static $DEFAULT_VALIDATION_OPTIONS = array(
+	private static array $DEFAULT_VALIDATION_OPTIONS = [
 		'on' => 'save',
 		'allow_null' => false,
 		'allow_blank' => false,
 		'message' => null,
-	);
+	];
 
-	private static  $ALL_RANGE_OPTIONS = array(
+	private static array $ALL_RANGE_OPTIONS = [
 		'is' => null,
 		'within' => null,
 		'in' => null,
 		'minimum' => null,
 		'maximum' => null,
-	);
+	];
 
-	private static $ALL_NUMERICALITY_CHECKS = array(
+	private static array $ALL_NUMERICALITY_CHECKS = [
 		'greater_than' => null,
 		'greater_than_or_equal_to'  => null,
 		'equal_to' => null,
@@ -80,13 +80,12 @@ class Validations
 		'less_than_or_equal_to' => null,
 		'odd' => null,
 		'even' => null
-	);
+	];
 
 	/**
 	 * Constructs a {@link Validations} object.
 	 *
 	 * @param Model $model The model to validate
-	 * @return Validations
 	 */
 	public function __construct(Model $model)
 	{
@@ -96,7 +95,7 @@ class Validations
 		$this->validators = array_intersect(array_keys($this->klass->getStaticProperties()), self::$VALIDATION_FUNCTIONS);
 	}
 
-	public function get_record()
+	public function get_record(): Errors
 	{
 		return $this->record;
 	}
@@ -106,9 +105,9 @@ class Validations
 	 *
 	 * @return array
 	 */
-	public function rules()
+	public function rules(): array
 	{
-		$data = array();
+		$data = [];
 		foreach ($this->validators as $validate)
 		{
 			$attrs = $this->klass->getStaticPropertyValue($validate);
@@ -118,7 +117,7 @@ class Validations
 				$field = $attr[0];
 
 				if (!isset($data[$field]) || !is_array($data[$field]))
-					$data[$field] = array();
+					$data[$field] = [];
 
 				$attr['validator'] = $validate;
 				unset($attr[0]);
@@ -133,7 +132,7 @@ class Validations
 	 *
 	 * @return Errors the validation errors if any
 	 */
-	public function validate()
+	public function validate(): Errors
 	{
 		foreach ($this->validators as $validate)
 		{
@@ -174,7 +173,7 @@ class Validations
 	 */
 	public function validates_presence_of($attrs)
 	{
-		$configuration = array_merge(self::$DEFAULT_VALIDATION_OPTIONS, array('message' => Errors::$DEFAULT_ERROR_MESSAGES['blank'], 'on' => 'save'));
+		$configuration = array_merge(self::$DEFAULT_VALIDATION_OPTIONS, ['message' => Errors::$DEFAULT_ERROR_MESSAGES['blank'], 'on' => 'save']);
 
 		foreach ($attrs as $attr)
 		{
@@ -249,7 +248,7 @@ class Validations
 	 */
 	public function validates_inclusion_or_exclusion_of($type, $attrs)
 	{
-		$configuration = array_merge(self::$DEFAULT_VALIDATION_OPTIONS, array('message' => Errors::$DEFAULT_ERROR_MESSAGES[$type], 'on' => 'save'));
+		$configuration = array_merge(self::$DEFAULT_VALIDATION_OPTIONS, ['message' => Errors::$DEFAULT_ERROR_MESSAGES[$type], 'on' => 'save']);
 
 		foreach ($attrs as $attr)
 		{
@@ -263,7 +262,7 @@ class Validations
 				$enum = $options['within'];
 
 			if (!is_array($enum))
-				array($enum);
+				$enum	= [$enum];
 
 			$message = str_replace('%s', $var, $options['message']);
 
@@ -305,7 +304,7 @@ class Validations
 	 */
 	public function validates_numericality_of($attrs)
 	{
-		$configuration = array_merge(self::$DEFAULT_VALIDATION_OPTIONS, array('only_integer' => false));
+		$configuration = array_merge(self::$DEFAULT_VALIDATION_OPTIONS, ['only_integer' => false]);
 
 		// Notice that for fixnum and float columns empty strings are converted to nil.
 		// Validates whether the value of the specified attribute is numeric by trying to convert it to a float with Kernel.Float
@@ -414,7 +413,7 @@ class Validations
 	 */
 	public function validates_format_of($attrs)
 	{
-		$configuration = array_merge(self::$DEFAULT_VALIDATION_OPTIONS, array('message' => Errors::$DEFAULT_ERROR_MESSAGES['invalid'], 'on' => 'save', 'with' => null));
+		$configuration = array_merge(self::$DEFAULT_VALIDATION_OPTIONS, ['message' => Errors::$DEFAULT_ERROR_MESSAGES['invalid'], 'on' => 'save', 'with' => null]);
 
 		foreach ($attrs as $attr)
 		{
@@ -461,11 +460,11 @@ class Validations
 	 */
 	public function validates_length_of($attrs)
 	{
-		$configuration = array_merge(self::$DEFAULT_VALIDATION_OPTIONS, array(
+		$configuration = array_merge(self::$DEFAULT_VALIDATION_OPTIONS, [
 			'too_long'     => Errors::$DEFAULT_ERROR_MESSAGES['too_long'],
 			'too_short'    => Errors::$DEFAULT_ERROR_MESSAGES['too_short'],
 			'wrong_length' => Errors::$DEFAULT_ERROR_MESSAGES['wrong_length']
-		));
+		]);
 
 		foreach ($attrs as $attr)
 		{
@@ -495,7 +494,7 @@ class Validations
 
 				if (!(Utils::is_a('range', $range)))
 					throw new  ValidationsArgumentError("$range_options[0] must be an array composing a range of numbers with key [0] being less than key [1]");
-				$range_options = array('minimum', 'maximum');
+				$range_options = ['minimum', 'maximum'];
 				$attr['minimum'] = $range[0];
 				$attr['maximum'] = $range[1];
 			}
@@ -511,7 +510,7 @@ class Validations
 
 				if (!($range_option == 'maximum' && is_null($this->model->$attribute)))
 				{
-					$messageOptions = array('is' => 'wrong_length', 'minimum' => 'too_short', 'maximum' => 'too_long');
+					$messageOptions = ['is' => 'wrong_length', 'minimum' => 'too_short', 'maximum' => 'too_long'];
 
 					if (isset($options['message']))
 						$message = $options['message'];
@@ -562,9 +561,9 @@ class Validations
 	 */
 	public function validates_uniqueness_of($attrs)
 	{
-		$configuration = array_merge(self::$DEFAULT_VALIDATION_OPTIONS, array(
+		$configuration = array_merge(self::$DEFAULT_VALIDATION_OPTIONS, [
 			'message' => Errors::$DEFAULT_ERROR_MESSAGES['unique']
-		));
+		]);
 		// Retrieve connection from model for quote_name method
 		$connection = $this->klass->getMethod('connection')->invoke(null);
 
@@ -582,11 +581,11 @@ class Validations
 			else
 			{
 				$add_record = $options[0];
-				$fields = array($options[0]);
+				$fields = [$options[0]];
 			}
 
 			$sql = "";
-			$conditions = array("");
+			$conditions = [""];
 			$pk_quoted = $connection->quote_name($pk[0]);
 			if ($pk_value === null)
 				$sql = "{$pk_quoted} IS NOT NULL";
@@ -606,7 +605,7 @@ class Validations
 
 			$conditions[0] = $sql;
 
-			if ($this->model->exists(array('conditions' => $conditions)))
+			if ($this->model->exists(['conditions' => $conditions]))
 				$this->record->add($add_record, $options['message']);
 		}
 	}
@@ -632,7 +631,7 @@ class Errors implements IteratorAggregate
 	private $model;
 	private $errors;
 
-	public static $DEFAULT_ERROR_MESSAGES = array(
+	public static $DEFAULT_ERROR_MESSAGES = [
 		'inclusion'    => "is not included in the list",
 		'exclusion'    => "is reserved",
 		'invalid'      => "is invalid",
@@ -653,7 +652,7 @@ class Errors implements IteratorAggregate
 		'unique'       => "must be unique",
 		'less_than_or_equal_to' => "must be less than or equal to %d",
 		'greater_than_or_equal_to' => "must be greater than or equal to %d"
-	);
+	];
 
 	/**
 	 * Constructs an {@link Errors} object.
@@ -687,7 +686,7 @@ class Errors implements IteratorAggregate
 			$msg = self :: $DEFAULT_ERROR_MESSAGES['invalid'];
 
 		if (!isset($this->errors[$attribute]))
-			$this->errors[$attribute] = array($msg);
+			$this->errors[$attribute] = [$msg];
 		else
 			$this->errors[$attribute][] = $msg;
 	}
@@ -793,8 +792,7 @@ class Errors implements IteratorAggregate
 	 */
 	public function full_messages()
 	{
-		$full_messages = array();
-
+		$full_messages = [];
 		$this->to_array(function($attribute, $message) use (&$full_messages) {
 			$full_messages[] = $message;
 		});
@@ -814,15 +812,14 @@ class Errors implements IteratorAggregate
 	 * # )
 	 * </code>
 	 *
-	 * @param callable $closure Closure to fetch the errors in some other format (optional)
+	 * @param callable|null $closure Closure to fetch the errors in some other format (optional)
 	 *                       This closure has the signature function($attribute, $message)
 	 *                       and is called for each available error message.
 	 * @return array
 	 */
-	public function to_array($closure=null)
+	public function to_array(callable $closure=null): array
 	{
-		$errors = array();
-
+		$errors = [];
 		if ($this->errors)
 		{
 			foreach ($this->errors as $attribute => $messages)
@@ -872,7 +869,7 @@ class Errors implements IteratorAggregate
 	 */
 	public function clear()
 	{
-		$this->errors = array();
+		$this->errors = [];
 	}
 
 	/**
