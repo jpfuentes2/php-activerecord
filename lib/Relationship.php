@@ -21,6 +21,8 @@ interface InterfaceRelationship
  *
  * @package ActiveRecord
  * @see http://www.phpactiverecord.org/guides/associations
+ *
+ * @property	string|array		$primary_key
  */
 abstract class AbstractRelationship implements InterfaceRelationship
 {
@@ -469,7 +471,7 @@ class HasMany extends AbstractRelationship
 	private $has_one = false;
 	private $through;
 
-	public string|array $foreign_key	= [];
+	public string|array $primary_key	= [];
 
 	/**
 	 * Constructs a {@link HasMany} relationship.
