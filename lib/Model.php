@@ -1754,12 +1754,12 @@ class Model
 	/**
 	 * Determines if the specified array is a valid ActiveRecord options array.
 	 *
-	 * @param array $array An options array
+	 * @param array|string $array An options array
 	 * @param bool $throw True to throw an exception if not valid
 	 * @return boolean True if valid otherwise valse
 	 * @throws {@link ActiveRecordException} if the array contained any invalid options
 	 */
-	public static function is_options_hash(array $array, bool $throw = true): bool
+	public static function is_options_hash(array|string $array, bool $throw = true): bool
 	{
 		if (is_hash($array))
 		{
