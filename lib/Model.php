@@ -1522,11 +1522,11 @@ class Model
 	 * Alias for self::find('first').
 	 *
 	 * @see find
-	 * @return $this The first matched record or null if not found
+	 * @return $this|null The first matched record or null if not found
 	 *
 	 * @throws RecordNotFound
 	 */
-	public static function first(/* ... */): static
+	public static function first(/* ... */): ?static
 	{
 		return call_user_func_array('static::find',array_merge(['first'],func_get_args()));
 	}
@@ -1537,7 +1537,7 @@ class Model
 	 * @see find
 	 * @return $this The last matched record or null if not found
 	 */
-	public static function last(/* ... */): static
+	public static function last(/* ... */): ?static
 	{
 		return call_user_func_array('static::find',array_merge(['last'],func_get_args()));
 	}
