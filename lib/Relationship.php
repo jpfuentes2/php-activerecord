@@ -133,8 +133,8 @@ abstract class AbstractRelationship implements InterfaceRelationship
 		$values = [];
 		$options = $this->options;
 		$inflector = Inflector::instance();
-		$query_key = $query_keys[0];
-		$model_values_key = $model_values_keys[0];
+		$query_key = $query_keys[0] ?? '';
+		$model_values_key = $model_values_keys[0] ?? '';
 
 		foreach ($attributes as $column => $value)
 			$values[] = $value[$inflector->variablize($model_values_key)];
