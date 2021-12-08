@@ -43,7 +43,7 @@ abstract class AbstractRelationship implements InterfaceRelationship
 	 *
 	 * @var string|array
 	 */
-	public string|array $foreign_key;
+	public string|array $foreign_key	= [];
 
 	/**
 	 * Options of the relationship.
