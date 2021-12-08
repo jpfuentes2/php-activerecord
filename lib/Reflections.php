@@ -17,15 +17,15 @@ class Reflections extends Singleton
 	 *
 	 * @var array
 	 */
-	private $reflections = array();
+	private array $reflections	= [];
 
 	/**
 	 * Instantiates a new ReflectionClass for the given class.
 	 *
-	 * @param string|null $class Name of a class
+	 * @param mixed $class Name of a class
 	 * @return Reflections $this so you can chain calls like Reflections::instance()->add('class')->get()
 	 */
-	public function add(string $class = null): static
+	public function add(mixed $class = null): static
 	{
 		$class = $this->get_class($class);
 
@@ -40,10 +40,10 @@ class Reflections extends Singleton
 	 *
 	 * Put this here mainly for testing purposes.
 	 *
-	 * @param string $class Name of a class.
+	 * @param mixed $class Name of a class.
 	 * @return void
 	 */
-	public function destroy(string $class)
+	public function destroy(mixed $class)
 	{
 		if (isset($this->reflections[$class]))
 			$this->reflections[$class] = null;
@@ -52,11 +52,11 @@ class Reflections extends Singleton
 	/**
 	 * Get a cached ReflectionClass.
 	 *
-	 * @param string|null $class Optional name of a class
+	 * @param mixed $class Optional name of a class
 	 * @return mixed null or a ReflectionClass instance
 	 * @throws ActiveRecordException if class was not found
 	 */
-	public function get(string $class = null): mixed
+	public function get(mixed $class = null): mixed
 	{
 		$class = $this->get_class($class);
 
