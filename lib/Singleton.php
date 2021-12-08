@@ -23,10 +23,8 @@ abstract class Singleton
 
 	/**
 	 * Static method for instantiating a singleton object.
-	 *
-	 * @return \ActiveRecord\Singleton
 	 */
-	final public static function instance(): Singleton
+	final public static function instance()
 	{
 		$class_name = static::class;
 
