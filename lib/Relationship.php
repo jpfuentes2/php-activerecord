@@ -466,7 +466,7 @@ class HasMany extends AbstractRelationship
 	 */
 	static protected array $valid_association_options = ['primary_key', 'order', 'group', 'having', 'limit', 'offset', 'through', 'source'];
 
-	public string|array $foreign_key;
+	public string|array $foreign_key	= [];
 
 	private $has_one = false;
 	private $through;
