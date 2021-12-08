@@ -120,14 +120,14 @@ class Model
 	 *
 	 * @var string
 	 */
-	static string $connection;
+	static string $connection	= '';
 
 	/**
 	 * Set to the name of the database this Model's table is in.
 	 *
 	 * @var string
 	 */
-	static string $db;
+	static string $db	= '';
 
 	/**
 	 * Set this to explicitly specify the model's table name if different from inferred name.
@@ -137,21 +137,21 @@ class Model
 	 *
 	 * @var string
 	 */
-	static string $table_name;
+	static string $table_name	= '';
 
 	/**
 	 * Set this to override the default primary key name if different from default name of "id".
 	 *
 	 * @var string
 	 */
-	static string $primary_key;
+	static string $primary_key	= '';
 
 	/**
 	 * Set this to explicitly specify the sequence name for the table.
 	 *
 	 * @var string
 	 */
-	static string $sequence;
+	static string $sequence	= '';
 
 	/**
 	 * Set this to true in your subclass to use caching for this model.
@@ -165,7 +165,7 @@ class Model
 	 *
 	 * @var integer
 	 */
-	static int $cache_expire;
+	static int $cache_expire	= 0;
 
 	/**
 	 * Allows you to create aliases for attributes.
@@ -244,9 +244,9 @@ class Model
 	 */
 	static array $delegate = [];
 
-    protected array $_cacheAttributesData = [];
+	protected array $_cacheAttributesData = [];
 
-    /**
+	/**
 	 * Constructs a model.
 	 *
 	 * When a user instantiates a new object (e.g.: it was not ActiveRecord that instantiated via a find)
