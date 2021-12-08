@@ -293,24 +293,6 @@ class Config extends Singleton
 	}
 
 	/**
-	 * @deprecated
-	 */
-	public function get_date_format()
-	{
-		trigger_error('Use ActiveRecord\Serialization::$DATETIME_FORMAT. Config::get_date_format() has been deprecated.', E_USER_DEPRECATED);
-		return Serialization::$DATETIME_FORMAT;
-	}
-
-	/**
-	 * @deprecated
-	 */
-	public function set_date_format($format)
-	{
-		trigger_error('Use ActiveRecord\Serialization::$DATETIME_FORMAT. Config::set_date_format() has been deprecated.', E_USER_DEPRECATED);
-		Serialization::$DATETIME_FORMAT = $format;
-	}
-
-	/**
 	 * Sets the url for the cache server to enable query caching.
 	 *
 	 * Only table schema queries are cached at the moment. A general query cache
