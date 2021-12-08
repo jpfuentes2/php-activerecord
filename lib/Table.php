@@ -190,7 +190,7 @@ class Table
 				if (is_string($options['conditions']))
 					$options['conditions'] = [$options['conditions']];
 
-				call_user_func_array([$sql,'where'], $options['conditions']);
+				call_user_func_array([$sql,'where'], $options['conditions'] ?? []);
 			}
 			else
 			{
