@@ -1283,13 +1283,13 @@ class Model
      *
      * @internal This should <strong>only</strong> be used by eager load
      *
-     * @param Model  $model
      * @param string $name of relationship for this table
+	 * @param Model  $model
      *
      * @return Model|array|null
      * @throws RelationshipException
      */
-	public function set_relationship_from_eager_load($model=null, $name)
+	public function set_relationship_from_eager_load(string $name, ?Model $model=null): Model|array|null
 	{
 		$table = static::table();
 
@@ -1315,7 +1315,7 @@ class Model
 	 *
 	 * @return Model
 	 */
-	public function reload()
+	public function reload(): Model
 	{
 		$this->__relationships = array();
 		$pk = array_values($this->get_values_for($this->get_primary_key()));
