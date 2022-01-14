@@ -31,14 +31,14 @@ abstract class AbstractRelationship implements InterfaceRelationship
 	 *
 	 * @var string
 	 */
-	public string $attribute_name;
+	public ?string $attribute_name	= null;
 
 	/**
 	 * Class name of the associated model.
 	 *
 	 * @var string
 	 */
-	public string $class_name;
+	public ?string $class_name	= null;
 
 	/**
 	 * Name of the foreign key.
