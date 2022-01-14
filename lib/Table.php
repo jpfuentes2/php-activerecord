@@ -301,7 +301,7 @@ class Table
 	 * @param $includes array eager load directives
 	 * @return void
 	 */
-	private function execute_eager_load(array $models = [], array $attrs = [], array $includes = [])
+	private function execute_eager_load(array $models = [], array $attrs = [], array|string $includes = [])
 	{
 		if (!is_array($includes))
 			$includes = [$includes];
