@@ -31,14 +31,14 @@ abstract class AbstractRelationship implements InterfaceRelationship
 	 *
 	 * @var string
 	 */
-	public string $attribute_name;
+	public ?string $attribute_name	= null;
 
 	/**
 	 * Class name of the associated model.
 	 *
 	 * @var string
 	 */
-	public string $class_name;
+	public ?string $class_name	= null;
 
 	/**
 	 * Name of the foreign key.
@@ -128,7 +128,7 @@ abstract class AbstractRelationship implements InterfaceRelationship
 	 * @param $model_values_keys -> key(s)/value(s) to be used in query from model which is including
 	 * @return void
 	 */
-	protected function query_and_attach_related_models_eagerly(Table $table, array $models, array $attributes, array $includes = [], array $query_keys = [], array $model_values_keys = []): void
+	protected function query_and_attach_related_models_eagerly(Table $table, array $models, array $attributes, array|string $includes = [], array $query_keys = [], array $model_values_keys = []): void
 	{
 		$values = [];
 		$options = $this->options;

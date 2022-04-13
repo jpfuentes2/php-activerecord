@@ -250,10 +250,10 @@ class Table
 	 * @param string $sql
 	 * @param array|null $values
 	 * @param bool $readonly
-	 * @param array|null $includes
+	 * @param array|string|null $includes
 	 * @return array
 	 */
-	public function find_by_sql(string $sql, ?array $values = null, bool $readonly = false, ?array $includes = null): array
+	public function find_by_sql(string $sql, ?array $values = null, bool $readonly = false, array|string $includes = null): array
 	{
 		$this->last_sql = $sql;
 
@@ -301,7 +301,7 @@ class Table
 	 * @param $includes array eager load directives
 	 * @return void
 	 */
-	private function execute_eager_load(array $models = [], array $attrs = [], array $includes = [])
+	private function execute_eager_load(array $models = [], array $attrs = [], array|string $includes = [])
 	{
 		if (!is_array($includes))
 			$includes = [$includes];
