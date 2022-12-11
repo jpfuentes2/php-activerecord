@@ -45,6 +45,7 @@ class Validations
 	private $options = [];
 	private $validators = [];
 	private $record;
+	private ?string $klass;
 
 	private static array $VALIDATION_FUNCTIONS = [
 		'validates_presence_of',
