@@ -316,11 +316,11 @@ abstract class AbstractRelationship implements InterfaceRelationship
 
 	/**
 	 * @param \ActiveRecord\Model $model
-	 * @param array $condition_keys
-	 * @param array $value_keys
+	 * @param array|null $condition_keys
+	 * @param array|null $value_keys
 	 * @return mixed
 	 */
-	protected function create_conditions_from_keys(Model $model, array $condition_keys = [], array $value_keys = []): mixed
+	protected function create_conditions_from_keys(Model $model, ?array $condition_keys = [], ?array $value_keys = []): mixed
 	{
 		$condition_string = implode('_and_', $condition_keys);
 		$condition_values = array_values($model->get_values_for($value_keys));
