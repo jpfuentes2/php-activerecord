@@ -322,7 +322,7 @@ abstract class AbstractRelationship implements InterfaceRelationship
 	 */
 	protected function create_conditions_from_keys(Model $model, ?array $condition_keys = [], ?array $value_keys = []): mixed
 	{
-		$condition_string = implode('_and_', $condition_keys);
+		$condition_string = implode('_and_', is_array($condition_keys) ? $condition_keys : [$condition_keys]);
 		$condition_values = array_values($model->get_values_for($value_keys));
 
 		// return null if all the foreign key values are null so that we don't try to do a query like "id is null"
