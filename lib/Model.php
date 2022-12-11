@@ -1468,7 +1468,7 @@ class Model
 	 */
 	public static function all(/* ... */)
 	{
-		return call_user_func_array('static::find',array_merge(['all'],func_get_args()));
+		return call_user_func_array(__CLASS__ . '::find',array_merge(['all'],func_get_args()));
 	}
 
 	/**
@@ -1492,7 +1492,7 @@ class Model
 			if (is_hash($args[0]))
 				$options['conditions'] = $args[0];
 			else
-				$options['conditions'] = call_user_func_array('static::pk_conditions',$args);
+				$options['conditions'] = call_user_func_array(__CLASS__ . '::pk_conditions',$args);
 		}
 
 		$table = static::table();
@@ -1515,7 +1515,7 @@ class Model
 	 */
 	public static function exists(/* ... */): bool
 	{
-		return call_user_func_array('static::count',func_get_args()) > 0;
+		return call_user_func_array(__CLASS__ . '::count',func_get_args()) > 0;
 	}
 
 	/**
@@ -1528,7 +1528,7 @@ class Model
 	 */
 	public static function first(/* ... */): ?static
 	{
-		return call_user_func_array('static::find',array_merge(['first'],func_get_args()));
+		return call_user_func_array(__CLASS__ . '::find',array_merge(['first'],func_get_args()));
 	}
 
 	/**
@@ -1539,7 +1539,7 @@ class Model
 	 */
 	public static function last(/* ... */): ?static
 	{
-		return call_user_func_array('static::find',array_merge(['last'],func_get_args()));
+		return call_user_func_array(__CLASS__ . '::find',array_merge(['last'],func_get_args()));
 	}
 
 	/**
