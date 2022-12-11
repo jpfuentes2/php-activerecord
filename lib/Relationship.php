@@ -470,6 +470,7 @@ class HasMany extends AbstractRelationship
 
 	private $has_one = false;
 	private $through;
+	private bool $initialized	= false;
 
 	public string|array $primary_key	= [];
 
