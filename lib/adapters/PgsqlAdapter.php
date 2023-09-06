@@ -177,7 +177,7 @@ SQL;
 		if ($matches && !strlen($matches[1])) {
 			return [];
 		}
-		return $matches ? str_getcsv($matches[1]) : $value;
+		return $matches ? str_getcsv($matches[1]) : [$value];
 	}
 
 	private function str_putcsv(array $input, $delimiter = ',', $enclosure = '"')
