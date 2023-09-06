@@ -22,12 +22,12 @@ class PgsqlAdapter extends Connection
 
 	public function get_sequence_name($table, $column_name)
 	{
-		return $column_name !== 'uuid' ? "{$table}_{$column_name}_seq" : null;
+		return "{$table}_{$column_name}_seq";
 	}
 
 	public function next_sequence_value($sequence_name)
 	{
-		return "nextval('" . str_replace("'","\\'",$sequence_name) . "')";
+		return !stristr($sequence_name, 'uuid_seq') ? "nextval('" . str_replace("'","\\'",$sequence_name) . "')" : 'DEFAULT';
 	}
 
 	public function limit($sql, $offset, $limit)
