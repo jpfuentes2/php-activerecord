@@ -355,7 +355,7 @@ class Model
 	 */
 	public function __isset($attribute_name)
 	{
-		return array_key_exists($attribute_name,$this->attributes) || array_key_exists($attribute_name,static::$alias_attribute);
+		return array_key_exists($attribute_name,$this->attributes) || array_key_exists($attribute_name,static::$alias_attribute) || static::table()->get_relationship($attribute_name) || method_exists($this, "get_$attribute_name");
 	}
 
 	/**
@@ -427,6 +427,9 @@ class Model
 
 		foreach (static::$delegate as &$item)
 		{
+			if (!is_array($item)) {
+				continue;
+			}
 			if (($delegated_name = $this->is_delegated($name,$item)))
 				return $this->{$item['to']}->{$delegated_name} = $value;
 		}
@@ -526,6 +529,9 @@ class Model
 
 		foreach (static::$delegate as &$item)
 		{
+			if (!is_array($item)) {
+				continue;
+			}
 			if (($delegated_name = $this->is_delegated($name,$item)))
 			{
 				$to = $item['to'];
@@ -1311,7 +1317,7 @@ class Model
 	 *
 	 * @var array
 	 */
-	static $VALID_OPTIONS = array('conditions', 'limit', 'offset', 'order', 'select', 'joins', 'include', 'readonly', 'group', 'from', 'having');
+	static $VALID_OPTIONS = array('conditions', 'limit', 'offset', 'order', 'select', 'joins', 'include', 'readonly', 'group', 'from', 'having', 'array_placeholders');
 
 	/**
 	 * Enables the use of dynamic finders.
@@ -1665,13 +1671,15 @@ class Model
 			$options['conditions'] = static::pk_conditions($values);
 			$list = $table->find($options);
 		}
+
 		$results = count($list);
+
+		if (!is_array($values)) $values = array($values);
 
 		if ($results != ($expected = count($values)))
 		{
 			$class = get_called_class();
-			if (is_array($values))
-				$values = join(',',$values);
+			$values = join(',',$values);
 
 			if ($expected == 1)
 			{
@@ -1695,7 +1703,7 @@ class Model
 	 * @param array $values An array of values for any parameters that needs to be bound
 	 * @return array An array of models
 	 */
-	public static function find_by_sql($sql, $values=null)
+	public static function find_by_sql($sql, $values=[])
 	{
 		return static::table()->find_by_sql($sql, $values, true);
 	}
@@ -1707,7 +1715,7 @@ class Model
 	 * @param array $values Bind values, if any, for the query
 	 * @return object A PDOStatement object
 	 */
-	public static function query($sql, $values=null)
+	public static function query($sql, $values=[])
 	{
 		return static::connection()->query($sql, $values);
 	}
